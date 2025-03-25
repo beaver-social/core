@@ -1,0 +1,38 @@
+{
+  "name": "@beaver-social/core",
+  "private": true,
+  "homepage": "https://beaversocial.xyz",
+  "license": "UNLICENSED",
+  "contributors": [
+    {
+      "name": "Spandan Barve",
+      "url": "https://github.com/marsian83"
+    },
+    {
+      "name": "Riya Jain",
+      "url": "https://github.com/jriyyya"
+    },
+    {
+      "name": "Kartik Tiwari",
+      "url": "https://github.com/ishtails"
+    }
+  ],
+  "workspaces": [
+    "packages/*",
+    "packages/lib/*"
+  ],
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beaver-social/cli.git"
+  },
+  "packageManager": "bun@1.2.0",
+  "engines": {
+    "bun": ">=1.2.0"
+  }
+}

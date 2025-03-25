@@ -1,0 +1,5 @@
+packages/*
+
+# do NOT ignore packages/public/...
+!packages/public
+!packages/public/**
