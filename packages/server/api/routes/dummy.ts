@@ -1,9 +1,9 @@
 import { Hono } from "hono";
-import { coins } from "../data/posts";
+import { posts } from "../data/posts";
 
 const app = new Hono()
-    .get("/coins", async (ctx) => {
-        return ctx.json({ coins });
+    .get("/posts", async (ctx) => {
+        return ctx.json({ posts }, 200);
     });
 
 export default app;

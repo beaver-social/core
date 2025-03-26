@@ -3,12 +3,12 @@
 
 @layer base {
   :root {
-    --background: rgb(1, 1, 10);
-    --foreground: rgb(255, 255, 255);
-    --primary: oklch(0.707 0.165 254.624);
-    --secondary: oklch(0.627 0.265 303.9);
+    --background: hsl(240, 82%, 2%);
+    --foreground: hsl(240, 76%, 97%);
+    --primary: hsl(211, 100%, 65%);
+    --secondary: hsl(342, 100%, 60%);
     --border: oklch(0.3 0 0);
-    --card: hsl(240, 23%, 8%);
+    --card: hsl(233, 49%, 7%);
   }
 
   * {

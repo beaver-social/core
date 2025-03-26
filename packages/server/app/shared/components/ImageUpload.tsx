@@ -6,10 +6,10 @@ interface IProps {
 
 export default function (props: IProps) {
   const [file, setFile] = useState<File>();
-  const [preview, setPreview] = useState(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
   useEffect(() => {
-    props.setImage(file);
+    file && props.setImage(file);
   }, [file]);
 
   return (
@@ -17,7 +17,7 @@ export default function (props: IProps) {
       <input
         type="file"
         onChange={(e) => {
-          const selectedFile = e.target.files[0];
+          const selectedFile = e.target.files?.[0];
           if (selectedFile) {
             setFile(selectedFile);
             setPreview(URL.createObjectURL(selectedFile));

@@ -1,0 +1,3 @@
+type BeaverClientConfig = {
+    debug?: boolean;
+};

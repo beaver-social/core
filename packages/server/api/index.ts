@@ -1,9 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import dummy from "./routes/dummy";
-import access from "./routes/access";
-import tokens from "./routes/tokens";
-import users from "./routes/users";
 
 let servedSessions = 0;
 const app = new Hono()
@@ -23,15 +20,10 @@ const app = new Hono()
         }),
     )
     .route("dummy", dummy)
-    .route("access", access)
-    .route("tokens", tokens)
-    .route("users", users)
     .get("/stats", async (ctx) => {
         servedSessions++;
-        const privyAppId = Bun.env.PRIVY_APP_ID;
         return ctx.json({
             servedSessions,
-            privyAppId,
         });
     });
 

@@ -1,9 +1,12 @@
 const envKeys = [
-    "PRIVY_APP_ID",
-    "PRIVY_APP_SECRET",
     "SERVER_PRIVATE_KEY",
-    "EVM_NETWORK",
+    // DB
     "DB_FILE_NAME",
+    // R2
+    "R2_ACCESS_KEY_ID",
+    "R2_SECRET_ACCESS_KEY",
+    "R2_BUCKET_NAME",
+    "R2_ENDPOINT",
 ] as const;
 
 type ENV = Record<typeof envKeys[number], string>;

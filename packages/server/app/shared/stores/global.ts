@@ -5,25 +5,19 @@ import { MINUTE } from "../config/constants";
 import apiClient from "../utils/apiClient";
 
 interface IGlobalState {
-    privyAppId: string;
-    init: boolean;
+    ready: boolean;
     actions: {
-        setPrivyAppId: (appId: string) => void;
         initialize: () => void;
     };
 }
 
 const useGlobalStore = create<IGlobalState>()((set) => ({
-    privyAppId: "",
-    init: false,
+    ready: false,
 
     actions: {
-        setPrivyAppId: (appId) => set({ privyAppId: appId }),
-        initialize: () => set({ init: true }),
+        initialize: () => set({ ready: true }),
     },
 }));
-
-export const usePrivyAppId = () => useGlobalStore((state) => state.privyAppId);
 
 export const useGlobalStoreActions = () =>
     useGlobalStore((state) => state.actions);
@@ -34,23 +28,23 @@ export const useServerConfig = () => {
     const serverStats = useQuery({
         queryKey: ["server-stats"],
         queryFn: async () => {
-            const res = await apiClient.stats.$get()
+            const res = await apiClient.stats.$get();
             return res.json();
         },
-        enabled: !globalStore.init,
+        enabled: !globalStore.ready,
         staleTime: 10 * MINUTE,
     });
 
     useEffect(() => {
         if (serverStats.data) {
-            globalStore.actions.setPrivyAppId(serverStats.data.privyAppId);
+            // globalStore.actions.setPrivyAppId(serverStats.data.privyAppId);
             globalStore.actions.initialize();
         }
     }, [serverStats.data]);
 
+    const { actions, ...values } = globalStore;
+
     return {
-        privyAppId: globalStore.privyAppId,
-        loading: (serverStats.isLoading || !globalStore.init ||
-            !globalStore.privyAppId),
+        ...values,
     };
 };
