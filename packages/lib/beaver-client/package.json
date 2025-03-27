@@ -1,0 +1,16 @@
+{
+  "name": "@web3/beaver-client",
+  "version": "1.0.0",
+  "description": "Beaver client library for Web3",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  }
+}
