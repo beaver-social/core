@@ -1,9 +1,17 @@
-import React from 'react'
+import { Link } from "react-router";
 
-type Props = {}
-
-export default function Error404({ }: Props) {
+export default function Error404() {
     return (
-        <div>_404</div>
-    )
+        <section
+            className={"min-h-screen flex flex-col items-center justify-center"}
+        >
+            <h1 className="text-[12rem] uppercase tracking-wider text-muted font-light">
+                404
+            </h1>
+
+            <Link to="/" className={"text-muted"}>
+                Back to Home
+            </Link>
+        </section>
+    );
 }
