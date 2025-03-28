@@ -2,12 +2,21 @@ import { defineConfig } from "vite";
 import devServer from "@hono/vite-dev-server";
 import bunAdapter from "@hono/vite-dev-server/bun";
 import tailwindcss from "@tailwindcss/vite";
-import react from "@vitejs/plugin-react";
 import path from "path";
 
 const port = Bun.env["PORT"] ? Number(Bun.env["PORT"]) : 5173;
 export default defineConfig({
-  server: { port: port },
+  server: {
+    port: port,
+    hmr: {
+      overlay: true,
+      clientPort: port,
+      protocol: "ws",
+    },
+    watch: {
+      usePolling: true,
+    },
+  },
   build: {
     rollupOptions: {
       input: ["./app/main.tsx"],
@@ -22,7 +31,6 @@ export default defineConfig({
   },
   publicDir: "public",
   plugins: [
-    react(),
     tailwindcss(),
     devServer({
       entry: "server.ts",
