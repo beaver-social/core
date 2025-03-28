@@ -13,7 +13,7 @@ const sidebarItems: sidebarItems[] = [
     {
         name: "Home",
         iconName: "House",
-        to: "/dashboard/home",
+        to: "/home",
     },
     {
         name: "Explore",
