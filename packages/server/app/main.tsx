@@ -18,9 +18,11 @@ function App() {
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <Providers>
-          <Router />
-        </Providers>
+        <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+          <Providers>
+            <Router />
+          </Providers>
+        </ThemeProvider>
       </QueryClientProvider>
     </StrictMode>
   );
@@ -32,9 +34,8 @@ function Providers(props: { children: React.ReactNode }) {
   if (!serverConfig.ready) return <></>;
 
   return <>
-    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      {props.children}
-    </ThemeProvider>
+
+    {props.children}
   </>;
 }
 
