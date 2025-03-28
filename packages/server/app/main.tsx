@@ -1,8 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import Router from "./Router.tsx";
-
-import "./tailwind.css";
+// import "./tailwind.css";
 
 import { useServerConfig } from "./shared/stores/global.ts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -26,9 +25,7 @@ function Providers(props: { children: React.ReactNode }) {
 
   return (
     <>
-      {/* <PrivyProvider appId={serverConfig.privyAppId} config={privyConfig}> */}
       {props.children}
-      {/* </PrivyProvider> */}
     </>
   );
 }
