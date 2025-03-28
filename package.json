@@ -13,7 +13,7 @@
       "url": "https://github.com/jriyyya"
     },
     {
-      "name": "Kartik Tiwari",
+      "name": "Kartikay Tiwari",
       "url": "https://github.com/ishtails"
     }
   ],
@@ -22,7 +22,8 @@
     "packages/lib/*"
   ],
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/node": "^22.13.14"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
@@ -35,9 +36,5 @@
   "engines": {
     "bun": ">=1.2.0"
   },
-  "dependencies": {
-    "@radix-ui/react-slot": "^1.1.2",
-    "@radix-ui/react-tooltip": "^1.1.8",
-    "class-variance-authority": "^0.7.1"
-  }
+  "dependencies": {}
 }

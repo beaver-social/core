@@ -1,5 +1,5 @@
 import { DynamicIcon } from "lucide-react/dynamic";
-import { cn } from "../utils/utils";
+import { cn } from "../lib/utils";
 
 type IProps = React.ComponentProps<typeof DynamicIcon>;
 
