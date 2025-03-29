@@ -1,3 +1,6 @@
 {
-    "name": "contracts"
+    "name": "contracts",
+    "scripts": {
+        "mc": "clear && sui move build --skip-fetch-latest-git-deps"
+    }
 }
