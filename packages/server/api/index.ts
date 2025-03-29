@@ -1,7 +1,8 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import dummy from "./routes/dummy";
-import user from "./routes/user";
+import users from "./routes/users";
+import posts from "./routes/posts";
 
 let servedSessions = 0;
 const app = new Hono()
@@ -21,7 +22,8 @@ const app = new Hono()
         }),
     )
     .route("dummy", dummy)
-    .route("user", user)
+    .route("users", users)
+    .route("posts", posts)
     .get("/stats", async (ctx) => {
         servedSessions++;
         return ctx.json({

@@ -5,13 +5,14 @@ import { zValidator } from "@hono/zod-validator";
 import { count, eq } from "drizzle-orm";
 import tryCatchSync from "../lib/tryCatch";
 import { DB } from "../lib/db/schema";
-import { post } from "../lib/db/schema/post";
+import { posts } from "../lib/db/schema/post";
 import { z } from "zod";
 import { zNumberString, zSuiAddress } from "../lib/zod/helpers";
+import { likes } from "../lib/db/schema/like";
+import { replies } from "../lib/db/schema/reply";
 
-const user = new Hono()
-    .get(
-        "/find",
+export default new Hono()
+    .get("/find",
         zValidator(
             "query",
             z.object({
@@ -68,8 +69,8 @@ const user = new Hono()
             return ctx.json({ id: user.id }, 200);
         },
     )
-    .get(
-        ":id",
+
+    .get("/:id",
         zValidator(
             "param",
             z.object({
@@ -85,9 +86,7 @@ const user = new Hono()
         },
     )
 
-
-    .get(
-        "/:id/posts",
+    .get("/:id/posts",
         zValidator(
             "param",
             z.object({
@@ -113,25 +112,69 @@ const user = new Hono()
             }
 
             const offset = (page - 1) * limit;
-            const posts = await db
+            const userPosts = await db
                 .select()
-                .from(post)
-                .where(eq(post.authorId, id))
+                .from(posts)
+                .where(eq(posts.authorId, id))
                 .limit(limit)
                 .offset(offset);
 
             const totalPosts = await db
                 .select({ count: count() })
-                .from(post)
-                .where(eq(post.authorId, id));
+                .from(posts)
+                .where(eq(posts.authorId, id));
 
             return ctx.json({
-                posts,
+                userPosts,
                 totalPosts: totalPosts[0]?.count ?? 0,
                 currentPage: page,
                 perPage: limit,
             }, 200);
         }
-    );
+    )
 
-export default user;
+    .get("/:id/replies",
+        zValidator(
+            "param",
+            z.object({
+                id: zNumberString,
+            }),
+        ),
+        zValidator(
+            "query",
+            z.object({
+                page: zNumberString.default("1"),
+                limit: zNumberString.default("10")
+            }),
+        ),
+        async (ctx) => {
+            const { id } = ctx.req.valid("param");
+
+            // check if page & limit is number when default
+            const { page, limit } = ctx.req.valid("query");
+
+            if (!id) {
+                return ctx.json({ error: "id not provided" }, 400)
+            }
+
+            const offset = (page - 1) * limit;
+            const userReplies = await db
+                .select()
+                .from(replies)
+                .where(eq(replies.userId, id))
+                .limit(limit)
+                .offset(offset);
+
+            const totalReplies = await db
+                .select({ count: count() })
+                .from(replies)
+                .where(eq(replies.userId, id));
+
+            return ctx.json({
+                userReplies,
+                totalPosts: totalReplies[0]?.count ?? 0,
+                currentPage: page,
+                perPage: limit,
+            }, 200);
+        }
+    );
