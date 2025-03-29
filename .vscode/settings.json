@@ -3,5 +3,9 @@
   "editor.formatOnSave": true,
   "tailwindCSS.experimental.classRegex": [
     ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
-  ]
+  ],
+  "workbench.colorTheme": "Tokyo Night Dark",
+  "[move]": {
+    "files.autoSave": "onFocusChange"
+  }
 }
