@@ -95,10 +95,10 @@ export default function ImageCarousel({ images, className = '', aspectRatio }: I
                                 setCurrentIndex(index);
                             }}
                             className={`w-2 h-2 rounded-full transition-colors ${index === currentIndex
-                                ? 'bg-black/60'
+                                ? 'bg-grey-100/60'
                                 : errorImages.has(index)
                                     ? 'bg-red-500'
-                                    : 'bg-black/30'
+                                    : 'bg-grey-100/30'
                                 }`}
                         />
                     ))}

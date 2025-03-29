@@ -52,53 +52,26 @@ function Sidebar() {
                 <ul className="flex flex-col items-center justify-center gap-6 text-grey-300 text-hover">
                     {sidebarItems.map((item, index) => (
                         <li className="btn-icon" key={index}>
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Link to={item.to}>
-                                            <Icon name={item.iconName} className="" />
-                                        </Link>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        {item.name}
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
+                            <Link to={item.to}>
+                                <Icon name={item.iconName} className="" />
+                            </Link>
                         </li>
                     ))}
 
                     <li>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Link to="/dashboard/profile">
-                                        <img src={
-                                            "/images/user.png"
-                                        } alt="user" className="w-[2rem] border rounded-full bg-background" />
-                                    </Link>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    Profile
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                        <Link to="/dashboard/profile">
+                            <img src={
+                                "/images/user.png"
+                            } alt="user" className="w-[2rem] border rounded-full bg-background" />
+                        </Link>
                     </li>
                 </ul>
             </section>
 
             <section className="flex flex-col gap-4 items-center justify-center w-full py-4 mb-2">
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Link to="/dashboard/support">
-                                <Icon name="Settings" className="text-hover" />
-                            </Link>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            Settings
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+                <Link to="/dashboard/settings">
+                    <Icon name="Settings" className="text-hover" />
+                </Link>
             </section>
         </div>
     )

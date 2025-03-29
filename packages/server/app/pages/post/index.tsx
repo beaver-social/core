@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import Icon from "@/shared/components/Icon";
 import PostContent from "./PostContent";
 import ReplyForm from "./ReplyForm";

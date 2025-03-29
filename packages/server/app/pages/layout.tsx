@@ -1,6 +1,7 @@
 import Sidebar from "@/pages/Sidebar";
 import BottomBar from "@/pages/BottomBar";
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
+import TopNav from "./TopNav";
 
 
 type LayoutProps = {
@@ -16,7 +17,11 @@ export default function Layout({ main, secondary }: LayoutProps) {
                 <Sidebar />
 
                 <section className="flex justify-center flex-col px-10 2xl:px-32 sm:ml-[4.5rem] lg:mr-[24rem] items-center">
-                    <div className="w-full mt-8">
+                    <div className="mt-4 w-full">
+                        <TopNav />
+                    </div>
+
+                    <div className="w-full mt-4">
                         {main}
                     </div>
                 </section>
@@ -32,6 +37,9 @@ export default function Layout({ main, secondary }: LayoutProps) {
 
             {/* Mobile Layout */}
             <div className="flex flex-col min-h-screen pb-16 sm:hidden">
+                <div className="fixed w-full p-4 bottom-16 z-50">
+                    <TopNav />
+                </div>
                 <section className="flex-1">
                     <div className="flex flex-col w-full mx-auto">
                         {main}
