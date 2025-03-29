@@ -1,145 +1,135 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog";
-import { Button } from "@/shared/components/ui/button";
-import { useState, useRef, useEffect } from "react";
+import { useState, useCallback, useMemo } from 'react';
+import Cropper from 'react-easy-crop';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from './ui/dialog';
+import { Button } from './ui/button';
+import Icon from './Icon';
 
-interface ImageCropDialogProps {
+type Props = {
     isOpen: boolean;
     onClose: () => void;
     image: File;
-    onCrop: (croppedFile: File) => void;
+    onCrop: (croppedFile: File, aspectRatio: 'square' | 'portrait') => void;
+    initialAspectRatio?: 'square' | 'portrait';
 }
 
-export default function ImageCropDialog({ isOpen, onClose, image, onCrop }: ImageCropDialogProps) {
-    const [aspectRatio, setAspectRatio] = useState<'square' | 'portrait'>('square');
-    const [previewUrl, setPreviewUrl] = useState<string>('');
-    const [cropArea, setCropArea] = useState({ x: 0, y: 0, width: 0, height: 0 });
-    const imageRef = useRef<HTMLImageElement>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
+export default function ImageCropDialog({ isOpen, onClose, image, onCrop, initialAspectRatio }: Props) {
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [aspectRatio, setAspectRatio] = useState<'square' | 'portrait'>(initialAspectRatio || 'square');
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
 
-    useEffect(() => {
-        if (image) {
-            const url = URL.createObjectURL(image);
-            setPreviewUrl(url);
-            return () => URL.revokeObjectURL(url);
-        }
-    }, [image]);
+    // Memoize the image URL to prevent recreating it on every render
+    const imageUrl = useMemo(() => URL.createObjectURL(image), [image]);
 
-    useEffect(() => {
-        if (imageRef.current && containerRef.current) {
-            const img = imageRef.current;
-            const container = containerRef.current;
+    const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+    }, []);
 
-            // Calculate initial crop area
-            const containerWidth = container.clientWidth;
-            const containerHeight = container.clientHeight;
-            const imgWidth = img.naturalWidth;
-            const imgHeight = img.naturalHeight;
+    const createImage = useCallback((url: string): Promise<HTMLImageElement> =>
+        new Promise((resolve, reject) => {
+            const image = new Image();
+            image.addEventListener('load', () => resolve(image));
+            image.addEventListener('error', error => reject(error));
+            image.src = url;
+        }), []);
 
-            let cropWidth, cropHeight;
-            if (aspectRatio === 'square') {
-                cropWidth = cropHeight = Math.min(imgWidth, imgHeight);
-            } else {
-                cropWidth = imgWidth;
-                cropHeight = (imgWidth * 4) / 3;
-            }
-
-            setCropArea({
-                x: (imgWidth - cropWidth) / 2,
-                y: (imgHeight - cropHeight) / 2,
-                width: cropWidth,
-                height: cropHeight
-            });
-        }
-    }, [aspectRatio, image]);
-
-    const handleCrop = async () => {
-        if (!imageRef.current) return;
-
+    const getCroppedImg = useCallback(async (imageSrc: string, pixelCrop: { x: number; y: number; width: number; height: number }) => {
+        const image = await createImage(imageSrc);
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        if (!ctx) return;
 
-        // Set canvas size to crop area
-        canvas.width = cropArea.width;
-        canvas.height = cropArea.height;
+        if (!ctx) {
+            throw new Error('No 2d context');
+        }
 
-        // Draw cropped image
+        // Set canvas size to match the crop size
+        canvas.width = pixelCrop.width;
+        canvas.height = pixelCrop.height;
+
+        // Use imageSmoothingQuality for better performance
+        ctx.imageSmoothingQuality = 'medium';
+        ctx.imageSmoothingEnabled = true;
+
         ctx.drawImage(
-            imageRef.current,
-            cropArea.x,
-            cropArea.y,
-            cropArea.width,
-            cropArea.height,
+            image,
+            pixelCrop.x,
+            pixelCrop.y,
+            pixelCrop.width,
+            pixelCrop.height,
             0,
             0,
-            cropArea.width,
-            cropArea.height
+            pixelCrop.width,
+            pixelCrop.height
         );
 
-        // Convert to blob
-        const blob = await new Promise<Blob>((resolve) => {
+        return new Promise<File>((resolve) => {
             canvas.toBlob((blob) => {
-                if (blob) resolve(blob);
-            }, 'image/jpeg', 0.95);
+                if (!blob) return;
+                const file = new File([blob], image.name, { type: 'image/jpeg' });
+                resolve(file);
+            }, 'image/jpeg', 0.8); // Use 0.8 quality for better performance
         });
+    }, [createImage]);
 
-        // Create new file
-        const croppedFile = new File([blob], image.name, {
-            type: 'image/jpeg',
-            lastModified: Date.now()
-        });
+    const handleCrop = useCallback(async () => {
+        if (!croppedAreaPixels) return;
 
-        onCrop(croppedFile);
-        onClose();
-    };
+        try {
+            const croppedImage = await getCroppedImg(imageUrl, croppedAreaPixels);
+            onCrop(croppedImage, aspectRatio);
+            onClose();
+        } catch (e) {
+            console.error(e);
+        }
+    }, [croppedAreaPixels, imageUrl, aspectRatio, onCrop, onClose, getCroppedImg]);
+
+    // Cleanup the object URL when component unmounts or image changes
+    useCallback(() => {
+        return () => {
+            URL.revokeObjectURL(imageUrl);
+        };
+    }, [imageUrl]);
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[600px]">
+            <DialogContent className="max-w-3xl">
                 <DialogHeader>
                     <DialogTitle>Crop Image</DialogTitle>
                 </DialogHeader>
-                <div className="flex flex-col gap-4">
-                    <div className="flex justify-center gap-4">
+                <div className="relative h-[400px] w-full">
+                    <Cropper
+                        image={imageUrl}
+                        crop={crop}
+                        zoom={zoom}
+                        aspect={aspectRatio === 'square' ? 1 : 3 / 4}
+                        onCropChange={setCrop}
+                        onZoomChange={setZoom}
+                        onCropComplete={onCropComplete}
+                    />
+                </div>
+                {!initialAspectRatio && (
+                    <div className="flex justify-center gap-4 mt-4">
                         <Button
                             variant={aspectRatio === 'square' ? 'default' : 'outline'}
                             onClick={() => setAspectRatio('square')}
                         >
+                            <Icon name="Square" className="mr-2" />
                             Square
                         </Button>
                         <Button
                             variant={aspectRatio === 'portrait' ? 'default' : 'outline'}
                             onClick={() => setAspectRatio('portrait')}
                         >
-                            4:3
+                            <Icon name="Image" className="mr-2" />
+                            3:4 Portrait
                         </Button>
                     </div>
-                    <div
-                        ref={containerRef}
-                        className="relative w-full aspect-square bg-black/5 rounded-lg overflow-hidden"
-                    >
-                        <img
-                            ref={imageRef}
-                            src={previewUrl}
-                            alt="Preview"
-                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-full max-h-full"
-                            style={{
-                                width: cropArea.width,
-                                height: cropArea.height,
-                                objectFit: 'cover'
-                            }}
-                        />
-                    </div>
-                    <div className="flex justify-end gap-2">
-                        <Button variant="outline" onClick={onClose}>
-                            Cancel
-                        </Button>
-                        <Button onClick={handleCrop}>
-                            Crop
-                        </Button>
-                    </div>
-                </div>
+                )}
+                <DialogFooter>
+                    <Button variant="outline" onClick={onClose}>Cancel</Button>
+                    <Button onClick={handleCrop}>Crop & Save</Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );
-} 
+}
