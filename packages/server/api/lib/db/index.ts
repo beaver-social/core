@@ -4,6 +4,7 @@ import schema from "./schema";
 import env from "../../../env";
 
 const sqlite = new Database(env.DB_FILE_NAME!);
+sqlite.exec("PRAGMA foreign_keys = ON");
 const db = drizzle({ client: sqlite, schema: schema, casing: "snake_case" });
 
 export default db;

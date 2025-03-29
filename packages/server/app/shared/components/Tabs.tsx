@@ -1,6 +1,6 @@
 import { NavLink } from "react-router";
 import Icon, { IconType } from "./Icon";
-import { cn } from "../utils/utils";
+import { cn } from "../lib/utils";
 
 export default function () {
   return (
@@ -29,9 +29,9 @@ const navItems: Array<{
   label: string;
   link: string;
 }> = [
-  { icon: "rocket", label: "Launches", link: "/" },
-  { icon: "message-square", label: "Chats", link: "/chats" },
-  { icon: "gem", label: "Rewards", link: "/rewards" },
-  { icon: "plus-circle", label: "Create", link: "/create" },
-  { icon: "wallet", label: "Portfolio", link: "/portfolio" },
-];
+    { icon: "rocket", label: "Launches", link: "/" },
+    { icon: "message-square", label: "Chats", link: "/chats" },
+    { icon: "gem", label: "Rewards", link: "/rewards" },
+    { icon: "plus-circle", label: "Create", link: "/create" },
+    { icon: "wallet", label: "Portfolio", link: "/portfolio" },
+  ];
