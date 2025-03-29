@@ -125,6 +125,7 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    scrollbar-width: thin;
   }
 
   body {
@@ -138,6 +139,18 @@
   border {
     @apply border-border;
   }
+}
+
+@utility text-hover {
+  @apply text-grey-500 hover:text-grey-300 transition-colors cursor-pointer;
+}
+
+@utility btn-icon {
+  @apply size-12 flex hover:bg-secondary items-center justify-center rounded-md text-hover;
+}
+
+@utility glass {
+  @apply backdrop-filter backdrop-blur-[8px];
 }
 
 @theme inline {
@@ -207,22 +220,4 @@
 
   --font-manrope: "Manrope", sans-serif;
   --font-openSans: "Open Sans", sans-serif;
-}
-
-@utility scrollbar-hidden {
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-@utility text-hover {
-  @apply text-grey-500 hover:text-grey-300 transition-colors cursor-pointer;
-}
-
-@utility btn-icon {
-  @apply size-12 flex hover:bg-secondary items-center justify-center rounded-md text-hover;
-}
-
-@utility glass {
-  @apply backdrop-filter backdrop-blur-[8px];
 }

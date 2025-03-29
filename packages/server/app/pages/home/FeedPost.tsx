@@ -1,5 +1,6 @@
 import Icon from "@/shared/components/Icon";
 import { Link } from "react-router";
+import ImageCarousel from "@/shared/components/ImageCarousel";
 
 type FeedPostProps = {
     id: string;
@@ -7,7 +8,8 @@ type FeedPostProps = {
     handle: string;
     timestamp: string;
     content: string;
-    imageUrl?: string;
+    images?: string[];
+    aspectRatio: 'square' | 'portrait';
     likes: number;
     comments: number;
     reposts: number;
@@ -21,7 +23,8 @@ function FeedPost({
     handle,
     timestamp,
     content,
-    imageUrl,
+    images,
+    aspectRatio,
     likes,
     comments,
     reposts,
@@ -43,7 +46,7 @@ function FeedPost({
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 min-w-0">
+                <div className="flex-1">
                     {/* Header */}
                     <div className="flex items-center gap-2">
                         <Link to={`/profile/${handle}`} className="font-semibold hover:underline" onClick={(e) => e.stopPropagation()}>
@@ -59,19 +62,18 @@ function FeedPost({
                         {content}
                     </div>
 
-                    {/* Image if present */}
-                    {imageUrl && (
-                        <div className="mt-3 bg-primary-100 rounded-xl overflow-hidden">
-                            <img
-                                src={imageUrl}
-                                alt="Post content"
-                                className="w-full object-cover"
-                            />
+                    {/* Images if present */}
+                    {images && images.length > 0 && (
+                        <div className="mt-3 cursor-default" onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }}>
+                            <ImageCarousel images={images} aspectRatio={aspectRatio} />
                         </div>
                     )}
 
                     {/* Action Buttons */}
-                    <div className="flex items-center justify-between mt-4 max-w-md">
+                    <div className="flex items-center gap-6 mt-4">
                         <button className="flex items-center gap-2 text-hover group" onClick={(e) => e.stopPropagation()}>
                             <Icon name="MessageCircle" className="w-5 h-5 group-hover:text-primary" />
                             <span className="text-sm">{comments}</span>

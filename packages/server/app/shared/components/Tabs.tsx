@@ -1,37 +1,49 @@
-import { NavLink } from "react-router";
-import Icon, { IconType } from "./Icon";
-import { cn } from "../lib/utils";
+import { cn } from "@/shared/lib/utils";
 
-export default function () {
+export interface Tab {
+  id: string;
+  label: string;
+  content: React.ReactNode;
+}
+
+interface TabsProps {
+  tabs: Tab[];
+  activeTab: string;
+  onTabChange: (tabId: string) => void;
+  className?: string;
+  tabClassName?: string;
+}
+
+function Tabs({ tabs, activeTab, onTabChange, className, tabClassName }: TabsProps) {
   return (
-    <nav className="fixed bottom-0 w-full bg-card/80 backdrop-blur-lg border-t flex justify-around p-4">
-      {navItems.map((item, key) => (
-        <NavLink
-          key={key}
-          to={item.link}
-          className={({ isActive }) =>
-            cn(
-              "flex flex-col items-center gap-1",
-              isActive ? "text-primary" : "text-foreground"
-            )
-          }
-        >
-          <Icon className="size-5" name={item.icon} />
-          <span className="text-xs">{item.label}</span>
-        </NavLink>
-      ))}
-    </nav>
+    <div className={cn("w-full", className)}>
+      {/* Tabs Header */}
+      <div className="sticky glass top-0 z-10 bg-background/50 border-b">
+        <div className="flex">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={cn(
+                "flex-1 py-4 text-center font-semibold",
+                activeTab === tab.id
+                  ? "text-primary border-b border-primary"
+                  : "text-grey-500 hover:text-grey-700",
+                tabClassName
+              )}
+              onClick={() => onTabChange(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      <div className="mt-4">
+        {tabs.find(tab => tab.id === activeTab)?.content}
+      </div>
+    </div>
   );
 }
 
-const navItems: Array<{
-  icon: IconType;
-  label: string;
-  link: string;
-}> = [
-    { icon: "rocket", label: "Launches", link: "/" },
-    { icon: "message-square", label: "Chats", link: "/chats" },
-    { icon: "gem", label: "Rewards", link: "/rewards" },
-    { icon: "plus-circle", label: "Create", link: "/create" },
-    { icon: "wallet", label: "Portfolio", link: "/portfolio" },
-  ];
+export default Tabs;
