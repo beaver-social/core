@@ -1,8 +1,7 @@
 import { sqliteTable as table } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
 import { suiAddressType, timestamps } from "./helpers";
-import { relations } from "drizzle-orm";
-import { posts } from "./post";
+import { post } from "./post";
 
 export const users = table("users", {
     id: t.int().notNull().primaryKey({ autoIncrement: true }),
@@ -16,7 +15,7 @@ export const users = table("users", {
     about: t.text(),
     imageUrl: t.text().notNull().default(""),
     timezone: t.int(),
-    pinned: t.int("pinned_post").references((): t.AnySQLiteColumn => posts.id),
+    pinned: t.int("pinned_post").references((): t.AnySQLiteColumn => post.id),
     ...timestamps,
 }, (table) => [
     t.uniqueIndex("identity_idx").on(table.identity),
