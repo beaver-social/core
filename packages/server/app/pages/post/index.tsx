@@ -1,8 +1,8 @@
 import { useParams } from "react-router";
 import Icon from "@/shared/components/Icon";
-import Layout from "@/pages/dashboard/layout";
 import PostContent from "./PostContent";
 import ReplyForm from "./ReplyForm";
+import Layout from "@/pages/layout";
 
 // Sample data - replace with actual data from your backend
 const samplePost = {
@@ -47,7 +47,7 @@ export default function Post() {
     const { postId } = useParams();
 
     return (
-        <Layout>
+        <Layout main={
             <div className="flex-1 mb-8 border-x max-w-2xl mx-auto">
                 {/* Post Header */}
                 <div className="sticky top-0 z-10 bg-background border-b border-t">
@@ -73,6 +73,6 @@ export default function Post() {
                     ))}
                 </div>
             </div>
-        </Layout>
+        } />
     );
 } 

@@ -1,6 +1,6 @@
-import Icon from "../../shared/components/Icon";
+import Icon from "../shared/components/Icon";
 import type { icons } from "lucide-react";
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./ui/tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "../shared/components/ui/tooltip";
 import { Link } from "react-router";
 
 type sidebarItems = {
@@ -13,7 +13,7 @@ const sidebarItems: sidebarItems[] = [
     {
         name: "Home",
         iconName: "House",
-        to: "/home",
+        to: "/",
     },
     {
         name: "Explore",
@@ -95,7 +95,7 @@ function Sidebar() {
                             </Link>
                         </TooltipTrigger>
                         <TooltipContent>
-                            Notifications
+                            Settings
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>

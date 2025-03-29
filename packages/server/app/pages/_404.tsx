@@ -9,7 +9,7 @@ export default function Error404() {
                 404
             </h1>
 
-            <Link to="/" className={"text-muted"}>
+            <Link to="/" className={"text-foreground"}>
                 Back to Home
             </Link>
         </section>

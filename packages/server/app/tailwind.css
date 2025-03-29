@@ -224,5 +224,5 @@
 }
 
 @utility glass {
-  @apply shadow-md backdrop-filter backdrop-blur-[8px];
+  @apply backdrop-filter backdrop-blur-[8px];
 }

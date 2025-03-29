@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 import Error404 from "./pages/_404";
-import Home from "./pages/dashboard/home";
-import Post from "./pages/dashboard/post";
+import Home from "./pages/home";
+import Post from "./pages/post";
 
 export default function () {
   return (

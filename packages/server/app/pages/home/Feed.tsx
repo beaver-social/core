@@ -94,11 +94,11 @@ function CreatePost() {
 
 function Feed() {
     return (
-        <div className="flex-1 border-x max-w-2xl mx-auto">
+        <div className="flex-1 border-x mx-auto">
             {/* Feed Header */}
-            <div className="sticky top-0 z-10 bg-background border-b">
-                <div className="flex border-b">
-                    <button className="flex-1 py-4 text-center font-semibold text-primary border-b-2 border-primary">
+            <div className="sticky glass top-0 z-10 bg-background/50 border-b">
+                <div className="flex">
+                    <button className="flex-1 py-4 text-center font-semibold text-primary border-b border-primary">
                         For you
                     </button>
                     <button className="flex-1 py-4 text-center text-grey-500 hover:text-grey-700">
