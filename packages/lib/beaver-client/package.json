@@ -1,0 +1,26 @@
+{
+    "name": "@beaver/client",
+    "version": "0.0.1",
+    "description": "The Beaver Social Client for interacting with Beaver Social",
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "license": "MIT",
+    "private": false,
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/beaver-social",
+        "directory": "packages/lib/client"
+    },
+    "scripts": {
+        "prepare": "bun run build",
+        "build": "tsup src/index.ts --format cjs,esm --dts",
+        "dev": "bun run build -- --watch",
+        "docs": "typedoc --out docs"
+    },
+    "devDependencies": {
+        "tsconfig": "*",
+        "typescript": "^5.2.2"
+    },
+    "dependencies": {}
+}
