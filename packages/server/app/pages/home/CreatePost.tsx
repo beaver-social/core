@@ -144,7 +144,7 @@ export default function CreatePost() {
                     />
                     {previewGrid}
                     <div className="flex justify-between items-center mt-2">
-                        <div className="flex gap-4 text-primary">
+                        <div className="flex gap-1 text-primary">
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
@@ -155,7 +155,7 @@ export default function CreatePost() {
                                                 className="hidden"
                                                 onChange={handleFileSelect}
                                             />
-                                            <Icon name="Image" className="size-5" />
+                                            <Icon name="ImagePlus" className="size-5" />
                                         </label>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -167,7 +167,7 @@ export default function CreatePost() {
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <button type="button" className="hover:bg-primary/10 p-2 rounded-full">
-                                            <Icon name="Smile" className="size-5" />
+                                            <Icon name="SmilePlus" className="size-5" />
                                         </button>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -178,7 +178,7 @@ export default function CreatePost() {
                         </div>
                         <button
                             type="submit"
-                            className="bg-primary text-white px-4 py-2 rounded-full font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={!content.trim()}
                         >
                             Post

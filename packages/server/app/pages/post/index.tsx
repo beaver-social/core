@@ -1,8 +1,8 @@
 import { Link, useParams } from "react-router";
 import Icon from "@/shared/components/Icon";
+import Layout from "@/pages/layout";
 import PostContent from "./PostContent";
 import ReplyForm from "./ReplyForm";
-import Layout from "@/pages/layout";
 
 // Sample data - replace with actual data from your backend
 const samplePost = {
@@ -52,7 +52,9 @@ export default function Post() {
                 {/* Post Header */}
                 <div className="sticky top-0 z-10 bg-background border-b border-t">
                     <div className="flex items-center gap-4 p-4">
-                        <Icon name="ArrowLeft" className="size-5 cursor-pointer" />
+                        <Link to="/">
+                            <Icon name="ArrowLeft" className="size-5 cursor-pointer" />
+                        </Link>
                         <div>
                             <h2 className="font-semibold">Post</h2>
                             <p className="text-sm text-grey-500">@{samplePost.handle}</p>

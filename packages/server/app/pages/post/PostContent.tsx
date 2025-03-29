@@ -27,7 +27,7 @@ export default function PostContent({ post }: {
                 </div>
                 <p className="mt-2">{post.content}</p>
                 {post.imageUrl && (
-                    <img src={post.imageUrl} alt="Post content" className="mt-2 rounded-lg max-h-[500px] w-full object-cover" />
+                    <img src={post.imageUrl} alt="Post content" className="mt-2 rounded-lg max-h-[500px] w-full object-cover bg-primary-100 dark:bg-primary-950" />
                 )}
                 <PostActions />
             </div>

@@ -1,17 +1,16 @@
 import Layout from "@/pages/layout"
-import Feed from "./Feed"
 import SecondaryPanel from "../SecondaryPanel"
+import MessagesFeed from "./Feed"
 import PageTitle from "@/shared/components/PageTitle"
-import TopNav from "../TopNav"
 
-export default function Home() {
+export default function Messages() {
     return (
         <Layout main={
             <div>
-                <PageTitle title="beaver social" />
+                <PageTitle title="messages" />
 
                 <div className="w-full">
-                    <Feed />
+                    <MessagesFeed />
                 </div>
             </div>
         } secondary={<SecondaryPanel />} />

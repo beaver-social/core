@@ -1,5 +1,5 @@
+import { Button } from "@/shared/components/ui/button";
 import { Search } from "lucide-react";
-import { Button } from "../../shared/components/ui/button";
 
 export default function SecondaryPanel() {
     return (
