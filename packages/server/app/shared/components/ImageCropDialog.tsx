@@ -12,6 +12,11 @@ type Props = {
     initialAspectRatio?: 'square' | 'portrait';
 }
 
+// Maximum dimensions for web images
+const MAX_WIDTH = 1920;
+const MAX_HEIGHT = 1920;
+const MAX_FILE_SIZE = 1024 * 1024; // 1MB
+
 export default function ImageCropDialog({ isOpen, onClose, image, onCrop, initialAspectRatio }: Props) {
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
@@ -21,7 +26,7 @@ export default function ImageCropDialog({ isOpen, onClose, image, onCrop, initia
     // Memoize the image URL to prevent recreating it on every render
     const imageUrl = useMemo(() => URL.createObjectURL(image), [image]);
 
-    const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
+    const onCropComplete = useCallback((croppedArea: { x: number; y: number; width: number; height: number }, croppedAreaPixels: { x: number; y: number; width: number; height: number }) => {
         setCroppedAreaPixels(croppedAreaPixels);
     }, []);
 
@@ -42,9 +47,20 @@ export default function ImageCropDialog({ isOpen, onClose, image, onCrop, initia
             throw new Error('No 2d context');
         }
 
+        // Calculate dimensions while maintaining aspect ratio
+        let width = pixelCrop.width;
+        let height = pixelCrop.height;
+
+        // Scale down if dimensions exceed maximum
+        if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+            const scale = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
+            width = Math.round(width * scale);
+            height = Math.round(height * scale);
+        }
+
         // Set canvas size to match the crop size
-        canvas.width = pixelCrop.width;
-        canvas.height = pixelCrop.height;
+        canvas.width = width;
+        canvas.height = height;
 
         // Use imageSmoothingQuality for better performance
         ctx.imageSmoothingQuality = 'medium';
@@ -58,16 +74,28 @@ export default function ImageCropDialog({ isOpen, onClose, image, onCrop, initia
             pixelCrop.height,
             0,
             0,
-            pixelCrop.width,
-            pixelCrop.height
+            width,
+            height
         );
 
         return new Promise<File>((resolve) => {
-            canvas.toBlob((blob) => {
-                if (!blob) return;
-                const file = new File([blob], image.name, { type: 'image/jpeg' });
-                resolve(file);
-            }, 'image/jpeg', 0.8); // Use 0.8 quality for better performance
+            let quality = 0.8;
+            const compressImage = () => {
+                canvas.toBlob((blob) => {
+                    if (!blob) return;
+
+                    // If file is still too large, reduce quality and try again
+                    if (blob.size > MAX_FILE_SIZE && quality > 0.1) {
+                        quality -= 0.1;
+                        compressImage();
+                    } else {
+                        const file = new File([blob], image.name, { type: 'image/jpeg' });
+                        resolve(file);
+                    }
+                }, 'image/jpeg', quality);
+            };
+
+            compressImage();
         });
     }, [createImage]);
 
@@ -93,10 +121,10 @@ export default function ImageCropDialog({ isOpen, onClose, image, onCrop, initia
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="max-w-3xl">
-                <DialogHeader>
+                <DialogHeader className="pt-6">
                     <DialogTitle>Crop Image</DialogTitle>
                 </DialogHeader>
-                <div className="relative h-[400px] w-full">
+                <div className="relative h-[500px] w-full bg-black">
                     <Cropper
                         image={imageUrl}
                         crop={crop}
@@ -105,10 +133,12 @@ export default function ImageCropDialog({ isOpen, onClose, image, onCrop, initia
                         onCropChange={setCrop}
                         onZoomChange={setZoom}
                         onCropComplete={onCropComplete}
+                        objectFit="contain"
+                        showGrid={true}
                     />
                 </div>
                 {!initialAspectRatio && (
-                    <div className="flex justify-center gap-4 mt-4">
+                    <div className="flex justify-center gap-4 py-4">
                         <Button
                             variant={aspectRatio === 'square' ? 'default' : 'outline'}
                             onClick={() => setAspectRatio('square')}
@@ -125,7 +155,7 @@ export default function ImageCropDialog({ isOpen, onClose, image, onCrop, initia
                         </Button>
                     </div>
                 )}
-                <DialogFooter>
+                <DialogFooter className="px-6 pb-2">
                     <Button variant="outline" onClick={onClose}>Cancel</Button>
                     <Button onClick={handleCrop}>Crop & Save</Button>
                 </DialogFooter>

@@ -1,13 +1,19 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 import Error404 from "./pages/_404";
 import Home from "./pages/home";
-import Post from "./pages/Post";
+import Post from "./pages/post";
+import Notifications from "./pages/notifications";
+import Messages from "./pages/messages";
+import Message from "./pages/messages/message";
 
 export default function () {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/alerts" element={<Notifications />} />
+        <Route path="/messages" element={<Messages />} />
+        <Route path="/message/:id" element={<Message />} />
         <Route path="post/:id" element={<Post />} />
         <Route path="*" element={<Error404 />} />
       </Routes>

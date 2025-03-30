@@ -1,5 +1,5 @@
 import Icon from "@/shared/components/Icon";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import ImageCarousel from "@/shared/components/ImageCarousel";
 
 type FeedPostProps = {
@@ -31,8 +31,15 @@ function FeedPost({
     shares,
     avatarUrl,
 }: FeedPostProps) {
+    const navigate = useNavigate();
+
     return (
-        <Link to={`/post/${id}`} className="block">
+        <div onClick={
+            (e) => {
+                e.preventDefault();
+                navigate(`/post/${id}`, { state: { postId: id } });
+            }
+        } className="block cursor-pointer">
             <article className="flex gap-4 p-4 border-b hover:bg-secondary/50 transition-colors">
                 {/* Avatar */}
                 <div className="flex-shrink-0">
@@ -93,7 +100,7 @@ function FeedPost({
                     </div>
                 </div>
             </article>
-        </Link>
+        </div>
     );
 }
 
