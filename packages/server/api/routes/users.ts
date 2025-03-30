@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import db from "../lib/db";
 import { users } from "../lib/db/schema/user";
 import { zValidator } from "@hono/zod-validator";
-import { count, eq } from "drizzle-orm";
+import { count, desc, eq, ilike, like, or, sql } from "drizzle-orm";
 import tryCatchSync from "../lib/tryCatch";
 import { DB } from "../lib/db/schema";
 import { posts } from "../lib/db/schema/post";
@@ -12,6 +12,94 @@ import { likes } from "../lib/db/schema/like";
 import { replies } from "../lib/db/schema/reply";
 
 export default new Hono()
+
+    .post("/create", zValidator(
+        "json",
+        z.object({
+            identity: zSuiAddress,
+            username: z.string(),
+            fullName: z.string(),
+            wallet: zSuiAddress,
+            suins_domain_name: zSuiAddress.optional(),
+            image_url: z.string(),
+            banner_url: z.string().optional(),
+            about: z.string().optional(),
+            timezone: zNumberString.optional(),
+            pinned: zNumberString.optional()
+        }),
+    ), async (ctx) => {
+        const { identity, username, fullName, wallet, suins_domain_name, image_url, banner_url, about, timezone, pinned } = ctx.req.valid("json")
+
+        const existingUser = await db.select().from(users).where(eq(users.username, username)).limit(1);
+        if (existingUser.length > 0) {
+            return ctx.json({ error: "Username already taken" }, 400);
+        }
+
+        const existingWallet = await db.select().from(users).where(eq(users.wallet, wallet)).limit(1);
+        if (existingWallet.length > 0) {
+            return ctx.json({ error: "Wallet already linked to some other account" }, 400)
+        }
+
+        if (suins_domain_name) {
+            const existingSuinsDomain = await db.select().from(users).where(eq(users.suins_domain_name, suins_domain_name)).limit(1);
+            if (existingSuinsDomain.length > 0) {
+                return ctx.json({ error: "SuiNDomain already linked to some other account" }, 400)
+            }
+        }
+
+        const [newUser] = await db
+            .insert(users)
+            .values({
+                identity,
+                username,
+                fullName,
+                wallet,
+                suins_domain_name: suins_domain_name || null,
+                image_url,
+                banner_url: banner_url || null,
+                about: about || null,
+                timezone: timezone || null,
+                pinned: pinned || null,
+            })
+            .returning();
+
+        return ctx.json({ user: newUser }, 201);
+
+    }
+    )
+
+    .get("/",
+        zValidator(
+            "query",
+            z.object({
+                page: zNumberString.default("1"),
+                limit: zNumberString.default("10")
+            }),
+        ),
+        async (ctx) => {
+            const { page, limit } = ctx.req.valid("query");
+
+            const offset = (page - 1) * limit;
+            const allUsers = await db
+                .select()
+                .from(users)
+                .orderBy(desc(users.createdAt))
+                .limit(limit)
+                .offset(offset);
+
+            const totalUsers = await db
+                .select({ count: count() })
+                .from(posts)
+
+            return ctx.json({
+                allUsers,
+                totalPosts: totalUsers[0]?.count ?? 0,
+                currentPage: page,
+                perPage: limit,
+            }, 200);
+        },
+    )
+
     .get("/find",
         zValidator(
             "query",
@@ -68,6 +156,34 @@ export default new Hono()
 
             return ctx.json({ id: user.id }, 200);
         },
+    )
+
+    .get("/search",
+        zValidator(
+            "query",
+            z.object({
+                query: z.string(),
+            })
+        ),
+        async (ctx) => {
+            const { query } = ctx.req.valid("query");
+
+            const fuzzyQuery = `%${query.split("").join("%")}%`;
+
+            const usersList = await db
+                .select()
+                .from(users)
+                .where(
+                    or(
+                        sql`${users.username} LIKE ${fuzzyQuery}`,
+                        sql`${users.fullName} LIKE ${fuzzyQuery}`
+                    )
+                )
+                .orderBy(sql`LENGTH(${users.username}) ASC, LENGTH(${users.fullName}) ASC`)
+                .limit(10);
+
+            return ctx.json({ users: usersList }, 200);
+        }
     )
 
     .get("/:id",
@@ -177,4 +293,4 @@ export default new Hono()
                 perPage: limit,
             }, 200);
         }
-    );
+    )
