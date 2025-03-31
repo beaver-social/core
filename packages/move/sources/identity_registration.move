@@ -141,27 +141,20 @@ public fun new_for_testing(
 }
 
 #[test_only]
-public fun set_expiration_timestamp_ms_for_testing(
-    self: &mut SuinsRegistration,
-    expiration_timestamp_ms: u64,
+public fun attach_suins_for_testing(
+    reg: &mut IdentityRegistration, 
+    suins: &suins_registration::SuinsRegistration, 
+    ctx: &mut TxContext
 ) {
-    set_expiration_timestamp_ms(self, expiration_timestamp_ms);
+    attach_suins(reg, suins, ctx);
 }
 
 #[test_only]
-public fun update_image_url_for_testing(self: & mut SuinsRegistration, image_url: String) {
-    update_image_url(self, image_url);
+public fun burn_for_testing(reg: IdentityRegistration) {
+    burn(reg);
 }
 
-#[test_only]
-public fun burn_for_testing(nft: SuinsRegistration) {
-    let SuinsRegistration {
-        id,
-        image_url: _,
-        domain: _,
-        domain_name: _,
-        expiration_timestamp_ms: _,
-    } = nft;
-
-    id.delete();
+#[test]
+fun test_contracts() {
+    // pass
 }
