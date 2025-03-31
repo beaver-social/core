@@ -1,7 +1,6 @@
 import { sqliteTable as table } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
 import { suiAddressType, timestamps } from "./helpers";
-import { relations } from "drizzle-orm";
 import { posts } from "./post";
 
 export const users = table("users", {
@@ -11,10 +10,9 @@ export const users = table("users", {
     fullName: t.text().notNull(),
     wallet: suiAddressType().notNull(),
     suins_domain_name: t.text(),
-    image_url: t.text(),
+    image_url: t.text().notNull(),
     banner_url: t.text(),
     about: t.text(),
-    imageUrl: t.text().notNull().default(""),
     timezone: t.int(),
     pinned: t.int("pinned_post").references((): t.AnySQLiteColumn => posts.id),
     ...timestamps,

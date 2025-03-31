@@ -1,3 +1,4 @@
+import { Button } from "@/shared/components/ui/button";
 import { Link } from "react-router";
 
 export default function Error404() {
@@ -5,13 +6,15 @@ export default function Error404() {
         <section
             className={"min-h-screen flex flex-col items-center justify-center"}
         >
-            <h1 className="text-[12rem] uppercase tracking-wider text-muted font-light">
+            <h1 className="text-[12rem] uppercase tracking-wider text-grey-400 font-light">
                 404
             </h1>
 
-            <Link to="/" className={"text-foreground"}>
-                Back to Home
-            </Link>
+            <Button variant="secondary">
+                <Link to="/">
+                    Back to Home
+                </Link>
+            </Button>
         </section>
     );
 }

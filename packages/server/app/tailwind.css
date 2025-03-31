@@ -83,11 +83,11 @@
   --popover-foreground: oklch(0.985 0 0);
   --accent: #0e1a28;
   --accent-foreground: oklch(0.985 0 0);
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
 
   --card: oklch(0.145 0 0);
   --card-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.637 0.237 25.331);
   --border: oklch(0.269 0 0);
@@ -108,7 +108,6 @@
   --sidebar-ring: oklch(0.439 0 0);
 
   /* styles */
-
   --grey-50: #faffff;
   --grey-100: #f1f5f9;
   --grey-200: #e2e8f0;

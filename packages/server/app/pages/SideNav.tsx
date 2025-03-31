@@ -18,79 +18,79 @@ const sidebarItems: sidebarItems[] = [
     {
         name: "Explore",
         iconName: "Search",
-        to: "/dashboard/explore",
+        to: "/explore",
     },
     {
         name: "Create",
         iconName: "SquarePlus",
-        to: "/dashboard/create",
+        to: "/create",
     },
     {
         name: "Messages",
-        iconName: "MessageCircle",
-        to: "/dashboard/messages",
+        iconName: "MessageSquare",
+        to: "/messages",
     },
     {
-        name: "Notifications",
+        name: "Alerts",
         iconName: "Heart",
-        to: "/dashboard/notification",
+        to: "/alerts",
     },
 ]
 
 function Sidebar() {
     return (
         <div className="fixed bg-background glass h-screen border-r flex-col items-center justify-between hidden sm:flex">
-            <section className="flex flex-col w-[4.5rem] items-center ">
+            <div className="flex flex-col w-[4.5rem] items-center ">
                 <Link to="/">
                     <img src={
                         "/icons/logo_icon.png"
                     } alt="logo" className="py-4 px-4 w-[5.5rem]" />
                 </Link>
-            </section>
+            </div>
 
-            <section className="flex items-center justify-center w-full h-full ">
+            <div className="flex items-center justify-center w-full h-full ">
                 <ul className="flex flex-col items-center justify-center gap-6 text-grey-300 text-hover">
                     {sidebarItems.map((item, index) => (
-                        <li className="btn-icon" key={index}>
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Link to={item.to}>
-                                            <Icon name={item.iconName} className="" />
-                                        </Link>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        {item.name}
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        </li>
-                    ))}
-
-                    <li>
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Link to="/dashboard/profile">
-                                        <img src={
-                                            "/images/user.png"
-                                        } alt="user" className="w-[2rem] border rounded-full bg-background" />
+                                    <Link to={item.to}>
+                                        <li className="btn-icon" key={index}>
+                                            <Icon name={item.iconName} className="" />
+                                        </li>
                                     </Link>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    Profile
+                                    {item.name}
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
-                    </li>
-                </ul>
-            </section>
+                    ))}
 
-            <section className="flex flex-col gap-4 items-center justify-center w-full py-4 mb-2">
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Link to="/dashboard/profile">
+                                    <li>
+                                        <img src={
+                                            "/images/user.png"
+                                        } alt="user" className="w-[2rem] border rounded-full bg-background" />
+                                    </li>
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                Profile
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </ul>
+            </div>
+
+            <div className="flex flex-col gap-4 items-center justify-center w-full py-4 mb-2">
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Link to="/dashboard/support">
+                            <Link to="/dashboard/settings">
                                 <Icon name="Settings" className="text-hover" />
                             </Link>
                         </TooltipTrigger>
@@ -99,7 +99,7 @@ function Sidebar() {
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
-            </section>
+            </div>
         </div>
     )
 }
