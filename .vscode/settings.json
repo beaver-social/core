@@ -2,10 +2,13 @@
   "java.configuration.updateBuildConfiguration": "interactive",
   "editor.formatOnSave": true,
   "tailwindCSS.experimental.classRegex": [
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+    [
+      "cva\\(([^)]*)\\)",
+      "[\"'`]([^\"'`]*).*?[\"'`]"
+    ]
   ],
-  "workbench.colorTheme": "Tokyo Night Dark",
   "[move]": {
     "files.autoSave": "onFocusChange"
-  }
+  },
+  "workbench.colorTheme": "Tokyo Night Dark"
 }
