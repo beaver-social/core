@@ -10,4 +10,5 @@
   "[move]": {
     "files.autoSave": "onFocusChange"
   },
+  "workbench.colorTheme": "Tokyo Night Dark",
 }
