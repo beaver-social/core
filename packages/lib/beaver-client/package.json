@@ -13,7 +13,6 @@
     "directory": "packages/lib/client"
   },
   "scripts": {
-    // "prepare": "bun run build",
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "dev": "bun run build -- --watch",
     "docs": "typedoc --out docs"
