@@ -2,7 +2,7 @@ import Layout from "@/pages/layout"
 import Feed from "./Feed"
 import SecondaryPanel from "../SecondaryPanel"
 import PageTitle from "@/shared/components/PageTitle"
-import TopNav from "../TopNav"
+import TopNav from "../../shared/components/ConnectWallet"
 
 export default function Home() {
     return (

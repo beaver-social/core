@@ -1,7 +1,7 @@
-import Sidebar from "@/pages/SideNav";
+import SideNav from "@/pages/SideNav";
 import BottomBar from "@/pages/BottomBar";
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
-import TopNav from "./TopNav";
+import TopNav from "../shared/components/ConnectWallet";
 import { useLocation } from "react-router";
 import ReplyBar from "./messages/message/ReplyBar";
 
@@ -18,7 +18,7 @@ export default function Layout({ main, secondary }: LayoutProps) {
         <div>
             {/* Desktop Layout */}
             <div className="hidden sm:block">
-                <Sidebar />
+                <SideNav />
 
                 <section className="flex justify-center flex-col px-10 2xl:px-32 sm:ml-[4.5rem] lg:mr-[24rem] items-center">
                     <div className="w-full mt-8">

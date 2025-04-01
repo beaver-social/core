@@ -5,6 +5,7 @@ import Post from "./pages/post";
 import Notifications from "./pages/notifications";
 import Messages from "./pages/messages";
 import Message from "./pages/messages/message";
+import Profile from "./pages/profile";
 
 export default function () {
   return (
@@ -15,6 +16,7 @@ export default function () {
         <Route path="/messages" element={<Messages />} />
         <Route path="/message/:id" element={<Message />} />
         <Route path="post/:id" element={<Post />} />
+        <Route path="/profile/:id" element={<Profile />} />
         <Route path="*" element={<Error404 />} />
       </Routes>
     </BrowserRouter>
