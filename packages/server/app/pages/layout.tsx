@@ -1,10 +1,11 @@
 import SideNav from "@/pages/SideNav";
 import BottomBar from "@/pages/BottomBar";
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
-import TopNav from "../shared/components/ConnectWallet";
 import { useLocation } from "react-router";
 import ReplyBar from "./messages/message/ReplyBar";
-
+import AuthDialog from "@/shared/components/web3/AuthDialog";
+import { Button } from "@/shared/components/ui/button";
+import Icon from "@/shared/components/Icon";
 
 type LayoutProps = {
     main: React.ReactNode;
@@ -31,7 +32,7 @@ export default function Layout({ main, secondary }: LayoutProps) {
                 </section>
 
                 <div className="fixed flex gap-4 bottom-0 right-0 p-5">
-                    <TopNav />
+                    <AuthDialog />
                     <ThemeSwitch />
                 </div>
             </div>
@@ -45,12 +46,16 @@ export default function Layout({ main, secondary }: LayoutProps) {
                 </section>
 
                 <div className="fixed flex gap-4 bottom-16 right-0 p-4">
-                    <TopNav />
+                    <AuthDialog
+                        trigger={
+                            <Button variant="neon" size="icon">
+                                <Icon name="User" />
+                            </Button>
+                        }
+                    />
                 </div>
 
-                {pathname.startsWith("/message/") ? (
-                    <ReplyBar />
-                ) : <BottomBar />}
+                <BottomBar />
             </div>
         </div>
     );

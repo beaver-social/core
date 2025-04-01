@@ -1,4 +1,4 @@
-{replace with your feature request}
+i have to create a dialog / modal auth ui component in my ConnectWallet file.
 
 ---
 
