@@ -37,7 +37,7 @@ const sidebarItems: sidebarItems[] = [
     },
 ]
 
-function Sidebar() {
+export default function SideNav() {
     return (
         <div className="fixed bg-background glass h-screen border-r flex-col items-center justify-between hidden sm:flex">
             <div className="flex flex-col w-[4.5rem] items-center ">
@@ -70,7 +70,7 @@ function Sidebar() {
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Link to="/dashboard/profile">
+                                <Link to="/profile/ishtails">
                                     <li>
                                         <img src={
                                             "/images/user.png"
@@ -103,5 +103,3 @@ function Sidebar() {
         </div>
     )
 }
-
-export default Sidebar;
