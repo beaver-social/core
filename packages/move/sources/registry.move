@@ -31,8 +31,9 @@ fun init(ctx: &mut TxContext) {
 }
 
 public entry fun switch_owners(
-    suins: &suins_registration::SuinsRegistration,
+    registry: Registry,
     identity: &mut IdentityRegistration,
+    suins: &suins_registration::SuinsRegistration,
     ctx: &mut TxContext
 ) {
     let domain_name: string::String = suins_registration::domain_name(suins);
@@ -44,4 +45,6 @@ public entry fun switch_owners(
 
     let sender = tx_context::sender(ctx);
     registration::set_owner(identity, sender);
+
+    table::add(registry.owners)
 }

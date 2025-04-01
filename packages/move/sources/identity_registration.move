@@ -9,6 +9,7 @@ use sui::{
     table
 };
 use suins::suins_registration;
+use beaver_social::test_helpers;
 
 /// Error messages.
 const EInvalidOwner: u64 = 0;
@@ -84,7 +85,7 @@ public(package) fun burn(reg: IdentityRegistration) {
     object::delete(id);
 }
 
-public(package) fun validate_owner(reg: &IdentityRegistration, ctx: &TxContext): bool {
+public(package) fun is_valid_owner(reg: &IdentityRegistration, ctx: &TxContext): bool {
     return reg.identity_data.owner == tx_context::sender(ctx)
 }
 
@@ -130,31 +131,54 @@ public fun image_url(data: &IdentityData): string::String { data.image_url }
 // === Testing ===
 
 #[test_only]
-public fun new_for_testing(
-    name: string::String,
-    image_url: string::String,
-    about: string::String,
-    url: string::String,
-    ctx: &mut TxContext
-): IdentityRegistration {
-    return new(name, image_url, about, url, ctx)
-}
-
-#[test_only]
-public fun attach_suins_for_testing(
-    reg: &mut IdentityRegistration, 
-    suins: &suins_registration::SuinsRegistration, 
-    ctx: &mut TxContext
-) {
-    attach_suins(reg, suins, ctx);
-}
-
-#[test_only]
-public fun burn_for_testing(reg: IdentityRegistration) {
+fun burn_for_testing(reg: IdentityRegistration) {
     burn(reg);
 }
 
+#[test_only]
+fun new_for_testing(ctx: &mut TxContext): IdentityRegistration {
+    return new(
+        string::utf8(b"name"),
+        string::utf8(b"img"),
+        string::utf8(b"about"),
+        string::utf8(b"example"),
+        ctx
+    )
+}
+
 #[test]
-fun test_contracts() {
-    // pass
+fun test_new_identity() {
+    let sender = @0xA;
+    let mut scenario = test_scenario::begin(sender);
+
+    let ctx = test_scenario::ctx(&mut scenario);
+
+    let reg = new_for_testing(ctx);
+
+    assert!(reg.identity_data.name == string::utf8(b"name"), 0);
+    assert!(reg.identity_data.image_url == string::utf8(b"img"), 0);
+    assert!(reg.identity_data.about == string::utf8(b"about"), 0);
+    assert!(reg.identity_data.url == string::utf8(b"example"), 0);
+    assert!(reg.identity_data.suins_domain_name == option::none(), 0);
+
+    burn_for_testing(reg);
+}
+
+#[test]
+fun test_attach_suins() {
+    let ctx = &mut tx_context::dummy();
+
+    let mut reg = new_for_testing(ctx);
+    let suins = test_helpers::new_dummy_suins();
+
+    attach_suins(&mut reg, &suins, ctx);
+
+    let reg_data = identity_data(&reg);
+    let suins_opt = suins_domain_name(reg_data);
+
+    assert!(option::is_some(&suins_opt));
+    assert!(option::borrow(&suins_opt) == suins_registration::domain_name(&suins), 0);
+
+    suins_registration::burn_for_testing(suins);
+    burn_for_testing(reg);
 }

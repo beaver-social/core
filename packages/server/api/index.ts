@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 import dummy from "./routes/dummy";
 import users from "./routes/users";
 import posts from "./routes/posts";
+import nft from "./routes/nft";
 
 let servedSessions = 0;
 const app = new Hono()
@@ -24,6 +25,7 @@ const app = new Hono()
     .route("dummy", dummy)
     .route("users", users)
     .route("posts", posts)
+    .route("nft", nft)
     .get("/stats", async (ctx) => {
         servedSessions++;
         return ctx.json({
