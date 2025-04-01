@@ -132,7 +132,7 @@ const { networkConfig } = createNetworkConfig({
 
 type Network = keyof typeof networkConfig;
 
-export default function Web3Provider({ children }: { children: React.ReactNode }) {
+export function Web3Provider({ children }: { children: React.ReactNode }) {
     const [activeNetwork, setActiveNetwork] = useState<Network>('localnet');
     const { theme } = useTheme();
 

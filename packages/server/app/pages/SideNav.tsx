@@ -21,9 +21,9 @@ const sidebarItems: sidebarItems[] = [
         to: "/explore",
     },
     {
-        name: "Create",
-        iconName: "SquarePlus",
-        to: "/create",
+        name: "Shorts",
+        iconName: "Video",
+        to: "/shorts",
     },
     {
         name: "Messages",

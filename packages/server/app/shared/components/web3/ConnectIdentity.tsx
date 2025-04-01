@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "../ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "../ui/dialog"
-import { NetworkSelector, WalletButton } from "./ConnectWalletComponents"
+import { WalletButton } from "./Wallet"
 import { useTheme } from "@/shared/context/theme-provider";
 import { useCurrentAccount, useDisconnectWallet } from "@mysten/dapp-kit";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ type Props = {
     trigger?: React.ReactNode;
 }
 
-export default function AuthDialog({ open, onOpenChange, trigger }: Props) {
+export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) {
     const [isOpen, setIsOpen] = useState(open || false);
     const { theme } = useTheme();
     const currentAccount = useCurrentAccount();

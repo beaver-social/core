@@ -3,6 +3,7 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/shar
 import { useState, useCallback, useMemo } from "react";
 import ImageCropDialog from "@/shared/components/ImageCropDialog";
 import imageCompression from 'browser-image-compression';
+import { Button } from "@/shared/components/ui/button";
 
 type ImageWithAspectRatio = {
     file: File;
@@ -14,7 +15,7 @@ const compressionOptions = {
     maxWidthOrHeight: 1920,
     useWebWorker: true,
     fileType: 'image/jpeg',
-    initialQuality: 0.8,
+    initialQuality: 0.7,
 };
 
 export default function CreatePost() {
@@ -29,7 +30,6 @@ export default function CreatePost() {
         e.preventDefault();
 
         try {
-            // Compress all images before sending
             const compressedImages = await Promise.all(
                 images.map(async (image) => {
                     const compressedFile = await imageCompression(image.file, compressionOptions);
@@ -176,13 +176,14 @@ export default function CreatePost() {
                                 </Tooltip>
                             </TooltipProvider>
                         </div>
-                        <button
+                        <Button
+                            variant="default"
                             type="submit"
-                            className="bg-primary text-white px-4 py-2 rounded-md font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="rounded-md"
                             disabled={!content.trim()}
                         >
                             Post
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </form>

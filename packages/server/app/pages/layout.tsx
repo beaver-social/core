@@ -3,9 +3,10 @@ import BottomBar from "@/pages/BottomBar";
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
 import { useLocation } from "react-router";
 import ReplyBar from "./messages/message/ReplyBar";
-import AuthDialog from "@/shared/components/web3/AuthDialog";
+import AuthDialog from "@/shared/components/web3/ConnectIdentity";
 import { Button } from "@/shared/components/ui/button";
 import Icon from "@/shared/components/Icon";
+import ConnectIdentity from "@/shared/components/web3/ConnectIdentity";
 
 type LayoutProps = {
     main: React.ReactNode;
@@ -32,7 +33,7 @@ export default function Layout({ main, secondary }: LayoutProps) {
                 </section>
 
                 <div className="fixed flex gap-4 bottom-0 right-0 p-5">
-                    <AuthDialog />
+                    <ConnectIdentity />
                     <ThemeSwitch />
                 </div>
             </div>
