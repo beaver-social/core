@@ -51,20 +51,20 @@ export default function SideNav() {
             <div className="flex items-center justify-center w-full h-full ">
                 <ul className="flex flex-col items-center justify-center gap-6 text-grey-300 text-hover">
                     {sidebarItems.map((item, index) => (
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Link to={item.to}>
-                                        <li className="btn-icon" key={index}>
+                        <li key={index}>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Link className="btn-icon" to={item.to}>
                                             <Icon name={item.iconName} className="" />
-                                        </li>
-                                    </Link>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    {item.name}
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                                        </Link>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        {item.name}
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </li>
                     ))}
 
                     <TooltipProvider>

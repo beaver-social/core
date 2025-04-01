@@ -1,7 +1,7 @@
 import SideNav from "@/pages/SideNav";
 import BottomBar from "@/pages/BottomBar";
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
-import TopNav from "./TopNav";
+import TopNav from "../shared/components/ConnectWallet";
 import { useLocation } from "react-router";
 import ReplyBar from "./messages/message/ReplyBar";
 

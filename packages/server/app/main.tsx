@@ -1,11 +1,13 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import Router from "./Router.tsx";
+import '@mysten/dapp-kit/dist/index.css';
 import "./tailwind.css";
 
 import { useServerConfig } from "./shared/stores/global.ts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "./shared/context/theme-provider.tsx";
+import Web3Provider from "./shared/context/web3context.tsx";
 
 const queryClient = new QueryClient();
 
@@ -34,8 +36,9 @@ function Providers(props: { children: React.ReactNode }) {
   if (!serverConfig.ready) return <></>;
 
   return <>
-
-    {props.children}
+    <Web3Provider>
+      {props.children}
+    </Web3Provider>
   </>;
 }
 
