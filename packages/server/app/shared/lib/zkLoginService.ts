@@ -5,6 +5,7 @@ import {
   genAddressSeed,
   getZkLoginSignature,
   jwtToAddress,
+  getExtendedEphemeralPublicKey,
 } from "@mysten/sui/zklogin";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { Transaction } from "@mysten/sui/transactions";
@@ -181,15 +182,18 @@ export class zkLoginService {
     userSalt: bigint
   ): Promise<any> {
     try {
+      const extendedEphemeralPublicKey = getExtendedEphemeralPublicKey(
+        ephemeralKeyPair.keypair.getPublicKey()
+      );
+
       // Prepare data for the ZK proving request
       const zkpRequestPayload = {
         jwt,
-        extendedEphemeralPublicKey: ephemeralKeyPair.keypair
-          .getPublicKey()
-          .toBase64(),
+        extendedEphemeralPublicKey,
         maxEpoch: ephemeralKeyPair.maxEpoch,
-        randomness: ephemeralKeyPair.randomness,
+        jwtRandomness: ephemeralKeyPair.randomness,
         salt: userSalt.toString(),
+        keyClaimName: "sub",
       };
 
       // Using fetch instead of axios
@@ -197,7 +201,7 @@ export class zkLoginService {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.VITE_ENOKI_API_KEY}`,
+          Authorization: `Bearer ${import.meta.env.VITE_ENOKI_API_KEY}`,
         },
         body: JSON.stringify(zkpRequestPayload),
       });
@@ -253,27 +257,25 @@ export class zkLoginService {
    * Executes all steps of the zkLogin flow
    */
   async completeZkLoginFlow(redirectUrl: string): Promise<ZkLoginData> {
-    // Step 1: Fetch ephemeral key pair from session storage
+    // Fetch ephemeral key pair from session storage
     const ephemeralKeyPair = JSON.parse(
       sessionStorage.getItem("zkLoginEphemeralKeyPair") as string
     );
 
-    console.log("ephemeralKeyPair", ephemeralKeyPair);
-
     // Step 3: Extract and decode JWT (assuming step 2, user login, was done externally)
     const { jwt, decodedJwt } = this.extractAndDecodeJwt(redirectUrl);
 
-    console.log("decodedJwt", decodedJwt);
+    // console.log("decodedJwt", decodedJwt);
 
     // Step 4: Get user salt
     const userSalt = await this.getUserSalt(decodedJwt);
 
-    console.log("userSalt", userSalt);
+    // console.log("userSalt", userSalt);
 
     // Step 5: Generate user's Sui address
     const userAddress = this.computeZkLoginAddress(userSalt, jwt);
 
-    console.log("userAddress", userAddress);
+    // console.log("userAddress", userAddress);
 
     // Step 6: Get zero-knowledge proof
     const zkProof = await this.getZkProof(jwt, ephemeralKeyPair, userSalt);
