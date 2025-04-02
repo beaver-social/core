@@ -1,20 +1,23 @@
-FROM oven/bun:1-alpine AS base
+FROM oven/bun:1.2.8-alpine AS base
 
 WORKDIR /app
 
 COPY package.json ./
 COPY packages/server/package.json ./packages/server/
-COPY packages/lib/beaver-client/package.json ./packages/lib/beaver-client/
-# COPY packages/lib/beaver-core/package.json ./packages/lib/beaver-core/
+COPY packages/lib/beaver-client/package.json ./packagesp/lib/beaver-client/
+# COPY packages/lib/beaver-react/package.json ./packages/lib/beaver-react/
 
-RUN bun install
+RUN bun i
 
 COPY . .
 
-RUN cd packages/server && bun run build
+WORKDIR /app/packages/server
+
+RUN bun run build
 
 ENV NODE_ENV=production
 ENV PORT=3000
+
 EXPOSE 3000
 
-CMD ["bun", "run", "packages/server/src/server"]
+ENTRYPOINT ["bun", "run", "packages/server/server"]
