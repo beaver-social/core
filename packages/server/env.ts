@@ -22,5 +22,6 @@ export function ensureEnv() {
 
   env = Object.fromEntries(envKeys.map((key) => [key, Bun.env[key]])) as ENV;
 }
+ensureEnv();
 
 export default env;

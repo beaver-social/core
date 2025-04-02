@@ -13,6 +13,7 @@ COPY . .
 
 WORKDIR /app/packages/server
 
+ENV DB_FILE_NAME=primary.db
 RUN bun run build
 
 ENV NODE_ENV=production

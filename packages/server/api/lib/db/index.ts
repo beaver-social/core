@@ -3,7 +3,7 @@ import { Database } from "bun:sqlite";
 import schema from "./schema";
 import env from "../../../env";
 
-const sqlite = new Database(env.DB_FILE_NAME!);
+const sqlite = new Database(env.DB_FILE_NAME || "data.db");
 sqlite.exec("PRAGMA foreign_keys = ON");
 const db = drizzle({ client: sqlite, schema: schema, casing: "snake_case" });
 
