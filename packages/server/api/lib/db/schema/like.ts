@@ -12,4 +12,6 @@ export const likes = table("likes", {
     replyId: t.int().references(() => replies.id),
     reaction: t.int(),
     ...timestamps
-});
+}, (table) => [
+    t.index("postId_idx").on(table.postId),
+]);

@@ -2,10 +2,24 @@
   "java.configuration.updateBuildConfiguration": "interactive",
   "editor.formatOnSave": true,
   "tailwindCSS.experimental.classRegex": [
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+    [
+      "cva\\(([^)]*)\\)",
+      "[\"']([^\"']).?[\"'`]"
+    ]
   ],
-  // "workbench.colorTheme": "Tokyo Night Dark",
   "[move]": {
     "files.autoSave": "onFocusChange"
-  }
+  },
+  "background.fullscreen": {
+    "useFront": true,
+    "style": {
+      "background-size": "cover",
+      "background-position": "bottom",
+      "opacity": 0.01
+    },
+    // Local images can be dragged into the browser to quickly get the file protocol address from the address bar
+    "images": [
+      "https://preview.redd.it/girl-enjoying-the-view-of-the-city-with-her-cat-1920-x-1080-v0-btucbeyudd2b1.jpg?auto=webp&s=e144f5b3102ee56e2deeb651cc8866373c2b1c17",
+    ],
+  },
 }
