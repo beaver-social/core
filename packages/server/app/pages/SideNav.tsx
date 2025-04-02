@@ -21,9 +21,9 @@ const sidebarItems: sidebarItems[] = [
         to: "/explore",
     },
     {
-        name: "Create",
-        iconName: "SquarePlus",
-        to: "/create",
+        name: "Shorts",
+        iconName: "Video",
+        to: "/shorts",
     },
     {
         name: "Messages",
@@ -37,7 +37,7 @@ const sidebarItems: sidebarItems[] = [
     },
 ]
 
-function Sidebar() {
+export default function SideNav() {
     return (
         <div className="fixed bg-background glass h-screen border-r flex-col items-center justify-between hidden sm:flex">
             <div className="flex flex-col w-[4.5rem] items-center ">
@@ -51,26 +51,26 @@ function Sidebar() {
             <div className="flex items-center justify-center w-full h-full ">
                 <ul className="flex flex-col items-center justify-center gap-6 text-grey-300 text-hover">
                     {sidebarItems.map((item, index) => (
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Link to={item.to}>
-                                        <li className="btn-icon" key={index}>
+                        <li key={index}>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Link className="btn-icon" to={item.to}>
                                             <Icon name={item.iconName} className="" />
-                                        </li>
-                                    </Link>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    {item.name}
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                                        </Link>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        {item.name}
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </li>
                     ))}
 
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Link to="/dashboard/profile">
+                                <Link to="/profile/ishtails">
                                     <li>
                                         <img src={
                                             "/images/user.png"
@@ -103,5 +103,3 @@ function Sidebar() {
         </div>
     )
 }
-
-export default Sidebar;
