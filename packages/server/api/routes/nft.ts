@@ -1,26 +1,24 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { createCanvas, loadImage } from "canvas";
 
-export default new Hono()
+export default new Hono().get(
+  "/img",
+  zValidator(
+    "query",
+    z.object({
+      name: z.string(),
+      image: z.string(),
+    })
+  ),
+  async (ctx) => {
+    const { name, image } = ctx.req.valid("query");
 
-    .get("/img",
-        zValidator(
-            "query",
-            z.object({
-                name: z.string(),
-                image: z.string(),
-            }),
-        ),
-        async (ctx) => {
-            const { name, image } = ctx.req.valid("query");
+    ctx.header("Content-Type", "image/svg+xml");
 
-            ctx.header("Content-Type", "image/svg+xml");
-
-            return ctx.body(nftSvg(name, image), 200);
-        },
-    )
+    return ctx.body(nftSvg(name, image), 200);
+  }
+);
 
 const nftSvg = (name: string, image: string) => `
 <svg width="640" height="640" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -57,4 +55,4 @@ const nftSvg = (name: string, image: string) => `
     ${name}
   </text>
 </svg>
-`
+`;

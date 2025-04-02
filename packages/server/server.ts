@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import api from "./api";
+import { serveStatic } from "@hono/node-server/serve-static";
 
 import { ensureEnv } from "./env";
 ensureEnv();
@@ -19,7 +20,16 @@ app.use((ctx, next) => {
 });
 
 app.route("api", api);
-app.get("*", (c) => c.html(html));
+if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "prod") {
+  app.use("/*", serveStatic({ root: "./dist" }));
+
+  // SPA fallback
+  app.get("*", async (ctx) =>
+    ctx.html(await Bun.file("./dist/index.html").text())
+  );
+} else {
+  app.get("*", (ctx) => ctx.html(html));
+}
 
 export default {
   ...app,

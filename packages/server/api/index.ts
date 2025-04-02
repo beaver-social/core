@@ -22,12 +22,14 @@ const app = new Hono()
       credentials: true,
       allowMethods: ["POST", "GET", "PATCH", "OPTIONS"],
       allowHeaders: ["Content-Type", "Authorization"],
-    }),
+    })
   )
   .route("dummy", dummy)
   .route("users", users)
   .route("posts", posts)
   .route("replies", replies)
+  .route("nft", nft)
+  .route("oauth", oauth)
   .get("/stats", async (ctx) => {
     servedSessions++;
     return ctx.json({
