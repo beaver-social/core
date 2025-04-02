@@ -21,4 +21,4 @@ ENV PORT=3000
 
 EXPOSE 3000
 
-ENTRYPOINT ["bun", "run", "packages/server/server"]
+ENTRYPOINT ["bun", "run", "app/packages/server/server.ts"]
