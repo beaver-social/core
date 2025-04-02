@@ -21,6 +21,8 @@ app.use((ctx, next) => {
 
 app.route("api", api);
 if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "prod") {
+  log("Production mode detected, serving static files.");
+
   app.use("/*", serveStatic({ root: __dirname + "/dist" }));
 
   // SPA fallback
@@ -28,6 +30,8 @@ if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "prod") {
     ctx.html(await Bun.file(__dirname + "/dist/index.html").text())
   );
 } else {
+  log("Development mode detected.");
+
   app.get("*", (ctx) => ctx.html(html));
 }
 
