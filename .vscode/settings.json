@@ -10,6 +10,10 @@
   "[move]": {
     "files.autoSave": "onFocusChange"
   },
+<<<<<<< HEAD
+  "workbench.colorTheme": "Tokyo Night Dark",
+  "svg.preview.background": "editor",
+=======
   "background.fullscreen": {
     "useFront": true,
     "style": {
@@ -22,4 +26,5 @@
       "https://preview.redd.it/girl-enjoying-the-view-of-the-city-with-her-cat-1920-x-1080-v0-btucbeyudd2b1.jpg?auto=webp&s=e144f5b3102ee56e2deeb651cc8866373c2b1c17",
     ],
   },
+>>>>>>> b070a5fbf311724c6bb78d8fbcbd400f97293168
 }
