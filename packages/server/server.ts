@@ -1,11 +1,16 @@
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import api from "./api";
-import { serveStatic } from "@hono/node-server/serve-static";
-
+import path from "path";
 import { ensureEnv } from "./env";
+import staticRequestsHandler from "./api/middlewares/staticRequestsHandler";
 
-const htmlFile = Bun.file(__dirname + "/index.html");
+const isProd =
+  process.env.NODE_ENV === "production" || process.env.NODE_ENV === "prod";
+
+const htmlFile = Bun.file(
+  path.join(__dirname, isProd ? "dist" : "", "index.html")
+);
 const html = await htmlFile.text();
 
 const app = new Hono();
@@ -13,34 +18,38 @@ const app = new Hono();
 const log = (...data: any[]) => console.log(...data);
 
 app.use(logger(log));
-let envEnsured = false;
 app.use((ctx, next) => {
-  if (!envEnsured) {
-    ensureEnv();
-    envEnsured = true;
-    log("Environment variables successfully ensured.");
-  }
-
   ctx.log = log;
   return next();
 });
 
 app.route("api", api);
-if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "prod") {
+
+app.get("/health", (ctx) => ctx.json({ status: "ok" }));
+
+if (isProd) {
   log("Production mode detected, serving static files.");
 
-  app.use("/*", serveStatic({ root: __dirname + "/dist" }));
-
-  // SPA fallback
-  app.get("*", async (ctx) =>
-    ctx.html(await Bun.file(__dirname + "/dist/index.html").text())
+  app.use(
+    "/static/*",
+    staticRequestsHandler(path.join(__dirname, "dist", "static"))
   );
+
+  let envEnsured = false;
+  app.use((ctx, next) => {
+    if (!envEnsured) {
+      ensureEnv();
+      envEnsured = true;
+      log("Environment variables ensured.");
+    }
+    return next();
+  });
 } else {
   log("Development mode detected.");
-
   ensureEnv();
-  app.get("*", (ctx) => ctx.html(html));
 }
+
+app.get("*", (ctx) => ctx.html(html));
 
 export default {
   ...app,

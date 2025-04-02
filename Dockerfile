@@ -13,12 +13,13 @@ COPY . .
 
 WORKDIR /app/packages/server
 
-ENV DB_FILE_NAME=primary.db
 RUN bun run build
+
+WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=3000
 
 EXPOSE 3000
 
-ENTRYPOINT ["bun", "run", "server"]
+ENTRYPOINT ["bun", "run", "packages/server/server"]
