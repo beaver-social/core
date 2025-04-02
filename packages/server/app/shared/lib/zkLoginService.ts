@@ -56,7 +56,7 @@ export class zkLoginService {
         | "testnet"
         | "mainnet") || "testnet";
     this.GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
-    this.REDIRECT_URL = import.meta.env.VITE_REDIRECT_URL || "";
+    this.REDIRECT_URL = import.meta.env.VITE_GOOGLE_REDIRECT_URL || "";
     this.SALT_SERVICE_URL = import.meta.env.VITE_SALT_SERVICE_URL || "";
     this.ZK_PROVING_SERVICE_URL =
       import.meta.env.VITE_ZK_PROVING_SERVICE_URL ||
@@ -97,7 +97,11 @@ export class zkLoginService {
    */
   generateGoogleOAuthUrl(ephemeralData: EphemeralKeyPair): string {
     // For Google, we use id_token response type
-    return `https://accounts.google.com/o/oauth2/v2/auth?client_id=${this.GOOGLE_CLIENT_ID}&response_type=id_token&redirect_uri=${this.REDIRECT_URL}&scope=openid&nonce=${ephemeralData.nonce}`;
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${this.GOOGLE_CLIENT_ID}&response_type=id_token&redirect_uri=${this.REDIRECT_URL}&scope=openid&nonce=${ephemeralData.nonce}`;
+
+    console.log("oauth url", url);
+
+    return url;
   }
 
   /**
@@ -118,6 +122,7 @@ export class zkLoginService {
     }
 
     const decodedJwt = jwtDecode.jwtDecode(jwt) as JwtPayload;
+
     return { jwt, decodedJwt };
   }
 
@@ -125,7 +130,7 @@ export class zkLoginService {
    * Step 4: Get user salt
    * Fetches a unique salt for the user from salt service
    */
-  async getUserSalt(sub: string): Promise<bigint> {
+  async getUserSalt(jwt: JwtPayload): Promise<bigint> {
     try {
       // This is an example implementation - you should implement your own salt service
       const response = await fetch(this.SALT_SERVICE_URL, {
@@ -134,21 +139,17 @@ export class zkLoginService {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          jwt_token_sub: sub,
+          jwt,
         }),
       });
 
       const data = await response.json();
 
       // Convert the returned salt to a BigInt
-      return BigInt(data.salt);
+      return BigInt(data.salt.integer);
     } catch (error) {
-      // For testing or if no salt service available, generate a random one
-      // In production, salt should be consistent for the same user
-      console.warn(
-        "Salt service unavailable, using random salt (NOT FOR PRODUCTION)"
-      );
-      return BigInt(Math.floor(Math.random() * 1000000000));
+      console.error("Error getting user salt:", error);
+      throw new Error("Failed to get user salt");
     }
   }
 
@@ -196,6 +197,7 @@ export class zkLoginService {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.VITE_ENOKI_API_KEY}`,
         },
         body: JSON.stringify(zkpRequestPayload),
       });
@@ -251,20 +253,32 @@ export class zkLoginService {
    * Executes all steps of the zkLogin flow
    */
   async completeZkLoginFlow(redirectUrl: string): Promise<ZkLoginData> {
-    // Step 1: Generate ephemeral key pair
-    const ephemeralKeyPair = await this.generateEphemeralKeyPair();
+    // Step 1: Fetch ephemeral key pair from session storage
+    const ephemeralKeyPair = JSON.parse(
+      sessionStorage.getItem("zkLoginEphemeralKeyPair") as string
+    );
+
+    console.log("ephemeralKeyPair", ephemeralKeyPair);
 
     // Step 3: Extract and decode JWT (assuming step 2, user login, was done externally)
     const { jwt, decodedJwt } = this.extractAndDecodeJwt(redirectUrl);
 
+    console.log("decodedJwt", decodedJwt);
+
     // Step 4: Get user salt
-    const userSalt = await this.getUserSalt(decodedJwt.sub as string);
+    const userSalt = await this.getUserSalt(decodedJwt);
+
+    console.log("userSalt", userSalt);
 
     // Step 5: Generate user's Sui address
     const userAddress = this.computeZkLoginAddress(userSalt, jwt);
 
+    console.log("userAddress", userAddress);
+
     // Step 6: Get zero-knowledge proof
     const zkProof = await this.getZkProof(jwt, ephemeralKeyPair, userSalt);
+
+    console.log("zkProof", zkProof);
 
     // Return all the zkLogin data
     return {

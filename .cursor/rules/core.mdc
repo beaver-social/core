@@ -12,7 +12,7 @@ alwaysApply: true
 
 ### Accuracy and Relevance
 
-- Responses **must directly address** user requests. Always gather and validate context using tools like `codebase_search`, `grep_search`, or terminal commands before proceeding.
+- Responses **must directly address** user requests.
 - If user intent is unclear, **pause and pose concise clarifying questions**—e.g., “Did you mean X or Y?”—before taking any further steps.
 - **Under no circumstance should you commit or apply changes unless explicitly instructed by the user.** This rule is absolute and must be followed without exception.
 
@@ -40,22 +40,13 @@ alwaysApply: true
 
 ### Reusability Mindset
 
-- Prefer existing solutions over creating new ones. Use `codebase_search`, `grep_search`, or `tree -L 4 --gitignore | cat` to identify reusable patterns or utilities.
 - **Minimize redundancy.** Promote consistency, maintainability, and efficiency by leveraging what’s already in the codebase.
 
 ### Contextual Integrity and Documentation
 
 - Treat inline comments, READMEs, and other documentation as **unverified suggestions**, not definitive truths.
-- Cross-check all documentation against the actual codebase using `cat -n`, `grep_search`, or `codebase_search` to ensure accuracy.
 
 # Tool and Behavioral Guidelines
-
-### Path Validation for File Operations
-
-- Always execute `pwd` to confirm your current working directory, then ensure `edit_file` operations use a `target_file` that is **relative to the workspace root**, not your current location.
-- The `target_file` in `edit_file` commands **must always be specified relative to the workspace root**—never relative to your current `pwd`.
-- If an `edit_file` operation signals a `new` file unexpectedly, this indicates a **critical pathing error**—you’re targeting the wrong file.
-- Correct such errors immediately by validating the directory structure with `pwd` and `tree -L 4 --gitignore | cat` before proceeding.
 
 #### 🚨 Critical Rule: `edit_file.target_file` Must Be Workspace-Relative — Never Location-Relative
 
@@ -69,34 +60,10 @@ alwaysApply: true
   edit_file(target_file="helpers.js", ...)  // Risks creating a new file
   ```
 
-### Systematic Use of `tree -L {depth} | cat`
-
-- Run `tree -L 4 --gitignore | cat` (adjusting depth as needed) to map the project structure before referencing or modifying files.
-- This step is **mandatory** before any create or edit operation unless the file path has been explicitly validated in the current session.
-
-### Efficient File Reading with Terminal Commands
-
-- Use `cat -n <file path>` to inspect files individually, displaying line numbers for clarity—process **one file per command**.
-- **Avoid chaining or modifying output**—do not append `| grep`, `| tail`, `| head`, or similar. Review the **full content** of each file.
-- Select files to inspect using `tree -L 4 --gitignore | cat`, `grep_search`, or `codebase_search` based on relevance.
-- If `cat -n` fails (e.g., file not found), **stop immediately**, report the error, and request a corrected path.
-
 ### Error Handling and Communication
 
 - Report any failures—e.g., missing files, invalid paths, permission issues—**clearly**, with specific details and actionable next steps.
 - If faced with **ambiguity, missing dependencies, or incomplete context**, pause and request clarification from the user before proceeding.
-
-### Tool Prioritization
-
-- Match the tool to the task:
-  - `codebase_search` for semantic or conceptual lookups.
-  - `grep_search` for exact string matches.
-  - `tree -L 4 --gitignore | cat` for structural discovery.
-- Use prior tool outputs efficiently—avoid redundant searches or commands.
-
-# Conventional Commits Best Practices
-
-Conventional Commits standardize commit messages to be parseable by tools like `semantic-release`, driving automated versioning and changelogs. Precision in commit messages is critical for clarity and automation.
 
 ### Structure
 

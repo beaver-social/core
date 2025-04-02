@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { zkLoginService } from "./zkLoginService";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -14,3 +15,5 @@ export function truncateSuiAddress(
   }
   return `${address.slice(0, 6)}...${address.slice(-length)}`;
 }
+
+export const zkLogin = new zkLoginService();

@@ -7,7 +7,7 @@ import { useCurrentAccount, useDisconnectWallet } from "@mysten/dapp-kit";
 import { toast } from "sonner";
 import { formatAddress } from "@mysten/sui/utils";
 import Icon from "../Icon";
-import { zkLoginService } from "@/shared/lib/zkLogin";
+import { zkLogin } from "@/shared/lib/utils";
 
 type Props = {
     open?: boolean;
@@ -22,7 +22,6 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
     const { theme } = useTheme();
     const currentAccount = useCurrentAccount();
     const { mutate: disconnectWallet } = useDisconnectWallet();
-    const zkLogin = new zkLoginService();
 
     // Check for OAuth redirect on component mount
     useEffect(() => {
@@ -81,27 +80,6 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
         onOpenChange?.(newOpen);
     };
 
-    const handleGoogleLogin = async () => {
-        try {
-            // Generate ephemeral keypair
-            const ephemeralKeyPair = await zkLogin.generateEphemeralKeyPair();
-
-            // Store the keypair in session storage (we'll need it after redirect)
-            sessionStorage.setItem('zkLoginEphemeralKeyPair', JSON.stringify({
-                publicKey: ephemeralKeyPair.publicKey,
-                maxEpoch: ephemeralKeyPair.maxEpoch,
-                randomness: ephemeralKeyPair.randomness,
-                nonce: ephemeralKeyPair.nonce
-            }));
-
-            // Generate OAuth URL and redirect
-            const oauthUrl = zkLogin.generateGoogleOAuthUrl(ephemeralKeyPair);
-            window.location.href = oauthUrl;
-        } catch (error: any) {
-            toast.error(`Error initiating login: ${error.message}`);
-        }
-    };
-
     const handleDisconnect = () => {
         // Clear zkLogin data
         sessionStorage.removeItem('zkLoginData');
@@ -116,6 +94,30 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
         toast.success("Identity disconnected");
     };
 
+    async function handleGoogleLogin() {
+        try {
+            // Generate ephemeral keypair
+            const ephemeralKeyPair = await zkLogin.generateEphemeralKeyPair();
+
+            // Store the keypair in session storage (we'll need it after redirect)
+            sessionStorage.setItem(
+                "zkLoginEphemeralKeyPair",
+                JSON.stringify({
+                    publicKey: ephemeralKeyPair.publicKey,
+                    maxEpoch: ephemeralKeyPair.maxEpoch,
+                    randomness: ephemeralKeyPair.randomness,
+                    nonce: ephemeralKeyPair.nonce,
+                })
+            );
+
+            // Generate OAuth URL and redirect
+            const oauthUrl = zkLogin.generateGoogleOAuthUrl(ephemeralKeyPair);
+            window.location.href = oauthUrl;
+        } catch (error: any) {
+            toast.error(`Error initiating login: ${error.message}`);
+        }
+    }
+
     if (currentAccount?.address || zkAddress) {
         return (
             <Button variant="neon" className="w-full" onClick={handleDisconnect}>
@@ -129,7 +131,7 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
         return (
             <Dialog open={isOpen} onOpenChange={handleOpenChange}>
                 <DialogTrigger asChild>
-                    <Button variant="neon" className="w-full">
+                    <Button variant="neon">
                         Connect Identity
                     </Button>
                 </DialogTrigger>

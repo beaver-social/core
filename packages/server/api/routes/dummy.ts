@@ -1,9 +1,7 @@
 import { Hono } from "hono";
-import { posts } from "../data/posts";
 
-const app = new Hono()
-    .get("/posts", async (ctx) => {
-        return ctx.json({ posts }, 200);
-    });
+const app = new Hono().get("/", async (ctx) => {
+  return ctx.json("hey", 200);
+});
 
 export default app;

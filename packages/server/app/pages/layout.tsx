@@ -47,13 +47,7 @@ export default function Layout({ main, secondary }: LayoutProps) {
                 </section>
 
                 <div className="fixed flex gap-4 bottom-16 right-0 p-4">
-                    <AuthDialog
-                        trigger={
-                            <Button variant="neon" size="icon">
-                                <Icon name="User" />
-                            </Button>
-                        }
-                    />
+                    <ConnectIdentity />
                 </div>
 
                 <BottomBar />
