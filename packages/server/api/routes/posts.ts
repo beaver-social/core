@@ -1,13 +1,12 @@
 import { Hono } from "hono";
 import db from "../lib/db";
-import { users } from "../lib/db/schema/user";
 import { zValidator } from "@hono/zod-validator";
-import { count, desc, eq } from "drizzle-orm";
-import { DB } from "../lib/db/schema";
+import { count, desc, eq, like, sql } from "drizzle-orm";
 import { z } from "zod";
-import { zNumberString, zSuiAddress } from "../lib/zod/helpers";
+import { zNumberString } from "../lib/zod/helpers";
 import { posts } from "../lib/db/schema/post";
 import { replies } from "../lib/db/schema/reply";
+import { likes } from "../lib/db/schema/like";
 
 function err(msg: string) {
     return { error: msg }
@@ -23,13 +22,19 @@ export default new Hono()
             }),
         ),
         async (ctx) => {
-            // check if page & limit is number when default
             const { page, limit } = ctx.req.valid("query");
 
             const offset = (page - 1) * limit;
             const allPosts = await db
-                .select()
+                .select({
+                    post: posts,
+                    repliesCount: sql<number>`COALESCE(COUNT(DISTINCT replies.id), 0)`,
+                    likesCount: sql<number>`COALESCE(COUNT(DISTINCT likes.id), 0)`
+                })
                 .from(posts)
+                .leftJoin(replies, eq(posts.id, replies.postId))
+                .leftJoin(likes, eq(posts.id, likes.postId))
+                .groupBy(posts.id)
                 .orderBy(desc(posts.createdAt))
                 .limit(limit)
                 .offset(offset);
@@ -49,17 +54,17 @@ export default new Hono()
 
     )
 
-    .get("/:postId",
+    .get("/:id",
         zValidator(
             "param",
             z.object({
-                postId: zNumberString,
+                id: zNumberString,
             }),
         ),
         async (ctx) => {
-            const { postId } = ctx.req.valid("param");
+            const { id } = ctx.req.valid("param");
 
-            const { 0: post } = await db.select().from(posts).where(eq(posts.id, postId));
+            const { 0: post } = await db.select().from(posts).where(eq(posts.id, id));
 
             if (!post) return ctx.json(err("Post not found"), 404)
 
@@ -67,11 +72,11 @@ export default new Hono()
         },
     )
 
-    .get("/:postId/replies",
+    .get("/:id/replies",
         zValidator(
             "param",
             z.object({
-                postId: zNumberString,
+                id: zNumberString,
             }),
         ),
         zValidator(
@@ -82,12 +87,12 @@ export default new Hono()
             }),
         ),
         async (ctx) => {
-            const { postId } = ctx.req.valid("param");
+            const { id } = ctx.req.valid("param");
 
             // check if page & limit is number when default
             const { page, limit } = ctx.req.valid("query");
 
-            if (!postId) {
+            if (!id) {
                 return ctx.json({ error: "id not provided" }, 400)
             }
 
@@ -95,18 +100,64 @@ export default new Hono()
             const postReplies = await db
                 .select()
                 .from(replies)
-                .where(eq(replies.postId, postId))
+                .where(eq(replies.id, id))
                 .limit(limit)
                 .offset(offset);
 
             const totalReplies = await db
                 .select({ count: count() })
                 .from(replies)
-                .where(eq(replies.userId, postId));
+                .where(eq(replies.id, id));
 
             return ctx.json({
                 postReplies,
                 totalPosts: totalReplies[0]?.count ?? 0,
+                currentPage: page,
+                perPage: limit,
+            }, 200);
+        }
+    )
+
+    .get("/:id/likes",
+        zValidator(
+            "param",
+            z.object({
+                id: zNumberString,
+            }),
+        ),
+        zValidator(
+            "query",
+            z.object({
+                page: zNumberString.default("1"),
+                limit: zNumberString.default("10")
+            }),
+        ),
+        async (ctx) => {
+            const { id } = ctx.req.valid("param");
+
+            // check if page & limit is number when default
+            const { page, limit } = ctx.req.valid("query");
+
+            if (!id) {
+                return ctx.json({ error: "id not provided" }, 400)
+            }
+
+            const offset = (page - 1) * limit;
+            const postLikes = await db
+                .select()
+                .from(likes)
+                .where(eq(likes.id, id))
+                .limit(limit)
+                .offset(offset);
+
+            const totalPostLikes = await db
+                .select({ count: count() })
+                .from(replies)
+                .where(eq(likes.id, id));
+
+            return ctx.json({
+                postLikes,
+                totalPosts: totalPostLikes[0]?.count ?? 0,
                 currentPage: page,
                 perPage: limit,
             }, 200);

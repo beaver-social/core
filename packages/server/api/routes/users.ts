@@ -89,11 +89,11 @@ export default new Hono()
 
             const totalUsers = await db
                 .select({ count: count() })
-                .from(posts)
+                .from(users)
 
             return ctx.json({
                 allUsers,
-                totalPosts: totalUsers[0]?.count ?? 0,
+                totalUsers: totalUsers[0]?.count ?? 0,
                 currentPage: page,
                 perPage: limit,
             }, 200);
@@ -219,9 +219,7 @@ export default new Hono()
         async (ctx) => {
             const { id } = ctx.req.valid("param");
 
-            // check if page & limit is number when default
             const { page, limit } = ctx.req.valid("query");
-
 
             if (!id) {
                 return ctx.json({ error: "id not provided" }, 400)

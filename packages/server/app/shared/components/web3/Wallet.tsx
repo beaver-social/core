@@ -1,6 +1,6 @@
 import { Button } from "@/shared/components/ui/button"
-import { ConnectModal, useCurrentAccount, useSuiClientContext } from '@mysten/dapp-kit';
-import Icon from "./Icon";
+import { ConnectModal, useCurrentAccount, useDisconnectWallet, useSuiClientContext } from '@mysten/dapp-kit';
+import Icon from "../Icon";
 import {
     Select,
     SelectContent,
@@ -12,16 +12,17 @@ import {
 } from "@/shared/components/ui/select"
 import { useState } from "react";
 import { formatAddress } from "@mysten/sui/utils";
+import { toast } from "sonner";
 
 type Props = {}
 
-function NetworkSelector() {
+export function NetworkSelector() {
     const ctx = useSuiClientContext();
 
     return (
         <>
             <Select>
-                <SelectTrigger className="w-[12rem]">
+                <SelectTrigger className="">
                     <SelectValue placeholder="Select a network" />
                 </SelectTrigger>
                 <SelectContent>
@@ -39,14 +40,18 @@ function NetworkSelector() {
     )
 }
 
-export default function ConnectWallet({ }: Props) {
+export function WalletButton() {
     const currentAccount = useCurrentAccount();
+    const { mutate: disconnectWallet } = useDisconnectWallet();
     const [open, setOpen] = useState(false);
 
     if (currentAccount?.address) {
         return (
-            <Button variant="neon" className="">
-                <Icon name="Wallet" />
+            <Button variant="outline" className="w-full" onClick={() => {
+                disconnectWallet();
+                toast.success("Wallet disconnected");
+            }}>
+                <Icon name="LogOut" />
                 {formatAddress(currentAccount?.address)}
             </Button>
         )
@@ -55,7 +60,7 @@ export default function ConnectWallet({ }: Props) {
     return (
         <ConnectModal
             trigger={
-                <Button variant="neon" className="">
+                <Button variant="outline" className="w-full">
                     <Icon name="Wallet" />
                     Connect Wallet
                 </Button>

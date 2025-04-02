@@ -1,10 +1,12 @@
 import SideNav from "@/pages/SideNav";
 import BottomBar from "@/pages/BottomBar";
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
-import TopNav from "../shared/components/ConnectWallet";
 import { useLocation } from "react-router";
 import ReplyBar from "./messages/message/ReplyBar";
-
+import AuthDialog from "@/shared/components/web3/ConnectIdentity";
+import { Button } from "@/shared/components/ui/button";
+import Icon from "@/shared/components/Icon";
+import ConnectIdentity from "@/shared/components/web3/ConnectIdentity";
 
 type LayoutProps = {
     main: React.ReactNode;
@@ -31,7 +33,7 @@ export default function Layout({ main, secondary }: LayoutProps) {
                 </section>
 
                 <div className="fixed flex gap-4 bottom-0 right-0 p-5">
-                    <TopNav />
+                    <ConnectIdentity />
                     <ThemeSwitch />
                 </div>
             </div>
@@ -45,12 +47,10 @@ export default function Layout({ main, secondary }: LayoutProps) {
                 </section>
 
                 <div className="fixed flex gap-4 bottom-16 right-0 p-4">
-                    <TopNav />
+                    <ConnectIdentity />
                 </div>
 
-                {pathname.startsWith("/message/") ? (
-                    <ReplyBar />
-                ) : <BottomBar />}
+                <BottomBar />
             </div>
         </div>
     );
