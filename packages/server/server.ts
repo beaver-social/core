@@ -13,8 +13,13 @@ const app = new Hono();
 const log = (...data: any[]) => console.log(...data);
 
 app.use(logger(log));
+let envEnsured = false;
 app.use((ctx, next) => {
-  ensureEnv();
+  if (!envEnsured) {
+    ensureEnv();
+    envEnsured = true;
+    log("Environment variables successfully ensured.");
+  }
 
   ctx.log = log;
   return next();
