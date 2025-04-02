@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "../ui/dialog"
 import { WalletButton } from "./Wallet"
@@ -7,6 +7,7 @@ import { useCurrentAccount, useDisconnectWallet } from "@mysten/dapp-kit";
 import { toast } from "sonner";
 import { formatAddress } from "@mysten/sui/utils";
 import Icon from "../Icon";
+import { zkLoginService } from "@/shared/lib/zkLogin";
 
 type Props = {
     open?: boolean;
@@ -16,29 +17,118 @@ type Props = {
 
 export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) {
     const [isOpen, setIsOpen] = useState(open || false);
+    const [zkLoginInProgress, setZkLoginInProgress] = useState(false);
+    const [zkAddress, setZkAddress] = useState<string | null>(null);
     const { theme } = useTheme();
     const currentAccount = useCurrentAccount();
     const { mutate: disconnectWallet } = useDisconnectWallet();
+    const zkLogin = new zkLoginService();
+
+    // Check for OAuth redirect on component mount
+    useEffect(() => {
+        const handleOAuthRedirect = async () => {
+            // Check if there is an id_token in the URL (OAuth callback)
+            if (window.location.hash.includes('id_token')) {
+                try {
+                    setZkLoginInProgress(true);
+
+                    // Get ephemeral keypair from session storage
+                    const storedKeyPair = sessionStorage.getItem('zkLoginEphemeralKeyPair');
+                    if (!storedKeyPair) {
+                        throw new Error("No ephemeral keypair found. Please try again.");
+                    }
+
+                    // Complete the zkLogin flow
+                    const zkLoginData = await zkLogin.completeZkLoginFlow(window.location.href);
+
+                    // Save the zkLogin data
+                    setZkAddress(zkLoginData.userAddress);
+                    sessionStorage.setItem('zkLoginData', JSON.stringify({
+                        userAddress: zkLoginData.userAddress,
+                        jwt: zkLoginData.jwt
+                    }));
+
+                    // Clean URL to remove the hash
+                    window.history.replaceState({}, document.title, window.location.pathname);
+
+                    toast.success("Successfully connected with Google");
+                    handleOpenChange(false);
+                } catch (error: any) {
+                    toast.error(`Login failed: ${error.message}`);
+                } finally {
+                    setZkLoginInProgress(false);
+                }
+            }
+        };
+
+        // Check for saved zkLogin data on component mount
+        const savedData = sessionStorage.getItem('zkLoginData');
+        if (savedData) {
+            try {
+                const { userAddress } = JSON.parse(savedData);
+                setZkAddress(userAddress);
+            } catch (e) {
+                // Invalid data in storage, clear it
+                sessionStorage.removeItem('zkLoginData');
+            }
+        }
+
+        handleOAuthRedirect();
+    }, []);
 
     const handleOpenChange = (newOpen: boolean) => {
         setIsOpen(newOpen);
         onOpenChange?.(newOpen);
     };
 
-    if (currentAccount?.address) {
+    const handleGoogleLogin = async () => {
+        try {
+            // Generate ephemeral keypair
+            const ephemeralKeyPair = await zkLogin.generateEphemeralKeyPair();
+
+            // Store the keypair in session storage (we'll need it after redirect)
+            sessionStorage.setItem('zkLoginEphemeralKeyPair', JSON.stringify({
+                publicKey: ephemeralKeyPair.publicKey,
+                maxEpoch: ephemeralKeyPair.maxEpoch,
+                randomness: ephemeralKeyPair.randomness,
+                nonce: ephemeralKeyPair.nonce
+            }));
+
+            // Generate OAuth URL and redirect
+            const oauthUrl = zkLogin.generateGoogleOAuthUrl(ephemeralKeyPair);
+            window.location.href = oauthUrl;
+        } catch (error: any) {
+            toast.error(`Error initiating login: ${error.message}`);
+        }
+    };
+
+    const handleDisconnect = () => {
+        // Clear zkLogin data
+        sessionStorage.removeItem('zkLoginData');
+        sessionStorage.removeItem('zkLoginEphemeralKeyPair');
+        setZkAddress(null);
+
+        // Disconnect wallet if connected
+        if (currentAccount) {
+            disconnectWallet();
+        }
+
+        toast.success("Identity disconnected");
+    };
+
+    if (currentAccount?.address || zkAddress) {
         return (
-            <Button variant="neon" className="w-full" onClick={() => {
-                disconnectWallet();
-                toast.success("Wallet disconnected");
-            }}>
+            <Button variant="neon" className="w-full" onClick={handleDisconnect}>
                 <Icon name="LogOut" />
-                {formatAddress(currentAccount?.address)}
+                {currentAccount?.address
+                    ? formatAddress(currentAccount.address)
+                    : zkAddress && formatAddress(zkAddress)}
             </Button>
         )
     } else {
         return (
             <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-                <DialogTrigger>
+                <DialogTrigger asChild>
                     <Button variant="neon" className="w-full">
                         Connect Identity
                     </Button>
@@ -55,8 +145,17 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
                         <div className="space-y-2">
                             <h3 className="text-sm font-medium text-muted-foreground">Continue with</h3>
                             <div className="grid grid-cols-2 gap-2">
-                                <Button variant="outline" className="w-full">
-                                    <img src="/icons/google_icon.png" alt="Google" className="size-6" />
+                                <Button
+                                    variant="outline"
+                                    className="w-full"
+                                    onClick={handleGoogleLogin}
+                                    disabled={zkLoginInProgress}
+                                >
+                                    {zkLoginInProgress ? (
+                                        <span className="animate-spin">⟳</span>
+                                    ) : (
+                                        <img src="/icons/google_icon.png" alt="Google" className="size-6" />
+                                    )}
                                 </Button>
                                 <Button variant="outline" className="w-full">
                                     {
@@ -100,6 +199,4 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
             </Dialog>
         )
     }
-
-
 }

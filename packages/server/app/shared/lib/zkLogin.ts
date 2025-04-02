@@ -51,15 +51,15 @@ export class zkLoginService {
 
   constructor() {
     this.network =
-      (process.env.REACT_APP_SUI_NETWORK as
+      (import.meta.env.VITE_SUI_NETWORK as
         | "localnet"
         | "testnet"
         | "mainnet") || "testnet";
-    this.GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || "";
-    this.REDIRECT_URL = process.env.REACT_APP_REDIRECT_URL || "";
-    this.SALT_SERVICE_URL = process.env.REACT_APP_SALT_SERVICE_URL || "";
+    this.GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+    this.REDIRECT_URL = import.meta.env.VITE_REDIRECT_URL || "";
+    this.SALT_SERVICE_URL = import.meta.env.VITE_SALT_SERVICE_URL || "";
     this.ZK_PROVING_SERVICE_URL =
-      process.env.REACT_APP_ZK_PROVING_SERVICE_URL ||
+      import.meta.env.VITE_ZK_PROVING_SERVICE_URL ||
       "https://zklogin-dev-api.sui.io/v1";
 
     this.client = new SuiClient({ url: getFullnodeUrl(this.network) });
