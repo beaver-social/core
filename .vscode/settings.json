@@ -11,4 +11,5 @@
     "files.autoSave": "onFocusChange"
   },
   "workbench.colorTheme": "Tokyo Night Dark",
+  "svg.preview.background": "editor",
 }

@@ -16,9 +16,8 @@ const EInvalidOwner: u64 = 0;
 
 public struct IdentityData has store {
     owner: address,
-    name: string::String,
+    username: string::String,
     suins_domain_name: Option<string::String>,
-    image_url: string::String ,
     about: string::String,
     url: string::String,
 }
@@ -49,20 +48,15 @@ fun init(ctx: &mut TxContext) {
 
 public(package) fun new(
     name: string::String,
-    image_url: string::String,
     about: string::String,
-    url: string::String,
     ctx: &mut TxContext,
 ): IdentityRegistration {
     let sender = tx_context::sender(ctx);
 
     let identity_data = IdentityData {
         owner: sender,
-        name: name,
         suins_domain_name: option::none(),
-        image_url: image_url,
         about: about,
-        url: url
     };
     
     let identity_registration = IdentityRegistration {
