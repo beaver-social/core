@@ -4,7 +4,6 @@ import api from "./api";
 import { serveStatic } from "@hono/node-server/serve-static";
 
 import { ensureEnv } from "./env";
-ensureEnv();
 
 const htmlFile = Bun.file(__dirname + "/index.html");
 const html = await htmlFile.text();
@@ -15,6 +14,8 @@ const log = (...data: any[]) => console.log(...data);
 
 app.use(logger(log));
 app.use((ctx, next) => {
+  ensureEnv();
+
   ctx.log = log;
   return next();
 });
@@ -32,6 +33,7 @@ if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "prod") {
 } else {
   log("Development mode detected.");
 
+  ensureEnv();
   app.get("*", (ctx) => ctx.html(html));
 }
 
