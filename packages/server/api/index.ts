@@ -35,6 +35,19 @@ const app = new Hono()
     return ctx.json({
       servedSessions,
     });
+  })
+  .get("/testnet", async (ctx) => {
+    return ctx.json({
+      beaverSocial: {
+        package: "0x",
+        modules: {
+          identity_registration: {
+            address: "0x",
+            functions: [],
+          },
+        },
+      },
+    });
   });
 
 export default app;

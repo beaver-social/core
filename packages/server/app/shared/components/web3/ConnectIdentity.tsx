@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { formatAddress } from "@mysten/sui/utils";
 import Icon from "../Icon";
 import { zkLogin } from "@/shared/lib/utils";
+import { useZkAuthStore } from "@/shared/stores/zustand";
 
 type Props = {
     open?: boolean;
@@ -17,63 +18,12 @@ type Props = {
 
 export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) {
     const [isOpen, setIsOpen] = useState(open || false);
-    const [zkLoginInProgress, setZkLoginInProgress] = useState(false);
-    const [zkAddress, setZkAddress] = useState<string | null>(null);
+    const [zkAddress, setZkAddress] = useState<string | null>();
     const { theme } = useTheme();
     const currentAccount = useCurrentAccount();
     const { mutate: disconnectWallet } = useDisconnectWallet();
 
-    // Check for OAuth redirect on component mount
-    useEffect(() => {
-        const handleOAuthRedirect = async () => {
-            // Check if there is an id_token in the URL (OAuth callback)
-            if (window.location.hash.includes('id_token')) {
-                try {
-                    setZkLoginInProgress(true);
-
-                    // Get ephemeral keypair from session storage
-                    const storedKeyPair = sessionStorage.getItem('zkLoginEphemeralKeyPair');
-                    if (!storedKeyPair) {
-                        throw new Error("No ephemeral keypair found. Please try again.");
-                    }
-
-                    // Complete the zkLogin flow
-                    const zkLoginData = await zkLogin.completeZkLoginFlow(window.location.href);
-
-                    // Save the zkLogin data
-                    setZkAddress(zkLoginData.userAddress);
-                    sessionStorage.setItem('zkLoginData', JSON.stringify({
-                        userAddress: zkLoginData.userAddress,
-                        jwt: zkLoginData.jwt
-                    }));
-
-                    // Clean URL to remove the hash
-                    window.history.replaceState({}, document.title, window.location.pathname);
-
-                    toast.success("Successfully connected with Google");
-                    handleOpenChange(false);
-                } catch (error: any) {
-                    toast.error(`Login failed: ${error.message}`);
-                } finally {
-                    setZkLoginInProgress(false);
-                }
-            }
-        };
-
-        // Check for saved zkLogin data on component mount
-        const savedData = sessionStorage.getItem('zkLoginData');
-        if (savedData) {
-            try {
-                const { userAddress } = JSON.parse(savedData);
-                setZkAddress(userAddress);
-            } catch (e) {
-                // Invalid data in storage, clear it
-                sessionStorage.removeItem('zkLoginData');
-            }
-        }
-
-        handleOAuthRedirect();
-    }, []);
+    const zkAuthStore = useZkAuthStore();
 
     const handleOpenChange = (newOpen: boolean) => {
         setIsOpen(newOpen);
@@ -84,14 +34,13 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
         // Clear zkLogin data
         sessionStorage.removeItem('zkLoginData');
         sessionStorage.removeItem('zkLoginEphemeralKeyPair');
-        setZkAddress(null);
+
+        toast.success("Identity disconnected");
 
         // Disconnect wallet if connected
         if (currentAccount) {
             disconnectWallet();
         }
-
-        toast.success("Identity disconnected");
     };
 
     async function handleGoogleLogin() {
@@ -120,87 +69,71 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
         }
     }
 
-    if (currentAccount?.address || zkAddress) {
-        return (
-            <Button variant="neon" className="w-full" onClick={handleDisconnect}>
-                <Icon name="LogOut" />
-                {currentAccount?.address
-                    ? formatAddress(currentAccount.address)
-                    : zkAddress && formatAddress(zkAddress)}
-            </Button>
-        )
-    } else {
-        return (
-            <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-                <DialogTrigger asChild>
-                    <Button variant="neon">
-                        Connect Identity
-                    </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle className="text-2xl font-bold text-center">Connect to Beaver Social</DialogTitle>
-                        <DialogDescription className="text-center">
-                            Choose your preferred way to connect
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        {/* Social Login Section */}
-                        <div className="space-y-2">
-                            <h3 className="text-sm font-medium text-muted-foreground">Continue with</h3>
-                            <div className="grid grid-cols-2 gap-2">
-                                <Button
-                                    variant="outline"
-                                    className="w-full"
-                                    onClick={handleGoogleLogin}
-                                    disabled={zkLoginInProgress}
-                                >
-                                    {zkLoginInProgress ? (
-                                        <span className="animate-spin">⟳</span>
+    return (
+        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+            <DialogTrigger asChild>
+                <Button variant="neon">
+                    Connect Identity
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold text-center">Connect to Beaver Social</DialogTitle>
+                    <DialogDescription className="text-center">
+                        Choose your preferred way to connect
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                    {/* Social Login Section */}
+                    <div className="space-y-2">
+                        <h3 className="text-sm font-medium text-muted-foreground">Continue with</h3>
+                        <div className="grid grid-cols-2 gap-2">
+                            <Button
+                                variant="outline"
+                                className="w-full"
+                                onClick={handleGoogleLogin}
+                            >
+                                <img src="/icons/google_icon.png" alt="Google" className="size-6" />
+                            </Button>
+                            <Button variant="outline" className="w-full">
+                                {
+                                    theme === "dark" ? (
+                                        <img src="/icons/x_icon_dark.png" alt="X" className="size-7 p-1" />
                                     ) : (
-                                        <img src="/icons/google_icon.png" alt="Google" className="size-6" />
-                                    )}
-                                </Button>
-                                <Button variant="outline" className="w-full">
-                                    {
-                                        theme === "dark" ? (
-                                            <img src="/icons/x_icon_dark.png" alt="X" className="size-7 p-1" />
-                                        ) : (
-                                            <img src="/icons/x_icon_light.png" alt="X" className="size-7 p-1" />
-                                        )
-                                    }
-                                </Button>
-                            </div>
-                        </div>
-
-                        {/* Divider */}
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <span className="w-full border-t" />
-                            </div>
-                            <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-background px-2 text-muted-foreground">
-                                    Or
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Wallet Connect Section */}
-                        <div className="space-y-2">
-                            <h3 className="text-sm font-medium text-muted-foreground">Connect Wallet</h3>
-                            <div className="space-y-2 w-full">
-                                <WalletButton />
-                                {/* <NetworkSelector /> */}
-                            </div>
+                                        <img src="/icons/x_icon_light.png" alt="X" className="size-7 p-1" />
+                                    )
+                                }
+                            </Button>
                         </div>
                     </div>
-                    <DialogFooter>
-                        <p className="text-xs text-muted-foreground">
-                            By connecting, you agree to our <a className="underline" href="/terms-of-service">Terms of Service</a> and <a className="underline" href="/privacy-policy">Privacy Policy</a>
-                        </p>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        )
-    }
+
+                    {/* Divider */}
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-background px-2 text-muted-foreground">
+                                Or
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Wallet Connect Section */}
+                    <div className="space-y-2">
+                        <h3 className="text-sm font-medium text-muted-foreground">Connect Wallet</h3>
+                        <div className="space-y-2 w-full">
+                            <WalletButton />
+                            {/* <NetworkSelector /> */}
+                        </div>
+                    </div>
+                </div>
+                <DialogFooter>
+                    <p className="text-xs text-muted-foreground">
+                        By connecting, you agree to our <a className="underline" href="/terms-of-service">Terms of Service</a> and <a className="underline" href="/privacy-policy">Privacy Policy</a>
+                    </p>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
 }

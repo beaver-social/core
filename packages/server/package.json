@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "bunx --bun vite"
   },
+  "exports": {
+    ".": "./exports.ts"
+  },
   "dependencies": {
     "@hono/zod-validator": "^0.4.3",
     "@libsql/client": "^0.14.0",
