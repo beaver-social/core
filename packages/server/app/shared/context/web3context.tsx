@@ -145,7 +145,7 @@ export function Web3Provider({ children }: { children: React.ReactNode }) {
             onNetworkChange={(network) => {
                 setActiveNetwork(network);
             }}>
-            {/* <RegisterEnokiWallets /> */}
+            <RegisterEnokiWallets />
             <WalletProvider
                 key={theme}
                 theme={theme === 'dark' ? darkTheme : lightTheme}
