@@ -257,30 +257,34 @@ export class zkLoginService {
    * Executes all steps of the zkLogin flow
    */
   async completeZkLoginFlow(redirectUrl: string): Promise<ZkLoginData> {
-    // Fetch ephemeral key pair from session storage
-    const ephemeralKeyPair = JSON.parse(
+    // Fetch ephemeral key pair data from session storage
+    const storedData = JSON.parse(
       sessionStorage.getItem("zkLoginEphemeralKeyPair") as string
     );
+
+    // Reconstruct the Ed25519Keypair from the stored private key bytes
+    const keypair = Ed25519Keypair.fromSecretKey(storedData.privateKeyBytes);
+
+    // Reconstruct the EphemeralKeyPair object
+    const ephemeralKeyPair: EphemeralKeyPair = {
+      keypair,
+      publicKey: storedData.publicKey,
+      maxEpoch: storedData.maxEpoch,
+      randomness: storedData.randomness,
+      nonce: storedData.nonce,
+    };
 
     // Step 3: Extract and decode JWT (assuming step 2, user login, was done externally)
     const { jwt, decodedJwt } = this.extractAndDecodeJwt(redirectUrl);
 
-    // console.log("decodedJwt", decodedJwt);
-
     // Step 4: Get user salt
     const userSalt = await this.getUserSalt(decodedJwt);
-
-    // console.log("userSalt", userSalt);
 
     // Step 5: Generate user's Sui address
     const userAddress = this.computeZkLoginAddress(userSalt, jwt);
 
-    // console.log("userAddress", userAddress);
-
     // Step 6: Get zero-knowledge proof
     const zkProof = await this.getZkProof(jwt, ephemeralKeyPair, userSalt);
-
-    console.log("zkProof", zkProof);
 
     // Return all the zkLogin data
     return {

@@ -18,15 +18,13 @@ const root = createRoot(rootElement);
 
 function App() {
   return (
-    <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-          <Providers>
-            <Router />
-          </Providers>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+        <Providers>
+          <Router />
+        </Providers>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 

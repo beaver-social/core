@@ -98,9 +98,9 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
         try {
             // Generate ephemeral keypair
             const ephemeralKeyPair = await zkLogin.generateEphemeralKeyPair();
-            console.log("ephemeralKeyPair login page", ephemeralKeyPair);
 
-            // Store the keypair in session storage (we'll need it after redirect)
+            // Store only the necessary data in session storage
+            const secretKey = ephemeralKeyPair.keypair.getSecretKey();
             sessionStorage.setItem(
                 "zkLoginEphemeralKeyPair",
                 JSON.stringify({
@@ -108,7 +108,7 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
                     maxEpoch: ephemeralKeyPair.maxEpoch,
                     randomness: ephemeralKeyPair.randomness,
                     nonce: ephemeralKeyPair.nonce,
-                    keypair: ephemeralKeyPair.keypair,
+                    privateKeyBytes: secretKey
                 })
             );
 
