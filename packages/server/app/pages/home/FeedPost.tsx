@@ -42,7 +42,7 @@ function FeedPost({
     const navigate = useNavigate();
     const zkAuthStore = useZkAuthStore();
 
-    async function handleTransaction(e: React.MouseEvent<HTMLButtonElement>) {
+    async function handleLike(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -70,6 +70,31 @@ function FeedPost({
         } catch (error: any) {
             console.log({ error });
             toast.error(`Error liking post: ${error.message}`);
+        }
+    }
+
+    async function handleComment(e: React.MouseEvent<HTMLButtonElement>) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        console.log('Commenting on post queued');
+
+        try {
+            if (!zkAuthStore.zkLoginData) {
+                throw new Error("No zkLogin data found");
+            }
+
+            const message = 'Commenting on post';
+
+            const result = await zkLoginService.zkSignPersonalMessage(
+                zkAuthStore.zkLoginData,
+                message,
+            );
+
+            console.log({ result });
+        } catch (error: any) {
+            console.log({ error });
+            toast.error(`Error commenting on post: ${error.message}`);
         }
     }
 
@@ -121,11 +146,11 @@ function FeedPost({
 
                     {/* Action Buttons */}
                     <div className="flex items-center gap-6 mt-4">
-                        <button className="flex items-center gap-2 text-hover group" onClick={handleTransaction}>
+                        <button className="flex items-center gap-2 text-hover group" onClick={handleLike}>
                             <Icon name="Heart" className="w-5 h-5 group-hover:text-red-500" />
                             <span className="text-sm">{likes}</span>
                         </button>
-                        <button className="flex items-center gap-2 text-hover group" onClick={(e) => e.stopPropagation()}>
+                        <button className="flex items-center gap-2 text-hover group" onClick={handleComment}>
                             <Icon name="MessageCircle" className="w-5 h-5 group-hover:text-primary" />
                             <span className="text-sm">{comments}</span>
                         </button>

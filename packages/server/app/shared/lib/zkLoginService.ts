@@ -242,6 +242,7 @@ class zkLoginService {
   ): EphemeralKeyPair {
     const parsedData = JSON.parse(ephemeralKeyPairString);
     const keypair = Ed25519Keypair.fromSecretKey(parsedData.privateKeyBytes);
+
     return {
       ...parsedData,
       keypair,
@@ -249,27 +250,39 @@ class zkLoginService {
   }
 
   // Create a zkLogin signature that can be used to submit transactions
-  async createZkLoginSignature(
-    zkLoginData: ZkLoginData,
-    transactionBlock: Uint8Array<ArrayBufferLike>
-  ): Promise<string> {
-    // Generate address seed from salt, sub, and aud
+  async zkSignPersonalMessage(
+    zkLoginData: StoredZkLoginData,
+    message: string
+  ): Promise<{ userSignature: string; zkLoginSignature: string }> {
+    const ephemeralKeyPair = this.deserializeEphemeralKeyPair(
+      zkLoginData.ephemeralKeyPairString
+    );
     const aud = zkLoginData.decodedJwt.aud;
-    // Handle the case where aud is an array by using the first element
     const audienceString = Array.isArray(aud) ? aud[0] : (aud as string);
+    const subString = zkLoginData.decodedJwt.sub as string;
 
     const addressSeed = genAddressSeed(
-      zkLoginData.userSalt,
+      BigInt(zkLoginData.userSalt),
       "sub",
-      zkLoginData.decodedJwt.sub as string,
+      subString,
       audienceString
     ).toString();
 
+    // convert string to Uint8Array
+    const messageBytes = new TextEncoder().encode(message);
+
     // Sign the transaction with the ephemeral key
-    const userSignature =
-      await zkLoginData.ephemeralKeyPair.keypair.signPersonalMessage(
-        transactionBlock
-      );
+    const { signature: userSignature } =
+      await ephemeralKeyPair.keypair.signPersonalMessage(messageBytes);
+
+    // Verify the transaction
+    const verified = await ephemeralKeyPair.keypair
+      .getPublicKey()
+      .verifyPersonalMessage(messageBytes, userSignature);
+
+    if (!verified) {
+      throw new Error("Signature verification failed");
+    }
 
     // Create the zkLogin signature
     const zkLoginSignature = getZkLoginSignature({
@@ -277,11 +290,14 @@ class zkLoginService {
         ...zkLoginData.partialZkLoginSignature,
         addressSeed,
       },
-      maxEpoch: zkLoginData.ephemeralKeyPair.maxEpoch,
-      userSignature: userSignature.signature,
+      maxEpoch: ephemeralKeyPair.maxEpoch,
+      userSignature,
     });
 
-    return zkLoginSignature;
+    return {
+      userSignature,
+      zkLoginSignature,
+    };
   }
 
   // Execute a transaction with zkLogin
@@ -315,10 +331,9 @@ class zkLoginService {
         throw new Error("Signature verification failed");
       }
 
-      // Generate address seed
+      // Generate ZKLogin signature
       const aud = zkLoginData.decodedJwt.aud;
       const subString = zkLoginData.decodedJwt.sub as string;
-      // Handle the case where aud is an array by using the first element
       const audienceString = Array.isArray(aud) ? aud[0] : (aud as string);
 
       const addressSeed = genAddressSeed(

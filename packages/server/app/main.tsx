@@ -8,6 +8,7 @@ import { useServerConfig } from "./shared/stores/global.ts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "./shared/context/theme-provider.tsx";
 import { Web3Provider } from "./shared/context/web3context.tsx";
+import { Toaster } from "sonner";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ function App() {
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
         <Providers>
           <Router />
+          <Toaster />
         </Providers>
       </ThemeProvider>
     </QueryClientProvider>
