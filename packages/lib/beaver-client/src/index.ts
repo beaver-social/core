@@ -1,10 +1,10 @@
 
 import Logger from "./logger";
 import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
-import { BeaverClientConfig } from "./types";
+import { BeaverClientConfig, Surface } from "./types";
 import type { API } from "server"
 import { hc } from "hono/client"
-import { Defaults } from "./default";
+import { Defaults } from "./types";
 import { S3Client } from "@aws-sdk/client-s3";
 import { tryCatch } from "./utils/tryCatch";
 import { User } from "./user";
@@ -19,7 +19,7 @@ export class BeaverClient {
     defaults: Defaults;
     logger: Logger;
 
-    constructor(config: BeaverClientConfig) {
+    constructor(surface: Surface, config: BeaverClientConfig) {
         const logger = new Logger("Beaver Social SDK", Boolean(config.debug));
         const rpcUrl = getFullnodeUrl(config.network || 'mainnet');
         const suiClient = new SuiClient({ url: rpcUrl });
@@ -30,6 +30,7 @@ export class BeaverClient {
             apiClient,
             suiClient,
             s3Client,
+            surface,
             contracts: null,
         }
 
