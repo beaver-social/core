@@ -14,18 +14,21 @@ use suins::suins_registration;
 
 use beaver_social::test_helpers;
 
+/// Constants
+const BASE_URL: vector<u8> = b"http://xksgo8ggkwsgooc84o0ok0c8.176.57.188.144.sslip.io";
+
 /// Error messages.
 const EInvalidOwner: u64 = 0;
 
 public struct IdentityData has store {
     owner: address,
-    username: string::String,
     suins_domain_name: Option<string::String>,
     about: string::String,
 }
 
-public struct IdentityRegistration has key {
+public struct IdentityRegistration has key, store {
     id: UID,
+    username: string::String,
     identity_data: IdentityData,
 }
 
@@ -38,6 +41,12 @@ public struct FollowRegistry has key {
 }
 
 fun init(otw: IDENTITY_REGISTRATION,ctx: &mut TxContext) {
+    let mut url = string::utf8(BASE_URL);
+    string::append(&mut url, b"/api/v1/user/{id}".to_string());
+
+    let mut img_url = string::utf8(BASE_URL);
+    string::append(&mut img_url, b"/api/v1/nft/img/{id}".to_string());
+
     let keys = vector[
         b"name".to_string(),
         b"link".to_string(),
@@ -49,10 +58,10 @@ fun init(otw: IDENTITY_REGISTRATION,ctx: &mut TxContext) {
 
     let values = vector[
         b"@{username}".to_string(),
-        b"https://beaversocial.xyz/api/user/{id}".to_string(),
-        b"https://beaversocial.xyz/api/nft/img/{img_url}".to_string(),
+        url,
+        img_url,
         b"Beaver Social - The social layer of the decentralized web".to_string(),
-        b"https://beaversocial.xyz".to_string(),
+        string::utf8(BASE_URL),
         b"Beaver Social".to_string(),
     ];
 
@@ -90,13 +99,13 @@ public(package) fun new(
 
     let identity_data = IdentityData {
         owner: sender,
-        username: username,
         suins_domain_name: option::none(),
         about: about,
     };
     
     let identity_registration = IdentityRegistration {
         id: object::new(ctx),
+        username: username,
         identity_data: identity_data,
     };
 
@@ -104,12 +113,15 @@ public(package) fun new(
 }
 
 public(package) fun burn(reg: IdentityRegistration) {
-    let IdentityRegistration { id, identity_data: IdentityData { 
-        owner: _,
+    let IdentityRegistration { 
+        id, 
         username: _,
-        suins_domain_name: _,
-        about: _,
-    } } = reg;
+        identity_data: IdentityData { 
+            owner: _,
+            suins_domain_name: _,
+            about: _,
+            } 
+        } = reg;
     object::delete(id);
 }
 
@@ -141,11 +153,11 @@ public entry fun attach_suins(
 
 public fun identity_data(reg: &IdentityRegistration): &IdentityData { &reg.identity_data }
 
+public fun username(reg: &IdentityRegistration): string::String { reg.username }
+
 public fun uid(reg: &IdentityRegistration): &UID { &reg.id }
 
 public fun uid_mut(reg: &mut IdentityRegistration): &mut UID { &mut reg.id }
-
-public fun username(data: &IdentityData): string::String { data.username }
 
 public fun about(data: &IdentityData): string::String { data.about }
 
