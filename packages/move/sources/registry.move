@@ -7,6 +7,7 @@ use std::{
 };
 use sui::{
     table,
+    clock,
 };
 use beaver_social::{
     identity_registration as registration,
@@ -34,6 +35,7 @@ public entry fun mint(
     registry: &mut Registry,
     username: string::String,
     about: string::String,
+    clock: &clock::Clock,
     ctx: &mut TxContext
 ){
     let sender = tx_context::sender(ctx);
@@ -45,16 +47,20 @@ public entry fun mint(
     );
 
     table::add(&mut registry.owners, username, sender);
-    table::add(&mut registry.owner_changes, username, table::new<u64, address>(ctx));
-    
+
+    let mut owner_changes = table::new<u64, address>(ctx);
+    table::add(&mut owner_changes, clock.timestamp_ms(), sender);
+    table::add(&mut registry.owner_changes, username, owner_changes);
+
     transfer::public_transfer(registration, sender);
 }
 
 
 public entry fun switch_owners(
-    registry: Registry,
+    registry: &mut Registry,
     identity: &mut IdentityRegistration,
     suins: &suins_registration::SuinsRegistration,
+    clock: &clock::Clock,
     ctx: &mut TxContext
 ) {
     let domain_name: string::String = suins_registration::domain_name(suins);
@@ -67,6 +73,12 @@ public entry fun switch_owners(
     let sender = tx_context::sender(ctx);
     registration::set_owner(identity, sender);
 
-    let id = identity.id;
-    table::add(&mut registry.owners, id, sender);
+    let username = registration::username(identity);
+    table::add(&mut registry.owners, username, sender);
+
+    let mut owner_changes = table::borrow_mut(&mut registry.owner_changes, username);
+    let now = clock.timestamp_ms();
+    table::add(owner_changes, now, sender);
 }
+
+
