@@ -45,6 +45,8 @@ function FeedPost({
         e.preventDefault();
         e.stopPropagation();
 
+        console.log('Liking post queued');
+
         try {
             // Check Auth
             if (!zkAuthStore.zkEphemeralKeyPair) {
@@ -59,12 +61,20 @@ function FeedPost({
 
             const tx = new Transaction();
 
-            zkLoginService.executeTransactionWithZkLogin(
+            const result = await zkLoginService.executeTransactionWithZkLogin(
                 zkAuthStore.zkEphemeralKeyPair,
                 zkAuthStore.partialZkLoginSignature,
                 tx,
                 zkAuthStore.zkLoginData
             );
+
+            if (result.success) {
+                console.log({ result });
+                toast.success("Transaction executed successfully");
+            } else {
+                console.log({ result });
+                throw new Error(result.error);
+            }
         } catch (error: any) {
             console.log({ error });
             toast.error(`Error liking post: ${error.message}`);

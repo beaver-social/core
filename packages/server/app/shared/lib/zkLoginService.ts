@@ -11,6 +11,7 @@ import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { Transaction } from "@mysten/sui/transactions";
 import * as jwtDecode from "jwt-decode";
 import apiClient from "@/shared/lib/apiClient";
+import { partialZkLoginSignature, StoredZkLoginData } from "../types/zk";
 // Define an interface for JWT payload
 export interface JwtPayload {
   iss?: string;
@@ -276,7 +277,7 @@ export class zkLoginService {
   // Create a zkLogin signature that can be used to submit transactions
   async createZkLoginSignature(
     zkLoginData: ZkLoginData,
-    transactionBlock: Transaction
+    transactionBlock: Uint8Array<ArrayBufferLike>
   ): Promise<string> {
     // Generate address seed from salt, sub, and aud
     const aud = zkLoginData.decodedJwt.aud;
