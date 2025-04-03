@@ -1,15 +1,14 @@
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
-import { zkLogin } from "@/shared/lib/utils"
 import { useEffect, useState } from 'react'
 import { toast } from "sonner";
 import { useZkAuthStore } from "@/shared/stores/zustand";
 import Icon from "@/shared/components/Icon";
+import zkLoginService from "@/shared/lib/zkLoginService";
 
 type Props = {}
 
 export default function GoogleOAuth({ }: Props) {
     const zkAuthStore = useZkAuthStore();
-    const [newAddress, setNewAddress] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
@@ -24,17 +23,15 @@ export default function GoogleOAuth({ }: Props) {
                     }
 
                     // Complete the zkLogin flow
-                    const zkLoginData = await zkLogin.completeZkLoginFlow(window.location.href);
-
-                    setNewAddress(zkLoginData.userAddress);
+                    const zkLoginData = await zkLoginService.completeZkLoginFlow(window.location.href);
                     setIsLoading(false);
 
-                    zkAuthStore.setZkLoginData({
-                        ephemeralKeyPair: storedKeyPair,
+                    // set zkAuthStore
+                    zkAuthStore.setZkEphemeralKeyPair(storedKeyPair);
+                    zkAuthStore.setPartialZkLoginSignature(zkLoginData.partialZkLoginSignature); zkAuthStore.setZkLoginData({
                         jwt: zkLoginData.jwt,
                         decodedJwt: zkLoginData.decodedJwt,
                         userAddress: zkLoginData.userAddress,
-                        partialZkLoginSignature: zkLoginData.partialZkLoginSignature,
                         userSalt: zkLoginData.userSalt.toString(),
                     });
 

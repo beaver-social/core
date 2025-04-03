@@ -7,8 +7,7 @@ import { Transaction } from "@mysten/sui/transactions";
 import { genAddressSeed, getZkLoginSignature } from "@mysten/sui/zklogin";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
 import { Network } from "@/shared/context/web3context";
-import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
-import { EphemeralKeyPair } from "@/shared/lib/zkLoginService";
+import zkLoginService from "@/shared/lib/zkLoginService";
 
 type FeedPostProps = {
     id: string;
@@ -41,83 +40,31 @@ function FeedPost({
 }: FeedPostProps) {
     const navigate = useNavigate();
     const zkAuthStore = useZkAuthStore();
-    const client = new SuiClient({ url: getFullnodeUrl(import.meta.env.VITE_SUI_NETWORK as Network), network: import.meta.env.VITE_SUI_NETWORK as Network });
 
     async function handleTransaction(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
         e.stopPropagation();
 
         try {
-            const zkLoginData = zkAuthStore.zkLoginData;
-            if (!zkLoginData) {
+            // Check Auth
+            if (!zkAuthStore.zkEphemeralKeyPair) {
+                throw new Error("No ephemeral key found");
+            }
+            if (!zkAuthStore.partialZkLoginSignature) {
+                throw new Error("No partial zkLogin signature found");
+            }
+            if (!zkAuthStore.zkLoginData) {
                 throw new Error("No zkLogin data found");
             }
 
-            let storedData = JSON.parse(zkLoginData.ephemeralKeyPair);
-            const keypair = Ed25519Keypair.fromSecretKey(storedData.privateKeyBytes);
-            storedData = {
-                ...storedData,
-                keypair,
-            }
+            const tx = new Transaction();
 
-            const userAddress = zkLoginData.userAddress;
-            const signer = keypair;
-
-            const coins = await client.getCoins({
-                owner: userAddress,
-            })
-
-            console.log({ userAddress, coins });
-
-            const txb = new Transaction();
-            txb.setSender(userAddress);
-
-            console.log({ txb: txb.getData() });
-
-            console.log({ client, signer });
-
-
-            const bytes = await txb.build({ client }); // NOT WORKING
-            console.log({ bytes });
-
-            const userSignature = (await signer.signTransaction(bytes)).signature;
-            console.log({ userSignature });
-
-            const verified = await signer.getPublicKey().verifyTransaction(bytes, userSignature);
-            console.log({ verified });
-
-            if (!verified) {
-                throw new Error("Signature verification failed");
-            }
-
-            const addressSeed = genAddressSeed(
-                BigInt(zkLoginData.userSalt),
-                'sub',
-                zkLoginData.decodedJwt.sub as string,
-                zkLoginData.decodedJwt.aud as string,
-            ).toString();
-
-            console.log({ addressSeed });
-
-            console.log({ partialZkLoginSignature: zkLoginData.partialZkLoginSignature });
-
-            const zkLoginSignature = getZkLoginSignature({
-                inputs: {
-                    ...zkLoginData.partialZkLoginSignature,
-                    addressSeed,
-                },
-                maxEpoch: storedData.maxEpoch,
-                userSignature,
-            });
-
-            console.log({ zkLoginSignature });
-
-            const result = await client.executeTransactionBlock({
-                transactionBlock: bytes,
-                signature: zkLoginSignature,
-            })
-
-            console.log({ result });
+            zkLoginService.executeTransactionWithZkLogin(
+                zkAuthStore.zkEphemeralKeyPair,
+                zkAuthStore.partialZkLoginSignature,
+                tx,
+                zkAuthStore.zkLoginData
+            );
         } catch (error: any) {
             console.log({ error });
             toast.error(`Error liking post: ${error.message}`);
