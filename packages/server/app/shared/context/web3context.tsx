@@ -5,6 +5,71 @@ import { ThemeVars } from '@mysten/dapp-kit';
 import { useTheme } from "./theme-provider";
 import { registerEnokiWallets, isEnokiNetwork } from '@mysten/enoki';
 
+const { networkConfig } = createNetworkConfig({
+    localnet: { url: getFullnodeUrl('localnet') },
+    devnet: { url: getFullnodeUrl('devnet') },
+    testnet: { url: getFullnodeUrl('testnet') },
+    mainnet: { url: getFullnodeUrl('mainnet') },
+});
+
+export type Network = keyof typeof networkConfig;
+
+export function Web3Provider({ children }: { children: React.ReactNode }) {
+    const [activeNetwork, setActiveNetwork] = useState<Network>(import.meta.env.VITE_SUI_NETWORK as Network);
+    const { theme } = useTheme();
+
+    return (
+        <SuiClientProvider
+            networks={networkConfig}
+            network={activeNetwork}
+            onNetworkChange={(network) => {
+                setActiveNetwork(network);
+            }}>
+            <RegisterEnokiWallets />
+            <WalletProvider
+                key={theme}
+                theme={theme === 'dark' ? darkTheme : lightTheme}
+            >
+                {children}
+            </WalletProvider>
+        </SuiClientProvider>
+    );
+};
+
+function RegisterEnokiWallets() {
+    const { client, network } = useSuiClientContext();
+
+    useEffect(() => {
+        try {
+            if (!isEnokiNetwork(network)) {
+                console.log('Not an Enoki network:', network);
+                return;
+            }
+
+            const { unregister } = registerEnokiWallets({
+                apiKey: import.meta.env.VITE_ENOKI_API_KEY as string,
+                providers: {
+                    google: {
+                        clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID as string,
+                        redirectUrl: import.meta.env.VITE_GOOGLE_REDIRECT_URL as string,
+                    },
+                },
+                client,
+                network,
+            });
+
+            return unregister;
+        } catch (error) {
+            console.error('Error registering Enoki wallets:', error);
+            // Continue without Enoki wallets if there's an error
+            return;
+        }
+    }, [client, network]);
+
+    return null;
+}
+
+
 // Light theme copied from dapp-kit
 const lightTheme: ThemeVars = {
     blurs: {
@@ -124,67 +189,3 @@ const darkTheme: ThemeVars = {
         letterSpacing: '1',
     },
 };
-
-const { networkConfig } = createNetworkConfig({
-    localnet: { url: getFullnodeUrl('localnet') },
-    devnet: { url: getFullnodeUrl('devnet') },
-    testnet: { url: getFullnodeUrl('testnet') },
-    mainnet: { url: getFullnodeUrl('mainnet') },
-});
-
-type Network = keyof typeof networkConfig;
-
-export function Web3Provider({ children }: { children: React.ReactNode }) {
-    const [activeNetwork, setActiveNetwork] = useState<Network>(import.meta.env.VITE_SUI_NETWORK as Network);
-    const { theme } = useTheme();
-
-    return (
-        <SuiClientProvider
-            networks={networkConfig}
-            network={activeNetwork}
-            onNetworkChange={(network) => {
-                setActiveNetwork(network);
-            }}>
-            <RegisterEnokiWallets />
-            <WalletProvider
-                key={theme}
-                theme={theme === 'dark' ? darkTheme : lightTheme}
-            >
-                {children}
-            </WalletProvider>
-        </SuiClientProvider>
-    );
-};
-
-function RegisterEnokiWallets() {
-    const { client, network } = useSuiClientContext();
-
-    useEffect(() => {
-        try {
-            if (!isEnokiNetwork(network)) {
-                console.log('Not an Enoki network:', network);
-                return;
-            }
-
-            const { unregister } = registerEnokiWallets({
-                apiKey: import.meta.env.VITE_ENOKI_API_KEY as string,
-                providers: {
-                    google: {
-                        clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID as string,
-                        redirectUrl: import.meta.env.VITE_GOOGLE_REDIRECT_URL as string,
-                    },
-                },
-                client,
-                network,
-            });
-
-            return unregister;
-        } catch (error) {
-            console.error('Error registering Enoki wallets:', error);
-            // Continue without Enoki wallets if there's an error
-            return;
-        }
-    }, [client, network]);
-
-    return null;
-}

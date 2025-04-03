@@ -28,6 +28,7 @@ const app = new Hono()
   .route("users", users)
   .route("posts", posts)
   .route("replies", replies)
+  .route("nft", nft)
   .route("oauth", oauth)
   .get("/stats", async (ctx) => {
     servedSessions++;

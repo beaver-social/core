@@ -3,7 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bunx --bun vite"
+    "build": "bunx --bun drizzle-kit push && bunx --bun vite build",
+    "start": "bun run server",
+    "dev": "NODE_ENV=development bunx --bun vite"
   },
   "exports": {
     ".": "./exports.ts"
@@ -22,7 +24,6 @@
     "@tailwindcss/vite": "^4.0.11",
     "@tanstack/react-query": "^5.67.1",
     "browser-image-compression": "^2.0.2",
-    "canvas": "^3.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.40.0",

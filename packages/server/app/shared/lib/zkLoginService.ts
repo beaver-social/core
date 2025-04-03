@@ -38,9 +38,14 @@ export interface ZkLoginData {
   decodedJwt: JwtPayload;
   userSalt: bigint;
   userAddress: string;
-  zkProof: any;
+  partialZkLoginSignature: any;
   zkLoginSignature?: string;
 }
+
+export type PartialZkLoginSignature = Omit<
+  Parameters<typeof getZkLoginSignature>["0"]["inputs"],
+  "addressSeed"
+>;
 
 export class zkLoginService {
   private client: SuiClient;
@@ -206,7 +211,10 @@ export class zkLoginService {
         body: JSON.stringify(zkpRequestPayload),
       });
 
-      return await response.json();
+      const proofResponse = await response.json();
+      const partialZkLoginSignature = proofResponse as PartialZkLoginSignature;
+
+      return partialZkLoginSignature;
     } catch (error) {
       console.error("Error getting ZK proof:", error);
       throw new Error("Failed to obtain ZK proof");
@@ -242,7 +250,7 @@ export class zkLoginService {
     // Create the zkLogin signature
     const zkLoginSignature = getZkLoginSignature({
       inputs: {
-        ...zkLoginData.zkProof,
+        ...zkLoginData.partialZkLoginSignature,
         addressSeed,
       },
       maxEpoch: zkLoginData.ephemeralKeyPair.maxEpoch,
@@ -284,7 +292,11 @@ export class zkLoginService {
     const userAddress = this.computeZkLoginAddress(userSalt, jwt);
 
     // Step 6: Get zero-knowledge proof
-    const zkProof = await this.getZkProof(jwt, ephemeralKeyPair, userSalt);
+    const partialZkLoginSignature = await this.getZkProof(
+      jwt,
+      ephemeralKeyPair,
+      userSalt
+    );
 
     // Return all the zkLogin data
     return {
@@ -293,7 +305,7 @@ export class zkLoginService {
       decodedJwt,
       userSalt,
       userAddress,
-      zkProof,
+      partialZkLoginSignature,
     };
   }
 
@@ -333,7 +345,7 @@ export class zkLoginService {
       // Assemble zkLogin signature
       const zkLoginSignature = getZkLoginSignature({
         inputs: {
-          ...zkLoginData.zkProof,
+          ...zkLoginData.partialZkLoginSignature,
           addressSeed,
         },
         maxEpoch: zkLoginData.ephemeralKeyPair.maxEpoch,

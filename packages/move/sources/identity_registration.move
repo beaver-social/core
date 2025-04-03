@@ -6,26 +6,33 @@ use std::{
     string
 };
 use sui::{
-    table
+    table,
+    display,
+    package
 };
 use suins::suins_registration;
+
 use beaver_social::test_helpers;
+
+/// Constants
+const BASE_URL: vector<u8> = b"http://xksgo8ggkwsgooc84o0ok0c8.176.57.188.144.sslip.io";
 
 /// Error messages.
 const EInvalidOwner: u64 = 0;
 
 public struct IdentityData has store {
     owner: address,
-    username: string::String,
     suins_domain_name: Option<string::String>,
     about: string::String,
-    url: string::String,
 }
 
-public struct IdentityRegistration has key {
+public struct IdentityRegistration has key, store {
     id: UID,
+    username: string::String,
     identity_data: IdentityData,
 }
+
+public struct IDENTITY_REGISTRATION has drop {}
 
 public struct FollowRegistry has key {
     id: UID,
@@ -33,7 +40,44 @@ public struct FollowRegistry has key {
     following: table::Table<address, vector<address>>
 }
 
-fun init(ctx: &mut TxContext) {
+fun init(otw: IDENTITY_REGISTRATION,ctx: &mut TxContext) {
+    let mut url = string::utf8(BASE_URL);
+    string::append(&mut url, b"/api/v1/user/{id}".to_string());
+
+    let mut img_url = string::utf8(BASE_URL);
+    string::append(&mut img_url, b"/api/v1/nft/img/{id}".to_string());
+
+    let keys = vector[
+        b"name".to_string(),
+        b"link".to_string(),
+        b"image_url".to_string(),
+        b"description".to_string(),
+        b"project_url".to_string(),
+        b"creator".to_string(),
+    ];
+
+    let values = vector[
+        b"@{username}".to_string(),
+        url,
+        img_url,
+        b"Beaver Social - The social layer of the decentralized web".to_string(),
+        string::utf8(BASE_URL),
+        b"Beaver Social".to_string(),
+    ];
+
+    let publisher = package::claim(otw, ctx);
+
+    let mut display = display::new_with_fields<IdentityRegistration>(
+        &publisher, keys, values, ctx
+    );
+
+    // Commit first version of `Display` to apply changes.
+    display.update_version();
+
+    transfer::public_transfer(publisher, tx_context::sender(ctx));
+    transfer::public_transfer(display, tx_context::sender(ctx));
+
+
     let followRegistry = FollowRegistry{
         id: object::new(ctx),
         followers: table::new<address, vector<address>>(ctx),
@@ -47,7 +91,7 @@ fun init(ctx: &mut TxContext) {
 // === Protected methods ===
 
 public(package) fun new(
-    name: string::String,
+    username: string::String,
     about: string::String,
     ctx: &mut TxContext,
 ): IdentityRegistration {
@@ -61,6 +105,7 @@ public(package) fun new(
     
     let identity_registration = IdentityRegistration {
         id: object::new(ctx),
+        username: username,
         identity_data: identity_data,
     };
 
@@ -68,14 +113,15 @@ public(package) fun new(
 }
 
 public(package) fun burn(reg: IdentityRegistration) {
-    let IdentityRegistration { id, identity_data: IdentityData { 
-        owner: _,
-        name: _,
-        suins_domain_name: _,
-        image_url: _,
-        about: _,
-        url: _
-    } } = reg;
+    let IdentityRegistration { 
+        id, 
+        username: _,
+        identity_data: IdentityData { 
+            owner: _,
+            suins_domain_name: _,
+            about: _,
+            } 
+        } = reg;
     object::delete(id);
 }
 
@@ -107,19 +153,15 @@ public entry fun attach_suins(
 
 public fun identity_data(reg: &IdentityRegistration): &IdentityData { &reg.identity_data }
 
+public fun username(reg: &IdentityRegistration): string::String { reg.username }
+
 public fun uid(reg: &IdentityRegistration): &UID { &reg.id }
 
 public fun uid_mut(reg: &mut IdentityRegistration): &mut UID { &mut reg.id }
 
-public fun name(data: &IdentityData): string::String { data.name }
-
 public fun about(data: &IdentityData): string::String { data.about }
 
-public fun url(data: &IdentityData): string::String { data.url }
-
 public fun suins_domain_name(data: &IdentityData): Option<string::String> { data.suins_domain_name }
-
-public fun image_url(data: &IdentityData): string::String { data.image_url }
 
 
 // === Testing ===
