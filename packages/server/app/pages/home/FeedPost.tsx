@@ -8,6 +8,7 @@ import { genAddressSeed, getZkLoginSignature } from "@mysten/sui/zklogin";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
 import { Network } from "@/shared/context/web3context";
 import zkLoginService from "@/shared/lib/zkLoginService";
+import { useSignPersonalMessage } from "@mysten/dapp-kit";
 
 type FeedPostProps = {
     id: string;
@@ -48,13 +49,6 @@ function FeedPost({
         console.log('Liking post queued');
 
         try {
-            // Check Auth
-            if (!zkAuthStore.zkEphemeralKeyPair) {
-                throw new Error("No ephemeral key found");
-            }
-            if (!zkAuthStore.partialZkLoginSignature) {
-                throw new Error("No partial zkLogin signature found");
-            }
             if (!zkAuthStore.zkLoginData) {
                 throw new Error("No zkLogin data found");
             }
@@ -62,10 +56,8 @@ function FeedPost({
             const tx = new Transaction();
 
             const result = await zkLoginService.executeTransactionWithZkLogin(
-                zkAuthStore.zkEphemeralKeyPair,
-                zkAuthStore.partialZkLoginSignature,
+                zkAuthStore.zkLoginData,
                 tx,
-                zkAuthStore.zkLoginData
             );
 
             if (result.success) {

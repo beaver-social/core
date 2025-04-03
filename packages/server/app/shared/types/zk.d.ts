@@ -3,7 +3,7 @@ import { JwtPayload } from "jwt-decode";
 // zkLoginService - JwtPayload
 interface JwtPayload {
   iss?: string;
-  sub?: string; // Subject ID
+  sub: string; // Subject ID
   aud?: string[] | string;
   exp?: number;
   nbf?: number;
@@ -48,8 +48,10 @@ interface partialZkLoginSignature {
 
 // Stored zkLogin data in local storage
 interface StoredZkLoginData {
+  ephemeralKeyPairString: string;
   userAddress: string;
   jwt: string;
   decodedJwt: JwtPayload;
+  partialZkLoginSignature: partialZkLoginSignature;
   userSalt: string;
 }

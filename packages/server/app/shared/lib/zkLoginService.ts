@@ -11,54 +11,28 @@ import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { Transaction } from "@mysten/sui/transactions";
 import * as jwtDecode from "jwt-decode";
 import apiClient from "@/shared/lib/apiClient";
-import { partialZkLoginSignature, StoredZkLoginData } from "../types/zk";
-// Define an interface for JWT payload
-export interface JwtPayload {
-  iss?: string;
-  sub: string;
-  aud?: string[] | string;
-  exp?: number;
-  nbf?: number;
-  iat?: number;
-  jti?: string;
-}
+import {
+  JwtPayload,
+  partialZkLoginSignature,
+  StoredZkLoginData,
+  EphemeralKeyPair,
+  ZkLoginData,
+} from "../types/zk";
 
-// Store ephemeral key data
-export interface EphemeralKeyPair {
-  keypair: Ed25519Keypair;
-  publicKey: string;
-  maxEpoch: number;
-  randomness: string;
-  nonce: string;
-}
-
-// Store zkLogin data
-export interface ZkLoginData {
-  ephemeralKeyPair: EphemeralKeyPair;
-  jwt: string;
-  decodedJwt: JwtPayload;
-  userSalt: bigint;
-  userAddress: string;
-  partialZkLoginSignature: any;
-  zkLoginSignature?: string;
-}
-
-export type PartialZkLoginSignature = Omit<
+type PartialZkLoginSignature = Omit<
   Parameters<typeof getZkLoginSignature>["0"]["inputs"],
   "addressSeed"
 >;
 
-export class zkLoginService {
+class zkLoginService {
   private client: SuiClient;
   private GOOGLE_CLIENT_ID: string;
   private REDIRECT_URL: string;
-  private SALT_SERVICE_URL: string;
   private ZK_PROVING_SERVICE_URL: string;
 
   constructor() {
     this.GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
     this.REDIRECT_URL = import.meta.env.VITE_GOOGLE_REDIRECT_URL || "";
-    this.SALT_SERVICE_URL = import.meta.env.VITE_SALT_SERVICE_URL || "";
     this.ZK_PROVING_SERVICE_URL =
       import.meta.env.VITE_ZK_PROVING_SERVICE_URL || "";
     this.client = new SuiClient({
@@ -312,15 +286,13 @@ export class zkLoginService {
 
   // Execute a transaction with zkLogin
   async executeTransactionWithZkLogin(
-    ephemeralKeyPairString: string,
-    partialZkLoginSignature: partialZkLoginSignature,
-    tx: Transaction,
-    zkLoginData: StoredZkLoginData
+    zkLoginData: StoredZkLoginData,
+    tx: Transaction
   ): Promise<{ success: boolean; digest?: string; error?: string }> {
     try {
       // Deserialize the ephemeralKeyPairString
       const ephemeralKeyPair = this.deserializeEphemeralKeyPair(
-        ephemeralKeyPairString
+        zkLoginData.ephemeralKeyPairString
       );
 
       // Get user address and signer
@@ -359,7 +331,7 @@ export class zkLoginService {
       // Assemble zkLogin signature
       const zkLoginSignature = getZkLoginSignature({
         inputs: {
-          ...partialZkLoginSignature,
+          ...zkLoginData.partialZkLoginSignature,
           addressSeed,
         },
         maxEpoch: ephemeralKeyPair.maxEpoch,

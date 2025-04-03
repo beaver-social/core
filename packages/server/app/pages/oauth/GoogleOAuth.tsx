@@ -26,13 +26,13 @@ export default function GoogleOAuth({ }: Props) {
                     const zkLoginData = await zkLoginService.completeZkLoginFlow(window.location.href);
                     setIsLoading(false);
 
-                    // set zkAuthStore
-                    zkAuthStore.setZkEphemeralKeyPair(storedKeyPair);
-                    zkAuthStore.setPartialZkLoginSignature(zkLoginData.partialZkLoginSignature); zkAuthStore.setZkLoginData({
+                    zkAuthStore.setZkLoginData({
                         jwt: zkLoginData.jwt,
                         decodedJwt: zkLoginData.decodedJwt,
                         userAddress: zkLoginData.userAddress,
                         userSalt: zkLoginData.userSalt.toString(),
+                        ephemeralKeyPairString: storedKeyPair,
+                        partialZkLoginSignature: zkLoginData.partialZkLoginSignature,
                     });
 
                     // clear session storage
