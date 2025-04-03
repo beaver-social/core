@@ -30,10 +30,7 @@ app.get("/health", (ctx) => ctx.json({ status: "ok" }));
 if (isProd) {
   log("Production mode detected, serving static files.");
 
-  app.use(
-    "/static/*",
-    staticRequestsHandler(path.join(__dirname, "dist", "static"))
-  );
+  app.use("/*", staticRequestsHandler(path.join(__dirname, "dist", "static")));
 
   let envEnsured = false;
   app.use((ctx, next) => {
