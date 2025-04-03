@@ -10,16 +10,39 @@ import {
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { Transaction } from "@mysten/sui/transactions";
 import * as jwtDecode from "jwt-decode";
-import {
-  EphemeralKeyPair,
-  JwtPayload,
-  partialZkLoginSignature,
-  StoredZkLoginData,
-  ZkLoginData,
-} from "../types/zk";
-
+import apiClient from "@/shared/lib/apiClient";
 // Define an interface for JWT payload
-type PartialZkLoginSignature = Omit<
+export interface JwtPayload {
+  iss?: string;
+  sub: string;
+  aud?: string[] | string;
+  exp?: number;
+  nbf?: number;
+  iat?: number;
+  jti?: string;
+}
+
+// Store ephemeral key data
+export interface EphemeralKeyPair {
+  keypair: Ed25519Keypair;
+  publicKey: string;
+  maxEpoch: number;
+  randomness: string;
+  nonce: string;
+}
+
+// Store zkLogin data
+export interface ZkLoginData {
+  ephemeralKeyPair: EphemeralKeyPair;
+  jwt: string;
+  decodedJwt: JwtPayload;
+  userSalt: bigint;
+  userAddress: string;
+  partialZkLoginSignature: any;
+  zkLoginSignature?: string;
+}
+
+export type PartialZkLoginSignature = Omit<
   Parameters<typeof getZkLoginSignature>["0"]["inputs"],
   "addressSeed"
 >;
@@ -113,22 +136,13 @@ export class zkLoginService {
    * Step 4: Get user salt
    * Fetches a unique salt for the user from salt service
    */
+
   async getUserSalt(jwt: JwtPayload): Promise<bigint> {
     try {
-      // This is an example implementation - you should implement your own salt service
-      const response = await fetch(this.SALT_SERVICE_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          jwt,
-        }),
+      const response = await apiClient.oauth["get-salt"].$post({
+        json: { jwt },
       });
-
       const data = await response.json();
-
-      // Convert the returned salt to a BigInt
       return BigInt(data.salt.integer);
     } catch (error) {
       console.error("Error getting user salt:", error);

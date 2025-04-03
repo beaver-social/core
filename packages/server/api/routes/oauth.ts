@@ -1,23 +1,11 @@
 import { Hono } from "hono";
 import crypto from "crypto";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
+import { zJwt } from "../lib/zod/helpers";
 
-// Define an interface for JWT payload
-export interface JwtPayload {
-  iss?: string;
-  sub?: string; // Subject ID
-  aud?: string[] | string;
-  exp?: number;
-  nbf?: number;
-  iat?: number;
-  jti?: string;
-}
-
-function deriveUserSalt(jwt: JwtPayload): Uint8Array {
+function deriveUserSalt(jwt: z.infer<typeof zJwt>): Uint8Array {
   const { sub, iss, aud } = jwt;
-
-  if (!sub) {
-    throw new Error("Missing required field: sub");
-  }
 
   // Use JWT fields as inputs for the key derivation
   const info = Buffer.from(sub);
@@ -55,39 +43,15 @@ export default new Hono()
       message: "oauth routes",
     });
   })
-  .post("/get-salt", async (ctx) => {
-    try {
-      const body = await ctx.req.json();
-      const { jwt } = body as { jwt: JwtPayload };
+  .post("/get-salt", zValidator("json", z.object({ jwt: zJwt })), (ctx) => {
+    const { jwt } = ctx.req.valid("json");
+    const salt = deriveUserSalt(jwt);
 
-      if (!jwt) {
-        return ctx.json(
-          {
-            error: "Missing required field: jwt",
-          },
-          400
-        );
-      }
-
-      // Derive the salt using the provided JWT information
-      const salt = deriveUserSalt(jwt);
-
-      // Return the salt in both hex and base64 formats
-      return ctx.json({
-        salt: {
-          hex: Buffer.from(salt).toString("hex"),
-          base64: Buffer.from(salt).toString("base64"),
-          // Convert to an integer smaller than 2^128 (big-endian)
-          integer: BigInt(`0x${Buffer.from(salt).toString("hex")}`).toString(),
-        },
-      });
-    } catch (error) {
-      console.error("Error generating salt:", error);
-      return ctx.json(
-        {
-          error: "Failed to generate salt",
-        },
-        500
-      );
-    }
+    return ctx.json({
+      salt: {
+        hex: Buffer.from(salt).toString("hex"),
+        base64: Buffer.from(salt).toString("base64"),
+        integer: BigInt(`0x${Buffer.from(salt).toString("hex")}`).toString(),
+      },
+    });
   });
