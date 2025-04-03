@@ -9,7 +9,6 @@ import { formatAddress } from "@mysten/sui/utils";
 import Icon from "../Icon";
 import { zkLogin } from "@/shared/lib/utils";
 import { useZkAuthStore } from "@/shared/stores/zustand";
-
 type Props = {
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
@@ -18,11 +17,9 @@ type Props = {
 
 export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) {
     const [isOpen, setIsOpen] = useState(open || false);
-    const [zkAddress, setZkAddress] = useState<string | null>();
     const { theme } = useTheme();
     const currentAccount = useCurrentAccount();
     const { mutate: disconnectWallet } = useDisconnectWallet();
-
     const zkAuthStore = useZkAuthStore();
 
     const handleOpenChange = (newOpen: boolean) => {
@@ -67,6 +64,17 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
         } catch (error: any) {
             toast.error(`Error initiating login: ${error.message}`);
         }
+    }
+
+    if (zkAuthStore.zkLoginData?.userAddress) {
+        return (
+            <div>
+                <Button variant="neon">
+                    <Icon name="Wallet" className="size-4" />
+                    <p>{formatAddress(zkAuthStore.zkLoginData.userAddress)}</p>
+                </Button>
+            </div>
+        )
     }
 
     return (
