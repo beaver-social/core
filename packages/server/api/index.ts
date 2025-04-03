@@ -28,11 +28,25 @@ const app = new Hono()
   .route("users", users)
   .route("posts", posts)
   .route("replies", replies)
+  .route("nft", nft)
   .route("oauth", oauth)
   .get("/stats", async (ctx) => {
     servedSessions++;
     return ctx.json({
       servedSessions,
+    });
+  })
+  .get("/testnet", async (ctx) => {
+    return ctx.json({
+      beaverSocial: {
+        package: "0x",
+        modules: {
+          identity_registration: {
+            address: "0x",
+            functions: [],
+          },
+        },
+      },
     });
   });
 

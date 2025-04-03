@@ -6,9 +6,12 @@ use std::{
     string
 };
 use sui::{
-    table
+    table,
+    display,
+    package
 };
 use suins::suins_registration;
+
 use beaver_social::test_helpers;
 
 /// Error messages.
@@ -19,7 +22,6 @@ public struct IdentityData has store {
     username: string::String,
     suins_domain_name: Option<string::String>,
     about: string::String,
-    url: string::String,
 }
 
 public struct IdentityRegistration has key {
@@ -27,13 +29,46 @@ public struct IdentityRegistration has key {
     identity_data: IdentityData,
 }
 
+public struct IDENTITY_REGISTRATION has drop {}
+
 public struct FollowRegistry has key {
     id: UID,
     followers: table::Table<address, vector<address>>,
     following: table::Table<address, vector<address>>
 }
 
-fun init(ctx: &mut TxContext) {
+fun init(otw: IDENTITY_REGISTRATION,ctx: &mut TxContext) {
+    let keys = vector[
+        b"name".to_string(),
+        b"link".to_string(),
+        b"image_url".to_string(),
+        b"description".to_string(),
+        b"project_url".to_string(),
+        b"creator".to_string(),
+    ];
+
+    let values = vector[
+        b"@{username}".to_string(),
+        b"https://beaversocial.xyz/api/user/{id}".to_string(),
+        b"https://beaversocial.xyz/api/nft/img/{img_url}".to_string(),
+        b"Beaver Social - The social layer of the decentralized web".to_string(),
+        b"https://beaversocial.xyz".to_string(),
+        b"Beaver Social".to_string(),
+    ];
+
+    let publisher = package::claim(otw, ctx);
+
+    let mut display = display::new_with_fields<IdentityRegistration>(
+        &publisher, keys, values, ctx
+    );
+
+    // Commit first version of `Display` to apply changes.
+    display.update_version();
+
+    transfer::public_transfer(publisher, tx_context::sender(ctx));
+    transfer::public_transfer(display, tx_context::sender(ctx));
+
+
     let followRegistry = FollowRegistry{
         id: object::new(ctx),
         followers: table::new<address, vector<address>>(ctx),
@@ -47,7 +82,7 @@ fun init(ctx: &mut TxContext) {
 // === Protected methods ===
 
 public(package) fun new(
-    name: string::String,
+    username: string::String,
     about: string::String,
     ctx: &mut TxContext,
 ): IdentityRegistration {
@@ -55,6 +90,7 @@ public(package) fun new(
 
     let identity_data = IdentityData {
         owner: sender,
+        username: username,
         suins_domain_name: option::none(),
         about: about,
     };
@@ -70,11 +106,9 @@ public(package) fun new(
 public(package) fun burn(reg: IdentityRegistration) {
     let IdentityRegistration { id, identity_data: IdentityData { 
         owner: _,
-        name: _,
+        username: _,
         suins_domain_name: _,
-        image_url: _,
         about: _,
-        url: _
     } } = reg;
     object::delete(id);
 }
@@ -111,15 +145,11 @@ public fun uid(reg: &IdentityRegistration): &UID { &reg.id }
 
 public fun uid_mut(reg: &mut IdentityRegistration): &mut UID { &mut reg.id }
 
-public fun name(data: &IdentityData): string::String { data.name }
+public fun username(data: &IdentityData): string::String { data.username }
 
 public fun about(data: &IdentityData): string::String { data.about }
 
-public fun url(data: &IdentityData): string::String { data.url }
-
 public fun suins_domain_name(data: &IdentityData): Option<string::String> { data.suins_domain_name }
-
-public fun image_url(data: &IdentityData): string::String { data.image_url }
 
 
 // === Testing ===
