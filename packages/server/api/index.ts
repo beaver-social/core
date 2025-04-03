@@ -36,16 +36,19 @@ const app = new Hono()
       servedSessions,
     });
   })
-  .get("/testnet", async (ctx) => {
+  .get("/contracts", async (ctx) => {
     return ctx.json({
-      beaverSocial: {
-        package: "0x",
-        modules: {
-          identity_registration: {
-            address: "0x",
-            functions: [],
-          },
-        },
+      testnet: {
+        beaverSocial: {
+          package: "0x",
+          modules: {
+            registry: {
+              functions: [{
+                name: "mint"
+              }]
+            }
+          }
+        }
       },
     });
   });
