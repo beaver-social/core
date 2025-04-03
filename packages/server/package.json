@@ -5,7 +5,7 @@
   "scripts": {
     "build": "bunx --bun drizzle-kit push && bunx --bun vite build",
     "start": "bun run server",
-    "dev": "bunx --bun vite"
+    "dev": "NODE_ENV=development bunx --bun vite"
   },
   "exports": {
     ".": "./exports.ts"

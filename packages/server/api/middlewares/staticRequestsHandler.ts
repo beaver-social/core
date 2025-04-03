@@ -5,7 +5,11 @@ import { tryCatch } from "../lib/tryCatch";
 const staticRequestsHandler = (staticDir: string) =>
   createMiddleware(async (ctx, next) => {
     const requestedPath = ctx.req.path;
-    const relativePath = requestedPath.substring("/static/".length);
+    const relativePath = requestedPath.substring("/".length);
+
+    if (!relativePath.includes(".")) {
+      await next();
+    }
 
     // Prevent directory traversal attacks
     if (relativePath.includes("..")) {
@@ -20,10 +24,12 @@ const staticRequestsHandler = (staticDir: string) =>
 
     if (exists.error) {
       ctx.log(`[Static] Truoble trying to find file: ${absoluteFilePath}.`);
+
       await next();
     }
     if (!exists.data) {
       ctx.log(`[Static] File not found: ${absoluteFilePath}.`);
+
       return ctx.text("Not Found", 404);
     }
 
