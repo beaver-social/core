@@ -3,7 +3,7 @@ import { Defaults } from "../types";
 import Logger from "../logger";
 import { bcs } from '@mysten/bcs';
 
-export class User {
+export class Identity {
     defaults: Defaults
     logger: Logger
 
@@ -47,4 +47,5 @@ export class User {
 
         suiClient.executeTransactionBlock({ transactionBlock: transactionBytes, signature: signature.signature })
     }
+
 }

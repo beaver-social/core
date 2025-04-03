@@ -46,6 +46,11 @@ const app = new Hono()
               functions: [{
                 name: "mint"
               }]
+            },
+            identity_registration: {
+              functions: [{
+                name: "attach_suins"
+              }]
             }
           }
         }

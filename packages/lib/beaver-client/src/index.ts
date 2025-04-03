@@ -7,7 +7,7 @@ import { hc } from "hono/client"
 import { Defaults } from "./types";
 import { S3Client } from "@aws-sdk/client-s3";
 import { tryCatch } from "./utils/tryCatch";
-import { User } from "./user";
+import { Identity } from "./identity";
 
 // import { User } from "./user";
 
@@ -53,7 +53,7 @@ export class BeaverClient {
     }
 
     get user() {
-        return new User(this.defaults, this.logger);
+        return new Identity(this.defaults, this.logger);
     }
 }
 
