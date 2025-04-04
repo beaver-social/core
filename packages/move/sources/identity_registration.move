@@ -19,6 +19,7 @@ const BASE_URL: vector<u8> = b"http://xksgo8ggkwsgooc84o0ok0c8.176.57.188.144.ss
 
 /// Error messages.
 const EInvalidOwner: u64 = 200;
+const ENewAboutTooLong: u64 = 201;
 
 public struct IdentityData has store {
     owner: address,
@@ -88,17 +89,16 @@ fun init(otw: IDENTITY_REGISTRATION,ctx: &mut TxContext) {
 }
  
  
-// === Protected methods ===
+// Protected methods
 
 public(package) fun new(
     username: string::String,
     about: string::String,
-    ctx: &mut TxContext,
+    owner: address,
+    ctx: &mut TxContext
 ): IdentityRegistration {
-    let sender = tx_context::sender(ctx);
-
     let identity_data = IdentityData {
-        owner: sender,
+        owner: owner,
         suins_domain_name: option::none(),
         about: about,
     };
@@ -137,7 +137,7 @@ public(package) fun set_owner(
 }
 
 
-// === Public methods ===
+// Public methods
 
 public entry fun attach_suins(
     reg: &mut IdentityRegistration, 
@@ -148,8 +148,22 @@ public entry fun attach_suins(
     reg.identity_data.suins_domain_name = option::some(suins_registration::domain_name(suins)); 
 }
 
+public entry fun set_about(
+    reg: &mut IdentityRegistration,
+    about: string::String,
+    ctx: &mut TxContext
+) {
+    let about_length = string::length(&about);
+    assert!(about_length <= 255, ENewAboutTooLong);
 
-// === Getters ===
+    let sender = tx_context::sender(ctx);
+    assert!(reg.identity_data.owner == sender, EInvalidOwner);
+
+    reg.identity_data.about = about;
+}
+
+
+// Getters
 
 public fun identity_data(reg: &IdentityRegistration): &IdentityData { &reg.identity_data }
 
@@ -164,7 +178,7 @@ public fun about(data: &IdentityData): string::String { data.about }
 public fun suins_domain_name(data: &IdentityData): Option<string::String> { data.suins_domain_name }
 
 
-// === Testing ===
+// Testing
 
 #[test_only]
 fun burn_for_testing(reg: IdentityRegistration) {

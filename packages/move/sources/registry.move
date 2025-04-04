@@ -15,10 +15,10 @@ use beaver_social::{
 };
 use suins::suins_registration;
 
+
 /// Constants
 const MIN_USERNAME_LENGTH: u64 = 3;
 const MAX_USERNAME_LENGTH: u64 = 32;
-const MAX_ABOUT_LENGTH: u64 = 500;
 
 
 /// Error messages.
@@ -50,42 +50,44 @@ fun init(ctx: &mut TxContext) {
 }
 
 
-// === Public methods ===
+/// Protected Methods
 
-public entry fun mint(
+public(package) fun mint_(
     registry: &mut Registry,
+    owner: address,
     username: string::String,
     about: string::String,
     clock: &clock::Clock,
     ctx: &mut TxContext
-){
+): IdentityRegistration {
     let username_length = string::length(&username);
     let about_length = string::length(&about);
 
     assert!(username_length >= MIN_USERNAME_LENGTH, EUsernameTooShort);
     assert!(username_length <= MAX_USERNAME_LENGTH, EUsernameTooLong);
-    assert!(about_length <= MAX_ABOUT_LENGTH, EAboutTooLong);
+    assert!(about_length <= 255, EAboutTooLong);
 
-    let sender = tx_context::sender(ctx);
-
-    assert!(!table::contains(&registry.minters, sender), EIdentityAlreadyMinted);
+    assert!(!table::contains(&registry.minters, owner), EIdentityAlreadyMinted);
     assert!(!table::contains(&registry.owners, username), EUsernameTaken);
 
     let registration = registration::new(
         username,
         about,
+        owner,
         ctx
     );
 
-    table::add(&mut registry.owners, username, sender);
+    table::add(&mut registry.owners, username, owner);
 
     let mut owner_changes = table::new<u64, address>(ctx);
-    table::add(&mut owner_changes, clock.timestamp_ms(), sender);
+    table::add(&mut owner_changes, clock.timestamp_ms(), owner);
     table::add(&mut registry.owner_changes, username, owner_changes);
 
-    transfer::public_transfer(registration, sender);
+    return registration
 }
 
+
+/// Public Methods
 
 public entry fun switch_owners(
     registry: &mut Registry,
@@ -112,4 +114,16 @@ public entry fun switch_owners(
     table::add(owner_changes, now, sender);
 }
 
+public entry fun mint(
+    username: string::String,
+    about: string::String,
+    registry: &mut Registry,
+    clock: &clock::Clock,
+    ctx: &mut TxContext
+) {
+    let sender = tx_context::sender(ctx);
 
+    let registration = mint_(registry, sender, username, about, clock, ctx);
+
+    transfer::public_transfer(registration, sender);
+}
