@@ -18,7 +18,7 @@ use beaver_social::test_helpers;
 const BASE_URL: vector<u8> = b"http://xksgo8ggkwsgooc84o0ok0c8.176.57.188.144.sslip.io";
 
 /// Error messages.
-const EInvalidOwner: u64 = 0;
+const EInvalidOwner: u64 = 200;
 
 public struct IdentityData has store {
     owner: address,

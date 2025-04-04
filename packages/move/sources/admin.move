@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-module beaver_social::registry;
+module beaver_social::admin;
 
 use std::{
     string,
@@ -15,25 +15,12 @@ use beaver_social::{
 };
 use suins::suins_registration;
 
-/// Constants
-const MIN_USERNAME_LENGTH: u64 = 3;
-const MAX_USERNAME_LENGTH: u64 = 32;
-const MAX_ABOUT_LENGTH: u64 = 500;
-
-
 /// Error messages.
 const EMissingSuins: u64 = 100;
 const EInvalidSuins: u64 = 101;
-const EUsernameTaken: u64 = 102;
-const EUsernameTooShort: u64 = 103;
-const EUsernameTooLong: u64 = 104;
-const EAboutTooLong: u64 = 105;
-const EIdentityAlreadyMinted: u64 = 106;
-
 
 public struct Registry has key, store {
     id: UID,
-    minters: table::Table<address, bool>,
     owners: table::Table<string::String, address>,
     owner_changes: table::Table<string::String, table::Table<u64, address>>,
 }
@@ -41,7 +28,6 @@ public struct Registry has key, store {
 fun init(ctx: &mut TxContext) {
     let registry = Registry {
         id: object::new(ctx),
-        minters: table::new<address, bool>(ctx),
         owners: table::new<string::String, address>(ctx),
         owner_changes: table::new<string::String, table::Table<u64, address>>(ctx),
     };
@@ -59,17 +45,7 @@ public entry fun mint(
     clock: &clock::Clock,
     ctx: &mut TxContext
 ){
-    let username_length = string::length(&username);
-    let about_length = string::length(&about);
-
-    assert!(username_length >= MIN_USERNAME_LENGTH, EUsernameTooShort);
-    assert!(username_length <= MAX_USERNAME_LENGTH, EUsernameTooLong);
-    assert!(about_length <= MAX_ABOUT_LENGTH, EAboutTooLong);
-
     let sender = tx_context::sender(ctx);
-
-    assert!(!table::contains(&registry.minters, sender), EIdentityAlreadyMinted);
-    assert!(!table::contains(&registry.owners, username), EUsernameTaken);
 
     let registration = registration::new(
         username,
