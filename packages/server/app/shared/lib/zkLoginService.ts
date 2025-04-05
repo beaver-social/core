@@ -17,6 +17,11 @@ import {
   EphemeralKeyPair,
   ZkLoginData,
 } from "../types/zk";
+import {
+  verifyPersonalMessageSignature,
+  verifyTransactionSignature,
+} from "@mysten/sui/verify";
+import { SuiGraphQLClient } from "@mysten/sui/graphql";
 
 type PartialZkLoginSignature = Omit<
   Parameters<typeof getZkLoginSignature>["0"]["inputs"],
@@ -225,7 +230,7 @@ class zkLoginService {
   async zkSignPersonalMessage(
     zkLoginData: StoredZkLoginData,
     message: string
-  ): Promise<{ userSignature: string; zkLoginSignature: string }> {
+  ): Promise<{ zkLoginSignature: string }> {
     const ephemeralKeyPair = zkLoginData.ephemeralKeyPair;
     const aud = zkLoginData.decodedJwt.aud;
     const audienceString = Array.isArray(aud) ? aud[0] : (aud as string);
@@ -249,15 +254,6 @@ class zkLoginService {
       messageBytes
     );
 
-    // Verify the transaction
-    const verified = await keypair
-      .getPublicKey()
-      .verifyPersonalMessage(messageBytes, userSignature);
-
-    if (!verified) {
-      throw new Error("Signature verification failed");
-    }
-
     // Create the zkLogin signature
     const zkLoginSignature = getZkLoginSignature({
       inputs: {
@@ -268,34 +264,35 @@ class zkLoginService {
       userSignature,
     });
 
-    return {
-      userSignature,
-      zkLoginSignature,
-    };
+    // const publicKey = await verifyPersonalMessageSignature(
+    //   messageBytes,
+    //   zkLoginSignature,
+    //   {
+    //     client: new SuiGraphQLClient({
+    //       url: "https://sui-devnet.mystenlabs.com/graphql",
+    //     }),
+    //   }
+    // );
+
+    // const verified = publicKey.toSuiAddress() === zkLoginData.userAddress;
+
+    return { zkLoginSignature };
   }
 
   // Create a zkLogin signature that can be used to submit transactions
   async zkSignTransaction(
     zkLoginData: StoredZkLoginData,
     tx: Transaction
-  ): Promise<{ userSignature: string; zkLoginSignature: string }> {
+  ): Promise<{ zkLoginSignature: string; txBytes: Uint8Array }> {
     const ephemeralKeyPair = zkLoginData.ephemeralKeyPair;
 
     // get keypair from secret key
     const keypair = Ed25519Keypair.fromSecretKey(ephemeralKeyPair.secretKey);
 
     // Build & Sign the transaction
-    const bytes = await tx.build({ client: this.client });
-    const userSignature = (await keypair.signTransaction(bytes)).signature;
-
-    // Verify the transaction
-    const verified = await keypair
-      .getPublicKey()
-      .verifyTransaction(bytes, userSignature);
-
-    if (!verified) {
-      throw new Error("Signature verification failed");
-    }
+    tx.setSender(zkLoginData.userAddress);
+    const txBytes = await tx.build({ client: this.client });
+    const userSignature = (await keypair.signTransaction(txBytes)).signature;
 
     // Generate ZKLogin signature
     const aud = zkLoginData.decodedJwt.aud;
@@ -318,9 +315,21 @@ class zkLoginService {
       userSignature,
     });
 
+    // const publicKey = await verifyTransactionSignature(
+    //   txBytes,
+    //   zkLoginSignature,
+    //   {
+    //     client: new SuiGraphQLClient({
+    //       url: "https://sui-devnet.mystenlabs.com/graphql",
+    //     }),
+    //   }
+    // );
+
+    // const verified = publicKey.toSuiAddress() === zkLoginData.userAddress;
+
     return {
-      userSignature,
       zkLoginSignature,
+      txBytes,
     };
   }
 
@@ -330,54 +339,14 @@ class zkLoginService {
     tx: Transaction
   ): Promise<{ success: boolean; digest?: string; error?: string }> {
     try {
-      // Deserialize the ephemeralKeyPairString
-      const ephemeralKeyPair = zkLoginData.ephemeralKeyPair;
-
-      // Get user address and signer
-      const userAddress = zkLoginData.userAddress;
-      const keypair = Ed25519Keypair.fromSecretKey(ephemeralKeyPair.secretKey);
-
-      // Set the sender
-      tx.setSender(userAddress);
-
-      // Build & Sign the transaction
-      const bytes = await tx.build({ client: this.client });
-      const userSignature = (await keypair.signTransaction(bytes)).signature;
-
-      // Verify the transaction
-      const verified = await keypair
-        .getPublicKey()
-        .verifyTransaction(bytes, userSignature);
-
-      if (!verified) {
-        throw new Error("Signature verification failed");
-      }
-
-      // Generate ZKLogin signature
-      const aud = zkLoginData.decodedJwt.aud;
-      const subString = zkLoginData.decodedJwt.sub as string;
-      const audienceString = Array.isArray(aud) ? aud[0] : (aud as string);
-
-      const addressSeed = genAddressSeed(
-        BigInt(zkLoginData.userSalt),
-        "sub",
-        subString,
-        audienceString
-      ).toString();
-
-      // Assemble zkLogin signature
-      const zkLoginSignature = getZkLoginSignature({
-        inputs: {
-          ...zkLoginData.partialZkLoginSignature,
-          addressSeed,
-        },
-        maxEpoch: ephemeralKeyPair.maxEpoch,
-        userSignature,
-      });
+      const { txBytes, zkLoginSignature } = await this.zkSignTransaction(
+        zkLoginData,
+        tx
+      );
 
       // Execute the transaction
       const result = await this.client.executeTransactionBlock({
-        transactionBlock: bytes,
+        transactionBlock: txBytes,
         signature: zkLoginSignature,
       });
 
