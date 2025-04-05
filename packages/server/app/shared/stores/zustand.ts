@@ -32,8 +32,8 @@ export const useZkAuthStore = create<ZkAuthStore>()(
 interface GlobalUIStore {
   screen: Screen;
   setScreen: (screen: Screen) => void;
-  activeTab: Tab | null;
-  setActiveTab: (tab: Tab | null) => void;
+  activeTab: string | null;
+  setActiveTab: (tab: string | null) => void;
 }
 
 export const useGlobalUIStore = create<GlobalUIStore>()(

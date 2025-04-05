@@ -1,4 +1,4 @@
-import { tabs } from "../../pages/ui";
+import { tabs } from "../../pages/Tabs";
 import { useGlobalUIStore } from "../stores/zustand";
 
 export const useGlobalUI = () => {
@@ -23,8 +23,8 @@ export const useGlobalUI = () => {
 
   return {
     screen,
-    activeTab,
     setScreen,
+    activeTab,
     setActiveTab,
     getTabs,
   };

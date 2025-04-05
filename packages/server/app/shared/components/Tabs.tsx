@@ -1,15 +1,18 @@
 import { cn } from "@/shared/lib/utils";
-import { Tab } from "../types/globalUI";
+import { useGlobalUI } from "../hooks/useGlobalUI";
+import { useEffect } from "react";
 
 interface TabsProps {
-  tabs: Tab[];
-  activeTab: string;
-  onTabChange: (tabId: string) => void;
   className?: string;
   tabClassName?: string;
 }
 
-function Tabs({ tabs, activeTab, onTabChange, className, tabClassName }: TabsProps) {
+function Tabs({ className, tabClassName }: TabsProps) {
+  const { getTabs, activeTab, setActiveTab } = useGlobalUI();
+  const tabs = getTabs();
+
+  console.log(activeTab);
+
   return (
     <div className={cn("w-full", className)}>
       {/* Tabs Header */}
@@ -25,7 +28,7 @@ function Tabs({ tabs, activeTab, onTabChange, className, tabClassName }: TabsPro
                   : "text-grey-500 hover:text-grey-700",
                 tabClassName
               )}
-              onClick={() => onTabChange(tab.id)}
+              onClick={() => setActiveTab(tab.id)}
             >
               {tab.label}
             </button>
@@ -35,7 +38,7 @@ function Tabs({ tabs, activeTab, onTabChange, className, tabClassName }: TabsPro
 
       {/* Tab Content */}
       <div className="mt-4">
-        {tabs.find(tab => tab.id === activeTab)?.content}
+        {tabs.find(tab => tab.id === activeTab)?.content ? tabs.find(tab => tab.id === activeTab)?.content : tabs.find(tab => tab.id === tabs[0].id)?.content}
       </div>
     </div>
   );

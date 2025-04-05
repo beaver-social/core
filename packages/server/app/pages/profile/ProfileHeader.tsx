@@ -1,16 +1,10 @@
 import { Button } from "@/shared/components/ui/button";
-import Icon from "@/shared/components/Icon";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router";
+import { UserDetails } from ".";
 
 type Props = {
-    data: {
-        name: string;
-        username: string;
-        profilePicture: string;
-        coverPhoto: string;
-        postCount?: number;
-    };
+    data: UserDetails;
     isCurrentUser?: boolean;
 }
 
@@ -20,7 +14,7 @@ export default function ProfileHeader({ data, isCurrentUser = false }: Props) {
     return (
         <div>
             {/* Header with back button and user info */}
-            <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm flex items-center gap-6 p-3 border-b border-t">
+            <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm flex items-center gap-6 p-3 border-b">
                 <button
                     onClick={() => navigate(-1)}
                     className="rounded-full p-2 hover:bg-grey-200/10"
@@ -29,7 +23,6 @@ export default function ProfileHeader({ data, isCurrentUser = false }: Props) {
                 </button>
                 <div>
                     <h1 className="font-bold text-xl">{data.name}</h1>
-                    <p className="text-sm text-grey-500">{data.postCount} posts</p>
                 </div>
             </div>
 
