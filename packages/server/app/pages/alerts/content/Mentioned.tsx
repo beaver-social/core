@@ -1,0 +1,54 @@
+import NotificationBody from "../NotificationBody";
+
+const sampleAllNotifications = [
+    {
+        id: "1",
+        username: "John Doe",
+        timestamp: "2h",
+        content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
+        avatarUrl: "/images/user.png",
+        type: "reply"
+    },
+    {
+        id: "2",
+        username: "John Doe",
+        timestamp: "2h",
+        content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
+        avatarUrl: "/images/user.png",
+        type: "like"
+    },
+    {
+        id: "4",
+        username: "John Doe",
+        timestamp: "2h",
+        content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
+        avatarUrl: "/images/user.png",
+        type: "repost"
+    },
+    {
+        id: "5",
+        username: "John Doe",
+        timestamp: "2h",
+        content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
+        avatarUrl: "/images/user.png",
+        type: "message"
+    },
+    {
+        id: "5",
+        username: "John Doe",
+        timestamp: "2h",
+        content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
+        avatarUrl: "/images/user.png",
+        type: "other"
+    },
+];
+
+export default function Mentioned() {
+    return (
+        <div className="divide-y">
+            {sampleAllNotifications.map((post, index) => (
+                <NotificationBody key={index} {...post} />
+            ))}
+        </div>
+    )
+}

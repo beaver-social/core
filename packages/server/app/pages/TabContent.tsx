@@ -5,6 +5,9 @@ import Media from "./profile/content/Media";
 import Activity from "./profile/content/Activity";
 import ForYou from "./home/content/ForYou";
 import Following from "./home/content/Following";
+import Mentioned from "./alerts/content/Mentioned";
+import AllAlerts from "./alerts/content/AllAlerts";
+
 export const tabs: Record<Screen, Tab[]> = {
   home: [
     {
@@ -40,8 +43,19 @@ export const tabs: Record<Screen, Tab[]> = {
       content: (<Activity />),
     },
   ],
+  alerts: [
+    {
+      id: "mentioned",
+      label: "Mentioned",
+      content: (<Mentioned />),
+    },
+    {
+      id: "all",
+      label: "All",
+      content: (<AllAlerts />),
+    },
+  ],
   search: [],
-  notifications: [],
   messages: [],
   settings: [],
 };

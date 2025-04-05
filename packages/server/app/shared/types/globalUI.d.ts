@@ -8,6 +8,6 @@ export type Screen =
   | "home"
   | "profile"
   | "search"
-  | "notifications"
+  | "alerts"
   | "messages"
   | "settings";

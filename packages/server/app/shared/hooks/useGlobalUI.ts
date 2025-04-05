@@ -1,10 +1,11 @@
 import { tabs } from "../../pages/TabContent";
 import { useGlobalUIStore } from "../stores/zustand";
+import { Tab } from "../types/globalUI";
 
 export const useGlobalUI = () => {
   const { screen, setScreen, activeTab, setActiveTab } = useGlobalUIStore();
 
-  const getTabs = () => {
+  const getTabs = (): Tab[] => {
     switch (screen) {
       case "home":
         return tabs.home;
@@ -12,8 +13,8 @@ export const useGlobalUI = () => {
         return tabs.profile;
       case "search":
         return tabs.search;
-      case "notifications":
-        return tabs.notifications;
+      case "alerts":
+        return tabs.alerts;
       case "messages":
         return tabs.messages;
       case "settings":

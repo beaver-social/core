@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import Error404 from "./pages/_404";
 import Home from "./pages/home";
 import Post from "./pages/post";
-import Notifications from "./pages/notifications";
+import Notifications from "./pages/alerts";
 import Messages from "./pages/messages";
 import Message from "./pages/messages/message";
 import Profile from "./pages/profile";

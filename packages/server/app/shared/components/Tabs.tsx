@@ -1,5 +1,6 @@
 import { cn } from "@/shared/lib/utils";
 import { useGlobalUI } from "../hooks/useGlobalUI";
+import { Tab } from "../types/globalUI";
 
 interface TabsProps {
   className?: string;
@@ -10,14 +11,12 @@ function Tabs({ className, tabClassName }: TabsProps) {
   const { getTabs, activeTab, setActiveTab } = useGlobalUI();
   const tabs = getTabs();
 
-  console.log(activeTab);
-
   return (
     <div className={cn("w-full", className)}>
       {/* Tabs Header */}
       <div className="sticky glass top-0 z-10 bg-background/50 border-b">
         <div className="flex">
-          {tabs.map((tab) => (
+          {tabs && tabs.length > 0 && tabs.map((tab) => (
             <button
               key={tab.id}
               className={cn(
@@ -37,7 +36,7 @@ function Tabs({ className, tabClassName }: TabsProps) {
 
       {/* Tab Content */}
       <div className="mt-4">
-        {tabs.find(tab => tab.id === activeTab)?.content ? tabs.find(tab => tab.id === activeTab)?.content : tabs.find(tab => tab.id === tabs[0].id)?.content}
+        {tabs && tabs.length > 0 && tabs.find((tab) => tab.id === activeTab)?.content ? tabs.find((tab) => tab.id === activeTab)?.content : tabs.find((tab) => tab.id === tabs[0].id)?.content}
       </div>
     </div>
   );
