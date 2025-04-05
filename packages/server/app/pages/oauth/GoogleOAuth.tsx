@@ -1,15 +1,14 @@
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
-import { zkLogin } from "@/shared/lib/utils"
 import { useEffect, useState } from 'react'
 import { toast } from "sonner";
 import { useZkAuthStore } from "@/shared/stores/zustand";
 import Icon from "@/shared/components/Icon";
+import zkLoginService from "@/shared/lib/zkLoginService";
 
 type Props = {}
 
 export default function GoogleOAuth({ }: Props) {
     const zkAuthStore = useZkAuthStore();
-    const [newAddress, setNewAddress] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
@@ -19,23 +18,24 @@ export default function GoogleOAuth({ }: Props) {
                 try {
                     // Get ephemeral keypair from session storage
                     const storedKeyPair = sessionStorage.getItem('zkLoginEphemeralKeyPair');
+
                     if (!storedKeyPair) {
-                        throw new Error("No ephemeral keypair found. Please try again.");
+                        throw new Error("No ephemeral keypair found in session. Please try again.");
                     }
 
-                    // Complete the zkLogin flow
-                    const zkLoginData = await zkLogin.completeZkLoginFlow(window.location.href);
+                    const ephemeralKeyPair = JSON.parse(storedKeyPair);
 
-                    setNewAddress(zkLoginData.userAddress);
+                    // Complete the zkLogin flow
+                    const zkLoginData = await zkLoginService.completeZkLoginFlow(ephemeralKeyPair, window.location.href);
                     setIsLoading(false);
 
                     zkAuthStore.setZkLoginData({
-                        ephemeralKeyPair: storedKeyPair,
                         jwt: zkLoginData.jwt,
                         decodedJwt: zkLoginData.decodedJwt,
                         userAddress: zkLoginData.userAddress,
-                        partialZkLoginSignature: zkLoginData.partialZkLoginSignature,
                         userSalt: zkLoginData.userSalt.toString(),
+                        ephemeralKeyPair: ephemeralKeyPair,
+                        partialZkLoginSignature: zkLoginData.partialZkLoginSignature,
                     });
 
                     // clear session storage

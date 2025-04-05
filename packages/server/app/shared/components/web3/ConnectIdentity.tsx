@@ -7,8 +7,9 @@ import { useCurrentAccount, useDisconnectWallet } from "@mysten/dapp-kit";
 import { toast } from "sonner";
 import { formatAddress } from "@mysten/sui/utils";
 import Icon from "../Icon";
-import { zkLogin } from "@/shared/lib/utils";
 import { useZkAuthStore } from "@/shared/stores/zustand";
+import zkLoginService from "@/shared/lib/zkLoginService";
+
 type Props = {
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
@@ -43,23 +44,16 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
     async function handleGoogleLogin() {
         try {
             // Generate ephemeral keypair
-            const ephemeralKeyPair = await zkLogin.generateEphemeralKeyPair();
+            const ephemeralKeyPair = await zkLoginService.generateEphemeralKeyPair();
 
             // Store only the necessary data in session storage
-            const secretKey = ephemeralKeyPair.keypair.getSecretKey();
             sessionStorage.setItem(
                 "zkLoginEphemeralKeyPair",
-                JSON.stringify({
-                    publicKey: ephemeralKeyPair.publicKey,
-                    maxEpoch: ephemeralKeyPair.maxEpoch,
-                    randomness: ephemeralKeyPair.randomness,
-                    nonce: ephemeralKeyPair.nonce,
-                    privateKeyBytes: secretKey
-                })
+                JSON.stringify(ephemeralKeyPair)
             );
 
             // Generate OAuth URL and redirect
-            const oauthUrl = zkLogin.generateGoogleOAuthUrl(ephemeralKeyPair);
+            const oauthUrl = zkLoginService.generateGoogleOAuthUrl(ephemeralKeyPair);
             window.location.href = oauthUrl;
         } catch (error: any) {
             toast.error(`Error initiating login: ${error.message}`);
