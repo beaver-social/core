@@ -9,7 +9,7 @@ type Props = {
         username: string;
         profilePicture: string;
         coverPhoto: string;
-        postCount: number;
+        postCount?: number;
     };
     isCurrentUser?: boolean;
 }
