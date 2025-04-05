@@ -1,13 +1,13 @@
 import NotificationBody from "../NotificationBody";
 
-const sampleAllNotifications = [
+const sampleMentionedNotifications = [
     {
         id: "1",
         username: "John Doe",
         timestamp: "2h",
         content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
         avatarUrl: "/images/user.png",
-        type: "reply"
+        type: "mention"
     },
     {
         id: "2",
@@ -15,7 +15,15 @@ const sampleAllNotifications = [
         timestamp: "2h",
         content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
         avatarUrl: "/images/user.png",
-        type: "like"
+        type: "mention"
+    },
+    {
+        id: "3",
+        username: "John Doe",
+        timestamp: "2h",
+        content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
+        avatarUrl: "/images/user.png",
+        type: "mention"
     },
     {
         id: "4",
@@ -23,30 +31,14 @@ const sampleAllNotifications = [
         timestamp: "2h",
         content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
         avatarUrl: "/images/user.png",
-        type: "repost"
-    },
-    {
-        id: "5",
-        username: "John Doe",
-        timestamp: "2h",
-        content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
-        avatarUrl: "/images/user.png",
-        type: "message"
-    },
-    {
-        id: "5",
-        username: "John Doe",
-        timestamp: "2h",
-        content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
-        avatarUrl: "/images/user.png",
-        type: "other"
+        type: "mention"
     },
 ];
 
 export default function Mentioned() {
     return (
         <div className="divide-y">
-            {sampleAllNotifications.map((post, index) => (
+            {sampleMentionedNotifications.map((post, index) => (
                 <NotificationBody key={index} {...post} />
             ))}
         </div>

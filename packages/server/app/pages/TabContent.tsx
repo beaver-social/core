@@ -45,14 +45,14 @@ export const tabs: Record<Screen, Tab[]> = {
   ],
   alerts: [
     {
-      id: "mentioned",
-      label: "Mentioned",
-      content: (<Mentioned />),
-    },
-    {
       id: "all",
       label: "All",
       content: (<AllAlerts />),
+    },
+    {
+      id: "mentioned",
+      label: "Mentioned",
+      content: (<Mentioned />),
     },
   ],
   search: [],

@@ -41,7 +41,7 @@ export const useGlobalUIStore = create<GlobalUIStore>()(
     (set) => ({
       screen: "home",
       setScreen: (screen) => set({ screen }),
-      activeTab: null,
+      activeTab: "for-you",
       setActiveTab: (tab) => set({ activeTab: tab }),
     }),
     { name: "global-ui-store" }

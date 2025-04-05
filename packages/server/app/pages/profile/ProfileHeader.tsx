@@ -15,7 +15,7 @@ export default function ProfileHeader({ data, isCurrentUser = false }: Props) {
     return (
         <div>
             {/* Header with back button and user info */}
-            <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm flex items-center gap-6 p-3 border-b">
+            <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm flex items-center gap-6 p-3 rounded-t-lg">
                 <button
                     onClick={() => navigate(-1)}
                     className="rounded-full p-2 hover:bg-grey-200/10"

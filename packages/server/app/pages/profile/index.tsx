@@ -44,11 +44,9 @@ const userDetails: UserDetails = {
 export default function Profile() {
     const { id } = useParams<{ id: string }>()
     const { setScreen } = useGlobalUI();
-
-    // Set the screen to profile
     useEffect(() => {
         setScreen("profile");
-    }, [setScreen]);
+    }, []);
 
     const isCurrentUser = id === userDetails.id;
 

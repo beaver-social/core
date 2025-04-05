@@ -1,24 +1,54 @@
-import React from 'react'
 import NotificationBody from "../NotificationBody"
 
 type Props = {}
 
-// Sample following posts
-const sampleMentionedNotifications = [
+const sampleAllNotifications = [
     {
-        id: "3",
+        id: "1",
         username: "John Doe",
         timestamp: "2h",
-        content: "Thanks to @ishtails for supporting me.",
+        content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
         avatarUrl: "/images/user.png",
-        type: "mention"
+        type: "reply"
+    },
+    {
+        id: "2",
+        username: "John Doe",
+        timestamp: "2h",
+        content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
+        avatarUrl: "/images/user.png",
+        type: "like"
+    },
+    {
+        id: "4",
+        username: "John Doe",
+        timestamp: "2h",
+        content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
+        avatarUrl: "/images/user.png",
+        type: "repost"
+    },
+    {
+        id: "5",
+        username: "John Doe",
+        timestamp: "2h",
+        content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
+        avatarUrl: "/images/user.png",
+        type: "message"
+    },
+    {
+        id: "5",
+        username: "John Doe",
+        timestamp: "2h",
+        content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
+        avatarUrl: "/images/user.png",
+        type: "other"
     },
 ];
 
 export default function AllAlerts({ }: Props) {
     return (
         <div className="divide-y">
-            {sampleMentionedNotifications.map((post, index) => (
+            {sampleAllNotifications.map((post, index) => (
                 <NotificationBody key={index} {...post} />
             ))}
         </div>

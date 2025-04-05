@@ -1,6 +1,6 @@
 import { tabs } from "../../pages/TabContent";
 import { useGlobalUIStore } from "../stores/zustand";
-import { Tab } from "../types/globalUI";
+import { Tab, Screen } from "../types/globalUI";
 
 export const useGlobalUI = () => {
   const { screen, setScreen, activeTab, setActiveTab } = useGlobalUIStore();
@@ -22,9 +22,14 @@ export const useGlobalUI = () => {
     }
   };
 
+  const setScreenHandler = (screen: Screen) => {
+    setScreen(screen);
+    setActiveTab(null);
+  };
+
   return {
     screen,
-    setScreen,
+    setScreen: setScreenHandler,
     activeTab,
     setActiveTab,
     getTabs,
