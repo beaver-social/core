@@ -2,6 +2,7 @@ import { Button } from "@/shared/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router";
 import { UserDetails } from ".";
+import { Image } from "@/shared/components/Image";
 
 type Props = {
     data: UserDetails;
@@ -28,14 +29,14 @@ export default function ProfileHeader({ data, isCurrentUser = false }: Props) {
 
             {/* Cover Photo */}
             <div className="relative">
-                <img
+                <Image
                     src={data.coverPhoto}
                     alt="Cover"
                     className="w-full h-48 object-cover"
                 />
 
                 {/* Profile Picture */}
-                <img
+                <Image
                     src={data.profilePicture}
                     alt="Profile"
                     className="absolute -bottom-16 left-6 size-32 rounded-full border-4 border-background bg-grey-900"

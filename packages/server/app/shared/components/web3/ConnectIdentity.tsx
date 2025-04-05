@@ -9,6 +9,7 @@ import { formatAddress } from "@mysten/sui/utils";
 import Icon from "../Icon";
 import { useZkAuthStore } from "@/shared/stores/zustand";
 import zkLoginService from "@/shared/lib/zkLoginService";
+import { Image } from "../Image";
 
 type Props = {
     open?: boolean;
@@ -95,14 +96,14 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
                                 className="w-full"
                                 onClick={handleGoogleLogin}
                             >
-                                <img src="/icons/google_icon.png" alt="Google" className="size-6" />
+                                <Image src="/icons/google_icon.png" alt="Google" className="size-6" />
                             </Button>
                             <Button variant="outline" className="w-full">
                                 {
                                     theme === "dark" ? (
-                                        <img src="/icons/x_icon_dark.png" alt="X" className="size-7 p-1" />
+                                        <Image src="/icons/x_icon_dark.png" alt="X" className="size-7 p-1" />
                                     ) : (
-                                        <img src="/icons/x_icon_light.png" alt="X" className="size-7 p-1" />
+                                        <Image src="/icons/x_icon_light.png" alt="X" className="size-7 p-1" />
                                     )
                                 }
                             </Button>

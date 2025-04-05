@@ -19,16 +19,17 @@ import { Link } from "react-router";
 import { Button } from "@/shared/components/ui/button";
 import Icon from "@/shared/components/Icon";
 import { Calendar, Globe, MapPin } from "lucide-react";
+import { Image } from "@/shared/components/Image";
 
 export default function ProfileDetailsSection({ data }: Props) {
     return (
         <div className="border rounded-t-md">
             {/* Cover Photo */}
             <div className="relative">
-                <img src={data.coverPhoto} alt="Cover" className="w-full h-48 object-cover rounded-t-md" />
+                <Image src={data.coverPhoto} alt="Cover" className="w-full h-48 object-cover rounded-t-md" />
 
                 {/* Profile Picture */}
-                <img
+                <Image
                     src={data.profilePicture}
                     alt="Profile"
                     className="absolute -bottom-16 left-6 size-32 rounded-full border-4 border-background bg-grey-900"

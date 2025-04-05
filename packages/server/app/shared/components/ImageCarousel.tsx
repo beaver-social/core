@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Icon from './Icon';
+import { Image } from "./Image";
 
 interface ImageCarouselProps {
     images: string[];
@@ -45,7 +46,7 @@ export default function ImageCarousel({ images, className = '', aspectRatio }: I
                         </div>
                     </button>
                 ) : (
-                    <img
+                    <Image
                         src={images[currentIndex]}
                         alt={`Image ${currentIndex + 1} of ${images.length}`}
                         className="w-full h-full object-contain"

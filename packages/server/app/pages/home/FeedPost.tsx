@@ -9,6 +9,7 @@ import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
 import { Network } from "@/shared/context/web3context";
 import zkLoginService from "@/shared/lib/zkLoginService";
 import { useSignPersonalMessage } from "@mysten/dapp-kit";
+import { Image } from "@/shared/components/Image";
 
 type FeedPostProps = {
     id: string;
@@ -109,7 +110,7 @@ function FeedPost({
                 {/* Avatar */}
                 <div className="flex-shrink-0">
                     <Link to={`/profile/${handle}`} onClick={(e) => e.stopPropagation()}>
-                        <img
+                        <Image
                             src={avatarUrl}
                             alt={username}
                             className="w-12 h-12 rounded-full"

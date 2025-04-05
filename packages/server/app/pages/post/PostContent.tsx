@@ -1,3 +1,4 @@
+import { Image } from "@/shared/components/Image";
 import PostActions from "./PostFunctions";
 
 
@@ -17,7 +18,7 @@ export default function PostContent({ post }: {
 }) {
     return (
         <div className="flex gap-4 p-4 border-b">
-            <img src={post.avatarUrl} alt={`${post.username}'s avatar`} className="w-10 h-10 rounded-full" />
+            <Image src={post.avatarUrl} alt={`${post.username}'s avatar`} className="w-10 h-10 rounded-full" />
             <div className="flex-1">
                 <div className="flex items-center gap-2">
                     <span className="font-semibold">{post.username}</span>
@@ -27,7 +28,7 @@ export default function PostContent({ post }: {
                 </div>
                 <p className="mt-2">{post.content}</p>
                 {post.imageUrl && (
-                    <img src={post.imageUrl} alt="Post content" className="mt-2 rounded-lg max-h-[500px] w-full object-cover bg-primary-100 dark:bg-primary-950" />
+                    <Image src={post.imageUrl} alt="Post content" className="mt-2 rounded-lg max-h-[500px] w-full object-cover bg-primary-100 dark:bg-primary-950" />
                 )}
                 <PostActions />
             </div>
