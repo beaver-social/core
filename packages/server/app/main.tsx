@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "./shared/context/theme-provider.tsx";
 import { Web3Provider } from "./shared/context/web3context.tsx";
 import { Toaster } from "sonner";
+import { ErrorBoundary } from "./shared/lib/errorHandling.ts";
 
 const queryClient = new QueryClient();
 
@@ -19,14 +20,18 @@ const root = createRoot(rootElement);
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <Providers>
-          <Router />
-          <Toaster />
-        </Providers>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <StrictMode>
+      <ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+            <Providers>
+              <Router />
+              <Toaster />
+            </Providers>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </ErrorBoundary>
+    </StrictMode>
   );
 }
 

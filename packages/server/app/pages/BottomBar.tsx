@@ -1,3 +1,4 @@
+import { Image } from "@/shared/components/Image";
 import Icon from "../shared/components/Icon";
 import type { icons } from "lucide-react";
 import { Link } from "react-router";
@@ -46,7 +47,7 @@ function BottomBar() {
                 ))}
 
                 <Link to={"/dashboard/profile"} className="flex flex-col items-center justify-center text-xs text-grey-300 hover:text-primary bg-grey-900 rounded-full p-1 hover:bg-grey-800 transition-all">
-                    <img src="/images/user.png" alt="logo" className="w-6 h-6" />
+                    <Image src="/images/user.png" alt="logo" className="w-6 h-6" />
                 </Link>
             </nav>
         </div>

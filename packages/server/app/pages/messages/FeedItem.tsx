@@ -1,6 +1,7 @@
 import Icon from "@/shared/components/Icon";
 import { Link, useNavigate } from "react-router";
 import ImageCarousel from "@/shared/components/ImageCarousel";
+import { Image } from "@/shared/components/Image";
 
 export default function FeedItem({
     id,
@@ -27,7 +28,7 @@ export default function FeedItem({
                 <div className="flex-1">
                     {/* Header */}
                     <div className="flex items-center">
-                        <img
+                        <Image
                             src={avatarUrl}
                             alt={username}
                             className="size-12 rounded-full"

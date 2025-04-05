@@ -1,3 +1,5 @@
+import { Image } from "@/shared/components/Image"
+
 type Props = {}
 
 export default function UserDetails({ }: Props) {
@@ -5,7 +7,7 @@ export default function UserDetails({ }: Props) {
         <div>
             <div className="flex w-full flex-col items-center justify-center p-6">
                 <div className="flex flex-col items-center justify-center w-full">
-                    <img src="/images/user.png" alt="User Avatar" className="size-20 rounded-full" />
+                    <Image src="/images/user.png" alt="User Avatar" className="size-20 rounded-full" />
                     <h2 className="text-xl font-bold">Adam Silverman</h2>
                     <p className="text-sm text-muted-foreground">@AtomSilverman</p>
                 </div>

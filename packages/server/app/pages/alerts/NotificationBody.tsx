@@ -1,6 +1,7 @@
 import Icon from "@/shared/components/Icon";
 import { Link, useNavigate } from "react-router";
 import ImageCarousel from "@/shared/components/ImageCarousel";
+import { Image } from "@/shared/components/Image";
 
 export default function NotificationBody({
     id,
@@ -48,7 +49,7 @@ export default function NotificationBody({
                     {/* Header */}
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <img
+                            <Image
                                 src={avatarUrl}
                                 alt={username}
                                 className="size-12 rounded-full"

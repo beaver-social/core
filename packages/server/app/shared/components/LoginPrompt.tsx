@@ -1,3 +1,4 @@
+import { Image } from "./Image";
 import LoginButton from "./LoginButton";
 
 interface IProps {
@@ -9,7 +10,7 @@ interface IProps {
 export default function (props: IProps) {
   return (
     <div className="flex flex-col items-center gap-y-4 p-4">
-      <img
+      <Image
         src={props.img}
         alt="This is what a new token looks like"
         className="w-1/2"
@@ -21,7 +22,7 @@ export default function (props: IProps) {
         {props.description}
       </p>
 
-      <LoginButton className="bg-secondary self-stretch rounded-lg py-3 font-semibold duration-150 active:duration-75 active:scale-95"> 
+      <LoginButton className="bg-secondary self-stretch rounded-lg py-3 font-semibold duration-150 active:duration-75 active:scale-95">
         Register or Sign in
       </LoginButton>
     </div>

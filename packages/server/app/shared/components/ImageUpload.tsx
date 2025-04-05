@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ImageCropDialog from "./ImageCropDialog";
+import { Image } from "./Image";
 
 interface IProps {
   setImage: (file: File) => void;
@@ -47,7 +48,7 @@ export default function (props: IProps) {
         {file ? file.name : "Choose an image"}
       </label>
       {preview && (
-        <img
+        <Image
           src={preview}
           alt="Preview"
           className="mt-2 mx-auto w-1/2 aspect-square object-contain rounded-lg"

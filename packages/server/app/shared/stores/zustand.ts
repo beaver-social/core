@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { partialZkLoginSignature, StoredZkLoginData } from "../types/zk";
-
+import { Tab, Screen } from "../types/globalUI";
 interface ZkAuthStore {
   zkEphemeralKeyPair: string | null;
   setZkEphemeralKeyPair: (zkEphemeralKeyPair: string | null) => void;
@@ -26,5 +26,24 @@ export const useZkAuthStore = create<ZkAuthStore>()(
       setZkLoginData: (zkLoginData) => set({ zkLoginData }),
     }),
     { name: "zk-auth-store" }
+  )
+);
+
+interface GlobalUIStore {
+  screen: Screen;
+  setScreen: (screen: Screen) => void;
+  activeTab: string | null;
+  setActiveTab: (tab: string | null) => void;
+}
+
+export const useGlobalUIStore = create<GlobalUIStore>()(
+  persist(
+    (set) => ({
+      screen: "home",
+      setScreen: (screen) => set({ screen }),
+      activeTab: "for-you",
+      setActiveTab: (tab) => set({ activeTab: tab }),
+    }),
+    { name: "global-ui-store" }
   )
 );

@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from "react";
 import ImageCropDialog from "@/shared/components/ImageCropDialog";
 import imageCompression from 'browser-image-compression';
 import { Button } from "@/shared/components/ui/button";
+import { Image } from "@/shared/components/Image";
 
 type ImageWithAspectRatio = {
     file: File;
@@ -110,7 +111,7 @@ export default function CreatePost() {
                 {previewUrls.map((url, index) => (
                     <div key={index} className="relative">
                         <div className={`relative ${images[index].aspectRatio === 'square' ? 'aspect-square' : 'aspect-[3/4]'}`}>
-                            <img
+                            <Image
                                 src={url}
                                 alt={`Preview ${index + 1}`}
                                 className="w-full h-full object-cover rounded-lg"
@@ -133,7 +134,7 @@ export default function CreatePost() {
     return (
         <div className="p-4 border-b">
             <form onSubmit={handleSubmit} className="flex gap-4">
-                <img src="/images/user.png" alt="User avatar" className="w-10 h-10 rounded-full" />
+                <Image src="/images/user.png" alt="User avatar" className="w-10 h-10 rounded-full" />
                 <div className="flex-1">
                     <textarea
                         placeholder="What's happening?"
