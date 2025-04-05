@@ -39,21 +39,14 @@ const app = new Hono()
   .get("/contracts", async (ctx) => {
     return ctx.json({
       testnet: {
-        beaverSocial: {
-          package: "0x",
-          modules: {
-            registry: {
-              functions: [{
-                name: "mint"
-              }]
-            },
-            identity_registration: {
-              functions: [{
-                name: "attach_suins"
-              }]
-            }
-          }
-        }
+        objects: {
+          adminsRecord: "0x",
+          clock: "0x",
+          registry: "0x",
+        },
+        packages: {
+          beaverSocial: { id: "0x" },
+        },
       },
     });
   });

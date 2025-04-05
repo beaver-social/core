@@ -3,12 +3,14 @@ import * as t from "drizzle-orm/sqlite-core";
 import { suiAddressType, timestamps } from "./helpers";
 import { posts } from "./post";
 
-export const users = table("users", {
+export const users = table(
+  "users",
+  {
     id: t.int().notNull().primaryKey({ autoIncrement: true }),
     identity: suiAddressType().notNull(),
     username: t.text().notNull(),
     fullName: t.text().notNull(),
-    wallet: suiAddressType().notNull(),
+    address: suiAddressType().notNull(),
     suins_domain_name: t.text(),
     image_url: t.text().notNull(),
     banner_url: t.text(),
@@ -16,6 +18,6 @@ export const users = table("users", {
     timezone: t.int(),
     pinned: t.int("pinned_post").references((): t.AnySQLiteColumn => posts.id),
     ...timestamps,
-}, (table) => [
-    t.uniqueIndex("identity_idx").on(table.identity),
-]);
+  },
+  (table) => [t.uniqueIndex("identity_idx").on(table.identity)]
+);
