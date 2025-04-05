@@ -5,7 +5,6 @@ import { count, desc, eq, like, sql } from "drizzle-orm";
 import { z } from "zod";
 import { zNumberString } from "../lib/zod/helpers";
 import { posts } from "../lib/db/schema/post";
-import { replies } from "../lib/db/schema/reply";
 import { likes } from "../lib/db/schema/like";
 
 function err(msg: string) {
@@ -32,7 +31,7 @@ export default new Hono()
                     likesCount: sql<number>`COALESCE(COUNT(DISTINCT likes.id), 0)`
                 })
                 .from(posts)
-                .leftJoin(replies, eq(posts.id, replies.postId))
+                .leftJoin(posts, eq(posts.id, posts.parent))
                 .leftJoin(likes, eq(posts.id, likes.postId))
                 .groupBy(posts.id)
                 .orderBy(desc(posts.createdAt))
@@ -72,52 +71,6 @@ export default new Hono()
         },
     )
 
-    .get("/:id/replies",
-        zValidator(
-            "param",
-            z.object({
-                id: zNumberString,
-            }),
-        ),
-        zValidator(
-            "query",
-            z.object({
-                page: zNumberString.default("1"),
-                limit: zNumberString.default("10")
-            }),
-        ),
-        async (ctx) => {
-            const { id } = ctx.req.valid("param");
-
-            // check if page & limit is number when default
-            const { page, limit } = ctx.req.valid("query");
-
-            if (!id) {
-                return ctx.json({ error: "id not provided" }, 400)
-            }
-
-            const offset = (page - 1) * limit;
-            const postReplies = await db
-                .select()
-                .from(replies)
-                .where(eq(replies.id, id))
-                .limit(limit)
-                .offset(offset);
-
-            const totalReplies = await db
-                .select({ count: count() })
-                .from(replies)
-                .where(eq(replies.id, id));
-
-            return ctx.json({
-                postReplies,
-                totalPosts: totalReplies[0]?.count ?? 0,
-                currentPage: page,
-                perPage: limit,
-            }, 200);
-        }
-    )
-
     .get("/:id/likes",
         zValidator(
             "param",
@@ -152,7 +105,7 @@ export default new Hono()
 
             const totalPostLikes = await db
                 .select({ count: count() })
-                .from(replies)
+                .from(likes)
                 .where(eq(likes.id, id));
 
             return ctx.json({
