@@ -1,6 +1,5 @@
 import { cn } from "@/shared/lib/utils";
 import { useGlobalUI } from "../hooks/useGlobalUI";
-import { useEffect } from "react";
 
 interface TabsProps {
   className?: string;

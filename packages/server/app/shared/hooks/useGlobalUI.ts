@@ -1,4 +1,4 @@
-import { tabs } from "../../pages/Tabs";
+import { tabs } from "../../pages/TabContent";
 import { useGlobalUIStore } from "../stores/zustand";
 
 export const useGlobalUI = () => {
