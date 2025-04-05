@@ -89,7 +89,7 @@ public(package) fun mint_(
 
 /// Public Methods
 
-public entry fun switch_owners(
+public entry fun switch_owner(
     registry: &mut Registry,
     identity: &mut IdentityRegistration,
     suins: &suins_registration::SuinsRegistration,

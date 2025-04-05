@@ -1,10 +1,13 @@
 {
-    "name": "contracts",
-    "scripts": {
-        "mc": "clear && sui move build --skip-fetch-latest-git-deps"
-    },
-    "dependencies": {
-        "@mysten/sui": "^1.26.1",
-        "bip39": "^3.1.0"
-    }
+  "name": "contracts",
+  "scripts": {
+    "mc": "clear && sui move build --skip-fetch-latest-git-deps"
+  },
+  "exports": {
+    ".": "./services/index.ts"
+  },
+  "dependencies": {
+    "@mysten/sui": "^1.26.1",
+    "bip39": "^3.1.0"
+  }
 }
