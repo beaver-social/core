@@ -3,6 +3,7 @@ import db from "..";
 import { likes } from "../schema/like";
 import { posts } from "../schema/post";
 import { createAction } from "./factory";
+import { users } from "../schema/user";
 
 export const likePost = createAction<{ postId: number }>(
   async ({ postId, userId }) => {
@@ -68,3 +69,25 @@ export const deleteComment = createAction<{ postId: number, parent: number }>(
       .where(eq(posts.id, parent));
   }
 )
+
+export const pinPost = createAction<{ postId: number }>(
+  async ({ userId, postId }) => {
+    await db
+      .update(users)
+      .set({
+        pinned: postId,
+      })
+      .where(eq(users.id, userId));
+  }
+);
+
+export const unpinPost = createAction(
+  async ({ userId }) => {
+    await db
+      .update(users)
+      .set({
+        pinned: null,
+      })
+      .where(eq(users.id, userId));
+  }
+);
