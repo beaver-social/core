@@ -34,3 +34,37 @@ export const unlikePost = createAction<{ postId: number }>(
       .where(eq(posts.id, postId));
   }
 );
+
+export const createComment = createAction<{ content: string, media: string, parent: number }>(
+  async ({ userId, content, media, parent }) => {
+
+    await db.insert(posts).values({
+      authorId: userId,
+      content,
+      media,
+      parent
+    })
+
+    await db
+      .update(posts)
+      .set({
+        repliesCount: sql`${posts.repliesCount} + 1`,
+      })
+      .where(eq(posts.id, parent));
+  }
+)
+
+
+export const deleteComment = createAction<{ postId: number, parent: number }>(
+  async ({ userId, parent, postId }) => {
+
+    await db.delete(posts).where(and(eq(posts.id, postId), eq(posts.authorId, userId)));
+
+    await db
+      .update(posts)
+      .set({
+        repliesCount: sql`${posts.repliesCount} - 1`,
+      })
+      .where(eq(posts.id, parent));
+  }
+)
