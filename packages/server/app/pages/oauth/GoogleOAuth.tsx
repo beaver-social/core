@@ -18,12 +18,15 @@ export default function GoogleOAuth({ }: Props) {
                 try {
                     // Get ephemeral keypair from session storage
                     const storedKeyPair = sessionStorage.getItem('zkLoginEphemeralKeyPair');
+
                     if (!storedKeyPair) {
-                        throw new Error("No ephemeral keypair found. Please try again.");
+                        throw new Error("No ephemeral keypair found in session. Please try again.");
                     }
 
+                    const ephemeralKeyPair = JSON.parse(storedKeyPair);
+
                     // Complete the zkLogin flow
-                    const zkLoginData = await zkLoginService.completeZkLoginFlow(window.location.href);
+                    const zkLoginData = await zkLoginService.completeZkLoginFlow(ephemeralKeyPair, window.location.href);
                     setIsLoading(false);
 
                     zkAuthStore.setZkLoginData({
@@ -31,7 +34,7 @@ export default function GoogleOAuth({ }: Props) {
                         decodedJwt: zkLoginData.decodedJwt,
                         userAddress: zkLoginData.userAddress,
                         userSalt: zkLoginData.userSalt.toString(),
-                        ephemeralKeyPairString: storedKeyPair,
+                        ephemeralKeyPair: ephemeralKeyPair,
                         partialZkLoginSignature: zkLoginData.partialZkLoginSignature,
                     });
 

@@ -13,7 +13,6 @@ import * as jwtDecode from "jwt-decode";
 import apiClient from "@/shared/lib/apiClient";
 import {
   JwtPayload,
-  partialZkLoginSignature,
   StoredZkLoginData,
   EphemeralKeyPair,
   ZkLoginData,
@@ -55,7 +54,7 @@ class zkLoginService {
 
     const maxEpoch = Number(epoch) + 2; // Active for 2 epochs
     const ephemeralKeyPair = new Ed25519Keypair();
-    const publicKey = ephemeralKeyPair.getPublicKey().toBase64();
+    const secretKey = ephemeralKeyPair.getSecretKey();
     const randomness = generateRandomness();
     const nonce = generateNonce(
       ephemeralKeyPair.getPublicKey(),
@@ -64,8 +63,7 @@ class zkLoginService {
     );
 
     return {
-      keypair: ephemeralKeyPair,
-      publicKey,
+      secretKey,
       maxEpoch,
       randomness,
       nonce,
@@ -153,8 +151,10 @@ class zkLoginService {
     userSalt: bigint
   ): Promise<any> {
     try {
+      const keyPair = Ed25519Keypair.fromSecretKey(ephemeralKeyPair.secretKey);
+
       const extendedEphemeralPublicKey = getExtendedEphemeralPublicKey(
-        ephemeralKeyPair.keypair.getPublicKey()
+        keyPair.getPublicKey()
       );
 
       // Prepare data for the ZK proving request
@@ -191,31 +191,16 @@ class zkLoginService {
    * Complete zkLogin flow
    * Executes all steps of the zkLogin flow
    */
-  async completeZkLoginFlow(redirectUrl: string): Promise<ZkLoginData> {
-    // Fetch ephemeral key pair data from session storage
-    const storedData = JSON.parse(
-      sessionStorage.getItem("zkLoginEphemeralKeyPair") as string
-    );
-
-    // Reconstruct the Ed25519Keypair from the stored private key bytes
-    const keypair = Ed25519Keypair.fromSecretKey(storedData.privateKeyBytes);
-
-    // Reconstruct the EphemeralKeyPair object
-    const ephemeralKeyPair: EphemeralKeyPair = {
-      keypair,
-      publicKey: storedData.publicKey,
-      maxEpoch: storedData.maxEpoch,
-      randomness: storedData.randomness,
-      nonce: storedData.nonce,
-    };
-
-    // Step 3: Extract and decode JWT (assuming step 2, user login, was done externally)
+  async completeZkLoginFlow(
+    ephemeralKeyPair: EphemeralKeyPair,
+    redirectUrl: string
+  ): Promise<ZkLoginData> {
+    // Deserialize the ephemeral key pair
     const { jwt, decodedJwt } = this.extractAndDecodeJwt(redirectUrl);
 
-    // Step 4: Get user salt
     const userSalt = await this.getUserSalt(decodedJwt);
 
-    // Step 5: Generate user's Sui address
+    // Generate user's Sui address
     const userAddress = this.computeZkLoginAddress(userSalt, jwt);
 
     // Step 6: Get zero-knowledge proof
@@ -236,27 +221,12 @@ class zkLoginService {
     };
   }
 
-  // Helper function to serialize the ephemeral key pair
-  deserializeEphemeralKeyPair(
-    ephemeralKeyPairString: string
-  ): EphemeralKeyPair {
-    const parsedData = JSON.parse(ephemeralKeyPairString);
-    const keypair = Ed25519Keypair.fromSecretKey(parsedData.privateKeyBytes);
-
-    return {
-      ...parsedData,
-      keypair,
-    };
-  }
-
-  // Create a zkLogin signature that can be used to submit transactions
+  // Create a zkLogin signature that can be used to submit personal messages
   async zkSignPersonalMessage(
     zkLoginData: StoredZkLoginData,
     message: string
   ): Promise<{ userSignature: string; zkLoginSignature: string }> {
-    const ephemeralKeyPair = this.deserializeEphemeralKeyPair(
-      zkLoginData.ephemeralKeyPairString
-    );
+    const ephemeralKeyPair = zkLoginData.ephemeralKeyPair;
     const aud = zkLoginData.decodedJwt.aud;
     const audienceString = Array.isArray(aud) ? aud[0] : (aud as string);
     const subString = zkLoginData.decodedJwt.sub as string;
@@ -271,12 +241,16 @@ class zkLoginService {
     // convert string to Uint8Array
     const messageBytes = new TextEncoder().encode(message);
 
+    // get keypair from secret key
+    const keypair = Ed25519Keypair.fromSecretKey(ephemeralKeyPair.secretKey);
+
     // Sign the transaction with the ephemeral key
-    const { signature: userSignature } =
-      await ephemeralKeyPair.keypair.signPersonalMessage(messageBytes);
+    const { signature: userSignature } = await keypair.signPersonalMessage(
+      messageBytes
+    );
 
     // Verify the transaction
-    const verified = await ephemeralKeyPair.keypair
+    const verified = await keypair
       .getPublicKey()
       .verifyPersonalMessage(messageBytes, userSignature);
 
@@ -300,6 +274,56 @@ class zkLoginService {
     };
   }
 
+  // Create a zkLogin signature that can be used to submit transactions
+  async zkSignTransaction(
+    zkLoginData: StoredZkLoginData,
+    tx: Transaction
+  ): Promise<{ userSignature: string; zkLoginSignature: string }> {
+    const ephemeralKeyPair = zkLoginData.ephemeralKeyPair;
+
+    // get keypair from secret key
+    const keypair = Ed25519Keypair.fromSecretKey(ephemeralKeyPair.secretKey);
+
+    // Build & Sign the transaction
+    const bytes = await tx.build({ client: this.client });
+    const userSignature = (await keypair.signTransaction(bytes)).signature;
+
+    // Verify the transaction
+    const verified = await keypair
+      .getPublicKey()
+      .verifyTransaction(bytes, userSignature);
+
+    if (!verified) {
+      throw new Error("Signature verification failed");
+    }
+
+    // Generate ZKLogin signature
+    const aud = zkLoginData.decodedJwt.aud;
+    const subString = zkLoginData.decodedJwt.sub as string;
+    const audienceString = Array.isArray(aud) ? aud[0] : (aud as string);
+
+    const addressSeed = genAddressSeed(
+      BigInt(zkLoginData.userSalt),
+      "sub",
+      subString,
+      audienceString
+    ).toString();
+
+    const zkLoginSignature = getZkLoginSignature({
+      inputs: {
+        ...zkLoginData.partialZkLoginSignature,
+        addressSeed,
+      },
+      maxEpoch: ephemeralKeyPair.maxEpoch,
+      userSignature,
+    });
+
+    return {
+      userSignature,
+      zkLoginSignature,
+    };
+  }
+
   // Execute a transaction with zkLogin
   async executeTransactionWithZkLogin(
     zkLoginData: StoredZkLoginData,
@@ -307,23 +331,21 @@ class zkLoginService {
   ): Promise<{ success: boolean; digest?: string; error?: string }> {
     try {
       // Deserialize the ephemeralKeyPairString
-      const ephemeralKeyPair = this.deserializeEphemeralKeyPair(
-        zkLoginData.ephemeralKeyPairString
-      );
+      const ephemeralKeyPair = zkLoginData.ephemeralKeyPair;
 
       // Get user address and signer
       const userAddress = zkLoginData.userAddress;
-      const signer = ephemeralKeyPair.keypair;
+      const keypair = Ed25519Keypair.fromSecretKey(ephemeralKeyPair.secretKey);
 
       // Set the sender
       tx.setSender(userAddress);
 
       // Build & Sign the transaction
       const bytes = await tx.build({ client: this.client });
-      const userSignature = (await signer.signTransaction(bytes)).signature;
+      const userSignature = (await keypair.signTransaction(bytes)).signature;
 
       // Verify the transaction
-      const verified = await signer
+      const verified = await keypair
         .getPublicKey()
         .verifyTransaction(bytes, userSignature);
 

@@ -14,8 +14,7 @@ interface JwtPayload {
 
 // zkLoginService - EphemeralKeyPair
 interface EphemeralKeyPair {
-  keypair: Ed25519Keypair;
-  publicKey: string;
+  secretKey: string;
   maxEpoch: number;
   randomness: string;
   nonce: string;
@@ -49,7 +48,7 @@ interface partialZkLoginSignature {
 
 // Stored zkLogin data in local storage
 interface StoredZkLoginData {
-  ephemeralKeyPairString: string;
+  ephemeralKeyPair: EphemeralKeyPair;
   userAddress: string;
   jwt: string;
   decodedJwt: JwtPayload;

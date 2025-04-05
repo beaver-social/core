@@ -47,16 +47,9 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
             const ephemeralKeyPair = await zkLoginService.generateEphemeralKeyPair();
 
             // Store only the necessary data in session storage
-            const secretKey = ephemeralKeyPair.keypair.getSecretKey();
             sessionStorage.setItem(
                 "zkLoginEphemeralKeyPair",
-                JSON.stringify({
-                    publicKey: ephemeralKeyPair.publicKey,
-                    maxEpoch: ephemeralKeyPair.maxEpoch,
-                    randomness: ephemeralKeyPair.randomness,
-                    nonce: ephemeralKeyPair.nonce,
-                    privateKeyBytes: secretKey
-                })
+                JSON.stringify(ephemeralKeyPair)
             );
 
             // Generate OAuth URL and redirect
