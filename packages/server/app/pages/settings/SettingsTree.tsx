@@ -89,9 +89,9 @@ export const settingsData = [
         items: [
             { id: "display", label: "Display" },
             { id: "motion", label: "Motion" },
-            { id: "font-size", label: "Font Size" },
-            { id: "color-contrast", label: "Color Contrast" },
             { id: "keyboard", label: "Keyboard Shortcuts" },
+            { id: "screen-reader", label: "Screen Reader" },
+            { id: "captions", label: "Captions" },
         ],
     },
     {
@@ -99,12 +99,11 @@ export const settingsData = [
         label: "Monetization",
         icon: "DollarSign",
         items: [
-            { id: "creator-earnings", label: "Creator Earnings" },
+            { id: "tokens", label: "Tokens" },
+            { id: "creator-fund", label: "Creator Fund" },
+            { id: "nfts", label: "NFTs" },
+            { id: "tips", label: "Tips" },
             { id: "subscriptions", label: "Subscriptions" },
-            { id: "tips", label: "Tips and Donations" },
-            { id: "token-gating", label: "Token Gating" },
-            { id: "nft-rewards", label: "NFT Rewards" },
-            { id: "payment-methods", label: "Payment Methods" },
         ],
     },
     {
@@ -112,11 +111,11 @@ export const settingsData = [
         label: "Your Data",
         icon: "Database",
         items: [
-            { id: "download", label: "Download Your Data" },
-            { id: "advertisers", label: "Connected Advertisers" },
-            { id: "activity", label: "Account Activity" },
-            { id: "data-storage", label: "Data Storage Options" },
-            { id: "off-platform", label: "Off-Platform Activity" },
+            { id: "control", label: "Data Control" },
+            { id: "export", label: "Data Export" },
+            { id: "privacy-policy", label: "Privacy Policy" },
+            { id: "deletion", label: "Data Deletion" },
+            { id: "third-party", label: "Third Party" },
         ],
     },
 ];

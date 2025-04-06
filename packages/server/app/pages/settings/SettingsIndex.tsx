@@ -17,6 +17,67 @@ import {
     TransactionHistoryContent,
 } from "./content/WalletSettings";
 
+import {
+    AudienceAndTaggingContent,
+    PostVisibilityContent,
+    MuteAndBlockContent,
+    DirectMessagesContent,
+    LocationInformationContent,
+    DataSharingContent,
+    OffChainPrivacyContent,
+} from "./content/PrivacySettings";
+
+import {
+    FiltersContent,
+    PreferencesContent,
+    EmailAlertsContent,
+    PushAlertsContent,
+    OnChainAlertsContent,
+} from "./content/AlertsSettings";
+
+import {
+    PasswordContent,
+    TwoFactorContent,
+    DevicesContent,
+    AccountRecoveryContent,
+    SecurityKeysContent,
+    BackupCodesContent,
+    ConnectedAppsContent,
+} from "./content/SecuritySettings";
+
+import {
+    LanguagesContent,
+    SensitiveContentContent,
+    InterestsContent,
+    DataUsageContent,
+    FeedPreferencesContent,
+    AutoplayContent,
+} from "./content/ContentSettings";
+
+import {
+    DisplayContent,
+    MotionContent,
+    KeyboardContent,
+    ScreenReaderContent,
+    CaptionsContent,
+} from "./content/AccessibilitySettings";
+
+import {
+    TokensContent,
+    CreatorFundContent,
+    NFTsContent,
+    TipsContent,
+    SubscriptionsContent,
+} from "./content/MonetizationSettings";
+
+import {
+    DataControlContent,
+    DataExportContent,
+    PrivacyPolicyContent,
+    DataDeletionContent,
+    ThirdPartyContent,
+} from "./content/DataSettings";
+
 interface SettingsContentProps {
     selectedSetting: SettingId;
 }
@@ -97,6 +158,140 @@ function renderSettingContent(categoryId: string, itemId: string) {
     }
     if (settingKey === "wallet.transactions") {
         return <TransactionHistoryContent />;
+    }
+
+    // Privacy settings
+    if (settingKey === "privacy.audience") {
+        return <AudienceAndTaggingContent />;
+    }
+    if (settingKey === "privacy.visibility") {
+        return <PostVisibilityContent />;
+    }
+    if (settingKey === "privacy.blocking") {
+        return <MuteAndBlockContent />;
+    }
+    if (settingKey === "privacy.direct-messages") {
+        return <DirectMessagesContent />;
+    }
+    if (settingKey === "privacy.location") {
+        return <LocationInformationContent />;
+    }
+    if (settingKey === "privacy.data-sharing") {
+        return <DataSharingContent />;
+    }
+    if (settingKey === "privacy.off-chain") {
+        return <OffChainPrivacyContent />;
+    }
+
+    // Alerts settings
+    if (settingKey === "alerts.filters") {
+        return <FiltersContent />;
+    }
+    if (settingKey === "alerts.preferences") {
+        return <PreferencesContent />;
+    }
+    if (settingKey === "alerts.email-alerts") {
+        return <EmailAlertsContent />;
+    }
+    if (settingKey === "alerts.push-alerts") {
+        return <PushAlertsContent />;
+    }
+    if (settingKey === "alerts.on-chain-alerts") {
+        return <OnChainAlertsContent />;
+    }
+
+    // Security settings
+    if (settingKey === "security.password") {
+        return <PasswordContent />;
+    }
+    if (settingKey === "security.two-factor") {
+        return <TwoFactorContent />;
+    }
+    if (settingKey === "security.devices") {
+        return <DevicesContent />;
+    }
+    if (settingKey === "security.recovery") {
+        return <AccountRecoveryContent />;
+    }
+    if (settingKey === "security.keys") {
+        return <SecurityKeysContent />;
+    }
+    if (settingKey === "security.backup-codes") {
+        return <BackupCodesContent />;
+    }
+    if (settingKey === "security.connected-apps") {
+        return <ConnectedAppsContent />;
+    }
+
+    // Content Preferences settings
+    if (settingKey === "content.languages") {
+        return <LanguagesContent />;
+    }
+    if (settingKey === "content.sensitive-content") {
+        return <SensitiveContentContent />;
+    }
+    if (settingKey === "content.interests") {
+        return <InterestsContent />;
+    }
+    if (settingKey === "content.data-usage") {
+        return <DataUsageContent />;
+    }
+    if (settingKey === "content.feed-preferences") {
+        return <FeedPreferencesContent />;
+    }
+    if (settingKey === "content.autoplay") {
+        return <AutoplayContent />;
+    }
+
+    // Accessibility settings
+    if (settingKey === "accessibility.display") {
+        return <DisplayContent />;
+    }
+    if (settingKey === "accessibility.motion") {
+        return <MotionContent />;
+    }
+    if (settingKey === "accessibility.keyboard") {
+        return <KeyboardContent />;
+    }
+    if (settingKey === "accessibility.screen-reader") {
+        return <ScreenReaderContent />;
+    }
+    if (settingKey === "accessibility.captions") {
+        return <CaptionsContent />;
+    }
+
+    // Monetization settings
+    if (settingKey === "monetization.tokens") {
+        return <TokensContent />;
+    }
+    if (settingKey === "monetization.creator-fund") {
+        return <CreatorFundContent />;
+    }
+    if (settingKey === "monetization.nfts") {
+        return <NFTsContent />;
+    }
+    if (settingKey === "monetization.tips") {
+        return <TipsContent />;
+    }
+    if (settingKey === "monetization.subscriptions") {
+        return <SubscriptionsContent />;
+    }
+
+    // Data settings
+    if (settingKey === "data.control") {
+        return <DataControlContent />;
+    }
+    if (settingKey === "data.export") {
+        return <DataExportContent />;
+    }
+    if (settingKey === "data.privacy-policy") {
+        return <PrivacyPolicyContent />;
+    }
+    if (settingKey === "data.deletion") {
+        return <DataDeletionContent />;
+    }
+    if (settingKey === "data.third-party") {
+        return <ThirdPartyContent />;
     }
 
     // Default content for other settings

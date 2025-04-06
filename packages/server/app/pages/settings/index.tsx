@@ -20,12 +20,12 @@ export default function Settings() {
         <Layout main={
             <div>
                 {/* Desktop & Tablet View */}
-                <div className="hidden sm:block">
+                <div className="hidden lg:block">
                     <SettingsContent selectedSetting={selectedSetting} />
                 </div>
 
                 {/* Mobile View */}
-                <div className="sm:hidden">
+                <div className="lg:hidden">
                     <div className="flex items-center justify-between p-4 border-b">
                         <h1 className="text-xl font-bold">Settings</h1>
                         <MobileSettingsDrawer
