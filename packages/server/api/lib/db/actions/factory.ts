@@ -1,18 +1,36 @@
-import { actions } from "../schema/action";
+import { actionFunctions, actionRequests, actions } from "../schema/action";
 import { verifyPersonalMessageSignature } from "@mysten/sui/verify";
 import { users } from "../schema/user";
 import { tryCatch } from "../../tryCatch";
 import { deriveActionNameFromFn } from "./utils";
 import db from "..";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
+import { compressActionRequest } from "./compression";
 
 export function createAction<T>(
-  fn: (args: T & { userId: number }) => Promise<void>
+  fn: (
+    tx: Parameters<Parameters<typeof db.transaction>["0"]>["0"],
+    args: T & { userId: number }
+  ) => Promise<void>
 ) {
-  return async (options: Parameters<typeof fn>[0], signature: string) => {
-    const message = new TextEncoder().encode(
-      JSON.stringify({ ...options, type: deriveActionNameFromFn(fn) })
-    );
+  return async (options: Parameters<typeof fn>[1], signature: string) => {
+    const [previous] = await db
+      .select()
+      .from(actions)
+      .where(eq(actions.userId, options.userId))
+      .orderBy(desc(actions.createdAt))
+      .limit(1);
+
+    const prevHash = previous?.hash ?? "GENESIS";
+
+    const req = {
+      ...options,
+      type: deriveActionNameFromFn(fn),
+      previous: prevHash,
+    };
+    const payload = JSON.stringify(req);
+    const [compressedPayload, keys] = compressActionRequest(req);
+    const message = new TextEncoder().encode(payload);
 
     const [user] = await db
       .select()
@@ -29,20 +47,58 @@ export function createAction<T>(
       throw new Error("Invalid signature");
     }
 
-    const result = await tryCatch(fn(options));
+    await db.transaction(async (tx) => {
+      const result = await tryCatch(fn(tx, options));
 
-    if (result.error) {
-      throw new Error(
-        `Error performing action "${deriveActionNameFromFn(fn)}" ` +
-          result.error.message
-      );
-    }
+      if (result.error) {
+        throw new Error(
+          `Error performing action "${deriveActionNameFromFn(fn)}" ` +
+            result.error.message
+        );
+      }
 
-    await db.insert(actions).values({
-      userId: options.userId,
-      type: deriveActionNameFromFn(fn),
-      request: JSON.stringify(options),
-      signature: signature,
+      const hash = new Bun.CryptoHasher("sha3-256")
+        .update(payload)
+        .digest("hex");
+
+      const fnHash = new Bun.CryptoHasher("sha3-256")
+        .update(fn.toString())
+        .digest("hex");
+
+      let fnId = 0;
+
+      const [fnExists] = await tx
+        .select()
+        .from(actionFunctions)
+        .where(eq(actionFunctions.hash, fnHash))
+        .limit(1);
+
+      if (!fnExists) {
+        const [{ id }] = await tx
+          .insert(actionFunctions)
+          .values({
+            hash: fnHash,
+            params: JSON.stringify(keys),
+          })
+          .returning();
+        fnId = id;
+      } else {
+        fnId = fnExists.id;
+      }
+
+      await tx.insert(actionRequests).values({
+        hash: hash,
+        function: fnId,
+        payload: compressedPayload,
+      });
+
+      await tx.insert(actions).values({
+        userId: options.userId,
+        hash: hash,
+        previous: prevHash,
+        type: deriveActionNameFromFn(fn),
+        signature: signature,
+      });
     });
   };
 }
