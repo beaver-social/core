@@ -3,6 +3,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
 import { Switch } from "@/shared/components/ui/switch";
 import Icon from "@/shared/components/Icon";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 
 export function AudienceAndTaggingContent() {
     const [postVisibility, setPostVisibility] = useState("public");
@@ -362,6 +363,8 @@ export function MuteAndBlockContent() {
 }
 
 export function DirectMessagesContent() {
+    const [messageRetention, setMessageRetention] = useState("forever");
+
     return (
         <div className="space-y-6">
             <div className="bg-card rounded-lg p-6 border">
@@ -458,12 +461,22 @@ export function DirectMessagesContent() {
                                 Set how long messages are stored before being deleted
                             </p>
                         </div>
-                        <select className="h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-                            <option>Forever</option>
-                            <option>30 days</option>
-                            <option>7 days</option>
-                            <option>24 hours</option>
-                        </select>
+                        <div className="w-56">
+                            <Select
+                                value="forever"
+                                onValueChange={setMessageRetention}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a retention period" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="forever">Forever</SelectItem>
+                                    <SelectItem value="30-days">30 days</SelectItem>
+                                    <SelectItem value="7-days">7 days</SelectItem>
+                                    <SelectItem value="24-hours">24 hours</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 </div>
 

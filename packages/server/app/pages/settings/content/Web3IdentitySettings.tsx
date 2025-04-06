@@ -2,6 +2,11 @@ import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
 import Icon from "@/shared/components/Icon";
+import { Input } from "@/shared/components/ui/input";
+import { Textarea } from "@/shared/components/ui/textarea";
+import { Switch } from "@/shared/components/ui/switch";
+import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
+
 
 export function AccountSettingsContent() {
     return (
@@ -24,40 +29,36 @@ export function AccountSettingsContent() {
                 <div className="bg-card rounded-lg p-6 border space-y-4">
                     <h3 className="text-lg font-medium">Personal Information</h3>
                     <div className="grid gap-4 py-2">
-                        <div className="space-y-2">
+                        <div className="flex flex-col space-y-3">
                             <Label htmlFor="full-name">Full Name</Label>
-                            <input
+                            <Input
                                 id="full-name"
                                 placeholder="Your full name"
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             />
                         </div>
-                        <div className="space-y-2">
+                        <div className="flex flex-col space-y-3">
                             <Label htmlFor="bio">Bio</Label>
-                            <textarea
+                            <Textarea
                                 id="bio"
-                                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                 placeholder="Tell us about yourself"
                             />
                         </div>
-                        <div className="space-y-2">
+                        <div className="flex flex-col space-y-3">
                             <Label htmlFor="location">Location</Label>
-                            <input
+                            <Input
                                 id="location"
                                 placeholder="Your location"
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             />
                         </div>
-                        <div className="space-y-2">
+                        <div className="flex flex-col space-y-3">
                             <Label htmlFor="website">Website</Label>
-                            <input
+                            <Input
                                 id="website"
                                 placeholder="Your website URL"
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             />
                         </div>
                     </div>
-                    <Button className="mt-4">Save Changes</Button>
+                    <Button className="mt-2">Save Changes</Button>
                 </div>
             </div>
 
@@ -66,15 +67,14 @@ export function AccountSettingsContent() {
                 <p className="text-sm text-muted-foreground">
                     Your username is unique and appears in your profile URL. It can contain only letters, numbers, and underscores, with no spaces.
                 </p>
-                <div className="space-y-2">
+                <div className="flex flex-col space-y-3">
                     <Label htmlFor="username">Username</Label>
-                    <input
+                    <Input
                         id="username"
                         placeholder="@username"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                 </div>
-                <Button className="mt-4">Update Username</Button>
+                <Button className="mt-2">Update Username</Button>
             </div>
 
             <div className="bg-card rounded-lg p-6 border space-y-4">
@@ -82,15 +82,14 @@ export function AccountSettingsContent() {
                 <p className="text-sm text-muted-foreground">
                     Your email is used for authentication and notifications.
                 </p>
-                <div className="space-y-2">
+                <div className="flex flex-col space-y-3">
                     <Label htmlFor="email">Email</Label>
-                    <input
+                    <Input
                         id="email"
                         placeholder="yourname@example.com"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                 </div>
-                <Button className="mt-4">Update Email</Button>
+                <Button className="mt-2">Update Email</Button>
             </div>
 
             <div className="bg-card rounded-lg p-6 border space-y-4">
@@ -98,15 +97,14 @@ export function AccountSettingsContent() {
                 <p className="text-sm text-muted-foreground">
                     Your phone number is used for authentication and notifications. You can add multiple phone numbers.
                 </p>
-                <div className="space-y-2">
+                <div className="flex flex-col space-y-3">
                     <Label htmlFor="phone">Phone</Label>
-                    <input
+                    <Input
                         id="phone"
                         placeholder="123-456-7890"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                 </div>
-                <Button className="mt-4">Add Phone Number</Button>
+                <Button className="mt-2">Add Phone Number</Button>
             </div>
 
             <div className="bg-card rounded-lg p-6 border space-y-4">
@@ -123,9 +121,9 @@ export function AccountSettingsContent() {
                 </div>
 
                 <div className="pl-12 space-y-4 mt-4">
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                         <h4 className="font-medium">Verification Status</h4>
-                        <p className="text-sm bg-secondary p-3 rounded-md inline-block">
+                        <p className="text-sm bg-red-800 p-3 rounded-md inline-block">
                             Not verified
                         </p>
                     </div>
@@ -260,24 +258,22 @@ export function IdentityTransferContent() {
                 <h3 className="text-lg font-medium">Transfer to Another Wallet</h3>
 
                 <div className="space-y-4">
-                    <div className="space-y-2">
+                    <div className="flex flex-col space-y-3">
                         <Label htmlFor="recipient-address">Recipient Address</Label>
-                        <input
+                        <Input
                             id="recipient-address"
                             placeholder="0x..."
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         />
                         <p className="text-xs text-muted-foreground">
                             Enter the SUI wallet address that will receive your identity NFT.
                         </p>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="flex flex-col space-y-3">
                         <Label htmlFor="transfer-reason">Reason for Transfer (Optional)</Label>
-                        <textarea
+                        <Textarea
                             id="transfer-reason"
                             placeholder="Explain why you're transferring this identity..."
-                            className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         />
                     </div>
 
@@ -416,12 +412,7 @@ export function ZkLoginSetupContent() {
                                 Cache authentication tokens for faster logins
                             </p>
                         </div>
-                        <div className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span
-                                onClick={() => { }}
-                                className={`translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition duration-200 ease-in-out`}
-                            />
-                        </div>
+                        <Switch />
                     </div>
 
                     <div className="flex justify-between items-center p-3 border rounded-md">
@@ -431,12 +422,8 @@ export function ZkLoginSetupContent() {
                                 Periodically rotate security salt for enhanced privacy
                             </p>
                         </div>
-                        <div className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-input transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span
-                                onClick={() => { }}
-                                className={`translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition duration-200 ease-in-out`}
-                            />
-                        </div>
+
+                        <Switch />
                     </div>
                 </div>
             </div>
@@ -613,12 +600,7 @@ export function IdentityPermissionsContent() {
                                 Automatically approve basic read access for new applications
                             </p>
                         </div>
-                        <div className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-input transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span
-                                onClick={() => { }}
-                                className={`translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition duration-200 ease-in-out`}
-                            />
-                        </div>
+                        <Switch />
                     </div>
 
                     <div className="flex justify-between items-center p-3 border rounded-md">
@@ -628,12 +610,7 @@ export function IdentityPermissionsContent() {
                                 Require additional authentication for asset transfers
                             </p>
                         </div>
-                        <div className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary transition-colors duration-200 ease-in-out focus:outline-none">
-                            <span
-                                onClick={() => { }}
-                                className={`translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition duration-200 ease-in-out`}
-                            />
-                        </div>
+                        <Switch />
                     </div>
 
                     <div className="flex justify-between items-center p-3 border rounded-md">
@@ -643,15 +620,20 @@ export function IdentityPermissionsContent() {
                                 Automatically revoke permissions after period of inactivity
                             </p>
                         </div>
-                        <select
-                            className="flex h-8 w-32 rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        >
-                            <option value="1h">1 hour</option>
-                            <option value="24h">24 hours</option>
-                            <option value="7d">7 days</option>
-                            <option value="30d">30 days</option>
-                            <option value="never">Never</option>
-                        </select>
+                        <div className="w-56">
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a timeout" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="1h">1 hour</SelectItem>
+                                    <SelectItem value="24h">24 hours</SelectItem>
+                                    <SelectItem value="7d">7 days</SelectItem>
+                                    <SelectItem value="30d">30 days</SelectItem>
+                                    <SelectItem value="never">Never</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 </div>
             </div>
