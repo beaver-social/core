@@ -3,6 +3,7 @@ import { Label } from "@/shared/components/ui/label";
 import { Switch } from "@/shared/components/ui/switch";
 import Icon from "@/shared/components/Icon";
 import { Input } from "@/shared/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
 
 export function TokensContent() {
     return (
@@ -205,15 +206,17 @@ export function CreatorFundContent() {
 
                     <div>
                         <Label htmlFor="payout-threshold">Payout Threshold</Label>
-                        <select
-                            id="payout-threshold"
-                            className="mt-2 w-full h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        >
-                            <option>100 BEAV</option>
-                            <option selected>500 BEAV</option>
-                            <option>1,000 BEAV</option>
-                            <option>2,500 BEAV</option>
-                        </select>
+                        <Select defaultValue="500">
+                            <SelectTrigger id="payout-threshold" className="mt-2">
+                                <SelectValue placeholder="Select threshold" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="100">100 BEAV</SelectItem>
+                                <SelectItem value="500">500 BEAV</SelectItem>
+                                <SelectItem value="1000">1,000 BEAV</SelectItem>
+                                <SelectItem value="2500">2,500 BEAV</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div className="flex items-center justify-between">

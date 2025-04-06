@@ -2,31 +2,37 @@ import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
 import { Switch } from "@/shared/components/ui/switch";
 import Icon from "@/shared/components/Icon";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/shared/components/ui/card";
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
 
 export function DataControlContent() {
     return (
         <div className="space-y-6">
-            <div className="bg-card rounded-lg p-6 border">
-                <div className="flex items-start gap-4">
-                    <div className="p-2 bg-blue-500/10 rounded-full">
-                        <Icon name="Database" className="h-6 w-6 text-blue-500" />
+            <Card>
+                <CardHeader>
+                    <div className="flex items-start gap-4">
+                        <div className="p-2 bg-blue-500/10 rounded-full">
+                            <Icon name="Database" className="h-6 w-6 text-blue-500" />
+                        </div>
+                        <div>
+                            <CardTitle>Data Control</CardTitle>
+                            <CardDescription>
+                                Manage how your data is collected and used.
+                            </CardDescription>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="text-lg font-medium">Data Control</h3>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                            Manage how your data is collected and used.
-                        </p>
-                    </div>
-                </div>
-            </div>
+                </CardHeader>
+            </Card>
 
-            <div className="bg-card rounded-lg p-6 border space-y-4">
-                <h3 className="text-lg font-medium">Activity Data</h3>
-                <p className="text-sm text-muted-foreground">
-                    Control how your activity information is collected and used to personalize your experience.
-                </p>
-
-                <div className="space-y-6 mt-4">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Activity Data</CardTitle>
+                    <CardDescription>
+                        Control how your activity information is collected and used to personalize your experience.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
                     <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
                             <Label htmlFor="personalized-content">Personalized Content</Label>
@@ -66,17 +72,17 @@ export function DataControlContent() {
                         </div>
                         <Switch id="interest-tracking" defaultChecked />
                     </div>
-                </div>
-
-                <div className="mt-4 pt-4 border-t">
+                </CardContent>
+                <CardFooter>
                     <Button variant="outline" className="w-full">Clear Activity Data</Button>
-                </div>
-            </div>
+                </CardFooter>
+            </Card>
 
-            <div className="bg-card rounded-lg p-6 border space-y-4">
-                <h3 className="text-lg font-medium">Off-Platform Activity</h3>
-
-                <div className="space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Off-Platform Activity</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
                     <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
                             <Label htmlFor="off-platform-data">Off-Platform Data Collection</Label>
@@ -96,10 +102,11 @@ export function DataControlContent() {
                         </div>
                         <Switch id="cross-app-tracking" />
                     </div>
-                </div>
-
-                <Button className="mt-4">Save Data Control Settings</Button>
-            </div>
+                </CardContent>
+                <CardFooter>
+                    <Button className="w-full">Save Data Control Settings</Button>
+                </CardFooter>
+            </Card>
         </div>
     );
 }
@@ -107,96 +114,104 @@ export function DataControlContent() {
 export function DataExportContent() {
     return (
         <div className="space-y-6">
-            <div className="bg-card rounded-lg p-6 border">
-                <div className="flex items-start gap-4">
-                    <div className="p-2 bg-blue-500/10 rounded-full">
-                        <Icon name="Download" className="h-6 w-6 text-blue-500" />
+            <Card>
+                <CardHeader>
+                    <div className="flex items-start gap-4">
+                        <div className="p-2 bg-blue-500/10 rounded-full">
+                            <Icon name="Download" className="h-6 w-6 text-blue-500" />
+                        </div>
+                        <div>
+                            <CardTitle>Data Export</CardTitle>
+                            <CardDescription>
+                                Request a copy of your personal data.
+                            </CardDescription>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="text-lg font-medium">Data Export</h3>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                            Request a copy of your personal data.
-                        </p>
-                    </div>
-                </div>
-            </div>
+                </CardHeader>
+            </Card>
 
-            <div className="bg-card rounded-lg p-6 border space-y-4">
-                <h3 className="text-lg font-medium">Export Options</h3>
-                <p className="text-sm text-muted-foreground">
-                    Choose what data to include in your export.
-                </p>
-
-                <div className="space-y-3 mt-4">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Export Options</CardTitle>
+                    <CardDescription>
+                        Choose what data to include in your export.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
                     <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="profile-data" defaultChecked className="h-4 w-4 rounded border-gray-300 focus:ring-blue-500" />
+                        <Checkbox id="profile-data" defaultChecked />
                         <Label htmlFor="profile-data">Profile Information</Label>
                     </div>
 
                     <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="posts-data" defaultChecked className="h-4 w-4 rounded border-gray-300 focus:ring-blue-500" />
+                        <Checkbox id="posts-data" defaultChecked />
                         <Label htmlFor="posts-data">Posts and Comments</Label>
                     </div>
 
                     <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="wallet-data" defaultChecked className="h-4 w-4 rounded border-gray-300 focus:ring-blue-500" />
+                        <Checkbox id="wallet-data" defaultChecked />
                         <Label htmlFor="wallet-data">Wallet and Transaction History</Label>
                     </div>
 
                     <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="activity-data" defaultChecked className="h-4 w-4 rounded border-gray-300 focus:ring-blue-500" />
+                        <Checkbox id="activity-data" defaultChecked />
                         <Label htmlFor="activity-data">Activity and Interactions</Label>
                     </div>
 
                     <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="direct-messages" defaultChecked className="h-4 w-4 rounded border-gray-300 focus:ring-blue-500" />
+                        <Checkbox id="direct-messages" defaultChecked />
                         <Label htmlFor="direct-messages">Direct Messages</Label>
                     </div>
 
                     <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="following-data" defaultChecked className="h-4 w-4 rounded border-gray-300 focus:ring-blue-500" />
+                        <Checkbox id="following-data" defaultChecked />
                         <Label htmlFor="following-data">Following and Followers</Label>
                     </div>
-                </div>
-            </div>
+                </CardContent>
+            </Card>
 
-            <div className="bg-card rounded-lg p-6 border space-y-4">
-                <h3 className="text-lg font-medium">Export Format</h3>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Export Format</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                    <RadioGroup defaultValue="json" className="space-y-3">
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="json" id="format-json" />
+                            <Label htmlFor="format-json">JSON (Machine Readable)</Label>
+                        </div>
 
-                <div className="space-y-3 mt-4">
-                    <div className="flex items-center space-x-2">
-                        <input type="radio" id="format-json" name="format" defaultChecked className="h-4 w-4" />
-                        <Label htmlFor="format-json">JSON (Machine Readable)</Label>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="html" id="format-html" />
+                            <Label htmlFor="format-html">HTML (Human Readable)</Label>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="csv" id="format-csv" />
+                            <Label htmlFor="format-csv">CSV (Spreadsheet)</Label>
+                        </div>
+                    </RadioGroup>
+
+                    <div className="p-4 rounded-lg bg-blue-50 mt-4 flex items-start gap-2">
+                        <Icon name="Info" className="h-5 w-5 text-blue-600 mt-0.5" />
+                        <div>
+                            <p className="text-sm font-medium text-blue-800">Export Processing Time</p>
+                            <p className="text-sm text-blue-700">
+                                Data exports may take up to 48 hours to process. You'll receive an email when your data is ready for download.
+                            </p>
+                        </div>
                     </div>
+                </CardContent>
+                <CardFooter>
+                    <Button className="w-full">Request Data Export</Button>
+                </CardFooter>
+            </Card>
 
-                    <div className="flex items-center space-x-2">
-                        <input type="radio" id="format-html" name="format" className="h-4 w-4" />
-                        <Label htmlFor="format-html">HTML (Human Readable)</Label>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                        <input type="radio" id="format-csv" name="format" className="h-4 w-4" />
-                        <Label htmlFor="format-csv">CSV (Spreadsheet)</Label>
-                    </div>
-                </div>
-
-                <div className="p-4 rounded-lg bg-blue-50 mt-4 flex items-start gap-2">
-                    <Icon name="Info" className="h-5 w-5 text-blue-600 mt-0.5" />
-                    <div>
-                        <p className="text-sm font-medium text-blue-800">Export Processing Time</p>
-                        <p className="text-sm text-blue-700">
-                            Data exports may take up to 48 hours to process. You'll receive an email when your data is ready for download.
-                        </p>
-                    </div>
-                </div>
-
-                <Button className="mt-4">Request Data Export</Button>
-            </div>
-
-            <div className="bg-card rounded-lg p-6 border space-y-4">
-                <h3 className="text-lg font-medium">Previous Exports</h3>
-
-                <div className="space-y-3 mt-2">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Previous Exports</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
                     <div className="flex items-center justify-between p-3 border rounded-md">
                         <div>
                             <p className="font-medium">Full Data Export</p>
@@ -212,8 +227,8 @@ export function DataExportContent() {
                         </div>
                         <Button variant="outline" size="sm">Download</Button>
                     </div>
-                </div>
-            </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }
@@ -221,24 +236,27 @@ export function DataExportContent() {
 export function PrivacyPolicyContent() {
     return (
         <div className="space-y-6">
-            <div className="bg-card rounded-lg p-6 border">
-                <div className="flex items-start gap-4">
-                    <div className="p-2 bg-blue-500/10 rounded-full">
-                        <Icon name="FileText" className="h-6 w-6 text-blue-500" />
+            <Card>
+                <CardHeader>
+                    <div className="flex items-start gap-4">
+                        <div className="p-2 bg-blue-500/10 rounded-full">
+                            <Icon name="FileText" className="h-6 w-6 text-blue-500" />
+                        </div>
+                        <div>
+                            <CardTitle>Privacy Policy</CardTitle>
+                            <CardDescription>
+                                Review our privacy policies and data practices.
+                            </CardDescription>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="text-lg font-medium">Privacy Policy</h3>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                            Review our privacy policies and data practices.
-                        </p>
-                    </div>
-                </div>
-            </div>
+                </CardHeader>
+            </Card>
 
-            <div className="bg-card rounded-lg p-6 border space-y-4">
-                <h3 className="text-lg font-medium">Current Policies</h3>
-
-                <div className="space-y-4 mt-2">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Current Policies</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
                     <div className="p-4 border rounded-md">
                         <div className="flex items-center justify-between">
                             <h4 className="font-medium">Privacy Policy</h4>
@@ -277,13 +295,14 @@ export function PrivacyPolicyContent() {
                             <Button variant="outline" size="sm">Read Cookie Policy</Button>
                         </div>
                     </div>
-                </div>
-            </div>
+                </CardContent>
+            </Card>
 
-            <div className="bg-card rounded-lg p-6 border space-y-4">
-                <h3 className="text-lg font-medium">Policy Updates</h3>
-
-                <div className="space-y-4 mt-2">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Policy Updates</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
                     <div className="p-4 border rounded-md bg-blue-50">
                         <div className="flex items-start gap-3">
                             <Icon name="Bell" className="h-5 w-5 text-blue-500 mt-0.5" />
@@ -296,18 +315,18 @@ export function PrivacyPolicyContent() {
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="flex items-center justify-between mt-2">
-                    <div className="space-y-0.5">
-                        <Label htmlFor="policy-notifications">Policy Update Notifications</Label>
-                        <p className="text-sm text-muted-foreground">
-                            Receive email notifications about policy changes
-                        </p>
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                            <Label htmlFor="policy-notifications">Policy Update Notifications</Label>
+                            <p className="text-sm text-muted-foreground">
+                                Receive email notifications about policy changes
+                            </p>
+                        </div>
+                        <Switch id="policy-notifications" defaultChecked />
                     </div>
-                    <Switch id="policy-notifications" defaultChecked />
-                </div>
-            </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }
@@ -315,27 +334,30 @@ export function PrivacyPolicyContent() {
 export function DataDeletionContent() {
     return (
         <div className="space-y-6">
-            <div className="bg-card rounded-lg p-6 border">
-                <div className="flex items-start gap-4">
-                    <div className="p-2 bg-blue-500/10 rounded-full">
-                        <Icon name="Trash" className="h-6 w-6 text-blue-500" />
+            <Card>
+                <CardHeader>
+                    <div className="flex items-start gap-4">
+                        <div className="p-2 bg-blue-500/10 rounded-full">
+                            <Icon name="Trash" className="h-6 w-6 text-blue-500" />
+                        </div>
+                        <div>
+                            <CardTitle>Data Deletion</CardTitle>
+                            <CardDescription>
+                                Manage or permanently delete your account and data.
+                            </CardDescription>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="text-lg font-medium">Data Deletion</h3>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                            Manage or permanently delete your account and data.
-                        </p>
-                    </div>
-                </div>
-            </div>
+                </CardHeader>
+            </Card>
 
-            <div className="bg-card rounded-lg p-6 border space-y-4">
-                <h3 className="text-lg font-medium">Clear Data</h3>
-                <p className="text-sm text-muted-foreground">
-                    Selectively clear specific types of data from your account.
-                </p>
-
-                <div className="space-y-3 mt-4">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Clear Data</CardTitle>
+                    <CardDescription>
+                        Selectively clear specific types of data from your account.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
                     <Button variant="outline" className="w-full justify-between">
                         Clear Search History
                         <Icon name="X" className="h-4 w-4" />
@@ -355,62 +377,68 @@ export function DataDeletionContent() {
                         Delete Uploaded Media
                         <Icon name="X" className="h-4 w-4" />
                     </Button>
-                </div>
 
-                <div className="p-4 rounded-lg bg-yellow-50 mt-4 flex items-start gap-2">
-                    <Icon name="Info" className="h-5 w-5 text-yellow-600 mt-0.5" />
-                    <p className="text-sm text-yellow-700">
-                        Clearing specific data types may impact your experience and personalized recommendations on the platform.
-                    </p>
-                </div>
-            </div>
-
-            <div className="bg-card rounded-lg p-6 border space-y-4">
-                <h3 className="text-lg font-medium">Blockchain Data</h3>
-                <p className="text-sm text-muted-foreground">
-                    Understand how your blockchain data is handled.
-                </p>
-
-                <div className="p-4 rounded-lg bg-secondary/30 mt-2">
-                    <p className="text-sm">
-                        Due to the nature of blockchain technology, some of your data such as transaction history and wallet
-                        addresses cannot be completely deleted from the blockchain. However, we can disconnect this data from
-                        your account and remove it from our servers.
-                    </p>
-                </div>
-
-                <div className="mt-4">
-                    <Button variant="outline" className="w-full">Disconnect Blockchain Data</Button>
-                </div>
-            </div>
-
-            <div className="bg-card rounded-lg p-6 border space-y-4">
-                <h3 className="text-lg font-medium text-destructive">Delete Account</h3>
-                <p className="text-sm text-muted-foreground">
-                    Permanently delete your account and all associated data.
-                </p>
-
-                <div className="p-4 rounded-lg bg-red-50 mt-2 space-y-3">
-                    <div className="flex items-start gap-2">
-                        <Icon name="Info" className="h-5 w-5 text-red-600 mt-0.5" />
-                        <p className="text-sm text-red-700 font-medium">
-                            This action is permanent and cannot be undone
+                    <div className="p-4 rounded-lg bg-yellow-50 mt-4 flex items-start gap-2">
+                        <Icon name="Info" className="h-5 w-5 text-yellow-600 mt-0.5" />
+                        <p className="text-sm text-yellow-700">
+                            Clearing specific data types may impact your experience and personalized recommendations on the platform.
                         </p>
                     </div>
-                    <p className="text-sm text-red-700">
-                        Deleting your account will permanently remove all your content, including posts, comments, and media. Your profile will no longer be accessible. As noted above, blockchain transactions cannot be removed from the chain itself.
-                    </p>
-                </div>
+                </CardContent>
+            </Card>
 
-                <div className="mt-4 space-y-4">
-                    <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="confirm-delete" className="h-4 w-4 rounded border-gray-300 focus:ring-blue-500" />
-                        <Label htmlFor="confirm-delete" className="text-sm">I understand this action is permanent</Label>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Blockchain Data</CardTitle>
+                    <CardDescription>
+                        Understand how your blockchain data is handled.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="p-4 rounded-lg bg-secondary/30">
+                        <p className="text-sm">
+                            Due to the nature of blockchain technology, some of your data such as transaction history and wallet
+                            addresses cannot be completely deleted from the blockchain. However, we can disconnect this data from
+                            your account and remove it from our servers.
+                        </p>
                     </div>
 
-                    <Button variant="destructive" className="w-full" disabled>Delete My Account</Button>
-                </div>
-            </div>
+                    <div className="mt-4">
+                        <Button variant="outline" className="w-full">Disconnect Blockchain Data</Button>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-destructive">Delete Account</CardTitle>
+                    <CardDescription>
+                        Permanently delete your account and all associated data.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="p-4 rounded-lg bg-red-50 space-y-3">
+                        <div className="flex items-start gap-2">
+                            <Icon name="Info" className="h-5 w-5 text-red-600 mt-0.5" />
+                            <p className="text-sm text-red-700 font-medium">
+                                This action is permanent and cannot be undone
+                            </p>
+                        </div>
+                        <p className="text-sm text-red-700">
+                            Deleting your account will permanently remove all your content, including posts, comments, and media. Your profile will no longer be accessible. As noted above, blockchain transactions cannot be removed from the chain itself.
+                        </p>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="flex items-center space-x-2">
+                            <Checkbox id="confirm-delete" />
+                            <Label htmlFor="confirm-delete" className="text-sm">I understand this action is permanent</Label>
+                        </div>
+
+                        <Button variant="destructive" className="w-full" disabled>Delete My Account</Button>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }
@@ -418,27 +446,30 @@ export function DataDeletionContent() {
 export function ThirdPartyContent() {
     return (
         <div className="space-y-6">
-            <div className="bg-card rounded-lg p-6 border">
-                <div className="flex items-start gap-4">
-                    <div className="p-2 bg-blue-500/10 rounded-full">
-                        <Icon name="Share2" className="h-6 w-6 text-blue-500" />
+            <Card>
+                <CardHeader>
+                    <div className="flex items-start gap-4">
+                        <div className="p-2 bg-blue-500/10 rounded-full">
+                            <Icon name="Share2" className="h-6 w-6 text-blue-500" />
+                        </div>
+                        <div>
+                            <CardTitle>Third-Party Data Sharing</CardTitle>
+                            <CardDescription>
+                                Manage how your data is shared with third parties.
+                            </CardDescription>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="text-lg font-medium">Third-Party Data Sharing</h3>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                            Manage how your data is shared with third parties.
-                        </p>
-                    </div>
-                </div>
-            </div>
+                </CardHeader>
+            </Card>
 
-            <div className="bg-card rounded-lg p-6 border space-y-4">
-                <h3 className="text-lg font-medium">Connected Services</h3>
-                <p className="text-sm text-muted-foreground">
-                    Manage third-party services connected to your account.
-                </p>
-
-                <div className="space-y-3 mt-4">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Connected Services</CardTitle>
+                    <CardDescription>
+                        Manage third-party services connected to your account.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
                     <div className="p-4 border rounded-md">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -478,13 +509,14 @@ export function ThirdPartyContent() {
                             </p>
                         </div>
                     </div>
-                </div>
-            </div>
+                </CardContent>
+            </Card>
 
-            <div className="bg-card rounded-lg p-6 border space-y-4">
-                <h3 className="text-lg font-medium">Data Sharing Settings</h3>
-
-                <div className="space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Data Sharing Settings</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
                     <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
                             <Label htmlFor="analytics-sharing">Analytics Providers</Label>
@@ -524,42 +556,47 @@ export function ThirdPartyContent() {
                         </div>
                         <Switch id="dapp-sharing" defaultChecked />
                     </div>
-                </div>
+                </CardContent>
+                <CardFooter>
+                    <Button className="w-full">Save Sharing Settings</Button>
+                </CardFooter>
+            </Card>
 
-                <Button className="mt-4">Save Sharing Settings</Button>
-            </div>
-
-            <div className="bg-card rounded-lg p-6 border space-y-4">
-                <h3 className="text-lg font-medium">Data Processors</h3>
-                <p className="text-sm text-muted-foreground">
-                    Companies that process your data on our behalf.
-                </p>
-
-                <div className="max-h-60 overflow-y-auto p-3 border rounded-md mt-2 space-y-2">
-                    <div className="pb-2 border-b">
-                        <p className="font-medium text-sm">Analytics Inc.</p>
-                        <p className="text-xs text-muted-foreground">Usage analytics and metrics</p>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Data Processors</CardTitle>
+                    <CardDescription>
+                        Companies that process your data on our behalf.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="max-h-60 overflow-y-auto p-3 border rounded-md space-y-2">
+                        <div className="pb-2 border-b">
+                            <p className="font-medium text-sm">Analytics Inc.</p>
+                            <p className="text-xs text-muted-foreground">Usage analytics and metrics</p>
+                        </div>
+                        <div className="pb-2 border-b">
+                            <p className="font-medium text-sm">Cloud Storage Provider</p>
+                            <p className="text-xs text-muted-foreground">Media storage and hosting</p>
+                        </div>
+                        <div className="pb-2 border-b">
+                            <p className="font-medium text-sm">Blockchain Data Services</p>
+                            <p className="text-xs text-muted-foreground">Transaction monitoring and analysis</p>
+                        </div>
+                        <div className="pb-2 border-b">
+                            <p className="font-medium text-sm">Email Service Provider</p>
+                            <p className="text-xs text-muted-foreground">Notification delivery</p>
+                        </div>
+                        <div>
+                            <p className="font-medium text-sm">Customer Support Platform</p>
+                            <p className="text-xs text-muted-foreground">Support ticket management</p>
+                        </div>
                     </div>
-                    <div className="pb-2 border-b">
-                        <p className="font-medium text-sm">Cloud Storage Provider</p>
-                        <p className="text-xs text-muted-foreground">Media storage and hosting</p>
-                    </div>
-                    <div className="pb-2 border-b">
-                        <p className="font-medium text-sm">Blockchain Data Services</p>
-                        <p className="text-xs text-muted-foreground">Transaction monitoring and analysis</p>
-                    </div>
-                    <div className="pb-2 border-b">
-                        <p className="font-medium text-sm">Email Service Provider</p>
-                        <p className="text-xs text-muted-foreground">Notification delivery</p>
-                    </div>
-                    <div>
-                        <p className="font-medium text-sm">Customer Support Platform</p>
-                        <p className="text-xs text-muted-foreground">Support ticket management</p>
-                    </div>
-                </div>
-
-                <Button variant="outline" className="mt-2">View Full Data Processor List</Button>
-            </div>
+                </CardContent>
+                <CardFooter>
+                    <Button variant="outline" className="w-full">View Full Data Processor List</Button>
+                </CardFooter>
+            </Card>
         </div>
     );
 }

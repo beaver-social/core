@@ -359,27 +359,36 @@ export function DataUsageContent() {
                 <div className="space-y-6">
                     <div>
                         <Label htmlFor="image-quality">Image Quality</Label>
-                        <select
-                            id="image-quality"
-                            className="mt-2 w-full h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        >
-                            <option>High Quality (Uses more data)</option>
-                            <option selected>Standard (Balanced)</option>
-                            <option>Data Saver (Lower quality)</option>
-                        </select>
+                        <div className="w-full mt-2">
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select an option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="high">High Quality (Uses more data)</SelectItem>
+                                    <SelectItem value="standard">Standard Definition (Balanced)</SelectItem>
+                                    <SelectItem value="low">Data Saver (Lower quality)</SelectItem>
+                                    <SelectItem value="auto">Auto (Based on connection)</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
 
                     <div>
                         <Label htmlFor="video-quality">Video Quality</Label>
-                        <select
-                            id="video-quality"
-                            className="mt-2 w-full h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        >
-                            <option>HD (High data usage)</option>
-                            <option selected>Standard Definition (Balanced)</option>
-                            <option>Low (Minimum data usage)</option>
-                            <option>Auto (Based on connection)</option>
-                        </select>
+                        <div className="w-full mt-2">
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select an option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="high">High Quality (Uses more data)</SelectItem>
+                                    <SelectItem value="standard">Standard Definition (Balanced)</SelectItem>
+                                    <SelectItem value="low">Data Saver (Lower quality)</SelectItem>
+                                    <SelectItem value="auto">Auto (Based on connection)</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -443,7 +452,7 @@ export function DataUsageContent() {
                     </div>
                 </div>
 
-                <Button className="mt-4">Save Changes</Button>
+                <Button className="mt-2">Save Changes</Button>
             </div>
         </div>
     );
@@ -491,22 +500,22 @@ export function FeedPreferencesContent() {
             <div className="bg-card rounded-lg p-6 border space-y-4">
                 <h3 className="text-lg font-medium">Sort Order</h3>
 
-                <div className="space-y-3 mt-4">
+                <RadioGroup className="space-y-3 mt-4" defaultValue="relevance">
                     <div className="flex items-center space-x-2">
-                        <input type="radio" id="feed-latest" name="feed-sort" className="h-4 w-4" />
+                        <RadioGroupItem value="latest" id="feed-latest" className="h-4 w-4" />
                         <Label htmlFor="feed-latest">Latest First</Label>
                     </div>
 
                     <div className="flex items-center space-x-2">
-                        <input type="radio" id="feed-relevance" name="feed-sort" defaultChecked className="h-4 w-4" />
+                        <RadioGroupItem value="relevance" id="feed-relevance" className="h-4 w-4" />
                         <Label htmlFor="feed-relevance">Relevance (Recommended)</Label>
                     </div>
 
                     <div className="flex items-center space-x-2">
-                        <input type="radio" id="feed-trending" name="feed-sort" className="h-4 w-4" />
+                        <RadioGroupItem value="trending" id="feed-trending" className="h-4 w-4" />
                         <Label htmlFor="feed-trending">Trending</Label>
                     </div>
-                </div>
+                </RadioGroup>
             </div>
 
             <div className="bg-card rounded-lg p-6 border space-y-4">
@@ -583,14 +592,18 @@ export function AutoplayContent() {
                 <div className="space-y-6">
                     <div>
                         <Label htmlFor="autoplay-setting">Autoplay Setting</Label>
-                        <select
-                            id="autoplay-setting"
-                            className="mt-2 w-full h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        >
-                            <option>Always autoplay videos</option>
-                            <option selected>Autoplay on Wi-Fi only</option>
-                            <option>Never autoplay videos</option>
-                        </select>
+                        <div className="w-full mt-2">
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select an option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="always">Always autoplay videos</SelectItem>
+                                    <SelectItem value="wifi">Autoplay on Wi-Fi only</SelectItem>
+                                    <SelectItem value="never">Never autoplay videos</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
 
                     <div className="flex items-center justify-between">

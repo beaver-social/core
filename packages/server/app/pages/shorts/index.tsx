@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import Layout from "../layout"
-import SecondaryPanel from "../SecondaryPanel"
+import SecondaryPanel from "../explore/SecondaryPanel"
 import { useGlobalUI } from "@/shared/hooks/useGlobalUI"
 import ShortsFeed from "./ShortsFeed"
 import ShortsErrorBoundary from "./ShortsErrorBoundary"

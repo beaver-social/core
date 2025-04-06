@@ -7,6 +7,7 @@ import AuthDialog from "@/shared/components/web3/ConnectIdentity";
 import { Button } from "@/shared/components/ui/button";
 import Icon from "@/shared/components/Icon";
 import ConnectIdentity from "@/shared/components/web3/ConnectIdentity";
+import GlobalSearch from "@/shared/components/GlobalSearch";
 
 type LayoutProps = {
     main: React.ReactNode;
@@ -18,6 +19,9 @@ export default function Layout({ main, secondary }: LayoutProps) {
 
     return (
         <div>
+            {/* GlobalSearch - adds CTRL+K functionality */}
+            <GlobalSearch />
+
             {/* Desktop Layout */}
             <div className="hidden sm:block">
                 <SideNav />
