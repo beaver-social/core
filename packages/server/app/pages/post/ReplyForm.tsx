@@ -1,12 +1,13 @@
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/shared/components/ui/tooltip";
 import { Button } from "@/shared/components/ui/button";
 import Icon from "@/shared/components/Icon";
+import { Image } from "@/shared/components/Image";
 
 export default function ReplyForm() {
     return (
         <div className="p-4 border-b">
             <div className="flex gap-4">
-                <img src="/images/user.png" alt="User avatar" className="w-10 h-10 rounded-full" />
+                <Image src="/images/user.png" alt="User avatar" className="w-10 h-10 rounded-full" />
                 <div className="flex-1">
                     <textarea
                         placeholder="Post your reply"

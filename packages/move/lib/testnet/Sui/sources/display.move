@@ -38,7 +38,7 @@ const EVecLengthMismatch: u64 = 1;
 ///  fields:
 ///    <name, "Capy { genes }">
 ///    <link, "https://capy.art/capy/{ id }">
-///    <image, "https://api.capy.art/capy/{ id }/svg">
+///    <img, "https://api.capy.art/capy/{ id }/svg">
 ///    <description, "Lovely Capy, one of many">
 /// }
 /// ```

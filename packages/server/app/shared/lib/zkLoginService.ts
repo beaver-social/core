@@ -10,65 +10,44 @@ import {
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { Transaction } from "@mysten/sui/transactions";
 import * as jwtDecode from "jwt-decode";
+import apiClient from "@/shared/lib/apiClient";
+import {
+  JwtPayload,
+  StoredZkLoginData,
+  EphemeralKeyPair,
+  ZkLoginData,
+} from "../types/zk";
+import {
+  verifyPersonalMessageSignature,
+  verifyTransactionSignature,
+} from "@mysten/sui/verify";
+import { SuiGraphQLClient } from "@mysten/sui/graphql";
 
-// Define an interface for JWT payload
-export interface JwtPayload {
-  iss?: string;
-  sub?: string; // Subject ID
-  aud?: string[] | string;
-  exp?: number;
-  nbf?: number;
-  iat?: number;
-  jti?: string;
-}
-
-// Store ephemeral key data
-export interface EphemeralKeyPair {
-  keypair: Ed25519Keypair;
-  publicKey: string;
-  maxEpoch: number;
-  randomness: string;
-  nonce: string;
-}
-
-// Store zkLogin data
-export interface ZkLoginData {
-  ephemeralKeyPair: EphemeralKeyPair;
-  jwt: string;
-  decodedJwt: JwtPayload;
-  userSalt: bigint;
-  userAddress: string;
-  partialZkLoginSignature: any;
-  zkLoginSignature?: string;
-}
-
-export type PartialZkLoginSignature = Omit<
+type PartialZkLoginSignature = Omit<
   Parameters<typeof getZkLoginSignature>["0"]["inputs"],
   "addressSeed"
 >;
 
-export class zkLoginService {
+class zkLoginService {
   private client: SuiClient;
-  private network: "localnet" | "testnet" | "mainnet";
   private GOOGLE_CLIENT_ID: string;
   private REDIRECT_URL: string;
-  private SALT_SERVICE_URL: string;
   private ZK_PROVING_SERVICE_URL: string;
 
   constructor() {
-    this.network =
-      (import.meta.env.VITE_SUI_NETWORK as
-        | "localnet"
-        | "testnet"
-        | "mainnet") || "testnet";
     this.GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
     this.REDIRECT_URL = import.meta.env.VITE_GOOGLE_REDIRECT_URL || "";
-    this.SALT_SERVICE_URL = import.meta.env.VITE_SALT_SERVICE_URL || "";
     this.ZK_PROVING_SERVICE_URL =
-      import.meta.env.VITE_ZK_PROVING_SERVICE_URL ||
-      "https://zklogin-dev-api.sui.io/v1";
-
-    this.client = new SuiClient({ url: getFullnodeUrl(this.network) });
+      import.meta.env.VITE_ZK_PROVING_SERVICE_URL || "";
+    this.client = new SuiClient({
+      url: getFullnodeUrl(
+        import.meta.env.VITE_SUI_NETWORK as
+          | "localnet"
+          | "testnet"
+          | "mainnet"
+          | "devnet"
+      ),
+    });
   }
 
   /**
@@ -80,7 +59,7 @@ export class zkLoginService {
 
     const maxEpoch = Number(epoch) + 2; // Active for 2 epochs
     const ephemeralKeyPair = new Ed25519Keypair();
-    const publicKey = ephemeralKeyPair.getPublicKey().toBase64();
+    const secretKey = ephemeralKeyPair.getSecretKey();
     const randomness = generateRandomness();
     const nonce = generateNonce(
       ephemeralKeyPair.getPublicKey(),
@@ -89,8 +68,7 @@ export class zkLoginService {
     );
 
     return {
-      keypair: ephemeralKeyPair,
-      publicKey,
+      secretKey,
       maxEpoch,
       randomness,
       nonce,
@@ -136,22 +114,13 @@ export class zkLoginService {
    * Step 4: Get user salt
    * Fetches a unique salt for the user from salt service
    */
+
   async getUserSalt(jwt: JwtPayload): Promise<bigint> {
     try {
-      // This is an example implementation - you should implement your own salt service
-      const response = await fetch(this.SALT_SERVICE_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          jwt,
-        }),
+      const response = await apiClient.oauth["get-salt"].$post({
+        json: { jwt },
       });
-
       const data = await response.json();
-
-      // Convert the returned salt to a BigInt
       return BigInt(data.salt.integer);
     } catch (error) {
       console.error("Error getting user salt:", error);
@@ -187,8 +156,10 @@ export class zkLoginService {
     userSalt: bigint
   ): Promise<any> {
     try {
+      const keyPair = Ed25519Keypair.fromSecretKey(ephemeralKeyPair.secretKey);
+
       const extendedEphemeralPublicKey = getExtendedEphemeralPublicKey(
-        ephemeralKeyPair.keypair.getPublicKey()
+        keyPair.getPublicKey()
       );
 
       // Prepare data for the ZK proving request
@@ -222,73 +193,19 @@ export class zkLoginService {
   }
 
   /**
-   * Step 7: Assemble zkLogin signature for transaction
-   * Creates a zkLogin signature that can be used to submit transactions
-   */
-  async createZkLoginSignature(
-    zkLoginData: ZkLoginData,
-    transactionBlock: Uint8Array
-  ): Promise<string> {
-    // Generate address seed from salt, sub, and aud
-    const aud = zkLoginData.decodedJwt.aud;
-    // Handle the case where aud is an array by using the first element
-    const audienceString = Array.isArray(aud) ? aud[0] : (aud as string);
-
-    const addressSeed = genAddressSeed(
-      zkLoginData.userSalt,
-      "sub",
-      zkLoginData.decodedJwt.sub as string,
-      audienceString
-    ).toString();
-
-    // Sign the transaction with the ephemeral key
-    const userSignature =
-      await zkLoginData.ephemeralKeyPair.keypair.signPersonalMessage(
-        transactionBlock
-      );
-
-    // Create the zkLogin signature
-    const zkLoginSignature = getZkLoginSignature({
-      inputs: {
-        ...zkLoginData.partialZkLoginSignature,
-        addressSeed,
-      },
-      maxEpoch: zkLoginData.ephemeralKeyPair.maxEpoch,
-      userSignature: userSignature.signature,
-    });
-
-    return zkLoginSignature;
-  }
-
-  /**
    * Complete zkLogin flow
    * Executes all steps of the zkLogin flow
    */
-  async completeZkLoginFlow(redirectUrl: string): Promise<ZkLoginData> {
-    // Fetch ephemeral key pair data from session storage
-    const storedData = JSON.parse(
-      sessionStorage.getItem("zkLoginEphemeralKeyPair") as string
-    );
-
-    // Reconstruct the Ed25519Keypair from the stored private key bytes
-    const keypair = Ed25519Keypair.fromSecretKey(storedData.privateKeyBytes);
-
-    // Reconstruct the EphemeralKeyPair object
-    const ephemeralKeyPair: EphemeralKeyPair = {
-      keypair,
-      publicKey: storedData.publicKey,
-      maxEpoch: storedData.maxEpoch,
-      randomness: storedData.randomness,
-      nonce: storedData.nonce,
-    };
-
-    // Step 3: Extract and decode JWT (assuming step 2, user login, was done externally)
+  async completeZkLoginFlow(
+    ephemeralKeyPair: EphemeralKeyPair,
+    redirectUrl: string
+  ): Promise<ZkLoginData> {
+    // Deserialize the ephemeral key pair
     const { jwt, decodedJwt } = this.extractAndDecodeJwt(redirectUrl);
 
-    // Step 4: Get user salt
     const userSalt = await this.getUserSalt(decodedJwt);
 
-    // Step 5: Generate user's Sui address
+    // Generate user's Sui address
     const userAddress = this.computeZkLoginAddress(userSalt, jwt);
 
     // Step 6: Get zero-knowledge proof
@@ -309,52 +226,127 @@ export class zkLoginService {
     };
   }
 
-  /**
-   * Create and execute a transaction with zkLogin
-   */
+  // Create a zkLogin signature that can be used to submit personal messages
+  async zkSignPersonalMessage(
+    zkLoginData: StoredZkLoginData,
+    message: string
+  ): Promise<{ zkLoginSignature: string }> {
+    const ephemeralKeyPair = zkLoginData.ephemeralKeyPair;
+    const aud = zkLoginData.decodedJwt.aud;
+    const audienceString = Array.isArray(aud) ? aud[0] : (aud as string);
+    const subString = zkLoginData.decodedJwt.sub as string;
+
+    const addressSeed = genAddressSeed(
+      BigInt(zkLoginData.userSalt),
+      "sub",
+      subString,
+      audienceString
+    ).toString();
+
+    // convert string to Uint8Array
+    const messageBytes = new TextEncoder().encode(message);
+
+    // get keypair from secret key
+    const keypair = Ed25519Keypair.fromSecretKey(ephemeralKeyPair.secretKey);
+
+    // Sign the transaction with the ephemeral key
+    const { signature: userSignature } = await keypair.signPersonalMessage(
+      messageBytes
+    );
+
+    // Create the zkLogin signature
+    const zkLoginSignature = getZkLoginSignature({
+      inputs: {
+        ...zkLoginData.partialZkLoginSignature,
+        addressSeed,
+      },
+      maxEpoch: ephemeralKeyPair.maxEpoch,
+      userSignature,
+    });
+
+    // const publicKey = await verifyPersonalMessageSignature(
+    //   messageBytes,
+    //   zkLoginSignature,
+    //   {
+    //     client: new SuiGraphQLClient({
+    //       url: "https://sui-devnet.mystenlabs.com/graphql",
+    //     }),
+    //   }
+    // );
+
+    // const verified = publicKey.toSuiAddress() === zkLoginData.userAddress;
+
+    return { zkLoginSignature };
+  }
+
+  // Create a zkLogin signature that can be used to submit transactions
+  async zkSignTransaction(
+    zkLoginData: StoredZkLoginData,
+    tx: Transaction
+  ): Promise<{ zkLoginSignature: string; txBytes: Uint8Array }> {
+    const ephemeralKeyPair = zkLoginData.ephemeralKeyPair;
+
+    // get keypair from secret key
+    const keypair = Ed25519Keypair.fromSecretKey(ephemeralKeyPair.secretKey);
+
+    // Build & Sign the transaction
+    tx.setSender(zkLoginData.userAddress);
+    const txBytes = await tx.build({ client: this.client });
+    const userSignature = (await keypair.signTransaction(txBytes)).signature;
+
+    // Generate ZKLogin signature
+    const aud = zkLoginData.decodedJwt.aud;
+    const subString = zkLoginData.decodedJwt.sub as string;
+    const audienceString = Array.isArray(aud) ? aud[0] : (aud as string);
+
+    const addressSeed = genAddressSeed(
+      BigInt(zkLoginData.userSalt),
+      "sub",
+      subString,
+      audienceString
+    ).toString();
+
+    const zkLoginSignature = getZkLoginSignature({
+      inputs: {
+        ...zkLoginData.partialZkLoginSignature,
+        addressSeed,
+      },
+      maxEpoch: ephemeralKeyPair.maxEpoch,
+      userSignature,
+    });
+
+    // const publicKey = await verifyTransactionSignature(
+    //   txBytes,
+    //   zkLoginSignature,
+    //   {
+    //     client: new SuiGraphQLClient({
+    //       url: "https://sui-devnet.mystenlabs.com/graphql",
+    //     }),
+    //   }
+    // );
+
+    // const verified = publicKey.toSuiAddress() === zkLoginData.userAddress;
+
+    return {
+      zkLoginSignature,
+      txBytes,
+    };
+  }
+
+  // Execute a transaction with zkLogin
   async executeTransactionWithZkLogin(
-    zkLoginData: ZkLoginData,
-    buildTransaction: (txb: Transaction) => Transaction
+    zkLoginData: StoredZkLoginData,
+    tx: Transaction
   ): Promise<{ success: boolean; digest?: string; error?: string }> {
     try {
-      // Create a new transaction
-      const txb = new Transaction();
-      txb.setSender(zkLoginData.userAddress);
-
-      // Let the caller build the transaction
-      buildTransaction(txb);
-
-      // Sign transaction with ephemeral key
-      const { bytes, signature: userSignature } = await txb.sign({
-        client: this.client,
-        signer: zkLoginData.ephemeralKeyPair.keypair,
-      });
-
-      // Generate address seed
-      const aud = zkLoginData.decodedJwt.aud;
-      // Handle the case where aud is an array by using the first element
-      const audienceString = Array.isArray(aud) ? aud[0] : (aud as string);
-
-      const addressSeed = genAddressSeed(
-        zkLoginData.userSalt,
-        "sub",
-        zkLoginData.decodedJwt.sub as string,
-        audienceString
-      ).toString();
-
-      // Assemble zkLogin signature
-      const zkLoginSignature = getZkLoginSignature({
-        inputs: {
-          ...zkLoginData.partialZkLoginSignature,
-          addressSeed,
-        },
-        maxEpoch: zkLoginData.ephemeralKeyPair.maxEpoch,
-        userSignature,
-      });
+      const { txBytes, zkLoginSignature } = await this.zkSignTransaction(
+        zkLoginData,
+        tx
+      );
 
       // Execute the transaction
       const result = await this.client.executeTransactionBlock({
-        transactionBlock: bytes,
+        transactionBlock: txBytes,
         signature: zkLoginSignature,
       });
 
@@ -366,8 +358,11 @@ export class zkLoginService {
       console.error("Error executing transaction:", error);
       return {
         success: false,
+        digest: undefined,
         error: error.message,
       };
     }
   }
 }
+
+export default new zkLoginService();

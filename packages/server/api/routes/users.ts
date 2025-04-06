@@ -9,7 +9,6 @@ import { posts } from "../lib/db/schema/post";
 import { z } from "zod";
 import { zNumberString, zSuiAddress } from "../lib/zod/helpers";
 import { likes } from "../lib/db/schema/like";
-import { replies } from "../lib/db/schema/reply";
 
 export default new Hono()
 
@@ -19,7 +18,7 @@ export default new Hono()
             identity: zSuiAddress,
             username: z.string(),
             fullName: z.string(),
-            wallet: zSuiAddress,
+            address: zSuiAddress,
             suins_domain_name: zSuiAddress.optional(),
             image_url: z.string(),
             banner_url: z.string().optional(),
@@ -28,14 +27,14 @@ export default new Hono()
             pinned: zNumberString.optional()
         }),
     ), async (ctx) => {
-        const { identity, username, fullName, wallet, suins_domain_name, image_url, banner_url, about, timezone, pinned } = ctx.req.valid("json")
+        const { identity, username, fullName, address, suins_domain_name, image_url, banner_url, about, timezone, pinned } = ctx.req.valid("json")
 
         const existingUser = await db.select().from(users).where(eq(users.username, username)).limit(1);
         if (existingUser.length > 0) {
             return ctx.json({ error: "Username already taken" }, 400);
         }
 
-        const existingWallet = await db.select().from(users).where(eq(users.wallet, wallet)).limit(1);
+        const existingWallet = await db.select().from(users).where(eq(users.address, address)).limit(1);
         if (existingWallet.length > 0) {
             return ctx.json({ error: "Wallet already linked to some other account" }, 400)
         }
@@ -53,7 +52,7 @@ export default new Hono()
                 identity,
                 username,
                 fullName,
-                wallet,
+                address,
                 suins_domain_name: suins_domain_name || null,
                 image_url,
                 banner_url: banner_url || null,
@@ -108,11 +107,11 @@ export default new Hono()
                 identity: zSuiAddress.optional(),
                 username: z.string().optional(),
                 suins_domain_name: z.string().optional(),
-                wallet: zSuiAddress.optional(),
+                address: zSuiAddress.optional(),
             }),
         ),
         async (ctx) => {
-            const { id, identity, username, suins_domain_name, wallet } = ctx
+            const { id, identity, username, suins_domain_name, address } = ctx
                 .req.valid("query");
 
             let user: DB["user"] | undefined = undefined;
@@ -145,9 +144,9 @@ export default new Hono()
                 user = data[0];
             }
 
-            if (wallet) {
+            if (address) {
                 const data = await db.select().from(users).where(
-                    eq(users.wallet, wallet),
+                    eq(users.address, address),
                 ).limit(1);
                 user = data[0];
             }
@@ -247,48 +246,48 @@ export default new Hono()
         }
     )
 
-    .get("/:id/replies",
-        zValidator(
-            "param",
-            z.object({
-                id: zNumberString,
-            }),
-        ),
-        zValidator(
-            "query",
-            z.object({
-                page: zNumberString.default("1"),
-                limit: zNumberString.default("10")
-            }),
-        ),
-        async (ctx) => {
-            const { id } = ctx.req.valid("param");
+// .get("/:id/replies",
+//     zValidator(
+//         "param",
+//         z.object({
+//             id: zNumberString,
+//         }),
+//     ),
+//     zValidator(
+//         "query",
+//         z.object({
+//             page: zNumberString.default("1"),
+//             limit: zNumberString.default("10")
+//         }),
+//     ),
+//     async (ctx) => {
+//         const { id } = ctx.req.valid("param");
 
-            // check if page & limit is number when default
-            const { page, limit } = ctx.req.valid("query");
+//         // check if page & limit is number when default
+//         const { page, limit } = ctx.req.valid("query");
 
-            if (!id) {
-                return ctx.json({ error: "id not provided" }, 400)
-            }
+//         if (!id) {
+//             return ctx.json({ error: "id not provided" }, 400)
+//         }
 
-            const offset = (page - 1) * limit;
-            const userReplies = await db
-                .select()
-                .from(replies)
-                .where(eq(replies.userId, id))
-                .limit(limit)
-                .offset(offset);
+//         const offset = (page - 1) * limit;
+//         const userReplies = await db
+//             .select()
+//             .from(replies)
+//             .where(eq(replies.userId, id))
+//             .limit(limit)
+//             .offset(offset);
 
-            const totalReplies = await db
-                .select({ count: count() })
-                .from(replies)
-                .where(eq(replies.userId, id));
+//         const totalReplies = await db
+//             .select({ count: count() })
+//             .from(replies)
+//             .where(eq(replies.userId, id));
 
-            return ctx.json({
-                userReplies,
-                totalPosts: totalReplies[0]?.count ?? 0,
-                currentPage: page,
-                perPage: limit,
-            }, 200);
-        }
-    )
+//         return ctx.json({
+//             userReplies,
+//             totalPosts: totalReplies[0]?.count ?? 0,
+//             currentPage: page,
+//             perPage: limit,
+//         }, 200);
+//     }
+// )

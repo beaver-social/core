@@ -46,7 +46,7 @@ const nftSvg = (name: string, image: string) => `
   <rect width="640" height="640" rx="42" fill="url(#border-gradient)" />
   <rect x="5" y="5" width="630" height="630" rx="38" fill="var(--back)" />
 
-  <image
+  <img
     href="${image}"
     x="160" y="72" width="320" height="320" clip-path="url(#clip-pfp)" preserveAspectRatio="xMidYMid slice" />
 

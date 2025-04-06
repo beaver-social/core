@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Tabs, { Tab } from "@/shared/components/Tabs";
+import Tabs from "@/shared/components/Tabs";
 import FeedItem from "./FeedItem";
 import Icon from "@/shared/components/Icon";
 

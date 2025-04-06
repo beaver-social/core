@@ -1,3 +1,4 @@
+import { Image } from "@/shared/components/Image";
 import { Button } from "@/shared/components/ui/button";
 import { Search } from "lucide-react";
 
@@ -35,7 +36,7 @@ export default function SecondaryPanel() {
                     {[1, 2, 3].map((i) => (
                         <div key={i} className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-primary-300" />
+                                <Image src="/images/user.png" alt="user" className="w-10 h-10 rounded-full bg-background" />
                                 <div>
                                     <p className="font-semibold">Kartik</p>
                                     <p className="text-sm text-muted-foreground">@ishtails</p>

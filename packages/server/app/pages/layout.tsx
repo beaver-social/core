@@ -32,7 +32,7 @@ export default function Layout({ main, secondary }: LayoutProps) {
                     {secondary}
                 </section>
 
-                <div className="fixed flex gap-4 bottom-0 right-0 p-5">
+                <div className="fixed z-50 flex gap-4 bottom-0 right-0 p-5">
                     <ConnectIdentity />
                     <ThemeSwitch />
                 </div>
@@ -45,10 +45,6 @@ export default function Layout({ main, secondary }: LayoutProps) {
                         {main}
                     </div>
                 </section>
-
-                <div className="fixed flex gap-4 bottom-16 right-0 p-4">
-                    <ConnectIdentity />
-                </div>
 
                 <BottomBar />
             </div>

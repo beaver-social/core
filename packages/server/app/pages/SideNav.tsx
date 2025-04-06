@@ -2,6 +2,7 @@ import Icon from "../shared/components/Icon";
 import type { icons } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "../shared/components/ui/tooltip";
 import { Link } from "react-router";
+import { Image } from "@/shared/components/Image";
 
 type sidebarItems = {
     name: string;
@@ -9,7 +10,7 @@ type sidebarItems = {
     iconName: keyof typeof icons;
 };
 
-const sidebarItems: sidebarItems[] = [
+export const sidebarItems: sidebarItems[] = [
     {
         name: "Home",
         iconName: "House",
@@ -22,18 +23,18 @@ const sidebarItems: sidebarItems[] = [
     },
     {
         name: "Shorts",
-        iconName: "Video",
+        iconName: "Clapperboard",
         to: "/shorts",
-    },
-    {
-        name: "Messages",
-        iconName: "MessageSquare",
-        to: "/messages",
     },
     {
         name: "Alerts",
         iconName: "Heart",
         to: "/alerts",
+    },
+    {
+        name: "Messages",
+        iconName: "MessageSquare",
+        to: "/messages",
     },
 ]
 
@@ -42,7 +43,7 @@ export default function SideNav() {
         <div className="fixed bg-background glass h-screen border-r flex-col items-center justify-between hidden sm:flex">
             <div className="flex flex-col w-[4.5rem] items-center ">
                 <Link to="/">
-                    <img src={
+                    <Image src={
                         "/icons/logo_icon.png"
                     } alt="logo" className="py-4 px-4 w-[5.5rem]" />
                 </Link>
@@ -72,7 +73,7 @@ export default function SideNav() {
                             <TooltipTrigger asChild>
                                 <Link to="/profile/ishtails">
                                     <li>
-                                        <img src={
+                                        <Image src={
                                             "/images/user.png"
                                         } alt="user" className="w-[2rem] border rounded-full bg-background" />
                                     </li>

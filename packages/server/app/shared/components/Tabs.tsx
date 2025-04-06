@@ -1,26 +1,22 @@
 import { cn } from "@/shared/lib/utils";
-
-export interface Tab {
-  id: string;
-  label: string;
-  content: React.ReactNode;
-}
+import { useGlobalUI } from "../hooks/useGlobalUI";
+import { Tab } from "../types/globalUI";
 
 interface TabsProps {
-  tabs: Tab[];
-  activeTab: string;
-  onTabChange: (tabId: string) => void;
   className?: string;
   tabClassName?: string;
 }
 
-function Tabs({ tabs, activeTab, onTabChange, className, tabClassName }: TabsProps) {
+function Tabs({ className, tabClassName }: TabsProps) {
+  const { getTabs, activeTab, setActiveTab } = useGlobalUI();
+  const tabs = getTabs();
+
   return (
     <div className={cn("w-full", className)}>
       {/* Tabs Header */}
       <div className="sticky glass top-0 z-10 bg-background/50 border-b">
         <div className="flex">
-          {tabs.map((tab) => (
+          {tabs && tabs.length > 0 && tabs.map((tab) => (
             <button
               key={tab.id}
               className={cn(
@@ -30,7 +26,7 @@ function Tabs({ tabs, activeTab, onTabChange, className, tabClassName }: TabsPro
                   : "text-grey-500 hover:text-grey-700",
                 tabClassName
               )}
-              onClick={() => onTabChange(tab.id)}
+              onClick={() => setActiveTab(tab.id)}
             >
               {tab.label}
             </button>
@@ -40,7 +36,7 @@ function Tabs({ tabs, activeTab, onTabChange, className, tabClassName }: TabsPro
 
       {/* Tab Content */}
       <div className="mt-4">
-        {tabs.find(tab => tab.id === activeTab)?.content}
+        {tabs && tabs.length > 0 && tabs.find((tab) => tab.id === activeTab)?.content ? tabs.find((tab) => tab.id === activeTab)?.content : tabs.find((tab) => tab.id === tabs[0].id)?.content}
       </div>
     </div>
   );
