@@ -17,19 +17,14 @@ export const sidebarItems: sidebarItems[] = [
         to: "/",
     },
     {
-        name: "Explore",
-        iconName: "Search",
-        to: "/explore",
+        name: "Alerts",
+        iconName: "Heart",
+        to: "/alerts",
     },
     {
         name: "Shorts",
         iconName: "Clapperboard",
         to: "/shorts",
-    },
-    {
-        name: "Alerts",
-        iconName: "Heart",
-        to: "/alerts",
     },
     {
         name: "Messages",
@@ -91,7 +86,7 @@ export default function SideNav() {
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Link to="/dashboard/settings">
+                            <Link to="/settings">
                                 <Icon name="Settings" className="text-hover" />
                             </Link>
                         </TooltipTrigger>

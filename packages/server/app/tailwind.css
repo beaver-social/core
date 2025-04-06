@@ -86,9 +86,9 @@
   --muted-foreground: #94a3b8;
   --border: #1e293b;
   --input: #1e293b;
-
-  --card: oklch(0.145 0 0);
+  --card: #020c19;
   --card-foreground: oklch(0.985 0 0);
+
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.637 0.237 25.331);
   --ring: oklch(0.439 0 0);
