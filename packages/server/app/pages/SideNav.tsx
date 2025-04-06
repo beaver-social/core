@@ -10,7 +10,7 @@ type sidebarItems = {
     iconName: keyof typeof icons;
 };
 
-const sidebarItems: sidebarItems[] = [
+export const sidebarItems: sidebarItems[] = [
     {
         name: "Home",
         iconName: "House",
@@ -23,18 +23,18 @@ const sidebarItems: sidebarItems[] = [
     },
     {
         name: "Shorts",
-        iconName: "Video",
+        iconName: "Clapperboard",
         to: "/shorts",
-    },
-    {
-        name: "Messages",
-        iconName: "MessageSquare",
-        to: "/messages",
     },
     {
         name: "Alerts",
         iconName: "Heart",
         to: "/alerts",
+    },
+    {
+        name: "Messages",
+        iconName: "MessageSquare",
+        to: "/messages",
     },
 ]
 
