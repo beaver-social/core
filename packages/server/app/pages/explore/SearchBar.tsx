@@ -5,7 +5,9 @@ import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from ".
 import { Search } from "lucide-react";
 import { Input } from "../../shared/components/ui/input";
 import { Image } from "../../shared/components/Image";
-import { Dialog, DialogContent } from "../../shared/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription } from "../../shared/components/ui/dialog";
+import Icon from "@/shared/components/Icon";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
 type Profile = {
     id: string;
@@ -54,7 +56,7 @@ export default function SearchBar({
             if (onSearch && searchValue.trim()) {
                 onSearch(searchValue);
             }
-        }, 500);
+        }, 300);
 
         return () => clearTimeout(timer);
     }, [searchValue, onSearch]);
@@ -115,32 +117,6 @@ export default function SearchBar({
         };
     }, [navigate]);
 
-    // Handle keyboard events
-    const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Escape') {
-            setOpen(false);
-            setIsFocused(false);
-            searchInputRef.current?.blur();
-            if (isModal && onModalClose) {
-                onModalClose();
-            }
-        } else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            setActiveIndex(prev => (prev < totalResults - 1 ? prev + 1 : 0));
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            setActiveIndex(prev => (prev > 0 ? prev - 1 : totalResults - 1));
-        } else if (e.key === 'Enter' && activeIndex >= 0 && activeIndex < totalResults) {
-            e.preventDefault();
-            const selectedItem = allResults[activeIndex];
-            if ('handle' in selectedItem) {
-                handleSelectProfile(selectedItem.handle);
-            } else {
-                handleSelectTopic(selectedItem.name);
-            }
-        }
-    }, [activeIndex, totalResults, allResults, handleSelectProfile, handleSelectTopic, isModal, onModalClose]);
-
     // Keep focus on input box
     useEffect(() => {
         if (isFocused && searchInputRef.current) {
@@ -162,7 +138,12 @@ export default function SearchBar({
         return (
             <Command shouldFilter={false}>
                 <CommandList>
-                    <CommandEmpty>No results found</CommandEmpty>
+                    <CommandGroup heading="Search">
+                        <CommandItem onSelect={() => handleSelectTopic(searchValue)} className="cursor-default text-muted-foreground">
+                            <Icon name="Search" className="mr-2" />
+                            Search for "{searchValue}"
+                        </CommandItem>
+                    </CommandGroup>
                     {filteredProfiles.length > 0 && (
                         <CommandGroup heading="People">
                             {filteredProfiles.map((profile, index) => {
@@ -211,13 +192,6 @@ export default function SearchBar({
         <form onSubmit={handleSearchSubmit} className={className}>
             <Popover
                 open={isFocused && searchValue.length > 0 && !isModal}
-                onOpenChange={(open) => {
-                    setOpen(open);
-                    // Keep focus on input whether opening or closing
-                    if (searchInputRef.current) {
-                        searchInputRef.current.focus();
-                    }
-                }}
             >
                 <PopoverTrigger asChild>
                     <div className="relative">
@@ -229,14 +203,6 @@ export default function SearchBar({
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
                             onFocus={() => setIsFocused(true)}
-                            onBlur={(e) => {
-                                // Prevent losing focus if clicking inside popover content
-                                if (e.relatedTarget && e.currentTarget.closest('form')?.contains(e.relatedTarget as Node)) {
-                                    e.preventDefault();
-                                    searchInputRef.current?.focus();
-                                }
-                            }}
-                            onKeyDown={handleKeyDown}
                             autoComplete="off"
                             className="w-full pl-10 pr-4 py-2 bg-background rounded-full border border-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                             aria-label="Search"
@@ -244,25 +210,7 @@ export default function SearchBar({
                     </div>
                 </PopoverTrigger>
                 <PopoverContent
-                    className="p-0 border rounded-xl"
                     align="start"
-                    side="bottom"
-                    sideOffset={5}
-                    onInteractOutside={(e) => {
-                        // Prevent popover from closing when clicking inside the input
-                        if (searchInputRef.current?.contains(e.target as Node)) {
-                            e.preventDefault();
-                        }
-                    }}
-                    onEscapeKeyDown={(e) => {
-                        // Keep focus on the input when Escape is pressed
-                        e.preventDefault();
-                        setOpen(false);
-                        if (searchInputRef.current) {
-                            searchInputRef.current.focus();
-                        }
-                    }}
-                    // Add this to prevent focus stealing
                     onOpenAutoFocus={(e) => {
                         e.preventDefault();
                         searchInputRef.current?.focus();
@@ -277,7 +225,9 @@ export default function SearchBar({
     return isModal ? (
         <Dialog open={true} onOpenChange={(open) => !open && onModalClose && onModalClose()}>
             <DialogContent className="sm:max-w-[500px] p-0 gap-0 bg-transparent border-none">
-                <div className="p-4">
+                <DialogTitle className="sr-only">Search</DialogTitle>
+                <DialogDescription className="sr-only">Search for people, topics, and more...</DialogDescription>
+                <form onSubmit={handleSearchSubmit} className="p-4">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
                         <Input
@@ -287,17 +237,16 @@ export default function SearchBar({
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
                             onFocus={() => setIsFocused(true)}
-                            onKeyDown={handleKeyDown}
                             autoFocus
                             autoComplete="off"
-                            className="w-full pl-10 pr-4 py-2 bg-background rounded-full border border-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                            className="w-full pl-10 pr-4 py-2 bg-background rounded-md border"
                             aria-label="Search"
                         />
                     </div>
                     {searchValue.length > 0 && (
                         <div className="mt-2 border rounded-xl">{renderResults()}</div>
                     )}
-                </div>
+                </form>
             </DialogContent>
         </Dialog>
     ) : (

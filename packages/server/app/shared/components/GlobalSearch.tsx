@@ -36,7 +36,6 @@ export default function GlobalSearch() {
     // Set up global keyboard shortcut
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            // Check for Ctrl+K or Cmd+K (on Mac)
             if ((event.ctrlKey || event.metaKey) && event.key === "k") {
                 event.preventDefault();
                 setIsSearchOpen(true);
