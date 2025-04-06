@@ -19,7 +19,11 @@ export const users = table(
     pinned: t.int("pinned_post").references((): t.AnySQLiteColumn => posts.id),
     ...timestamps,
   },
-  (table) => [t.uniqueIndex("identity_idx").on(table.identity)]
+  (table) => [
+    t.uniqueIndex("identity_idx").on(table.identity),
+    t.uniqueIndex("username_idx").on(table.username),
+    t.uniqueIndex("suins_idx").on(table.suins_domain_name)
+  ]
 );
 
 export const follows = table("follows", {

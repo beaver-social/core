@@ -2,7 +2,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { likes } from "../schema/like";
 import { post_action, post_media, posts } from "../schema/post";
 import { createAction } from "./factory";
-import { toHEX } from "@mysten/sui/utils";
+import { users } from "../schema/user";
 
 export const makePost = createAction<{
   content: string;
@@ -157,5 +157,56 @@ export const unlikePost = createAction<{ postId: number }>()(
         likesCount: sql`GREATEST(${posts.likesCount} - 1, 0)`,
       })
       .where(eq(posts.id, postId));
+  }
+);
+
+
+export const pinPost = createAction<{ postId: number }>()(
+  async (tx, { postId, userId }) => {
+    const [post] = await tx.select({ deletedAt: posts.deletedAt }).from(posts).where(eq(posts.id, postId)).limit(1)
+
+    if (!post) {
+      throw new Error("Post not found")
+    }
+
+    if (post.deletedAt) {
+      throw new Error("Cannot pin a deleted post");
+    }
+
+    const [user] = await tx
+      .select({ pinned: users.pinned })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (user?.pinned === postId) {
+      throw new Error("Post is already pinned");
+    }
+
+    await tx.update(users).set({
+      pinned: postId
+    }).where(eq(users.id, userId))
+  }
+)
+
+
+export const unpinPost = createAction<{ postId: number }>()(
+  async (tx, { userId }) => {
+    const [user] = await tx
+      .select({ pinned: users.pinned })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (!user?.pinned) {
+      throw new Error("No post is currently pinned");
+    }
+
+    await tx
+      .update(users)
+      .set({
+        pinned: null,
+      })
+      .where(eq(users.id, userId));
   }
 );

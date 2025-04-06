@@ -12,9 +12,9 @@ export const likes = table(
       .int()
       .references(() => users.id)
       .notNull(),
-    postId: t.int().references(() => posts.id),
+    postId: t.int().references(() => posts.id).notNull(),
     reaction: t.int(),
     ...timestamps,
   },
-  (table) => [t.index("postId_idx").on(table.postId)]
+  (table) => [t.uniqueIndex("post_user_idx").on(table.postId, table.userId)]
 );
