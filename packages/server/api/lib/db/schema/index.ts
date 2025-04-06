@@ -2,12 +2,14 @@ import * as post from "./post";
 import * as like from "./post";
 import * as user from "./user";
 import * as reply from "./reply";
+import * as action from "./action";
 
 const schema = {
   ...user,
   ...post,
   ...like,
   ...reply,
+  ...action,
 };
 
 export default schema;

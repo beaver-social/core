@@ -5,7 +5,7 @@ import { createAction } from "./factory";
 import { encode as msgpackEncode, decode as msgpackDecode } from "msgpackr";
 
 export function compressActionRequest(
-  req: Parameters<ReturnType<typeof createAction>>["0"] & {
+  req: Parameters<ReturnType<ReturnType<typeof createAction>>>["0"] & {
     type: string;
     previous: string;
   }
