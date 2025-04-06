@@ -10,4 +10,5 @@ export type Screen =
   | "search"
   | "alerts"
   | "messages"
-  | "settings";
+  | "settings"
+  | "shorts";

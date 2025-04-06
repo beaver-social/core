@@ -8,7 +8,7 @@ import Message from "./pages/messages/message";
 import Profile from "./pages/profile";
 import GoogleOAuth from "./pages/oauth/GoogleOAuth";
 import { PageErrorBoundary } from "./shared/lib/errorHandling";
-
+import Shorts from "./pages/shorts";
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary = (Component: React.ComponentType<any>) => (props: any) => (
   <PageErrorBoundary>
@@ -27,6 +27,7 @@ export default function () {
         <Route path="/message/:id" element={withPageErrorBoundary(Message)({})} />
         <Route path="post/:id" element={withPageErrorBoundary(Post)({})} />
         <Route path="/profile/:id" element={withPageErrorBoundary(Profile)({})} />
+        <Route path="/shorts" element={withPageErrorBoundary(Shorts)({})} />
         <Route path="*" element={withPageErrorBoundary(Error404)({})} />
       </Routes>
     </BrowserRouter>

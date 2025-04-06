@@ -7,6 +7,7 @@ import ForYou from "./home/content/ForYou";
 import Following from "./home/content/Following";
 import Mentioned from "./alerts/content/Mentioned";
 import AllAlerts from "./alerts/content/AllAlerts";
+import ShortsFeed from "./shorts/ShortsFeed";
 
 export const tabs: Record<Screen, Tab[]> = {
   home: [
@@ -58,4 +59,16 @@ export const tabs: Record<Screen, Tab[]> = {
   search: [],
   messages: [],
   settings: [],
+  shorts: [
+    {
+      id: "for-you",
+      label: "For you",
+      content: (<ShortsFeed />),
+    },
+    {
+      id: "following",
+      label: "Following",
+      content: (<ShortsFeed />),
+    },
+  ],
 };

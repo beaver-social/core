@@ -18,17 +18,22 @@ const bottomBarItems: bottomBarItems[] = [
     {
         name: "Explore",
         iconName: "Search",
-        to: "/dashboard/explore",
+        to: "/explore",
     },
     {
-        name: "Create",
-        iconName: "SquarePlus",
-        to: "/dashboard/create",
+        name: "Shorts",
+        iconName: "Video",
+        to: "/shorts",
     },
     {
         name: "Messages",
-        iconName: "MessageCircle",
-        to: "/dashboard/messages",
+        iconName: "MessageSquare",
+        to: "/messages",
+    },
+    {
+        name: "Alerts",
+        iconName: "Heart",
+        to: "/alerts",
     },
 ];
 

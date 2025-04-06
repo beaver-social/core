@@ -46,10 +46,6 @@ export default function Layout({ main, secondary }: LayoutProps) {
                     </div>
                 </section>
 
-                <div className="fixed flex gap-4 bottom-16 right-0 p-4">
-                    <ConnectIdentity />
-                </div>
-
                 <BottomBar />
             </div>
         </div>
