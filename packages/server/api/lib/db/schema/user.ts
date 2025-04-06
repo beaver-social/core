@@ -21,3 +21,15 @@ export const users = table(
   },
   (table) => [t.uniqueIndex("identity_idx").on(table.identity)]
 );
+
+export const follows = table("follows", {
+  id: t.int().primaryKey({ autoIncrement: true }),
+  followerId: t
+    .int()
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  followingId: t
+    .int()
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+});
