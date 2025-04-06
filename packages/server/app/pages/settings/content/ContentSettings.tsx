@@ -1,11 +1,18 @@
-import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
 import { Switch } from "@/shared/components/ui/switch";
 import Icon from "@/shared/components/Icon";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/shared/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
 
 export function LanguagesContent() {
-    const languages = [
+    interface Language {
+        code: string;
+        name: string;
+        selected: boolean;
+    }
+
+    const languages: Language[] = [
         { code: "en", name: "English", selected: true },
         { code: "es", name: "Español", selected: false },
         { code: "fr", name: "Français", selected: false },
@@ -37,18 +44,19 @@ export function LanguagesContent() {
                     Select the language for the application interface.
                 </p>
 
-                <div className="mt-4">
-                    <select
-                        className="w-full h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    >
-                        <option value="en">English (Default)</option>
-                        <option value="es">Español</option>
-                        <option value="fr">Français</option>
-                        <option value="de">Deutsch</option>
-                        <option value="zh">中文</option>
-                        <option value="ja">日本語</option>
-                        <option value="ko">한국어</option>
-                    </select>
+                <div className="mt-2">
+                    <Select>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a language" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {languages.map(language => (
+                                <SelectItem key={language.code} value={language.code}>
+                                    {language.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
 
@@ -59,19 +67,14 @@ export function LanguagesContent() {
                 </p>
 
                 <div className="space-y-3 mt-4">
-                    {languages.map(language => (
-                        <div key={language.code} className="flex items-center justify-between p-3 border rounded-md">
-                            <p className="font-medium">{language.name}</p>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    id={`lang-${language.code}`}
-                                    defaultChecked={language.selected}
-                                    className="h-4 w-4 rounded border-gray-300 focus:ring-blue-500"
-                                />
+                    <RadioGroup>
+                        {languages.map(language => (
+                            <div key={language.code} className="flex items-center justify-between p-3 border rounded-md">
+                                <Label className="font-medium">{language.name}</Label>
+                                <RadioGroupItem value={language.code} />
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </RadioGroup>
                 </div>
             </div>
 
@@ -171,11 +174,18 @@ export function SensitiveContentContent() {
                             <p className="font-medium">Violence and Gore</p>
                             <p className="text-sm text-muted-foreground">Graphic violence or injury</p>
                         </div>
-                        <select className="h-8 rounded-md border border-input bg-transparent px-2 text-sm">
-                            <option>Always Warn</option>
-                            <option>Hide Completely</option>
-                            <option>Show Without Warning</option>
-                        </select>
+                        <div className="w-40">
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select an option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="always-warn">Always Warn</SelectItem>
+                                    <SelectItem value="hide-completely">Hide Completely</SelectItem>
+                                    <SelectItem value="show-without-warning">Show Without Warning</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
 
                     <div className="flex items-center justify-between p-3 border rounded-md">
@@ -183,11 +193,18 @@ export function SensitiveContentContent() {
                             <p className="font-medium">Adult Content</p>
                             <p className="text-sm text-muted-foreground">Sexually explicit or suggestive content</p>
                         </div>
-                        <select className="h-8 rounded-md border border-input bg-transparent px-2 text-sm">
-                            <option>Always Warn</option>
-                            <option>Hide Completely</option>
-                            <option>Show Without Warning</option>
-                        </select>
+                        <div className="w-40">
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select an option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="always-warn">Always Warn</SelectItem>
+                                    <SelectItem value="hide-completely">Hide Completely</SelectItem>
+                                    <SelectItem value="show-without-warning">Show Without Warning</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
 
                     <div className="flex items-center justify-between p-3 border rounded-md">
@@ -195,11 +212,18 @@ export function SensitiveContentContent() {
                             <p className="font-medium">Disturbing Imagery</p>
                             <p className="text-sm text-muted-foreground">Disturbing or shocking imagery</p>
                         </div>
-                        <select className="h-8 rounded-md border border-input bg-transparent px-2 text-sm">
-                            <option>Always Warn</option>
-                            <option>Hide Completely</option>
-                            <option>Show Without Warning</option>
-                        </select>
+                        <div className="w-40">
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select an option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="always-warn">Always Warn</SelectItem>
+                                    <SelectItem value="hide-completely">Hide Completely</SelectItem>
+                                    <SelectItem value="show-without-warning">Show Without Warning</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 </div>
 

@@ -2,6 +2,9 @@ import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
 import { Switch } from "@/shared/components/ui/switch";
 import Icon from "@/shared/components/Icon";
+import { Select, SelectValue, SelectTrigger, SelectItem, SelectContent } from "@/shared/components/ui/select";
+import { Checkbox } from "@/shared/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
 
 export function FiltersContent() {
     return (
@@ -213,22 +216,32 @@ export function PreferencesContent() {
                 </p>
 
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
+                    <div className="flex flex-col space-y-3">
                         <Label htmlFor="start-time">Start Time</Label>
-                        <select id="start-time" className="w-full h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                            <option>10:00 PM</option>
-                            <option>11:00 PM</option>
-                            <option>12:00 AM</option>
-                        </select>
+                        <Select>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a time" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="10:00 PM">10:00 PM</SelectItem>
+                                <SelectItem value="11:00 PM">11:00 PM</SelectItem>
+                                <SelectItem value="12:00 AM">12:00 AM</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="end-time">End Time</Label>
-                        <select id="end-time" className="w-full h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                            <option>6:00 AM</option>
-                            <option>7:00 AM</option>
-                            <option>8:00 AM</option>
-                        </select>
+                    <div className="flex flex-col space-y-3">
+                        <Label htmlFor="start-time">End Time</Label>
+                        <Select>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a time" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="10:00 PM">10:00 PM</SelectItem>
+                                <SelectItem value="11:00 PM">11:00 PM</SelectItem>
+                                <SelectItem value="12:00 AM">12:00 AM</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
 
@@ -237,7 +250,7 @@ export function PreferencesContent() {
                     <div className="flex flex-wrap gap-2">
                         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
                             <label key={day} className="flex items-center space-x-2 cursor-pointer">
-                                <input type="checkbox" className="h-4 w-4" defaultChecked />
+                                <Checkbox id={day} defaultChecked />
                                 <span className="text-sm">{day}</span>
                             </label>
                         ))}
@@ -386,13 +399,13 @@ export function EmailAlertsContent() {
             <div className="bg-card rounded-lg p-6 border space-y-4">
                 <h3 className="text-lg font-medium">Email Format Preferences</h3>
 
-                <div className="space-y-3 mt-4">
+                <RadioGroup defaultValue="html" className="space-y-3 mt-4">
                     <div className="flex items-center justify-between p-3 rounded-md hover:bg-secondary/50">
                         <div>
                             <p className="font-medium">HTML Format</p>
                             <p className="text-sm text-muted-foreground">Rich formatting with images</p>
                         </div>
-                        <input type="radio" name="email-format" defaultChecked />
+                        <RadioGroupItem value="html" />
                     </div>
 
                     <div className="flex items-center justify-between p-3 rounded-md hover:bg-secondary/50">
@@ -400,11 +413,11 @@ export function EmailAlertsContent() {
                             <p className="font-medium">Plain Text Format</p>
                             <p className="text-sm text-muted-foreground">Simple text-only emails</p>
                         </div>
-                        <input type="radio" name="email-format" />
+                        <RadioGroupItem value="plain" />
                     </div>
-                </div>
+                </RadioGroup>
 
-                <Button className="mt-4">Save Changes</Button>
+                <Button className="mt-2">Save Changes</Button>
             </div>
         </div>
     );

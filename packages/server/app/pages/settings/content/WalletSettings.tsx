@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
-import { Label } from "@/shared/components/ui/label";
 import Icon from "@/shared/components/Icon";
-
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/shared/components/ui/select";
 export function ConnectedWalletsContent() {
     return (
         <div className="space-y-6">
@@ -346,18 +345,32 @@ export function TransactionHistoryContent() {
                     <h3 className="text-lg font-medium">Recent Transactions</h3>
 
                     <div className="flex items-center gap-2">
-                        <select className="bg-secondary border-0 rounded-lg text-sm p-2 h-9">
-                            <option>All Types</option>
-                            <option>Transfers</option>
-                            <option>NFT Transactions</option>
-                            <option>Swaps</option>
-                        </select>
+                        <div className="w-42">
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select Type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Types</SelectItem>
+                                    <SelectItem value="transfers">Transfers</SelectItem>
+                                    <SelectItem value="nft">NFT Transactions</SelectItem>
+                                    <SelectItem value="swaps">Swaps</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                        <select className="bg-secondary border-0 rounded-lg text-sm p-2 h-9">
-                            <option>All Wallets</option>
-                            <option>Primary Wallet</option>
-                            <option>MetaMask</option>
-                        </select>
+                        <div className="w-36">
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select Wallet" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Wallets</SelectItem>
+                                    <SelectItem value="primary">Primary Wallet</SelectItem>
+                                    <SelectItem value="metamask">MetaMask</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 </div>
 

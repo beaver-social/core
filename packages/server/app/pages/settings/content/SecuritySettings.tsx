@@ -3,6 +3,8 @@ import { Button } from "@/shared/components/ui/button";
 import { Label } from "@/shared/components/ui/label";
 import { Switch } from "@/shared/components/ui/switch";
 import Icon from "@/shared/components/Icon";
+import { Select, SelectValue, SelectTrigger, SelectContent, SelectItem } from "@/shared/components/ui/select";
+import { icons } from "lucide-react";
 
 export function PasswordContent() {
     return (
@@ -278,16 +280,21 @@ export function DevicesContent() {
                                 Automatically log out after period of inactivity
                             </p>
                         </div>
-                        <select
-                            id="auto-logout"
-                            className="h-9 rounded-md border border-input bg-transparent px-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        >
-                            <option>Never</option>
-                            <option>After 1 hour</option>
-                            <option>After 4 hours</option>
-                            <option>After 8 hours</option>
-                            <option>After 24 hours</option>
-                        </select>
+
+                        <div className="w-40">
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a time" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="never">Never</SelectItem>
+                                    <SelectItem value="1hour">After 1 hour</SelectItem>
+                                    <SelectItem value="4hours">After 4 hours</SelectItem>
+                                    <SelectItem value="8hours">After 8 hours</SelectItem>
+                                    <SelectItem value="24hours">After 24 hours</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
 
                     <div className="flex items-center justify-between">
@@ -597,11 +604,19 @@ export function BackupCodesContent() {
 }
 
 export function ConnectedAppsContent() {
-    const connectedApps = [
+    interface ConnectedApp {
+        id: number;
+        name: string;
+        icon: keyof typeof icons;
+        connected: string;
+        permissions: string[];
+    }
+
+    const connectedApps: ConnectedApp[] = [
         {
             id: 1,
             name: "DeFi Portfolio Tracker",
-            icon: "BarChart",
+            icon: "ChartBar",
             connected: "Mar 15, 2023",
             permissions: ["Read account info", "View wallet balance", "View transaction history"]
         },
@@ -636,14 +651,14 @@ export function ConnectedAppsContent() {
                     These applications have permission to access your account information.
                 </p>
 
-                {connectedApps.length > 0 ? (
+                {connectedApps && connectedApps.length > 0 ? (
                     <div className="space-y-4 mt-4">
                         {connectedApps.map(app => (
                             <div key={app.id} className="p-4 border rounded-md">
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-start gap-3">
                                         <div className="p-2 bg-secondary/50 rounded-full">
-                                            <Icon name={app.icon as any} className="h-5 w-5 text-muted-foreground" />
+                                            <Icon name={app.icon} className="h-5 w-5 text-muted-foreground" />
                                         </div>
                                         <div>
                                             <p className="font-medium">{app.name}</p>
