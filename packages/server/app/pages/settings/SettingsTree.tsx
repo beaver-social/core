@@ -10,10 +10,39 @@ export const settingsData = [
         label: "Account",
         icon: "User",
         items: [
+            { id: "profile", label: "Profile Information" },
             { id: "username", label: "Username" },
             { id: "email", label: "Email" },
             { id: "phone", label: "Phone" },
             { id: "verification", label: "Verification" },
+            { id: "account-status", label: "Account Status" },
+            { id: "deactivate", label: "Deactivate Account" },
+        ],
+    },
+    {
+        id: "web3Identity",
+        label: "Web3 Identity",
+        icon: "Key",
+        items: [
+            { id: "identity", label: "Identity Management" },
+            { id: "transfer", label: "Identity Transfer" },
+            { id: "zklogin", label: "zkLogin Setup" },
+            { id: "recovery", label: "Identity Recovery" },
+            { id: "permissions", label: "Identity Permissions" },
+        ],
+    },
+    {
+        id: "wallet",
+        label: "Wallet & Assets",
+        icon: "Wallet",
+        items: [
+            { id: "connected-wallets", label: "Connected Wallets" },
+            { id: "sui-balance", label: "SUI Balance" },
+            { id: "nft-gallery", label: "NFT Gallery" },
+            { id: "transactions", label: "Transaction History" },
+            { id: "nft-display", label: "NFT Display Settings" },
+            { id: "token-preferences", label: "Token Preferences" },
+            { id: "rewards", label: "Rewards & Airdrops" },
         ],
     },
     {
@@ -26,6 +55,8 @@ export const settingsData = [
             { id: "blocking", label: "Mute and Block" },
             { id: "direct-messages", label: "Direct Messages" },
             { id: "location", label: "Location Information" },
+            { id: "data-sharing", label: "Data Sharing" },
+            { id: "off-chain", label: "Off-Chain Privacy" },
         ],
     },
     {
@@ -37,17 +68,8 @@ export const settingsData = [
             { id: "preferences", label: "Preferences" },
             { id: "email-notifications", label: "Email Notifications" },
             { id: "push-notifications", label: "Push Notifications" },
-        ],
-    },
-    {
-        id: "wallet",
-        label: "Wallet & NFT",
-        icon: "Wallet",
-        items: [
-            { id: "connected-wallets", label: "Connected Wallets" },
-            { id: "transactions", label: "Transaction History" },
-            { id: "nft-display", label: "NFT Display Settings" },
-            { id: "token-preferences", label: "Token Preferences" },
+            { id: "web3-alerts", label: "Web3 Alerts" },
+            { id: "on-chain", label: "On-Chain Notifications" },
         ],
     },
     {
@@ -59,6 +81,9 @@ export const settingsData = [
             { id: "two-factor", label: "Two-Factor Authentication" },
             { id: "devices", label: "Devices and Sessions" },
             { id: "recovery", label: "Account Recovery" },
+            { id: "keys", label: "Security Keys" },
+            { id: "backup-codes", label: "Backup Codes" },
+            { id: "connected-apps", label: "Connected Apps" },
         ],
     },
     {
@@ -70,6 +95,8 @@ export const settingsData = [
             { id: "sensitive-content", label: "Sensitive Content" },
             { id: "interests", label: "Interests" },
             { id: "data-usage", label: "Data Usage" },
+            { id: "feed-preferences", label: "Feed Preferences" },
+            { id: "autoplay", label: "Autoplay" },
         ],
     },
     {
@@ -80,6 +107,8 @@ export const settingsData = [
             { id: "display", label: "Display" },
             { id: "motion", label: "Motion" },
             { id: "font-size", label: "Font Size" },
+            { id: "color-contrast", label: "Color Contrast" },
+            { id: "keyboard", label: "Keyboard Shortcuts" },
         ],
     },
     {
@@ -90,6 +119,9 @@ export const settingsData = [
             { id: "creator-earnings", label: "Creator Earnings" },
             { id: "subscriptions", label: "Subscriptions" },
             { id: "tips", label: "Tips and Donations" },
+            { id: "token-gating", label: "Token Gating" },
+            { id: "nft-rewards", label: "NFT Rewards" },
+            { id: "payment-methods", label: "Payment Methods" },
         ],
     },
     {
@@ -100,13 +132,17 @@ export const settingsData = [
             { id: "download", label: "Download Your Data" },
             { id: "advertisers", label: "Connected Advertisers" },
             { id: "activity", label: "Account Activity" },
+            { id: "data-storage", label: "Data Storage Options" },
+            { id: "off-platform", label: "Off-Platform Activity" },
         ],
     },
 ];
 
+export type SettingId = string;
+
 interface SettingsTreeProps {
-    selectedSetting: string;
-    onSelectSetting: (settingId: string) => void;
+    selectedSetting: SettingId;
+    onSelectSetting: (settingId: SettingId) => void;
     className?: string;
 }
 
