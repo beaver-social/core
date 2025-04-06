@@ -6,24 +6,11 @@ import { cn } from "@/shared/lib/utils";
 // Define the settings categories and items
 export const settingsData = [
     {
-        id: "account",
-        label: "Account",
-        icon: "User",
-        items: [
-            { id: "profile", label: "Profile Information" },
-            { id: "username", label: "Username" },
-            { id: "email", label: "Email" },
-            { id: "phone", label: "Phone" },
-            { id: "verification", label: "Verification" },
-            { id: "account-status", label: "Account Status" },
-            { id: "deactivate", label: "Deactivate Account" },
-        ],
-    },
-    {
         id: "web3Identity",
-        label: "Web3 Identity",
+        label: "Identity",
         icon: "Key",
         items: [
+            { id: "account", label: "Basic Details" },
             { id: "identity", label: "Identity Management" },
             { id: "transfer", label: "Identity Transfer" },
             { id: "zklogin", label: "zkLogin Setup" },
@@ -40,9 +27,6 @@ export const settingsData = [
             { id: "sui-balance", label: "SUI Balance" },
             { id: "nft-gallery", label: "NFT Gallery" },
             { id: "transactions", label: "Transaction History" },
-            { id: "nft-display", label: "NFT Display Settings" },
-            { id: "token-preferences", label: "Token Preferences" },
-            { id: "rewards", label: "Rewards & Airdrops" },
         ],
     },
     {
@@ -60,16 +44,15 @@ export const settingsData = [
         ],
     },
     {
-        id: "notifications",
-        label: "Notifications",
+        id: "alerts",
+        label: "Alerts",
         icon: "Bell",
         items: [
             { id: "filters", label: "Filters" },
             { id: "preferences", label: "Preferences" },
-            { id: "email-notifications", label: "Email Notifications" },
-            { id: "push-notifications", label: "Push Notifications" },
-            { id: "web3-alerts", label: "Web3 Alerts" },
-            { id: "on-chain", label: "On-Chain Notifications" },
+            { id: "email-alerts", label: "Email Alerts" },
+            { id: "push-alerts", label: "Push Alerts" },
+            { id: "on-chain-alerts", label: "On-Chain Alerts" },
         ],
     },
     {

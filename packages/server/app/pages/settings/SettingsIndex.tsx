@@ -1,16 +1,8 @@
 import { SettingId, settingsData } from "./SettingsTree";
 import Icon from "@/shared/components/Icon";
 
-// Import settings content components
 import {
-    UsernameSettingsContent,
-    EmailSettingsContent,
-    PhoneSettingsContent,
-    ProfileSettingsContent,
-    VerificationSettingsContent,
-} from "./content/AccountSettings";
-
-import {
+    AccountSettingsContent,
     IdentityManagementContent,
     IdentityTransferContent,
     ZkLoginSetupContent,
@@ -24,15 +16,6 @@ import {
     NftGalleryContent,
     TransactionHistoryContent,
 } from "./content/WalletSettings";
-
-import {
-    AudienceSettingsContent,
-    VisibilitySettingsContent,
-} from "./content/PrivacySettings";
-
-import {
-    NotificationPreferencesContent,
-} from "./content/NotificationsSettings";
 
 interface SettingsContentProps {
     selectedSetting: SettingId;
@@ -48,7 +31,7 @@ export default function SettingsContent({ selectedSetting }: SettingsContentProp
 
     if (!category || !item) {
         return (
-            <div className="h-full flex items-center justify-center p-8">
+            <div className="h-[90vh] flex items-center justify-center p-8">
                 <div className="text-center">
                     <Icon name="Settings" className="mx-auto h-12 w-12 text-muted-foreground" />
                     <h3 className="mt-4 text-lg font-medium">Select a setting</h3>
@@ -82,24 +65,10 @@ function renderSettingContent(categoryId: string, itemId: string) {
     // Use a mapping of category+item IDs to determine what to render
     const settingKey = `${categoryId}.${itemId}`;
 
-    // Account settings
-    if (settingKey === "account.username") {
-        return <UsernameSettingsContent />;
-    }
-    if (settingKey === "account.email") {
-        return <EmailSettingsContent />;
-    }
-    if (settingKey === "account.phone") {
-        return <PhoneSettingsContent />;
-    }
-    if (settingKey === "account.profile") {
-        return <ProfileSettingsContent />;
-    }
-    if (settingKey === "account.verification") {
-        return <VerificationSettingsContent />;
-    }
-
     // Web3 Identity settings
+    if (settingKey === "web3Identity.account") {
+        return <AccountSettingsContent />;
+    }
     if (settingKey === "web3Identity.identity") {
         return <IdentityManagementContent />;
     }
@@ -130,19 +99,6 @@ function renderSettingContent(categoryId: string, itemId: string) {
         return <TransactionHistoryContent />;
     }
 
-    // Privacy settings
-    if (settingKey === "privacy.audience") {
-        return <AudienceSettingsContent />;
-    }
-    if (settingKey === "privacy.visibility") {
-        return <VisibilitySettingsContent />;
-    }
-
-    // Notifications settings
-    if (settingKey === "notifications.preferences") {
-        return <NotificationPreferencesContent />;
-    }
-
     // Default content for other settings
     return (
         <div className="bg-card rounded-lg p-6 border">
@@ -152,4 +108,3 @@ function renderSettingContent(categoryId: string, itemId: string) {
         </div>
     );
 }
-
