@@ -1,7 +1,6 @@
 import { Transaction } from "@mysten/sui/transactions";
 import { Defaults } from "../types";
 import Logger from "../logger";
-import { bcs } from "@mysten/bcs";
 
 export class Identity {
   defaults: Defaults;
@@ -26,7 +25,26 @@ export class Identity {
     });
 
     const transactionBytes = await tx.build();
+    const signature = await surface.signTransaction(transactionBytes);
 
+    return suiClient.executeTransactionBlock({
+      transactionBlock: transactionBytes,
+      signature: signature.signature,
+    });
+  }
+
+  public async setAbout(options: { identity: string; about: string }) {
+    const { identity, about } = options;
+    const { contracts, surface, suiClient } = this.defaults;
+
+    const tx = new Transaction();
+
+    contracts.identityRegistration.setAbout(tx, {
+      identityRegistration: { id: identity },
+      about,
+    });
+
+    const transactionBytes = await tx.build();
     const signature = await surface.signTransaction(transactionBytes);
 
     return suiClient.executeTransactionBlock({
