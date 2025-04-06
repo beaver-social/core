@@ -56,7 +56,6 @@ export const tabs: Record<Screen, Tab[]> = {
       content: (<Mentioned />),
     },
   ],
-  search: [],
   messages: [],
   settings: [],
   shorts: [

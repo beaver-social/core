@@ -36,6 +36,8 @@ interface GlobalUIStore {
   setActiveTab: (tab: string | null) => void;
   isMuted: boolean;
   toggleMute: () => void;
+  selectedSetting: string;
+  setSelectedSetting: (setting: string) => void;
 }
 
 export const useGlobalUIStore = create<GlobalUIStore>()(
@@ -47,6 +49,8 @@ export const useGlobalUIStore = create<GlobalUIStore>()(
       setActiveTab: (tab) => set({ activeTab: tab }),
       isMuted: true,
       toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
+      selectedSetting: "account.username",
+      setSelectedSetting: (setting) => set({ selectedSetting: setting }),
     }),
     { name: "global-ui-store" }
   )

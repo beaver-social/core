@@ -1,7 +1,7 @@
 import { useParams } from "react-router"
 import { useEffect, useState } from "react"
 import Layout from "../layout"
-import SecondaryPanel from "../SecondaryPanel"
+import SecondaryPanel from "../explore/SecondaryPanel"
 import ProfileHeader from "./ProfileHeader"
 import Tabs from "@/shared/components/Tabs"
 import { useGlobalUI } from "@/shared/hooks/useGlobalUI"
