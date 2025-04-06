@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import ShortVideo from './ShortVideo';
 import { sampleShorts, ShortVideoData } from './mockData';
 import { useInView } from './useInView';
+import { useGlobalUIStore } from '@/shared/stores/zustand';
 
 export default function ShortsFeed() {
     const [activeIndex, setActiveIndex] = useState(0);
@@ -10,6 +11,10 @@ export default function ShortsFeed() {
     const [hasMore, setHasMore] = useState(true);
     const containerRef = useRef<HTMLDivElement>(null);
     const [loadError, setLoadError] = useState(false);
+    // Track which videos have been preloaded
+    const preloadedVideos = useRef<Set<string>>(new Set());
+    // Get global mute state from Zustand
+    const { isMuted, toggleMute } = useGlobalUIStore();
 
     // Bottom loader element to detect when to load more
     const [loaderRef, inView] = useInView<HTMLDivElement>({ threshold: 0.5 });
@@ -17,11 +22,55 @@ export default function ShortsFeed() {
     // Initialize with some shorts
     useEffect(() => {
         try {
-            setShorts(sampleShorts.slice(0, 2));
+            // Start with 4 videos instead of 2 to have more preloaded content
+            const initialShorts = sampleShorts.slice(0, 4);
+            setShorts(initialShorts);
+
+            // Preload the first video immediately
+            if (initialShorts.length > 0) {
+                preloadVideo(initialShorts[0].videoUrl);
+            }
         } catch (error) {
             console.error("Error initializing shorts feed:", error);
             setLoadError(true);
         }
+    }, []);
+
+    // Function to preload a video
+    const preloadVideo = useCallback((videoUrl: string) => {
+        // Skip if already preloaded
+        if (preloadedVideos.current.has(videoUrl)) return;
+
+        // Create a hidden video element to preload
+        const preloadElement = document.createElement('video');
+        preloadElement.src = videoUrl;
+        preloadElement.preload = 'auto';
+        preloadElement.muted = true;
+        preloadElement.style.display = 'none';
+        preloadElement.setAttribute('playsinline', '');
+
+        // Add network priority
+        if ('fetchPriority' in preloadElement) {
+            (preloadElement as any).fetchPriority = 'high';
+        }
+
+        // Start loading the video
+        preloadElement.load();
+
+        // Just load a bit of the video to prepare it for playback
+        preloadElement.onloadeddata = () => {
+            // Once loaded, we no longer need this element
+            // but we'll keep it around for a bit to ensure caching
+            setTimeout(() => {
+                document.body.removeChild(preloadElement);
+            }, 5000);
+
+            // Mark as preloaded
+            preloadedVideos.current.add(videoUrl);
+        };
+
+        // Add to DOM to ensure loading
+        document.body.appendChild(preloadElement);
     }, []);
 
     // Load more shorts when reaching the end
@@ -35,11 +84,10 @@ export default function ShortsFeed() {
             await new Promise(resolve => setTimeout(resolve, 800));
 
             // In a real app, you'd fetch from an API with pagination
-            // For now, we'll just add more from our sample data
             const currentLength = shorts.length;
 
-            // Only load 2 videos at a time to prevent performance issues
-            const moreShorts = sampleShorts.slice(currentLength, currentLength + 2);
+            // Load more videos at once to ensure we have enough preloaded content
+            const moreShorts = sampleShorts.slice(currentLength, currentLength + 3);
 
             if (moreShorts.length > 0) {
                 setShorts(prev => [...prev, ...moreShorts]);
@@ -60,6 +108,19 @@ export default function ShortsFeed() {
             loadMore();
         }
     }, [inView, loadMore, loadError]);
+
+    // Preload videos around the active video
+    useEffect(() => {
+        if (shorts.length === 0) return;
+
+        // Preload the next 3 videos for seamless playback
+        for (let i = 1; i <= 3; i++) {
+            const nextIndex = activeIndex + i;
+            if (nextIndex < shorts.length) {
+                preloadVideo(shorts[nextIndex].videoUrl);
+            }
+        }
+    }, [activeIndex, shorts, preloadVideo]);
 
     // Update active video based on scroll position
     const handleScroll = useCallback(() => {
@@ -87,10 +148,16 @@ export default function ShortsFeed() {
         };
     }, [handleScroll]);
 
-    // Only render videos that are currently active, about to be active, or just were active
-    // This helps with performance by not rendering too many video elements at once
+    // Wrapper for toggle mute to handle event stopping
+    const handleToggleMute = useCallback((e?: React.MouseEvent) => {
+        if (e) e.stopPropagation();
+        toggleMute();
+    }, [toggleMute]);
+
+    // Determine which videos to render to balance performance and loading
     const shouldRenderVideo = (index: number) => {
-        return Math.abs(index - activeIndex) <= 1;
+        // Always render active video and adjacent videos (3 videos total)
+        return Math.abs(index - activeIndex) <= 2;
     };
 
     if (loadError) {
@@ -117,12 +184,14 @@ export default function ShortsFeed() {
             {shorts.map((short, index) => (
                 <div
                     key={short.id}
-                    className="h-full w-full snap-start"
+                    className="h-full w-full snap-start flex items-center justify-center"
                 >
                     {shouldRenderVideo(index) ? (
                         <ShortVideo
                             {...short}
                             isActive={index === activeIndex}
+                            isMuted={isMuted}
+                            toggleMute={handleToggleMute}
                         />
                     ) : (
                         // Placeholder to maintain scroll position when video isn't rendered

@@ -39,7 +39,7 @@ const bottomBarItems: bottomBarItems[] = [
 
 function BottomBar() {
     return (
-        <div className="fixed bottom-0 left-0 right-0 bg-background/50 glass border-t sm:hidden">
+        <div className="fixed z-50 bottom-0 left-0 right-0 bg-background/50 glass border-t sm:hidden">
             <nav className="flex items-center justify-around h-16">
                 {bottomBarItems.map((item, index) => (
                     <Link

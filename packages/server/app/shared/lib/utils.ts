@@ -14,3 +14,8 @@ export function truncateSuiAddress(
   }
   return `${address.slice(0, 6)}...${address.slice(-length)}`;
 }
+
+export function truncateText(text: string, length: number = 10) {
+  if (text.length <= length) return text;
+  return `${text.slice(0, length)}...`;
+}

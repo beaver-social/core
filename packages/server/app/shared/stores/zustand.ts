@@ -34,6 +34,8 @@ interface GlobalUIStore {
   setScreen: (screen: Screen) => void;
   activeTab: string | null;
   setActiveTab: (tab: string | null) => void;
+  isMuted: boolean;
+  toggleMute: () => void;
 }
 
 export const useGlobalUIStore = create<GlobalUIStore>()(
@@ -43,6 +45,8 @@ export const useGlobalUIStore = create<GlobalUIStore>()(
       setScreen: (screen) => set({ screen }),
       activeTab: "for-you",
       setActiveTab: (tab) => set({ activeTab: tab }),
+      isMuted: true,
+      toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
     }),
     { name: "global-ui-store" }
   )

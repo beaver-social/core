@@ -7,6 +7,7 @@ export interface ShortVideoData {
   likes: number;
   comments: number;
   shares: number;
+  saves: number;
   avatarUrl: string;
 }
 
@@ -22,6 +23,7 @@ export const sampleShorts: ShortVideoData[] = [
     likes: 2456,
     comments: 124,
     shares: 56,
+    saves: 10,
     avatarUrl: "/images/user.png",
   },
   {
@@ -35,6 +37,7 @@ export const sampleShorts: ShortVideoData[] = [
     likes: 3782,
     comments: 245,
     shares: 89,
+    saves: 10,
     avatarUrl: "/images/user.png",
   },
   {
@@ -48,6 +51,7 @@ export const sampleShorts: ShortVideoData[] = [
     likes: 5921,
     comments: 312,
     shares: 154,
+    saves: 10,
     avatarUrl: "/images/user.png",
   },
   {
@@ -61,6 +65,7 @@ export const sampleShorts: ShortVideoData[] = [
     likes: 4287,
     comments: 178,
     shares: 92,
+    saves: 10,
     avatarUrl: "/images/user.png",
   },
   {
@@ -73,6 +78,7 @@ export const sampleShorts: ShortVideoData[] = [
     likes: 6843,
     comments: 321,
     shares: 210,
+    saves: 10,
     avatarUrl: "/images/user.png",
   },
   {
@@ -86,6 +92,7 @@ export const sampleShorts: ShortVideoData[] = [
     likes: 3248,
     comments: 156,
     shares: 64,
+    saves: 10,
     avatarUrl: "/images/user.png",
   },
 ];

@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import Router from "./Router.tsx";
 import "./tailwind.css";
 import "@mysten/dapp-kit/dist/index.css";
+import "./global.css";
 
 import { useServerConfig } from "./shared/stores/global.ts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
