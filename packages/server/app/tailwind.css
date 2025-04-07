@@ -57,7 +57,7 @@
   --primary-950: #001225;
 
   /* grey palette */
-  --grey-50: #020c18;
+  --grey-50: #000000;
   --grey-100: #0f172a;
   --grey-200: #1e293b;
   --grey-300: #334155;
@@ -72,11 +72,11 @@
 
 .dark {
   /* shadcn */
-  --background: #020c19;
+  --background: #000000;
   --foreground: oklch(0.985 0 0);
   --primary: #4ca5f9;
   --primary-foreground: oklch(0.205 0 0);
-  --secondary: #011828;
+  --secondary: #010913;
   --secondary-foreground: oklch(0.985 0 0);
   --popover: #030f1d;
   --popover-foreground: oklch(0.985 0 0);
@@ -140,7 +140,11 @@
   }
 
   body {
-    @apply bg-background text-foreground font-manrope;
+    @apply bg-background text-foreground font-openSans antialiased;
+  }
+
+  h1 {
+    @apply font-manrope;
   }
 
   button {

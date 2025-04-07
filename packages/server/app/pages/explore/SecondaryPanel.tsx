@@ -30,8 +30,8 @@ export default function SecondaryPanel() {
             />
 
             {/* Trending Topics */}
-            <div className="bg-secondary border rounded-xl p-4">
-                <h2 className="text-xl font-bold mb-4">What's happening</h2>
+            <div className="bg-secondary border border-border/80 rounded-xl p-4">
+                <h2 className="text-xl font-bold mb-2">Trending</h2>
                 <div className="space-y-4">
                     {trendingTopics.map((topic) => (
                         <div
@@ -48,7 +48,7 @@ export default function SecondaryPanel() {
             </div>
 
             {/* Suggested Profiles */}
-            <div className="bg-secondary border rounded-xl p-6">
+            <div className="bg-secondary border border-border/80 rounded-xl p-6">
                 <h2 className="font-bold mb-4">Suggested for you</h2>
                 <div className="space-y-4">
                     {sampleProfiles.map((profile) => (
