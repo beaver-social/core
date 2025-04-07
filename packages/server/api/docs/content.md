@@ -113,6 +113,30 @@ All endpoints are relative to: `/api/v1/`
 | `/:id/vote`   | POST   | Vote in a poll   | -                  | `{ optionId }`                    | `{ success, updatedPoll }`   |
 | `/:id/voters` | GET    | Get poll voters  | `?page=1&limit=20` | -                                 | `{ voters: [], pagination }` |
 
+## 8. Content Visibility & Embedding
+
+### Base Path: `/content`
+
+| Endpoint               | Method | Description                     | Query Params | Request Body                      | Response        |
+| ---------------------- | ------ | ------------------------------- | ------------ | --------------------------------- | --------------- |
+| `/visibility`          | GET    | Get content visibility settings | -            | -                                 | `{ settings }`  |
+| `/visibility`          | PATCH  | Update visibility settings      | -            | `{ discoverable, comments, etc }` | `{ settings }`  |
+| `/embed/:postId`       | GET    | Get post embed code             | -            | -                                 | `{ embedCode }` |
+| `/embed/settings`      | GET    | Get embed settings              | -            | -                                 | `{ settings }`  |
+| `/embed/settings`      | PATCH  | Update embed settings           | -            | `{ allowEmbedding, domains? }`    | `{ settings }`  |
+| `/aggregator-settings` | GET    | Get aggregator settings         | -            | -                                 | `{ settings }`  |
+| `/aggregator-settings` | PATCH  | Update aggregator settings      | -            | `{ allowAggregation, include? }`  | `{ settings }`  |
+
+## 9. Social Features & Emoji Reactions
+
+### Base Path: `/social`
+
+| Endpoint               | Method | Description                   | Query Params       | Request Body | Response                      |
+| ---------------------- | ------ | ----------------------------- | ------------------ | ------------ | ----------------------------- |
+| `/emoji-reactions`     | GET    | Get available emoji reactions | -                  | -            | `{ emojis: [] }`              |
+| `/posts/:id/reactions` | POST   | React to a post with emoji    | -                  | `{ emoji }`  | `{ success, reactionsCount }` |
+| `/posts/:id/reactions` | GET    | Get reactions to a post       | `?page=1&limit=20` | -            | `{ reactions: [], counts }`   |
+
 ## Data Models
 
 ### Post
