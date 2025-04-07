@@ -14,9 +14,9 @@ All endpoints are relative to: `/api/v1/`
 
 | Endpoint       | Method | Description                   | Query Params         | Request Body                                           | Response              |
 | -------------- | ------ | ----------------------------- | -------------------- | ------------------------------------------------------ | --------------------- |
+| `/`            | GET    | Get current user's profile    | -                    | -                                                      | `{ user }`            |
 | `/:username`   | GET    | Get user profile by username  | -                    | -                                                      | `{ user }`            |
 | `/:username`   | PATCH  | Update user profile           | -                    | `{ fullName?, image_url?, banner_url?, about?, etc. }` | `{ user }`            |
-| `/me`          | GET    | Get current user's profile    | -                    | -                                                      | `{ user }`            |
 | `/search`      | GET    | Search for users              | `?q=string&limit=10` | -                                                      | `{ users: [] }`       |
 | `/suggestions` | GET    | Get suggested users to follow | `?limit=number`      | -                                                      | `{ suggestions: [] }` |
 

@@ -21,6 +21,7 @@ All endpoints are relative to: `/api/v1/`
 | `/:id`         | PATCH  | Update a post         | -                                                | `{ content? }`                       | `{ post }`                  |
 | `/trending`    | GET    | Get trending posts    | `?page=1&limit=20`                               | -                                    | `{ posts: [], pagination }` |
 | `/recommended` | GET    | Get recommended posts | `?page=1&limit=20`                               | -                                    | `{ posts: [], pagination }` |
+| `/following`   | GET    | Get following posts   | `?page=1&limit=20`                               | -                                    | `{ posts: [], pagination }` |
 
 ## 2. Post Interactions
 
@@ -128,7 +129,7 @@ All endpoints are relative to: `/api/v1/`
 
 ## 9. NFT & Monetization
 
-### Base Path: `/content/nft`
+### Base Path: `/content/nft-posts`
 
 | Endpoint            | Method | Description                 | Query Params                       | Request Body                    | Response                       |
 | ------------------- | ------ | --------------------------- | ---------------------------------- | ------------------------------- | ------------------------------ |
