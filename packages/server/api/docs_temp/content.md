@@ -1,61 +1,24 @@
-# Content API
-
-## Overview
-
-This document outlines the API endpoints for content creation, management, and interactions within the Beaver Social platform, including posts, media, shorts, and collections.
-
-## Base URL
-
-All endpoints are relative to: `/api/v1/`
-
 ## 1. Post Creation & Management
 
-### Base Path: `/content/posts`
+### Base Path: `/content/posts`.
 
 | Endpoint       | Method | Description           | Query Params                                     | Request Body                         | Response                    |
 | -------------- | ------ | --------------------- | ------------------------------------------------ | ------------------------------------ | --------------------------- |
 | `/`            | POST   | Create a new post     | -                                                | `{ content, media?: [{url, type}] }` | `{ post }`                  |
 | `/`            | GET    | Get feed posts        | `?page=1&limit=20&type=all\|following\|trending` | -                                    | `{ posts: [], pagination }` |
-| `/:id`         | GET    | Get a specific post   | -                                                | -                                    | `{ post, media, author }`   |
-| `/:id`         | DELETE | Delete a post         | -                                                | -                                    | `{ success }`               |
-| `/:id`         | PATCH  | Update a post         | -                                                | `{ content? }`                       | `{ post }`                  |
 | `/trending`    | GET    | Get trending posts    | `?page=1&limit=20`                               | -                                    | `{ posts: [], pagination }` |
 | `/recommended` | GET    | Get recommended posts | `?page=1&limit=20`                               | -                                    | `{ posts: [], pagination }` |
 | `/following`   | GET    | Get following posts   | `?page=1&limit=20`                               | -                                    | `{ posts: [], pagination }` |
-
-## 2. Post Interactions
-
-### Base Path: `/content/posts/:id`
-
-| Endpoint      | Method | Description                | Query Params       | Request Body           | Response                      |
-| ------------- | ------ | -------------------------- | ------------------ | ---------------------- | ----------------------------- |
-| `/like`       | POST   | Like a post                | -                  | -                      | `{ success, likesCount }`     |
-| `/unlike`     | POST   | Unlike a post              | -                  | -                      | `{ success, likesCount }`     |
-| `/repost`     | POST   | Repost/share a post        | -                  | `{ comment? }`         | `{ success, repost }`         |
-| `/pin`        | POST   | Pin post to profile        | -                  | -                      | `{ success }`                 |
-| `/unpin`      | POST   | Unpin post from profile    | -                  | -                      | `{ success }`                 |
-| `/likers`     | GET    | Get users who liked post   | `?page=1&limit=20` | -                      | `{ users: [], pagination }`   |
-| `/reposters`  | GET    | Get users who reposted     | `?page=1&limit=20` | -                      | `{ users: [], pagination }`   |
-| `/bookmark`   | POST   | Bookmark a post            | -                  | -                      | `{ success }`                 |
-| `/unbookmark` | POST   | Remove post from bookmarks | -                  | -                      | `{ success }`                 |
-| `/report`     | POST   | Report a post              | -                  | `{ reason, details? }` | `{ success, reportId }`       |
-| `/reactions`  | POST   | React with emoji           | -                  | `{ emoji }`            | `{ success, reactionsCount }` |
-| `/reactions`  | GET    | Get reactions to post      | `?page=1&limit=20` | -                      | `{ reactions: [], counts }`   |
 
 ## 3. Replies & Threads
 
 ### Base Path: `/content/posts/:id/replies`
 
-| Endpoint           | Method | Description                        | Query Params       | Request Body                         | Response                      |
-| ------------------ | ------ | ---------------------------------- | ------------------ | ------------------------------------ | ----------------------------- |
-| `/`                | GET    | Get replies to a post              | `?page=1&limit=20` | -                                    | `{ replies: [], pagination }` |
-| `/`                | POST   | Reply to a post                    | -                  | `{ content, media?: [{url, type}] }` | `{ reply }`                   |
-| `/thread`          | GET    | Get full thread (parent + replies) | -                  | -                                    | `{ thread: [], rootPost }`    |
-| `/:replyId`        | GET    | Get specific reply                 | -                  | -                                    | `{ reply }`                   |
-| `/:replyId`        | DELETE | Delete a reply                     | -                  | -                                    | `{ success }`                 |
-| `/:replyId`        | PATCH  | Update a reply                     | -                  | `{ content? }`                       | `{ reply }`                   |
-| `/:replyId/like`   | POST   | Like a reply                       | -                  | -                                    | `{ success, likesCount }`     |
-| `/:replyId/unlike` | POST   | Unlike a reply                     | -                  | -                                    | `{ success, likesCount }`     |
+| Endpoint  | Method | Description                        | Query Params       | Request Body                         | Response                      |
+| --------- | ------ | ---------------------------------- | ------------------ | ------------------------------------ | ----------------------------- |
+| `/`       | GET    | Get replies to a post              | `?page=1&limit=20` | -                                    | `{ replies: [], pagination }` |
+| `/`       | POST   | Reply to a post                    | -                  | `{ content, media?: [{url, type}] }` | `{ reply }`                   |
+| `/thread` | GET    | Get full thread (parent + replies) | -                  | -                                    | `{ thread: [], rootPost }`    |
 
 ## 4. Media Management
 

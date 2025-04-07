@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import nft from "./routes/nft";
+import nft from "./routes/#legacy/nft";
 
 import content from "./routes/content/index";
 import user from "./routes/user/index";
@@ -8,6 +8,7 @@ import auth from "./routes/auth/index";
 
 let servedSessions = 0;
 const app = new Hono()
+  // middleware
   .use(
     cors({
       origin: (origin, ctx) => {
@@ -23,10 +24,14 @@ const app = new Hono()
       allowHeaders: ["Content-Type", "Authorization"],
     })
   )
+
+  // routes
   .route("auth", auth)
   .route("user", user)
   .route("content", content)
   .route("nft", nft)
+
+  // handlers
   .get("/stats", async (ctx) => {
     servedSessions++;
     return ctx.json({

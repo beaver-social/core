@@ -1,6 +1,6 @@
-import { zJwt } from "../../lib/zod/helpers";
 import crypto from "crypto";
 import { z } from "zod";
+import { zJwt } from "../../lib/zod/helpers";
 
 export function deriveUserSalt(jwt: z.infer<typeof zJwt>): Uint8Array {
   const { sub, iss, aud } = jwt;

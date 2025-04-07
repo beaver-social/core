@@ -1,17 +1,19 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { zJwt, zSuiAddress } from "../../lib/zod/helpers";
-import { deriveUserSalt } from "./helpers";
+import { zSuiAddress } from "../../lib/zod/helpers";
+import { deriveUserSalt } from "./zk.helpers";
+import { zJwt } from "../../lib/zod/helpers";
 
 export default new Hono()
+  // landing route
   .get("/", (ctx) => {
     return ctx.json({
       message: "auth service",
     });
   })
 
-  // check username
+  // check username availability
   .get(
     "/check-username",
     zValidator("query", z.object({ username: z.string() })),
@@ -64,12 +66,7 @@ export default new Hono()
     }
   )
 
-  // zkLogin salt service
-  .get("/zk/salt", (ctx) => {
-    return ctx.json({
-      message: "zkLogin salt service",
-    });
-  })
+  // zk service
   .post("/zk/salt", zValidator("json", z.object({ jwt: zJwt })), (ctx) => {
     const { jwt } = ctx.req.valid("json");
     const salt = deriveUserSalt(jwt);
@@ -84,11 +81,6 @@ export default new Hono()
   })
 
   // zkLogin prover service
-  .get("/zk/prover", (ctx) => {
-    return ctx.json({
-      message: "zkLogin prover service",
-    });
-  })
   .post("/zk/prover", (ctx) => {
     return ctx.json({
       message: "zkLogin prover service",
