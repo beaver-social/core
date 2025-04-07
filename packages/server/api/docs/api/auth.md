@@ -1,12 +1,8 @@
-# Authentication & Identity API
-
-## Overview
-
-This document outlines the API endpoints for user authentication, identity management, and web3 identity integration in the Beaver Social platform.
+# Authentication API
 
 ## Base URL
 
-All endpoints are relative to: `/api/v1/`
+All endpoints are relative to: `http://localhost:5173/api/v1/`
 
 ## 1. Authentication
 
@@ -23,7 +19,7 @@ All endpoints are relative to: `/api/v1/`
 
 ## 2. User Registration
 
-### Base Path: `/users`
+### Base Path: `/auth`
 
 | Endpoint          | Method | Description                 | Query Params       | Request Body                             | Response                  |
 | ----------------- | ------ | --------------------------- | ------------------ | ---------------------------------------- | ------------------------- |
@@ -33,7 +29,7 @@ All endpoints are relative to: `/api/v1/`
 
 ## 3. Web3 Identity Management
 
-### Base Path: `/identity`
+### Base Path: `/auth/identity`
 
 | Endpoint          | Method | Description                          | Request Body                 | Response                       |
 | ----------------- | ------ | ------------------------------------ | ---------------------------- | ------------------------------ |
@@ -45,7 +41,7 @@ All endpoints are relative to: `/api/v1/`
 
 ## 4. Identity Verification
 
-### Base Path: `/verification`
+### Base Path: `/auth/verification`
 
 | Endpoint   | Method | Description                  | Request Body            | Response                            |
 | ---------- | ------ | ---------------------------- | ----------------------- | ----------------------------------- |
@@ -54,7 +50,7 @@ All endpoints are relative to: `/api/v1/`
 
 ## 5. Account Recovery
 
-### Base Path: `/settings/recovery`
+### Base Path: `/auth/recovery`
 
 | Endpoint         | Method | Description                 | Request Body                       | Response       |
 | ---------------- | ------ | --------------------------- | ---------------------------------- | -------------- |
@@ -62,84 +58,3 @@ All endpoints are relative to: `/api/v1/`
 | `/`              | PATCH  | Update recovery settings    | `{ methods, contacts, guardians }` | `{ recovery }` |
 | `/backup-phrase` | POST   | Generate new backup phrase  | `{ password }`                     | `{ phrase }`   |
 | `/backup-phrase` | GET    | Verify backup phrase exists | -                                  | `{ exists }`   |
-
-## Data Models
-
-### User Authentication
-
-```typescript
-interface AuthResponse {
-  success: boolean;
-  token?: string;
-  userAddress?: string;
-  isRegistered: boolean;
-}
-
-interface Challenge {
-  challenge: string;
-  message: string;
-  expiresAt: number;
-}
-
-interface ZkLoginSalt {
-  hex: string;
-  base64: string;
-  integer: string;
-}
-```
-
-### Identity
-
-```typescript
-interface IdentityNFT {
-  id: string;
-  objectId: string;
-  owner: string;
-  verified: boolean;
-  createdAt: string;
-  updatedAt: string;
-  metadata: {
-    username: string;
-    image_url?: string;
-  };
-}
-
-interface VerificationRequest {
-  id: string;
-  userId: string;
-  status: "pending" | "approved" | "rejected";
-  reason: string;
-  submittedAt: string;
-  reviewedAt?: string;
-  evidence?: string[];
-}
-
-interface RecoverySettings {
-  methods: string[];
-  contacts: string[];
-  guardians: string[];
-  hasBackupPhrase: boolean;
-}
-```
-
-## Implementation Considerations
-
-1. **Security**
-
-   - Implement proper JWT validation and expiration
-   - Secure storage of cryptographic challenges
-   - Rate limiting on authentication endpoints
-   - Protection against enumeration attacks
-
-2. **Web3 Integration**
-
-   - Proper verification of on-chain identity
-   - Secure handling of zkLogin integration
-   - Support for multiple wallet types
-   - Secure NFT transfer mechanisms
-
-3. **Recovery**
-   - Secure backup phrase generation and storage
-   - Multi-factor recovery mechanisms
-   - Guardian-based recovery protocols
-   - Off-chain identity verification for recovery

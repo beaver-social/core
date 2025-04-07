@@ -10,7 +10,7 @@ All endpoints are relative to: `/api/v1/`
 
 ## 1. Post Creation & Management
 
-### Base Path: `/posts`
+### Base Path: `/content/posts`
 
 | Endpoint       | Method | Description           | Query Params                                     | Request Body                         | Response                    |
 | -------------- | ------ | --------------------- | ------------------------------------------------ | ------------------------------------ | --------------------------- |
@@ -24,7 +24,7 @@ All endpoints are relative to: `/api/v1/`
 
 ## 2. Post Interactions
 
-### Base Path: `/posts/:id`
+### Base Path: `/content/posts/:id`
 
 | Endpoint      | Method | Description                | Query Params       | Request Body           | Response                      |
 | ------------- | ------ | -------------------------- | ------------------ | ---------------------- | ----------------------------- |
@@ -43,7 +43,7 @@ All endpoints are relative to: `/api/v1/`
 
 ## 3. Replies & Threads
 
-### Base Path: `/posts/:id/replies`
+### Base Path: `/content/posts/:id/replies`
 
 | Endpoint           | Method | Description                        | Query Params       | Request Body                         | Response                      |
 | ------------------ | ------ | ---------------------------------- | ------------------ | ------------------------------------ | ----------------------------- |
@@ -58,7 +58,7 @@ All endpoints are relative to: `/api/v1/`
 
 ## 4. Media Management
 
-### Base Path: `/media`
+### Base Path: `/content/media`
 
 | Endpoint      | Method | Description                 | Query Params                              | Request Body                  | Response                    |
 | ------------- | ------ | --------------------------- | ----------------------------------------- | ----------------------------- | --------------------------- |
@@ -70,7 +70,7 @@ All endpoints are relative to: `/api/v1/`
 
 ## 5. Shorts/Reels Management
 
-### Base Path: `/shorts`
+### Base Path: `/content/shorts`
 
 | Endpoint        | Method | Description                   | Query Params       | Request Body                                  | Response                       |
 | --------------- | ------ | ----------------------------- | ------------------ | --------------------------------------------- | ------------------------------ |
@@ -88,23 +88,22 @@ All endpoints are relative to: `/api/v1/`
 
 ## 6. Collections & Bookmarks
 
-### Base Path: `/collections`
+### Base Path: `/content/collections`
 
-| Endpoint             | Method | Description                 | Query Params       | Request Body                        | Response                        |
-| -------------------- | ------ | --------------------------- | ------------------ | ----------------------------------- | ------------------------------- |
-| `/`                  | GET    | Get user's collections      | -                  | -                                   | `{ collections: [] }`           |
-| `/`                  | POST   | Create a new collection     | -                  | `{ name, description?, private? }`  | `{ collection }`                |
-| `/:id`               | GET    | Get a specific collection   | -                  | -                                   | `{ collection, posts: [] }`     |
-| `/:id`               | PATCH  | Update a collection         | -                  | `{ name?, description?, private? }` | `{ collection }`                |
-| `/:id`               | DELETE | Delete a collection         | -                  | -                                   | `{ success }`                   |
-| `/:id/posts`         | GET    | Get posts in collection     | `?page=1&limit=20` | -                                   | `{ posts: [], pagination }`     |
-| `/:id/posts`         | POST   | Add post to collection      | -                  | `{ postId }`                        | `{ success }`                   |
-| `/:id/posts/:postId` | DELETE | Remove post from collection | -                  | -                                   | `{ success }`                   |
-| `/bookmarks`         | GET    | Get user's bookmarked posts | `?page=1&limit=20` | -                                   | `{ bookmarks: [], pagination }` |
+| Endpoint             | Method | Description                 | Query Params       | Request Body                        | Response                    |
+| -------------------- | ------ | --------------------------- | ------------------ | ----------------------------------- | --------------------------- |
+| `/`                  | GET    | Get user's collections      | -                  | -                                   | `{ collections: [] }`       |
+| `/`                  | POST   | Create a new collection     | -                  | `{ name, description?, private? }`  | `{ collection }`            |
+| `/:id`               | GET    | Get a specific collection   | -                  | -                                   | `{ collection, posts: [] }` |
+| `/:id`               | PATCH  | Update a collection         | -                  | `{ name?, description?, private? }` | `{ collection }`            |
+| `/:id`               | DELETE | Delete a collection         | -                  | -                                   | `{ success }`               |
+| `/:id/posts`         | GET    | Get posts in collection     | `?page=1&limit=20` | -                                   | `{ posts: [], pagination }` |
+| `/:id/posts`         | POST   | Add post to collection      | -                  | `{ postId }`                        | `{ success }`               |
+| `/:id/posts/:postId` | DELETE | Remove post from collection | -                  | -                                   | `{ success }`               |
 
 ## 7. Polls & Interactive Content
 
-### Base Path: `/polls`
+### Base Path: `/content/polls`
 
 | Endpoint      | Method | Description      | Query Params       | Request Body                      | Response                     |
 | ------------- | ------ | ---------------- | ------------------ | --------------------------------- | ---------------------------- |
@@ -115,198 +114,69 @@ All endpoints are relative to: `/api/v1/`
 
 ## 8. Content Visibility & Embedding
 
-### Base Path: `/content`
+### Base Path: `/content/visibility`
 
 | Endpoint               | Method | Description                     | Query Params | Request Body                      | Response        |
 | ---------------------- | ------ | ------------------------------- | ------------ | --------------------------------- | --------------- |
-| `/visibility`          | GET    | Get content visibility settings | -            | -                                 | `{ settings }`  |
-| `/visibility`          | PATCH  | Update visibility settings      | -            | `{ discoverable, comments, etc }` | `{ settings }`  |
+| `/`                    | GET    | Get content visibility settings | -            | -                                 | `{ settings }`  |
+| `/`                    | PATCH  | Update visibility settings      | -            | `{ discoverable, comments, etc }` | `{ settings }`  |
 | `/embed/:postId`       | GET    | Get post embed code             | -            | -                                 | `{ embedCode }` |
 | `/embed/settings`      | GET    | Get embed settings              | -            | -                                 | `{ settings }`  |
 | `/embed/settings`      | PATCH  | Update embed settings           | -            | `{ allowEmbedding, domains? }`    | `{ settings }`  |
 | `/aggregator-settings` | GET    | Get aggregator settings         | -            | -                                 | `{ settings }`  |
 | `/aggregator-settings` | PATCH  | Update aggregator settings      | -            | `{ allowAggregation, include? }`  | `{ settings }`  |
 
-## 9. Social Features & Emoji Reactions
+## 9. NFT & Monetization
 
-### Base Path: `/social`
+### Base Path: `/content/nft`
 
-| Endpoint               | Method | Description                   | Query Params       | Request Body | Response                      |
-| ---------------------- | ------ | ----------------------------- | ------------------ | ------------ | ----------------------------- |
-| `/emoji-reactions`     | GET    | Get available emoji reactions | -                  | -            | `{ emojis: [] }`              |
-| `/posts/:id/reactions` | POST   | React to a post with emoji    | -                  | `{ emoji }`  | `{ success, reactionsCount }` |
-| `/posts/:id/reactions` | GET    | Get reactions to a post       | `?page=1&limit=20` | -            | `{ reactions: [], counts }`   |
+| Endpoint            | Method | Description                 | Query Params                       | Request Body                    | Response                       |
+| ------------------- | ------ | --------------------------- | ---------------------------------- | ------------------------------- | ------------------------------ |
+| `/gallery`          | GET    | Get user's NFT gallery      | `?username=string&page=1&limit=20` | -                               | `{ nfts: [], pagination }`     |
+| `/gallery/settings` | GET    | Get NFT gallery settings    | -                                  | -                               | `{ settings }`                 |
+| `/gallery/settings` | PATCH  | Update NFT gallery settings | -                                  | `{ visibility, featured, etc }` | `{ settings }`                 |
+| `/details/:tokenId` | GET    | Get NFT details             | -                                  | -                               | `{ nft, metadata, history }`   |
+| `/collections`      | GET    | Get user's NFT collections  | `?username=string`                 | -                               | `{ collections: [] }`          |
+| `/featured`         | GET    | Get user's featured NFTs    | `?username=string`                 | -                               | `{ nfts: [] }`                 |
+| `/verify-ownership` | POST   | Verify NFT ownership        | -                                  | `{ tokenId, contractAddress }`  | `{ verified, ownershipProof }` |
 
-## Data Models
+### Base Path: `/content/monetization`
 
-### Post
+| Endpoint                     | Method | Description               | Query Params           | Request Body                         | Response                          |
+| ---------------------------- | ------ | ------------------------- | ---------------------- | ------------------------------------ | --------------------------------- |
+| `/creator-fund`              | GET    | Check creator fund status | -                      | -                                    | `{ eligible, requirements }`      |
+| `/creator-fund/apply`        | POST   | Apply to creator fund     | -                      | `{ details, wallet }`                | `{ success, applicationId }`      |
+| `/creator-fund/stats`        | GET    | Get creator fund earnings | `?timeRange=7d\|30d`   | -                                    | `{ earnings, analytics }`         |
+| `/subscriptions`             | GET    | Get subscription status   | -                      | -                                    | `{ isSubscriber, subscribers }`   |
+| `/subscriptions/tiers`       | GET    | Get subscription tiers    | -                      | -                                    | `{ tiers: [] }`                   |
+| `/subscriptions/tiers`       | POST   | Create subscription tier  | -                      | `{ name, price, benefits, color }`   | `{ tier }`                        |
+| `/subscriptions/subscribers` | GET    | Get subscribers list      | `?page=1&limit=20`     | -                                    | `{ subscribers: [], pagination }` |
+| `/tips`                      | POST   | Send tip to creator       | -                      | `{ recipient, amount, message? }`    | `{ success, transactionId }`      |
+| `/tips`                      | GET    | Get tip history           | `?type=sent\|received` | -                                    | `{ tips: [], pagination }`        |
+| `/tokens/balance`            | GET    | Get token balances        | -                      | -                                    | `{ balances: [] }`                |
+| `/tokens/claim`              | POST   | Claim earned tokens       | -                      | -                                    | `{ success, amount }`             |
+| `/gating/verify`             | POST   | Verify access to content  | -                      | `{ contentId, contentType, proof? }` | `{ hasAccess, requiredGates }`    |
 
-```typescript
-interface Post {
-  id: string;
-  authorId: string;
-  content: string;
-  parent: string | null; // Parent post ID for replies
-  likesCount: number;
-  repliesCount: number;
-  repostsCount: number;
-  pinned: boolean;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-}
-```
+## 10. Content Discovery
 
-### PostMedia
+### Base Path: `/content/discovery`
 
-```typescript
-interface PostMedia {
-  id: string;
-  postId: string;
-  url: string;
-  type: "image" | "video";
-  aspectRatio: "square" | "portrait" | "landscape";
-  createdAt: string;
-}
-```
+| Endpoint         | Method | Description              | Query Params                        | Response                      |
+| ---------------- | ------ | ------------------------ | ----------------------------------- | ----------------------------- |
+| `/search`        | GET    | Search for posts         | `?q=string&page=1&limit=20`         | `{ posts: [], pagination }`   |
+| `/hashtags`      | GET    | Get trending hashtags    | `?limit=10`                         | `{ hashtags: [] }`            |
+| `/hashtag/:tag`  | GET    | Get posts with hashtag   | `?page=1&limit=20`                  | `{ posts: [], pagination }`   |
+| `/explore`       | GET    | Get explore page content | `?page=1&limit=20&category=string`  | `{ content: [], pagination }` |
+| `/tags/trending` | GET    | Get trending hashtags    | `?limit=10&timeRange=24h`           | `{ tags: [] }`                |
+| `/topics`        | GET    | Get trending topics      | `?limit=10&timeRange=24h&category=` | `{ topics: [] }`              |
 
-### Like
+### Base Path: `/content/recommendations`
 
-```typescript
-interface Like {
-  id: string;
-  userId: string;
-  postId: string;
-  createdAt: string;
-}
-```
-
-### Bookmark
-
-```typescript
-interface Bookmark {
-  id: string;
-  userId: string;
-  postId: string;
-  collectionId: string | null;
-  createdAt: string;
-}
-```
-
-### Collection
-
-```typescript
-interface Collection {
-  id: string;
-  userId: string;
-  name: string;
-  description: string | null;
-  private: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-```
-
-### Short
-
-```typescript
-interface Short {
-  id: string;
-  userId: string;
-  videoUrl: string;
-  caption: string | null;
-  soundId: string | null;
-  likesCount: number;
-  commentsCount: number;
-  sharesCount: number;
-  duration: number; // in seconds
-  createdAt: string;
-}
-```
-
-### Sound
-
-```typescript
-interface Sound {
-  id: string;
-  name: string;
-  artist: string | null;
-  url: string;
-  duration: number;
-  usageCount: number;
-  createdAt: string;
-}
-```
-
-### Poll
-
-```typescript
-interface Poll {
-  id: string;
-  userId: string;
-  question: string;
-  options: {
-    id: string;
-    text: string;
-    votes: number;
-  }[];
-  totalVotes: number;
-  expiresAt: string;
-  createdAt: string;
-}
-```
-
-### Reaction
-
-```typescript
-interface Reaction {
-  id: string;
-  userId: string;
-  contentId: string;
-  contentType: "post" | "comment" | "short";
-  emoji: string;
-  createdAt: string;
-}
-```
-
-## Implementation Considerations
-
-1. **Content Performance**
-
-   - Implement efficient pagination for timeline feeds
-   - Consider caching strategies for frequently accessed posts/feeds
-   - Optimize media delivery with CDN integration
-   - Load balancing for media processing services
-
-2. **Content Moderation**
-
-   - Apply content filtering based on user preferences
-   - Implement spam detection for posts and comments
-   - Flag potentially sensitive content for review
-   - Automated content policy detection
-
-3. **Media Processing**
-
-   - Server-side validation of media files (size, format, content)
-   - Image/video optimization and compression
-   - Generate thumbnails and previews
-   - Support for various media types and formats
-
-4. **Feed Algorithms**
-
-   - Personalized feed algorithm logic
-   - Trending calculation based on engagement metrics
-   - Content relevance scoring
-   - Web3/token-gated content integration
-
-5. **Real-time Features**
-
-   - Consider WebSockets for real-time engagement updates
-   - Optimistic UI updates for likes and other reactions
-   - Push notifications for high-engagement posts
-
-6. **Security & Privacy**
-   - Respect user visibility settings for all content
-   - Secure media upload and processing
-   - Content attribution and ownership verification
-   - NFT gating for exclusive content
+| Endpoint       | Method | Description                     | Query Params                      | Response                     |
+| -------------- | ------ | ------------------------------- | --------------------------------- | ---------------------------- |
+| `/posts`       | GET    | Get recommended posts           | `?page=1&limit=20`                | `{ posts: [], pagination }`  |
+| `/users`       | GET    | Get recommended users           | `?page=1&limit=20&interests=true` | `{ users: [], pagination }`  |
+| `/topics`      | GET    | Get recommended topics          | `?limit=10`                       | `{ topics: [] }`             |
+| `/collections` | GET    | Get recommended collections     | `?page=1&limit=10`                | `{ collections: [] }`        |
+| `/shorts`      | GET    | Get recommended shorts          | `?page=1&limit=10`                | `{ shorts: [], pagination }` |
+| `/feedback`    | POST   | Provide recommendation feedback | `{ itemId, itemType, relevant }`  | `{ success }`                |
