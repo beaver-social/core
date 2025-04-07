@@ -150,19 +150,19 @@ function FeedPost({
                     {/* Action Buttons */}
                     <div className="flex items-center gap-6 mt-4 w-[32rem] justify-between">
                         <button className="flex items-center gap-2 text-hover group" onClick={handleLike}>
-                            <Icon name="Heart" className="w-5 h-5 group-hover:text-red-500" />
+                            <Icon name="Heart" className="w-5 h-5 group-hover:text-rose-500" />
                             <span className="text-sm">{likes}</span>
                         </button>
                         <button className="flex items-center gap-2 text-hover group" onClick={handleComment}>
-                            <Icon name="MessageCircle" className="w-5 h-5 group-hover:text-primary" />
+                            <Icon name="BotMessageSquare" className="w-5 h-5 group-hover:text-emerald-500" />
                             <span className="text-sm">{comments}</span>
                         </button>
                         <button className="flex items-center gap-2 text-hover group" onClick={(e) => e.stopPropagation()}>
-                            <Icon name="Repeat" className="w-5 h-5 group-hover:text-green-500" />
+                            <Icon name="Repeat" className="w-5 h-5 group-hover:text-sky-500" />
                             <span className="text-sm">{reposts}</span>
                         </button>
                         <button className="flex items-center gap-2 text-hover group" onClick={(e) => e.stopPropagation()}>
-                            <Icon name="Share2" className="w-5 h-5 group-hover:text-primary" />
+                            <Icon name="Share2" className="w-5 h-5 group-hover:text-amber-500" />
                             <span className="text-sm">{shares}</span>
                         </button>
                     </div>
