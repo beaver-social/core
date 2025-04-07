@@ -1,10 +1,10 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import dummy from "./routes/dummy";
-import users from "./routes/users";
-import posts from "./routes/posts";
 import nft from "./routes/nft";
-import oauth from "./routes/oauth";
+
+import content from "./routes/content/index";
+import user from "./routes/user/index";
+import auth from "./routes/auth/index";
 
 let servedSessions = 0;
 const app = new Hono()
@@ -23,11 +23,10 @@ const app = new Hono()
       allowHeaders: ["Content-Type", "Authorization"],
     })
   )
-  .route("dummy", dummy)
-  .route("users", users)
-  .route("posts", posts)
+  .route("auth", auth)
+  .route("user", user)
+  .route("content", content)
   .route("nft", nft)
-  .route("oauth", oauth)
   .get("/stats", async (ctx) => {
     servedSessions++;
     return ctx.json({

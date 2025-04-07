@@ -1,10 +1,8 @@
-import { Hono } from "hono";
+import { zJwt } from "../../lib/zod/helpers";
 import crypto from "crypto";
-import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { zJwt } from "../lib/zod/helpers";
 
-function deriveUserSalt(jwt: z.infer<typeof zJwt>): Uint8Array {
+export function deriveUserSalt(jwt: z.infer<typeof zJwt>): Uint8Array {
   const { sub, iss, aud } = jwt;
 
   // Use JWT fields as inputs for the key derivation
@@ -36,22 +34,3 @@ function deriveUserSalt(jwt: z.infer<typeof zJwt>): Uint8Array {
   // Ensure the output is 16 bytes (128 bits) as required for zkLogin
   return derivedHmac.digest().subarray(0, 16);
 }
-
-export default new Hono()
-  .get("/", (ctx) => {
-    return ctx.json({
-      message: "oauth routes",
-    });
-  })
-  .post("/get-salt", zValidator("json", z.object({ jwt: zJwt })), (ctx) => {
-    const { jwt } = ctx.req.valid("json");
-    const salt = deriveUserSalt(jwt);
-
-    return ctx.json({
-      salt: {
-        hex: Buffer.from(salt).toString("hex"),
-        base64: Buffer.from(salt).toString("base64"),
-        integer: BigInt(`0x${Buffer.from(salt).toString("hex")}`).toString(),
-      },
-    });
-  });

@@ -225,3 +225,12 @@ All endpoints are relative to: `/api/v1/`
 | `/appeals/:id` | GET    | Check appeal status          | -                  | -                                     | `{ status, details, notes? }`    |
 | `/reported`    | GET    | Get content reported by user | `?page=1&limit=20` | -                                     | `{ reports: [], pagination }`    |
 | `/sensitive`   | POST   | Mark content as sensitive    | -                  | `{ contentId, contentType }`          | `{ success }`                    |
+
+## 4. Identity Verification
+
+### Base Path: `/auth/verification`
+
+| Endpoint   | Method | Description                  | Request Body            | Response                            |
+| ---------- | ------ | ---------------------------- | ----------------------- | ----------------------------------- |
+| `/request` | POST   | Request account verification | `{ reason, evidence? }` | `{ success, requestId }`            |
+| `/status`  | GET    | Check verification status    | -                       | `{ status, message?, verifiedAt? }` |

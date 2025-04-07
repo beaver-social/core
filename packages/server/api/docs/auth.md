@@ -32,19 +32,3 @@ All endpoints are relative to: `http://localhost:5173/api/v1/`
 | -------- | ----------- | ----------- | ------------------------------------ | ---------------------------- | ------------------------------ | -------------------- |
 | <!--     | `/`         | GET         | Get identity NFT details             | -                            | `{ identityNFT, owner, user }` | owns nft already --> |
 | <!--     | `/transfer` | POST        | Transfer identity to another address | `{ targetAddress, reason? }` | `{ success, transactionHash }` | client side only --> |
-
-## 4. Identity Verification
-
-### Base Path: `/auth/verification`
-
-| Endpoint   | Method | Description                  | Request Body            | Response                            |
-| ---------- | ------ | ---------------------------- | ----------------------- | ----------------------------------- |
-| `/request` | POST   | Request account verification | `{ reason, evidence? }` | `{ success, requestId }`            |
-| `/status`  | GET    | Check verification status    | -                       | `{ status, message?, verifiedAt? }` |
-
-## 5. Account Recovery
-
-### Base Path: `/auth/recovery`
-
-| Endpoint | Method | Description | Request Body | Response |
-| -------- | ------ | ----------- | ------------ | -------- |

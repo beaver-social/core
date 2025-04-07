@@ -117,7 +117,7 @@ class zkLoginService {
 
   async getUserSalt(jwt: JwtPayload): Promise<bigint> {
     try {
-      const response = await apiClient.oauth["get-salt"].$post({
+      const response = await apiClient.auth.zk["salt"].$post({
         json: { jwt },
       });
       const data = await response.json();
