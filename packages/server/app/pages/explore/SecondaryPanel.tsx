@@ -6,9 +6,9 @@ import SearchBar from "@/pages/explore/SearchBar";
 
 // Sample data for profiles and trending topics
 const sampleProfiles = [
-    { id: "1", name: "Kartik", handle: "ishtails", profilePicture: "/images/user.png" },
-    { id: "2", name: "John Doe", handle: "johndoe", profilePicture: "/images/user.png" },
-    { id: "3", name: "Jane Smith", handle: "janesmith", profilePicture: "/images/user.png" },
+    { id: "1", name: "Kartik", handle: "ishtails", profilePicture: "/images/user.webp" },
+    { id: "2", name: "John Doe", handle: "johndoe", profilePicture: "/images/user.webp" },
+    { id: "3", name: "Jane Smith", handle: "janesmith", profilePicture: "/images/user.webp" },
 ];
 
 const trendingTopics = [
@@ -30,7 +30,7 @@ export default function SecondaryPanel() {
             />
 
             {/* Trending Topics */}
-            <div className="bg-secondary rounded-xl p-4">
+            <div className="bg-secondary border rounded-xl p-4">
                 <h2 className="text-xl font-bold mb-4">What's happening</h2>
                 <div className="space-y-4">
                     {trendingTopics.map((topic) => (
@@ -48,7 +48,7 @@ export default function SecondaryPanel() {
             </div>
 
             {/* Suggested Profiles */}
-            <div className="bg-secondary rounded-xl p-6">
+            <div className="bg-secondary border rounded-xl p-6">
                 <h2 className="font-bold mb-4">Suggested for you</h2>
                 <div className="space-y-4">
                     {sampleProfiles.map((profile) => (

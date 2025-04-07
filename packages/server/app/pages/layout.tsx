@@ -26,7 +26,7 @@ export default function Layout({ main, secondary }: LayoutProps) {
             <div className="hidden sm:block">
                 <SideNav />
 
-                <section className="flex justify-center flex-col px-10 2xl:px-32 sm:ml-[4.5rem] lg:mr-[24rem] items-center">
+                <section className="flex justify-center flex-col px-10 2xl:px-44 sm:ml-[4.5rem] lg:mr-[24rem] items-center">
                     <div className="w-full mt-8">
                         {main}
                     </div>

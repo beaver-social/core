@@ -179,7 +179,7 @@ export default function ShortsFeed() {
     return (
         <div
             ref={containerRef}
-            className="h-full w-full overflow-y-auto overflow-x-hidden snap-y snap-mandatory no-scrollbar"
+            className="h-full w-full overflow-y-auto overflow-x-hidden snap-y snap-mandatory no-scrollbar sm:rounded-t-2xl"
         >
             {shorts.map((short, index) => (
                 <div

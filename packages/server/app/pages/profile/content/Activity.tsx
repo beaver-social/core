@@ -44,7 +44,7 @@ const activities: ActivityItem[] = [
         sourceUser: {
             name: "Kartik",
             handle: "ishtails",
-            avatar: "/images/user.png"
+            avatar: "/images/user.webp"
         },
         targetPost: {
             id: "123",
@@ -62,7 +62,7 @@ const activities: ActivityItem[] = [
         sourceUser: {
             name: "Kartik",
             handle: "ishtails",
-            avatar: "/images/user.png"
+            avatar: "/images/user.webp"
         },
         targetPost: {
             id: "456",
@@ -80,7 +80,7 @@ const activities: ActivityItem[] = [
         sourceUser: {
             name: "Kartik",
             handle: "ishtails",
-            avatar: "/images/user.png"
+            avatar: "/images/user.webp"
         },
         content: "Great analysis! I think DAOs are going to transform organizational structures in the next decade.",
         targetPost: {
@@ -99,7 +99,7 @@ const activities: ActivityItem[] = [
         sourceUser: {
             name: "Kartik",
             handle: "ishtails",
-            avatar: "/images/user.png"
+            avatar: "/images/user.webp"
         },
         targetUser: {
             name: "Web3 Foundation",
@@ -132,7 +132,7 @@ const activities: ActivityItem[] = [
         sourceUser: {
             name: "Kartik",
             handle: "ishtails",
-            avatar: "/images/user.png"
+            avatar: "/images/user.webp"
         },
         nftData: {
             collectionName: "Crypto Beavers",

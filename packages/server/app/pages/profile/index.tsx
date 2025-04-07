@@ -37,8 +37,8 @@ const userDetails: UserDetails = {
     joined: "January 2022",
     followers: 100,
     following: 50,
-    profilePicture: "/images/user.png",
-    coverPhoto: "/images/banner.webp",
+    profilePicture: "/images/user.webp",
+    coverPhoto: "/images/wallpapers/11.jpeg",
 }
 
 export default function Profile() {
@@ -52,7 +52,7 @@ export default function Profile() {
 
     return (
         <Layout main={
-            <div className="border mb-10">
+            <div className="border mb-10  rounded-t-2xl">
                 <ProfileHeader data={userDetails} isCurrentUser={isCurrentUser} />
                 <BasicInfo data={userDetails} />
                 <Tabs />

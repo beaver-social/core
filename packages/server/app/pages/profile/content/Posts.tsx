@@ -13,7 +13,7 @@ const samplePosts = [
         comments: 5,
         reposts: 8,
         shares: 3,
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         aspectRatio: "square" as const,
     },
     {
@@ -26,7 +26,7 @@ const samplePosts = [
         comments: 3,
         reposts: 2,
         shares: 1,
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         aspectRatio: "square" as const,
     },
     {
@@ -39,7 +39,7 @@ const samplePosts = [
         comments: 12,
         reposts: 15,
         shares: 8,
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         aspectRatio: "square" as const,
     },
     {
@@ -52,7 +52,7 @@ const samplePosts = [
         comments: 7,
         reposts: 4,
         shares: 2,
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         imageUrl: "/images/sunset.jpg",
         aspectRatio: "square" as const,
     },
@@ -66,7 +66,7 @@ const samplePosts = [
         comments: 23,
         reposts: 18,
         shares: 11,
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         imageUrl: "/images/ui-design.png",
         aspectRatio: "square" as const,
     }

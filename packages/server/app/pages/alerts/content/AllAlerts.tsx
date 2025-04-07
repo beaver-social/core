@@ -8,7 +8,7 @@ const sampleAllNotifications = [
         username: "John Doe",
         timestamp: "2h",
         content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         type: "reply"
     },
     {
@@ -16,7 +16,7 @@ const sampleAllNotifications = [
         username: "John Doe",
         timestamp: "2h",
         content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         type: "like"
     },
     {
@@ -24,7 +24,7 @@ const sampleAllNotifications = [
         username: "John Doe",
         timestamp: "2h",
         content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         type: "repost"
     },
     {
@@ -32,7 +32,7 @@ const sampleAllNotifications = [
         username: "John Doe",
         timestamp: "2h",
         content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         type: "message"
     },
     {
@@ -40,7 +40,7 @@ const sampleAllNotifications = [
         username: "John Doe",
         timestamp: "2h",
         content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         type: "other"
     },
 ];

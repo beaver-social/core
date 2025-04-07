@@ -49,7 +49,7 @@ export default function ImageCarousel({ images, className = '', aspectRatio }: I
                     <Image
                         src={images[currentIndex]}
                         alt={`Image ${currentIndex + 1} of ${images.length}`}
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-cover"
                         onError={() => handleImageError(currentIndex)}
                     />
                 )}

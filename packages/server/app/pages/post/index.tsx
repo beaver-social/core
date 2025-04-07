@@ -15,7 +15,7 @@ const samplePost = {
     comments: 12,
     reposts: 5,
     shares: 3,
-    avatarUrl: "/images/user.png"
+    avatarUrl: "/images/user.webp"
 };
 
 const sampleReplies = [
@@ -28,7 +28,7 @@ const sampleReplies = [
         comments: 2,
         reposts: 1,
         shares: 0,
-        avatarUrl: "/images/user.png"
+        avatarUrl: "/images/user.webp"
     },
     {
         username: "Mike Johnson",
@@ -39,7 +39,7 @@ const sampleReplies = [
         comments: 1,
         reposts: 0,
         shares: 0,
-        avatarUrl: "/images/user.png"
+        avatarUrl: "/images/user.webp"
     }
 ];
 

@@ -1,15 +1,18 @@
-import React from 'react'
+import { useTheme } from "../context/theme-provider"
+import { cn } from "../lib/utils";
+import { Image } from "./Image"
 
 type Props = {
     title: string
 }
 
 export default function PageTitle({ title }: Props) {
+    const { theme } = useTheme();
+
     return (
-        <div className="flex items-center justify-between h-full gap-4 px-10 py-5 border sm:rounded-t-md bg-primary-100 sm:py-10">
-            <div className="w-full text-5xl font-medium text-center sm:text-start sm:text-7xl sm:font-light text-primary-800">
-                {title}
-            </div>
+        <div className="w-full rounded-t-2xl border border-b-0 p-4 flex flex-col items-center justify-center gap-4">
+            <Image src={'/images/page2.png'} alt="logo" className="w-full pt-2 h-[120px] sm:h-[150px] object-contain object-center" />
+            <h1 className="text-2xl font-bold">{title}</h1>
         </div>
     )
 }

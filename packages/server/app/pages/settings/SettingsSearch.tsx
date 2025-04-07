@@ -90,7 +90,7 @@ export default function SettingsSearch({ onSelectSetting, className }: SettingsS
             {isOpen && results.length > 0 && (
                 <div
                     ref={resultsRef}
-                    className="absolute mt-1 z-10 w-full bg-popover rounded-md shadow-md border border-border py-1 max-h-[300px] overflow-y-auto"
+                    className="absolute mt-3 z-10 w-full bg-popover rounded-md shadow-md border border-border py-1 max-h-[28rem] overflow-y-auto"
                 >
                     {results.map((result, index) => (
                         <button

@@ -21,7 +21,7 @@ const samplePosts = [
         comments: 12,
         reposts: 5,
         shares: 3,
-        avatarUrl: "/images/user.png"
+        avatarUrl: "/images/user.webp"
     },
     {
         id: "2",
@@ -34,7 +34,7 @@ const samplePosts = [
         comments: 8,
         reposts: 3,
         shares: 1,
-        avatarUrl: "/images/user.png"
+        avatarUrl: "/images/user.webp"
     },
     {
         id: "3",
@@ -48,7 +48,7 @@ const samplePosts = [
         comments: 24,
         reposts: 12,
         shares: 6,
-        avatarUrl: "/images/user.png"
+        avatarUrl: "/images/user.webp"
     },
     {
         id: "4",
@@ -61,7 +61,7 @@ const samplePosts = [
         comments: 45,
         reposts: 23,
         shares: 15,
-        avatarUrl: "/images/user.png"
+        avatarUrl: "/images/user.webp"
     },
     {
         id: "5",
@@ -74,15 +74,15 @@ const samplePosts = [
         comments: 34,
         reposts: 14,
         shares: 8,
-        avatarUrl: "/images/user.png"
+        avatarUrl: "/images/user.webp"
     }
 ];
 
 // Sample data for profiles and topics in search
 const sampleProfiles = [
-    { id: "1", name: "Kartik", handle: "ishtails", profilePicture: "/images/user.png" },
-    { id: "2", name: "John Doe", handle: "johndoe", profilePicture: "/images/user.png" },
-    { id: "3", name: "Jane Smith", handle: "janesmith", profilePicture: "/images/user.png" },
+    { id: "1", name: "Kartik", handle: "ishtails", profilePicture: "/images/user.webp" },
+    { id: "2", name: "John Doe", handle: "johndoe", profilePicture: "/images/user.webp" },
+    { id: "3", name: "Jane Smith", handle: "janesmith", profilePicture: "/images/user.webp" },
 ];
 
 const trendingTopics = [
@@ -127,9 +127,9 @@ export default function SearchResults() {
     return (
         <Layout
             main={
-                <div className="border-x border-t mb-10 mx-auto">
+                <div className="border-x border-t mb-10 mx-auto rounded-t-2xl">
                     {/* Search Header */}
-                    <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b p-4">
+                    <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b p-4 rounded-t-2xl">
                         <div className="flex items-center gap-4 mb-5">
                             <button
                                 onClick={() => navigate(-1)}

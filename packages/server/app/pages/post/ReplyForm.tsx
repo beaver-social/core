@@ -7,7 +7,7 @@ export default function ReplyForm() {
     return (
         <div className="p-4 border-b">
             <div className="flex gap-4">
-                <Image src="/images/user.png" alt="User avatar" className="w-10 h-10 rounded-full" />
+                <Image src="/images/user.webp" alt="User avatar" className="w-10 h-10 rounded-full" />
                 <div className="flex-1">
                     <textarea
                         placeholder="Post your reply"

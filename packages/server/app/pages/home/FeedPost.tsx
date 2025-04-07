@@ -113,7 +113,7 @@ function FeedPost({
                         <Image
                             src={avatarUrl}
                             alt={username}
-                            className="w-12 h-12 rounded-full"
+                            className="w-12 h-12 mt-1 rounded-full"
                         />
                     </Link>
                 </div>
@@ -136,17 +136,19 @@ function FeedPost({
                     </div>
 
                     {/* Images if present */}
-                    {images && images.length > 0 && (
-                        <div className="mt-3 cursor-default" onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                        }}>
-                            <ImageCarousel images={images} aspectRatio={aspectRatio} />
-                        </div>
-                    )}
+                    <div className="max-w-[32rem]">
+                        {images && images.length > 0 && (
+                            <div className="mt-4 cursor-default" onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }}>
+                                <ImageCarousel images={images} aspectRatio={aspectRatio} />
+                            </div>
+                        )}
+                    </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-6 mt-4">
+                    <div className="flex items-center gap-6 mt-4 w-[32rem] justify-between">
                         <button className="flex items-center gap-2 text-hover group" onClick={handleLike}>
                             <Icon name="Heart" className="w-5 h-5 group-hover:text-red-500" />
                             <span className="text-sm">{likes}</span>

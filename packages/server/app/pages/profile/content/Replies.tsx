@@ -13,7 +13,7 @@ const repliesData = [
         comments: 3,
         reposts: 5,
         shares: 1,
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         replyingTo: {
             username: "Web3Expert",
             handle: "web3expert",
@@ -30,7 +30,7 @@ const repliesData = [
         comments: 2,
         reposts: 1,
         shares: 0,
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         replyingTo: {
             username: "BlockchainDev",
             handle: "blockchaindev",
@@ -47,7 +47,7 @@ const repliesData = [
         comments: 4,
         reposts: 2,
         shares: 1,
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         replyingTo: {
             username: "DeFiBuilder",
             handle: "defibuilder",
@@ -64,7 +64,7 @@ const repliesData = [
         comments: 1,
         reposts: 0,
         shares: 0,
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         replyingTo: {
             username: "DesignDAO",
             handle: "designdao",

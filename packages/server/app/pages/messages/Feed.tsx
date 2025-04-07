@@ -1,5 +1,3 @@
-import { useState } from "react";
-import Tabs from "@/shared/components/Tabs";
 import FeedItem from "./FeedItem";
 import Icon from "@/shared/components/Icon";
 
@@ -11,7 +9,7 @@ const sampleMessages = [
         handle: "AtomSilverman",
         timestamp: "1d",
         content: "Hey there! How's it going?",
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         type: "reply"
     },
     {
@@ -20,7 +18,7 @@ const sampleMessages = [
         handle: "johndoe",
         timestamp: "1d",
         content: "Hey there! How's it going?",
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         type: "reply"
     },
     {
@@ -29,7 +27,7 @@ const sampleMessages = [
         handle: "johndoe",
         timestamp: "1d",
         content: "Hey there! How's it going?",
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         type: "reply"
     },
     {
@@ -38,7 +36,7 @@ const sampleMessages = [
         handle: "johndoe",
         timestamp: "1d",
         content: "Hey there! How's it going?",
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         type: "reply"
     },
 ];
