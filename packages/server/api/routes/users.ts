@@ -137,6 +137,22 @@ export default new Hono()
         },
     )
 
+    .get("/:id",
+        zValidator(
+            "param",
+            z.object({
+                id: zNumberString,
+            }),
+        ),
+        async (ctx) => {
+            const { id } = ctx.req.valid("param");
+
+            const user = await db.select().from(users).where(eq(users.id, id));
+
+            return ctx.json({ user }, 200);
+        },
+    )
+
     .get("/search",
         zValidator(
             "query",
@@ -163,22 +179,6 @@ export default new Hono()
 
             return ctx.json({ users: usersList }, 200);
         }
-    )
-
-    .get("/:id",
-        zValidator(
-            "param",
-            z.object({
-                id: zNumberString,
-            }),
-        ),
-        async (ctx) => {
-            const { id } = ctx.req.valid("param");
-
-            const user = await db.select().from(users).where(eq(users.id, id));
-
-            return ctx.json({ user }, 200);
-        },
     )
 
     .get("/:id/posts",
