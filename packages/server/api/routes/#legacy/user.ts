@@ -2,107 +2,58 @@ import { Hono } from "hono";
 import db from "../../lib/db";
 import { users } from "../../lib/db/schema/user";
 import { zValidator } from "@hono/zod-validator";
-import { count, desc, eq, or, sql } from "drizzle-orm";
+import { count, desc, eq, ilike, like, or, sql } from "drizzle-orm";
 import { DB } from "../../lib/db/schema";
 import { posts } from "../../lib/db/schema/post";
 import { z } from "zod";
 import { zNumberString, zSuiAddress } from "../../lib/zod/helpers";
+import * as actions from "../../lib/db/actions"
+import { tryCatch } from "../../lib/tryCatch";
 
 export default new Hono()
-  .post(
-    "/create",
+
+  .post("/new",
     zValidator(
       "json",
       z.object({
-        identity: zSuiAddress,
         username: z.string(),
         fullName: z.string(),
         address: zSuiAddress,
-        suins_domain_name: zSuiAddress.optional(),
-        image_url: z.string(),
-        banner_url: z.string().optional(),
-        about: z.string().optional(),
-        timezone: zNumberString.optional(),
-        pinned: zNumberString.optional(),
-      })
+        imageUrl: z.string(),
+        about: z.string(),
+      }),
     ),
+    zValidator("query", z.object({
+      signature: z.string(),
+    })),
     async (ctx) => {
-      const {
-        identity,
+      const { username, fullName, address, imageUrl, about } = ctx.req.valid("json")
+      const { signature } = ctx.req.valid("query")
+
+      const resp = await tryCatch(actions.createIdentity({
+        userId: -1,
         username,
-        fullName,
-        address,
-        suins_domain_name,
-        image_url,
-        banner_url,
         about,
-        timezone,
-        pinned,
-      } = ctx.req.valid("json");
+        fullName,
+        imageUrl,
+        receiver: address,
+      }, signature))
 
-      const existingUser = await db
-        .select()
-        .from(users)
-        .where(eq(users.username, username))
-        .limit(1);
-      if (existingUser.length > 0) {
-        return ctx.json({ error: "Username already taken" }, 400);
+      if (resp.error) {
+        return ctx.err(resp.error?.message || "Failed to create identity", 400)
       }
 
-      const existingWallet = await db
-        .select()
-        .from(users)
-        .where(eq(users.address, address))
-        .limit(1);
-      if (existingWallet.length > 0) {
-        return ctx.json(
-          { error: "Wallet already linked to some other account" },
-          400
-        );
-      }
-
-      if (suins_domain_name) {
-        const existingSuinsDomain = await db
-          .select()
-          .from(users)
-          .where(eq(users.suins_domain_name, suins_domain_name))
-          .limit(1);
-        if (existingSuinsDomain.length > 0) {
-          return ctx.json(
-            { error: "SuiNDomain already linked to some other account" },
-            400
-          );
-        }
-      }
-
-      const [newUser] = await db
-        .insert(users)
-        .values({
-          identity,
-          username,
-          fullName,
-          address,
-          suins_domain_name: suins_domain_name || null,
-          image_url,
-          banner_url: banner_url || null,
-          about: about || null,
-          timezone: timezone || null,
-          pinned: pinned || null,
-        })
-        .returning();
-
-      return ctx.json({ user: newUser }, 201);
+      return ctx.ok({}, "Identity Created Successfully", 201);
     }
   )
 
-  .get(
-    "/",
+  .get("/",
     zValidator(
       "query",
       z.object({
         page: zNumberString.default("1"),
-        limit: zNumberString.default("10"),
-      })
+        limit: zNumberString.default("10")
+      }),
     ),
     async (ctx) => {
       const { page, limit } = ctx.req.valid("query");
@@ -115,22 +66,20 @@ export default new Hono()
         .limit(limit)
         .offset(offset);
 
-      const totalUsers = await db.select({ count: count() }).from(users);
+      const totalUsers = await db
+        .select({ count: count() })
+        .from(users)
 
-      return ctx.json(
-        {
-          allUsers,
-          totalUsers: totalUsers[0]?.count ?? 0,
-          currentPage: page,
-          perPage: limit,
-        },
-        200
-      );
-    }
+      return ctx.json({
+        allUsers,
+        totalUsers: totalUsers[0]?.count ?? 0,
+        currentPage: page,
+        perPage: limit,
+      }, 200);
+    },
   )
 
-  .get(
-    "/find",
+  .get("/find",
     zValidator(
       "query",
       z.object({
@@ -139,67 +88,72 @@ export default new Hono()
         username: z.string().optional(),
         suins_domain_name: z.string().optional(),
         address: zSuiAddress.optional(),
-      })
+      }),
     ),
     async (ctx) => {
-      const { id, identity, username, suins_domain_name, address } =
-        ctx.req.valid("query");
+      const { id, identity, username, suins_domain_name, address } = ctx
+        .req.valid("query");
 
       let user: DB["user"] | undefined = undefined;
 
       if (id) {
-        const data = await db
-          .select()
-          .from(users)
-          .where(eq(users.id, id))
-          .limit(1);
+        const data = await db.select().from(users).where(
+          eq(users.id, id),
+        ).limit(1);
         user = data[0];
       }
 
       if (identity) {
-        const data = await db
-          .select()
-          .from(users)
-          .where(eq(users.identity, identity))
-          .limit(1);
+        const data = await db.select().from(users).where(
+          eq(users.identity, identity),
+        ).limit(1);
         user = data[0];
       }
 
       if (username) {
-        const data = await db
-          .select()
-          .from(users)
-          .where(eq(users.username, username))
-          .limit(1);
+        const data = await db.select().from(users).where(
+          eq(users.username, username),
+        ).limit(1);
         user = data[0];
       }
 
       if (suins_domain_name) {
-        const data = await db
-          .select()
-          .from(users)
-          .where(eq(users.suins_domain_name, suins_domain_name))
-          .limit(1);
+        const data = await db.select().from(users).where(
+          eq(users.suinsDomainName, suins_domain_name),
+        ).limit(1);
         user = data[0];
       }
 
       if (address) {
-        const data = await db
-          .select()
-          .from(users)
-          .where(eq(users.address, address))
-          .limit(1);
+        const data = await db.select().from(users).where(
+          eq(users.address, address),
+        ).limit(1);
         user = data[0];
       }
 
       if (!user) return ctx.json({ error: "User not found" }, 404);
 
       return ctx.json({ id: user.id }, 200);
-    }
+    },
   )
 
-  .get(
-    "/search",
+  .get("/:id",
+    zValidator(
+      "param",
+      z.object({
+        id: zNumberString,
+      }),
+    ),
+    async (ctx) => {
+      const { id } = ctx.req.valid("param");
+
+      const user = await db.select().from(users).where(eq(users.id, id));
+
+      return ctx.json({ user }, 200);
+    },
+  )
+
+  .get("/search",
     zValidator(
       "query",
       z.object({
@@ -220,46 +174,26 @@ export default new Hono()
             sql`${users.fullName} LIKE ${fuzzyQuery}`
           )
         )
-        .orderBy(
-          sql`LENGTH(${users.username}) ASC, LENGTH(${users.fullName}) ASC`
-        )
+        .orderBy(sql`LENGTH(${users.username}) ASC, LENGTH(${users.fullName}) ASC`)
         .limit(10);
 
       return ctx.json({ users: usersList }, 200);
     }
   )
 
-  .get(
-    "/:id",
+  .get("/:id/posts",
     zValidator(
       "param",
       z.object({
         id: zNumberString,
-      })
-    ),
-    async (ctx) => {
-      const { id } = ctx.req.valid("param");
-
-      const user = await db.select().from(users).where(eq(users.id, id));
-
-      return ctx.json({ user }, 200);
-    }
-  )
-
-  .get(
-    "/:id/posts",
-    zValidator(
-      "param",
-      z.object({
-        id: zNumberString,
-      })
+      }),
     ),
     zValidator(
       "query",
       z.object({
         page: zNumberString.default("1"),
-        limit: zNumberString.default("10"),
-      })
+        limit: zNumberString.default("10")
+      }),
     ),
     async (ctx) => {
       const { id } = ctx.req.valid("param");
@@ -267,7 +201,7 @@ export default new Hono()
       const { page, limit } = ctx.req.valid("query");
 
       if (!id) {
-        return ctx.json({ error: "id not provided" }, 400);
+        return ctx.json({ error: "id not provided" }, 400)
       }
 
       const offset = (page - 1) * limit;
@@ -283,60 +217,11 @@ export default new Hono()
         .from(posts)
         .where(eq(posts.authorId, id));
 
-      return ctx.json(
-        {
-          userPosts,
-          totalPosts: totalPosts[0]?.count ?? 0,
-          currentPage: page,
-          perPage: limit,
-        },
-        200
-      );
+      return ctx.json({
+        userPosts,
+        totalPosts: totalPosts[0]?.count ?? 0,
+        currentPage: page,
+        perPage: limit,
+      }, 200);
     }
-  );
-
-// .get("/:id/replies",
-//     zValidator(
-//         "param",
-//         z.object({
-//             id: zNumberString,
-//         }),
-//     ),
-//     zValidator(
-//         "query",
-//         z.object({
-//             page: zNumberString.default("1"),
-//             limit: zNumberString.default("10")
-//         }),
-//     ),
-//     async (ctx) => {
-//         const { id } = ctx.req.valid("param");
-
-//         // check if page & limit is number when default
-//         const { page, limit } = ctx.req.valid("query");
-
-//         if (!id) {
-//             return ctx.json({ error: "id not provided" }, 400)
-//         }
-
-//         const offset = (page - 1) * limit;
-//         const userReplies = await db
-//             .select()
-//             .from(replies)
-//             .where(eq(replies.userId, id))
-//             .limit(limit)
-//             .offset(offset);
-
-//         const totalReplies = await db
-//             .select({ count: count() })
-//             .from(replies)
-//             .where(eq(replies.userId, id));
-
-//         return ctx.json({
-//             userReplies,
-//             totalPosts: totalReplies[0]?.count ?? 0,
-//             currentPage: page,
-//             perPage: limit,
-//         }, 200);
-//     }
-// )
+  )
