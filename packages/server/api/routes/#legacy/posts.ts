@@ -101,7 +101,7 @@ export default new Hono()
       const postLikes = await db
         .select()
         .from(likes)
-        .where(eq(likes.id, id))
+        .where(eq(likes.postId, id))
         .limit(limit)
         .offset(offset);
 
