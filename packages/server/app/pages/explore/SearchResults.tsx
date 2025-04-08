@@ -42,7 +42,7 @@ const samplePosts = [
         handle: "mikej",
         timestamp: "6h",
         content: "Great day at the NFT conference! Learned so much about the future of web development.",
-        images: ["/icons/logo_light.png"],
+        images: ["/icons/logo_dark.png"],
         aspectRatio: "square" as const,
         likes: 89,
         comments: 24,
@@ -127,7 +127,7 @@ export default function SearchResults() {
     return (
         <Layout
             main={
-                <div className="border-x border-t mb-10 mx-auto rounded-t-2xl">
+                <div className="border mb-10 mx-auto rounded-2xl">
                     {/* Search Header */}
                     <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b p-4 rounded-t-2xl">
                         <div className="flex items-center gap-4 mb-5">
