@@ -1,13 +1,13 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import dummy from "./routes/dummy";
-import users from "./routes/users";
-import posts from "./routes/posts";
-import nft from "./routes/nft";
-import oauth from "./routes/oauth";
+import authIndex from "./routes/auth";
+import contentIndex from "./routes/content";
+import miscIndex from "./routes/misc";
+import userIndex from "./routes/user";
 
 let servedSessions = 0;
 const app = new Hono()
+  // middleware
   .use(
     cors({
       origin: (origin, ctx) => {
@@ -23,11 +23,14 @@ const app = new Hono()
       allowHeaders: ["Content-Type", "Authorization"],
     })
   )
-  .route("dummy", dummy)
-  .route("users", users)
-  .route("posts", posts)
-  .route("nft", nft)
-  .route("oauth", oauth)
+
+  // routes
+  .route("auth", authIndex)
+  .route("content", contentIndex)
+  .route("misc", miscIndex)
+  .route("user", userIndex)
+
+  // handlers
   .get("/stats", async (ctx) => {
     servedSessions++;
     return ctx.json({
