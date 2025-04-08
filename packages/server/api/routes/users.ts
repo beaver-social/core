@@ -7,63 +7,44 @@ import { DB } from "../lib/db/schema";
 import { posts } from "../lib/db/schema/post";
 import { z } from "zod";
 import { zNumberString, zSuiAddress } from "../lib/zod/helpers";
-import { contracts } from "../lib/sui/contracts";
+import * as actions from "../lib/db/actions"
+import { tryCatch } from "../lib/tryCatch";
 
 export default new Hono()
 
-    .post("/create", zValidator(
-        "json",
-        z.object({
-            identity: zSuiAddress,
-            username: z.string(),
-            fullName: z.string(),
-            address: zSuiAddress,
-            suins_domain_name: zSuiAddress.optional(),
-            image_url: z.string(),
-            banner_url: z.string().optional(),
-            about: z.string().optional(),
-            timezone: zNumberString.optional(),
-            pinned: zNumberString.optional()
-        }),
-    ), async (ctx) => {
-        const { identity, username, fullName, address, suins_domain_name, image_url, banner_url, about, timezone, pinned } = ctx.req.valid("json"
-        )
+    .post("/new",
+        zValidator(
+            "json",
+            z.object({
+                username: z.string(),
+                fullName: z.string(),
+                address: zSuiAddress,
+                imageUrl: z.string(),
+                about: z.string(),
+            }),
+        ),
+        zValidator("query", z.object({
+            signature: z.string(),
+        })),
+        async (ctx) => {
+            const { username, fullName, address, imageUrl, about } = ctx.req.valid("json")
+            const { signature } = ctx.req.valid("query")
 
-        const existingUser = await db.select().from(users).where(eq(users.username, username)).limit(1);
-        if (existingUser.length > 0) {
-            return ctx.json({ error: "Username already taken" }, 400);
-        }
-
-        const existingWallet = await db.select().from(users).where(eq(users.address, address)).limit(1);
-        if (existingWallet.length > 0) {
-            return ctx.json({ error: "Wallet already linked to some other account" }, 400)
-        }
-
-        if (suins_domain_name) {
-            const existingSuinsDomain = await db.select().from(users).where(eq(users.suins_domain_name, suins_domain_name)).limit(1);
-            if (existingSuinsDomain.length > 0) {
-                return ctx.json({ error: "SuiNDomain already linked to some other account" }, 400)
-            }
-        }
-
-        const [newUser] = await db
-            .insert(users)
-            .values({
-                identity,
+            const resp = await tryCatch(actions.createIdentity({
+                userId: -1,
                 username,
+                about,
                 fullName,
-                address,
-                suins_domain_name: suins_domain_name || null,
-                image_url,
-                banner_url: banner_url || null,
-                about: about || null,
-                timezone: timezone || null,
-                pinned: pinned || null,
-            })
-            .returning();
+                imageUrl,
+                receiver: address,
+            }, signature))
 
-        return ctx.json({ user: newUser }, 201);
-    }
+            if (resp.error) {
+                return ctx.err(resp.error?.message || "Failed to create identity", 400)
+            }
+
+            return ctx.ok({}, "Identity Created Successfully", 201);
+        }
     )
 
     .get("/",
@@ -138,7 +119,7 @@ export default new Hono()
 
             if (suins_domain_name) {
                 const data = await db.select().from(users).where(
-                    eq(users.suins_domain_name, suins_domain_name),
+                    eq(users.suinsDomainName, suins_domain_name),
                 ).limit(1);
                 user = data[0];
             }
