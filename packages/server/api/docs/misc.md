@@ -59,20 +59,6 @@ All endpoints are relative to: `/api/v1/`
 | `/settings`         | GET    | Get web3 notification settings        | -                            | -                                                     | `{ settings }`                  |
 | `/settings`         | PATCH  | Update web3 notification settings     | -                            | `{ [settingKey]: value }`                             | `{ settings }`                  |
 
-## 4. Trends
-
-### Base Path: `/misc/trends`
-
-| Endpoint      | Method | Description              | Query Params                              | Response                     |
-| ------------- | ------ | ------------------------ | ----------------------------------------- | ---------------------------- |
-| `/`           | GET    | Get all trending content | `?category=all&timeRange=24h`             | `{ trends }`                 |
-| `/topics`     | GET    | Get trending topics      | `?limit=10&timeRange=24h&category=string` | `{ topics: [] }`             |
-| `/posts`      | GET    | Get trending posts       | `?page=1&limit=20&category=string`        | `{ posts: [], pagination }`  |
-| `/hashtags`   | GET    | Get trending hashtags    | `?limit=20&timeRange=24h`                 | `{ hashtags: [] }`           |
-| `/shorts`     | GET    | Get trending shorts      | `?page=1&limit=20`                        | `{ shorts: [], pagination }` |
-| `/for-you`    | GET    | Get personalized trends  | `?limit=10`                               | `{ trends: [] }`             |
-| `/categories` | GET    | Get trend categories     | -                                         | `{ categories: [] }`         |
-
 ## 5. Analytics Exports
 
 ### Base Path: `/misc/analytics/export`
