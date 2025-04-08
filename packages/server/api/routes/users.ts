@@ -3,12 +3,11 @@ import db from "../lib/db";
 import { users } from "../lib/db/schema/user";
 import { zValidator } from "@hono/zod-validator";
 import { count, desc, eq, ilike, like, or, sql } from "drizzle-orm";
-import tryCatchSync from "../lib/tryCatch";
 import { DB } from "../lib/db/schema";
 import { posts } from "../lib/db/schema/post";
 import { z } from "zod";
 import { zNumberString, zSuiAddress } from "../lib/zod/helpers";
-import { likes } from "../lib/db/schema/like";
+import { contracts } from "../lib/sui/contracts";
 
 export default new Hono()
 
@@ -27,7 +26,8 @@ export default new Hono()
             pinned: zNumberString.optional()
         }),
     ), async (ctx) => {
-        const { identity, username, fullName, address, suins_domain_name, image_url, banner_url, about, timezone, pinned } = ctx.req.valid("json")
+        const { identity, username, fullName, address, suins_domain_name, image_url, banner_url, about, timezone, pinned } = ctx.req.valid("json"
+        )
 
         const existingUser = await db.select().from(users).where(eq(users.username, username)).limit(1);
         if (existingUser.length > 0) {
@@ -63,7 +63,6 @@ export default new Hono()
             .returning();
 
         return ctx.json({ user: newUser }, 201);
-
     }
     )
 
@@ -245,49 +244,3 @@ export default new Hono()
             }, 200);
         }
     )
-
-// .get("/:id/replies",
-//     zValidator(
-//         "param",
-//         z.object({
-//             id: zNumberString,
-//         }),
-//     ),
-//     zValidator(
-//         "query",
-//         z.object({
-//             page: zNumberString.default("1"),
-//             limit: zNumberString.default("10")
-//         }),
-//     ),
-//     async (ctx) => {
-//         const { id } = ctx.req.valid("param");
-
-//         // check if page & limit is number when default
-//         const { page, limit } = ctx.req.valid("query");
-
-//         if (!id) {
-//             return ctx.json({ error: "id not provided" }, 400)
-//         }
-
-//         const offset = (page - 1) * limit;
-//         const userReplies = await db
-//             .select()
-//             .from(replies)
-//             .where(eq(replies.userId, id))
-//             .limit(limit)
-//             .offset(offset);
-
-//         const totalReplies = await db
-//             .select({ count: count() })
-//             .from(replies)
-//             .where(eq(replies.userId, id));
-
-//         return ctx.json({
-//             userReplies,
-//             totalPosts: totalReplies[0]?.count ?? 0,
-//             currentPage: page,
-//             perPage: limit,
-//         }, 200);
-//     }
-// )

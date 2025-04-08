@@ -3,6 +3,10 @@ import { likes } from "../schema/like";
 import { post_action, post_media, posts } from "../schema/post";
 import { createAction } from "./factory";
 import { users } from "../schema/user";
+import { contracts } from "../../sui/contracts";
+import { Transaction } from "@mysten/sui/transactions"
+import { defaultAdminCapId } from "../../sui/constants";
+import suiClient, { serverKeypair } from "../../sui/client";
 
 export const makePost = createAction<{
   content: string;
@@ -163,7 +167,8 @@ export const unlikePost = createAction<{ postId: number }>()(
 
 export const pinPost = createAction<{ postId: number }>()(
   async (tx, { postId, userId }) => {
-    const [post] = await tx.select({ deletedAt: posts.deletedAt }).from(posts).where(eq(posts.id, postId)).limit(1)
+    const [post] = await tx.select({ deletedAt: posts.deletedAt }).
+      from(posts).where(and(eq(posts.id, postId), eq(posts.authorId, userId))).limit(1)
 
     if (!post) {
       throw new Error("Post not found")
@@ -189,8 +194,7 @@ export const pinPost = createAction<{ postId: number }>()(
   }
 )
 
-
-export const unpinPost = createAction<{ postId: number }>()(
+export const unpinPost = createAction<{}>()(
   async (tx, { userId }) => {
     const [user] = await tx
       .select({ pinned: users.pinned })
@@ -210,3 +214,32 @@ export const unpinPost = createAction<{ postId: number }>()(
       .where(eq(users.id, userId));
   }
 );
+
+export const createIdentity = createAction<{ username: string, about: string, receiver: string }>()(
+  async (tx, { userId, username, about, receiver }) => {
+    const suiTx = new Transaction()
+    contracts.admin.mint_for(suiTx, {
+      username: username,
+      about: about,
+      receiver: receiver,
+      adminCap: { id: defaultAdminCapId }
+    })
+
+    const { objectChanges } = await suiClient.signAndExecuteTransaction({
+      signer: serverKeypair,
+      transaction: suiTx
+    })
+
+    if (!objectChanges) {
+      return tx.rollback();
+    }
+
+    let identityAddress = "";
+    for (const change of objectChanges) {
+      if (change.type === "created" && change.objectType === "0x2::identity::Identity") {
+        identityAddress = change.objectId;
+        break;
+      }
+    }
+  }
+)
