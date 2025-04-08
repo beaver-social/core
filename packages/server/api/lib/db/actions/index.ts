@@ -7,6 +7,7 @@ import { contracts } from "../../sui/contracts";
 import { Transaction } from "@mysten/sui/transactions"
 import { defaultAdminCapId } from "../../sui/constants";
 import suiClient, { serverKeypair } from "../../sui/client";
+import { tryCatch } from "../../tryCatch";
 
 export const makePost = createAction<{
   content: string;
@@ -215,8 +216,8 @@ export const unpinPost = createAction<{}>()(
   }
 );
 
-export const createIdentity = createAction<{ username: string, about: string, receiver: string }>()(
-  async (tx, { userId, username, about, receiver }) => {
+export const createIdentity = createAction<{ username: string, about: string, receiver: string; fullName: string; imageUrl: string }>()(
+  async (tx, { username, about, receiver, fullName, imageUrl }) => {
     const suiTx = new Transaction()
     contracts.admin.mint_for(suiTx, {
       username: username,
@@ -225,10 +226,16 @@ export const createIdentity = createAction<{ username: string, about: string, re
       adminCap: { id: defaultAdminCapId }
     })
 
-    const { objectChanges } = await suiClient.signAndExecuteTransaction({
+    const suiTxResp = await tryCatch(suiClient.signAndExecuteTransaction({
       signer: serverKeypair,
       transaction: suiTx
-    })
+    }))
+
+    if (suiTxResp.error) {
+      throw new Error("Failed to create identity on-chain", { cause: suiTxResp.error.message })
+    }
+
+    const { objectChanges } = suiTxResp.data;
 
     if (!objectChanges) {
       return tx.rollback();
@@ -240,6 +247,19 @@ export const createIdentity = createAction<{ username: string, about: string, re
         identityAddress = change.objectId;
         break;
       }
+    }
+
+    const addUser = await tryCatch(tx.insert(users).values({
+      address: receiver,
+      identity: identityAddress,
+      username: username,
+      fullName: fullName,
+      imageUrl: imageUrl,
+      about: about
+    }))
+
+    if (addUser.error) {
+      throw new Error("Failed to insert user into database", { cause: addUser.error.message })
     }
   }
 )
