@@ -1,25 +1,3 @@
-## 1. Post Creation & Management
-
-### Base Path: `/content/posts`.
-
-| Endpoint       | Method | Description           | Query Params                                     | Request Body                         | Response                    |
-| -------------- | ------ | --------------------- | ------------------------------------------------ | ------------------------------------ | --------------------------- |
-| `/`            | POST   | Create a new post     | -                                                | `{ content, media?: [{url, type}] }` | `{ post }`                  |
-| `/`            | GET    | Get feed posts        | `?page=1&limit=20&type=all\|following\|trending` | -                                    | `{ posts: [], pagination }` |
-| `/trending`    | GET    | Get trending posts    | `?page=1&limit=20`                               | -                                    | `{ posts: [], pagination }` |
-| `/recommended` | GET    | Get recommended posts | `?page=1&limit=20`                               | -                                    | `{ posts: [], pagination }` |
-| `/following`   | GET    | Get following posts   | `?page=1&limit=20`                               | -                                    | `{ posts: [], pagination }` |
-
-## 3. Replies & Threads
-
-### Base Path: `/content/posts/:id/replies`
-
-| Endpoint  | Method | Description                        | Query Params       | Request Body                         | Response                      |
-| --------- | ------ | ---------------------------------- | ------------------ | ------------------------------------ | ----------------------------- |
-| `/`       | GET    | Get replies to a post              | `?page=1&limit=20` | -                                    | `{ replies: [], pagination }` |
-| `/`       | POST   | Reply to a post                    | -                  | `{ content, media?: [{url, type}] }` | `{ reply }`                   |
-| `/thread` | GET    | Get full thread (parent + replies) | -                  | -                                    | `{ thread: [], rootPost }`    |
-
 ## 4. Media Management
 
 ### Base Path: `/content/media`

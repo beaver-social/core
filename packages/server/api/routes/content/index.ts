@@ -1,8 +1,10 @@
 import { Hono } from "hono";
-import posts from "./posts/posts";
-import post from "./posts/post";
-import shorts from "./posts/shorts";
-import trends from "./trends";
+import posts from "./posts";
+import post from "./post";
+import shorts from "./shorts";
+import short from "./short";
+import spaces from "./spaces";
+import space from "./space";
 
 export default new Hono()
   // feed posts
@@ -11,6 +13,8 @@ export default new Hono()
 
   // shorts (separated to improve performance by using a different database table for shorts)
   .route("/shorts", shorts)
-  .route("/shorts/:id", post)
+  .route("/shorts/:id", short)
 
-  .route("/trends", trends);
+  // spaces (public or private communities / topics that curate content which users can follow)
+  .route("/spaces", spaces)
+  .route("/spaces/:id", space);

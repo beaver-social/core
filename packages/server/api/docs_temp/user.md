@@ -12,13 +12,28 @@ All endpoints are relative to: `/api/v1/`
 
 ### Base Path: `/user/profile`
 
-| Endpoint       | Method | Description                   | Query Params         | Request Body                                           | Response              |
-| -------------- | ------ | ----------------------------- | -------------------- | ------------------------------------------------------ | --------------------- |
-| `/`            | GET    | Get current user's profile    | -                    | -                                                      | `{ user }`            |
-| `/:username`   | GET    | Get user profile by username  | -                    | -                                                      | `{ user }`            |
-| `/:username`   | PATCH  | Update user profile           | -                    | `{ fullName?, image_url?, banner_url?, about?, etc. }` | `{ user }`            |
-| `/search`      | GET    | Search for users              | `?q=string&limit=10` | -                                                      | `{ users: [] }`       |
-| `/suggestions` | GET    | Get suggested users to follow | `?limit=number`      | -                                                      | `{ suggestions: [] }` |
+| Endpoint       | Method | Description                   | Query Params            | Request Body                                           | Response              |
+| -------------- | ------ | ----------------------------- | ----------------------- | ------------------------------------------------------ | --------------------- |
+| `/`            | GET    | Get current user's profile    | -                       | -                                                      | `{ user }`            |
+| `/:username`   | GET    | Get user profile by username  | -                       | -                                                      | `{ user }`            |
+| `/`            | PATCH  | Update user profile           | -                       | `{ fullName?, image_url?, banner_url?, about?, etc. }` | `{ user }`            |
+| `/search`      | GET    | Search for users              | `?q=string&limit=10`    | -                                                      | `{ users: [] }`       |
+| `/suggestions` | GET    | Get suggested users to follow | `?limit=number`         | -                                                      | `{ suggestions: [] }` |
+| `/request`     | POST   | Request account verification  | `{ reason, evidence? }` | `{ success, requestId }`                               |
+| `/status`      | GET    | Check verification status     | -                       | `{ status, message?, verifiedAt? }`                    |
+
+### Base Path: `/user/profile/collections`
+
+| Endpoint             | Method | Description                 | Query Params       | Request Body                        | Response                    |
+| -------------------- | ------ | --------------------------- | ------------------ | ----------------------------------- | --------------------------- |
+| `/`                  | GET    | Get user's collections      | -                  | -                                   | `{ collections: [] }`       |
+| `/`                  | POST   | Create a new collection     | -                  | `{ name, description?, private? }`  | `{ collection }`            |
+| `/:id`               | GET    | Get a specific collection   | -                  | -                                   | `{ collection, posts: [] }` |
+| `/:id`               | PATCH  | Update a collection         | -                  | `{ name?, description?, private? }` | `{ collection }`            |
+| `/:id`               | DELETE | Delete a collection         | -                  | -                                   | `{ success }`               |
+| `/:id/posts`         | GET    | Get posts in collection     | `?page=1&limit=20` | -                                   | `{ posts: [], pagination }` |
+| `/:id/posts`         | POST   | Add post to collection      | -                  | `{ postId }`                        | `{ success }`               |
+| `/:id/posts/:postId` | DELETE | Remove post from collection | -                  | -                                   | `{ success }`               |
 
 ## 2. User Relationships
 
@@ -99,23 +114,23 @@ All endpoints are relative to: `/api/v1/`
 | `/blocked`                                | GET    | Get list of blocked users       | `?page=1&limit=20`                    | -                                                   | `{ users: [], pagination }`          |
 | `/search`                                 | GET    | Search messages                 | `?q=string`                           | -                                                   | `{ results: [] }`                    |
 
-## 6. Group Messaging
+## 6. Spaces
 
-### Base Path: `/user/groups`
+### Base Path: `/user/spaces`
 
 | Endpoint               | Method | Description                | Query Params       | Request Body                                    | Response                      |
 | ---------------------- | ------ | -------------------------- | ------------------ | ----------------------------------------------- | ----------------------------- |
-| `/`                    | GET    | Get user's groups          | `?page=1&limit=20` | -                                               | `{ groups: [], pagination }`  |
-| `/`                    | POST   | Create a new group         | -                  | `{ name, description?, image?, members: [] }`   | `{ group, gunChannelKey }`    |
-| `/:id`                 | GET    | Get group details          | -                  | -                                               | `{ group, members: [] }`      |
-| `/:id`                 | PATCH  | Update group               | -                  | `{ name?, description?, image? }`               | `{ group }`                   |
-| `/:id`                 | DELETE | Delete/leave group         | -                  | -                                               | `{ success }`                 |
-| `/:id/members`         | GET    | Get group members          | `?page=1&limit=50` | -                                               | `{ members: [], pagination }` |
-| `/:id/members`         | POST   | Add member to group        | -                  | `{ userId, role?: "member"\|"admin"\|"owner" }` | `{ success, member }`         |
+| `/`                    | GET    | Get user's spaces          | `?page=1&limit=20` | -                                               | `{ spaces: [], pagination }`  |
+| `/`                    | POST   | Create a new space         | -                  | `{ name, description?, image?, members: [] }`   | `{ space, gunChannelKey }`    |
+| `/:id`                 | GET    | Get space details          | -                  | -                                               | `{ space, members: [] }`      |
+| `/:id`                 | PATCH  | Update space               | -                  | `{ name?, description?, image? }`               | `{ space }`                   |
+| `/:id`                 | DELETE | Delete/leave space         | -                  | -                                               | `{ success }`                 |
+| `/:id/members`         | GET    | Get space members          | `?page=1&limit=50` | -                                               | `{ members: [], pagination }` |
+| `/:id/members`         | POST   | Add member to space        | -                  | `{ userId, role?: "member"\|"admin"\|"owner" }` | `{ success, member }`         |
 | `/:id/members/:userId` | DELETE | Remove member from group   | -                  | -                                               | `{ success }`                 |
 | `/:id/members/:userId` | PATCH  | Update member role         | -                  | `{ role: "member"\|"admin"\|"owner" }`          | `{ success, member }`         |
-| `/:id/join`            | POST   | Join a group by invitation | -                  | `{ inviteCode }`                                | `{ success, group }`          |
-| `/:id/invites`         | POST   | Create group invitation    | -                  | `{ expiry?: timestamp }`                        | `{ inviteCode }`              |
+| `/:id/join`            | POST   | Join a space by invitation | -                  | `{ inviteCode }`                                | `{ success, space }`          |
+| `/:id/invites`         | POST   | Create space invitation    | -                  | `{ expiry?: timestamp }`                        | `{ inviteCode }`              |
 | `/:id/invites/:code`   | DELETE | Revoke group invitation    | -                  | -                                               | `{ success }`                 |
 
 ## 7. Notifications
@@ -135,25 +150,9 @@ All endpoints are relative to: `/api/v1/`
 | `/mute/:type`   | POST   | Mute specific notification type     | -                                                        | `{ duration?: seconds }`  | `{ success, muteExpiry? }`    |
 | `/unmute/:type` | POST   | Unmute notification type            | -                                                        | -                         | `{ success }`                 |
 
-## 8. Push Notification Management
-
-### Base Path: `/user/devices`
-
-| Endpoint                 | Method | Description                        | Request Body                           | Response                      |
-| ------------------------ | ------ | ---------------------------------- | -------------------------------------- | ----------------------------- |
-| `/`                      | GET    | Get registered devices             | -                                      | `{ devices: [] }`             |
-| `/:id`                   | DELETE | Remove device                      | -                                      | `{ success }`                 |
-| `/current`               | GET    | Get current device info            | -                                      | `{ device }`                  |
-| `/push-subscription`     | POST   | Register push subscription         | `{ endpoint, keys: { p256dh, auth } }` | `{ success, subscriptionId }` |
-| `/push-subscription/:id` | DELETE | Remove push subscription           | -                                      | `{ success }`                 |
-| `/email`                 | GET    | Get email notification settings    | -                                      | `{ settings }`                |
-| `/email`                 | PATCH  | Update email notification settings | `{ digest, marketing, frequency? }`    | `{ settings }`                |
-| `/verify-email`          | POST   | Verify email for notifications     | `{ verificationCode }`                 | `{ success }`                 |
-| `/send-verification`     | POST   | Send email verification code       | `{ email }`                            | `{ success, expiresAt }`      |
-
 ## 9. Mentions & Tags
 
-### Base Path: `/user/mentions`
+### Base Path: `/user/alerts/mentions`
 
 | Endpoint       | Method | Description                  | Query Params                                | Response                       |
 | -------------- | ------ | ---------------------------- | ------------------------------------------- | ------------------------------ |
@@ -176,6 +175,17 @@ All endpoints are relative to: `/api/v1/`
 | `/dashboard`       | GET    | Get creator analytics dashboard | `?timeRange=7d\|30d\|90d` | -            | `{ overview, trends }`        |
 | `/engagement`      | GET    | Get engagement metrics          | `?timeRange=7d\|30d\|90d` | -            | `{ engagement }`              |
 | `/traffic-sources` | GET    | Get referral sources            | `?timeRange=7d\|30d\|90d` | -            | `{ sources: [] }`             |
+
+`/user/analytics/export`
+
+| Endpoint        | Method | Description                  | Query Params | Request Body          | Response                  |
+| --------------- | ------ | ---------------------------- | ------------ | --------------------- | ------------------------- |
+| `/`             | POST   | Create analytics export      | -            | `{ type, timeRange }` | `{ exportId, expires }`   |
+| `/:id`          | GET    | Get export status            | -            | -                     | `{ status, downloadUrl }` |
+| `/formats`      | GET    | Get available export formats | -            | -                     | `{ formats: [] }`         |
+| `/schedule`     | POST   | Schedule recurring report    | -            | `{ frequency, type }` | `{ scheduleId }`          |
+| `/schedule`     | GET    | Get report schedules         | -            | -                     | `{ schedules: [] }`       |
+| `/schedule/:id` | DELETE | Delete report schedule       | -            | -                     | `{ success }`             |
 
 ### Base Path: `/user/analytics/content`
 
@@ -202,20 +212,9 @@ All endpoints are relative to: `/api/v1/`
 | `/followers/gains` | GET    | Get new follower analytics  | `?timeRange=7d\|30d\|90d` | `{ gained, sources }` |
 | `/followers/lost`  | GET    | Get lost follower analytics | `?timeRange=7d\|30d\|90d` | `{ lost, reasons? }`  |
 
-### Base Path: `/user/analytics/export`
-
-| Endpoint        | Method | Description                  | Query Params | Request Body          | Response                  |
-| --------------- | ------ | ---------------------------- | ------------ | --------------------- | ------------------------- |
-| `/`             | POST   | Create analytics export      | -            | `{ type, timeRange }` | `{ exportId, expires }`   |
-| `/:id`          | GET    | Get export status            | -            | -                     | `{ status, downloadUrl }` |
-| `/formats`      | GET    | Get available export formats | -            | -                     | `{ formats: [] }`         |
-| `/schedule`     | POST   | Schedule recurring report    | -            | `{ frequency, type }` | `{ scheduleId }`          |
-| `/schedule`     | GET    | Get report schedules         | -            | -                     | `{ schedules: [] }`       |
-| `/schedule/:id` | DELETE | Delete report schedule       | -            | -                     | `{ success }`             |
-
 ## 11. Moderation & Reporting
 
-### Base Path: `/user/moderation`
+### Base Path: `/user/moderation` (CONTENT RELATED THINGS)
 
 | Endpoint       | Method | Description                  | Query Params       | Request Body                          | Response                         |
 | -------------- | ------ | ---------------------------- | ------------------ | ------------------------------------- | -------------------------------- |
@@ -226,18 +225,9 @@ All endpoints are relative to: `/api/v1/`
 | `/reported`    | GET    | Get content reported by user | `?page=1&limit=20` | -                                     | `{ reports: [], pagination }`    |
 | `/sensitive`   | POST   | Mark content as sensitive    | -                  | `{ contentId, contentType }`          | `{ success }`                    |
 
-## 4. Identity Verification
-
-### Base Path: `/auth/verification`
-
-| Endpoint   | Method | Description                  | Request Body            | Response                            |
-| ---------- | ------ | ---------------------------- | ----------------------- | ----------------------------------- |
-| `/request` | POST   | Request account verification | `{ reason, evidence? }` | `{ success, requestId }`            |
-| `/status`  | GET    | Check verification status    | -                       | `{ status, message?, verifiedAt? }` |
-
 ## 9. NFT & Monetization
 
-### Base Path: `/content/nft-posts`
+### Base Path: `/user/nft` (FUTURE SCOPE)
 
 | Endpoint            | Method | Description                 | Query Params                       | Request Body                    | Response                       |
 | ------------------- | ------ | --------------------------- | ---------------------------------- | ------------------------------- | ------------------------------ |
@@ -267,16 +257,3 @@ All endpoints are relative to: `/api/v1/`
 | `/gating/verify`             | POST   | Verify access to content  | -                      | `{ contentId, contentType, proof? }` | `{ hasAccess, requiredGates }`    |
 
 ## 6. Collections & Bookmarks
-
-### Base Path: `/content/collections`
-
-| Endpoint             | Method | Description                 | Query Params       | Request Body                        | Response                    |
-| -------------------- | ------ | --------------------------- | ------------------ | ----------------------------------- | --------------------------- |
-| `/`                  | GET    | Get user's collections      | -                  | -                                   | `{ collections: [] }`       |
-| `/`                  | POST   | Create a new collection     | -                  | `{ name, description?, private? }`  | `{ collection }`            |
-| `/:id`               | GET    | Get a specific collection   | -                  | -                                   | `{ collection, posts: [] }` |
-| `/:id`               | PATCH  | Update a collection         | -                  | `{ name?, description?, private? }` | `{ collection }`            |
-| `/:id`               | DELETE | Delete a collection         | -                  | -                                   | `{ success }`               |
-| `/:id/posts`         | GET    | Get posts in collection     | `?page=1&limit=20` | -                                   | `{ posts: [], pagination }` |
-| `/:id/posts`         | POST   | Add post to collection      | -                  | `{ postId }`                        | `{ success }`               |
-| `/:id/posts/:postId` | DELETE | Remove post from collection | -                  | -                                   | `{ success }`               |

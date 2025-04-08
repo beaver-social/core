@@ -1,10 +1,9 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import nft from "./routes/#legacy/nft";
-
-import content from "./routes/content/index";
-import user from "./routes/user/index";
-import auth from "./routes/auth/index";
+import authIndex from "./routes/auth";
+import contentIndex from "./routes/content";
+import miscIndex from "./routes/misc";
+import userIndex from "./routes/user";
 
 let servedSessions = 0;
 const app = new Hono()
@@ -26,10 +25,10 @@ const app = new Hono()
   )
 
   // routes
-  .route("auth", auth)
-  .route("user", user)
-  .route("content", content)
-  .route("nft", nft)
+  .route("auth", authIndex)
+  .route("content", contentIndex)
+  .route("misc", miscIndex)
+  .route("user", userIndex)
 
   // handlers
   .get("/stats", async (ctx) => {

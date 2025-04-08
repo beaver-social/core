@@ -5,20 +5,8 @@ export default new Hono()
   // get posts feed
   .get("/", (ctx) => {
     return ctx.json({
-      message: "get posts feed (for you)",
-    });
-  })
-  // get trending posts
-  .get("/popular", (ctx) => {
-    return ctx.json({
-      message: "get popular / trending posts",
-    });
-  })
-  // get posts from accounts you follow
-  .get("/following", (ctx) => {
-    return ctx.json({
       message:
-        "get popular posts from accounts you follow (choose chronological or algorithmic)",
+        "get posts feed (for you) - curated topics for you based on your following and interests. use query params to filter by type like trending, following etc",
     });
   })
 

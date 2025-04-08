@@ -5,20 +5,8 @@ export default new Hono()
   // get shorts feed
   .get("/", (ctx) => {
     return ctx.json({
-      message: "get shorts feed (for you)",
-    });
-  })
-  // get trending shorts
-  .get("/popular", (ctx) => {
-    return ctx.json({
-      message: "get popular / trending shorts",
-    });
-  })
-  // get shorts from accounts you follow
-  .get("/following", (ctx) => {
-    return ctx.json({
       message:
-        "get popular shorts from accounts you follow (choose chronological or algorithmic)",
+        "get shorts feed (for you) - curated topics for you based on your following and interests. use query params to filter by type like trending, following etc",
     });
   })
 
