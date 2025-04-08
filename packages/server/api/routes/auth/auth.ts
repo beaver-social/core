@@ -3,6 +3,8 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { zSuiAddress } from "../../lib/zod/helpers";
 import { checkUsernameAvailability, isAddressRegistered } from "./helpers";
+import { tryCatch } from "../../lib/tryCatch";
+import * as actions from "../../lib/db/actions"
 
 export default new Hono()
   // landing route
@@ -13,41 +15,38 @@ export default new Hono()
   })
 
   // register identity
-  .post(
-    "/register",
+  .post("/register",
     zValidator(
       "json",
-      z.object({ address: zSuiAddress, username: z.string() })
+      z.object({
+        username: z.string(),
+        fullName: z.string(),
+        address: zSuiAddress,
+        imageUrl: z.string(),
+        about: z.string(),
+      }),
     ),
-    (ctx) => {
-      const { address, username } = ctx.req.valid("json");
+    zValidator("query", z.object({
+      signature: z.string(),
+    })),
+    async (ctx) => {
+      const { username, fullName, address, imageUrl, about } = ctx.req.valid("json")
+      const { signature } = ctx.req.valid("query")
 
-      const isRegistered = isAddressRegistered(address);
-      if (isRegistered) {
-        return ctx.json(
-          {
-            message: "identity already registered",
-          },
-          400
-        );
+      const resp = await tryCatch(actions.createIdentity({
+        userId: -1,
+        username,
+        about,
+        fullName,
+        imageUrl,
+        receiver: address,
+      }, signature))
+
+      if (resp.error) {
+        return ctx.err(resp.error?.message || "Failed to create identity", 400)
       }
 
-      const isUsernameAvailable = checkUsernameAvailability(username);
-      if (!isUsernameAvailable) {
-        return ctx.json(
-          {
-            message: "username not available",
-          },
-          400
-        );
-      }
-
-      return ctx.json(
-        {
-          message: "identity registered",
-        },
-        201
-      );
+      return ctx.ok({}, "Identity Created Successfully", 201);
     }
   )
 
@@ -63,6 +62,7 @@ export default new Hono()
       });
     }
   )
+
   .post(
     "/challenge/verify",
     zValidator(
