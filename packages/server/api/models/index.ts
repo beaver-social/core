@@ -49,8 +49,12 @@ export type DB = {
     : never;
 };
 
-const sqlite = new Database(env.DB_FILE_NAME || "data.db");
+const sqlite = new Database(env.DB_FILE_NAME || "beaver.db");
 sqlite.exec("PRAGMA foreign_keys = ON");
-const db = drizzle({ client: sqlite, schema: schema, casing: "snake_case" });
+const beaverDB = drizzle({
+  client: sqlite,
+  schema: schema,
+  casing: "snake_case",
+});
 
-export default db;
+export default beaverDB;
