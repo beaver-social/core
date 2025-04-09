@@ -34,7 +34,7 @@ type UtilityFunctions =
   | "contentInteractions"
   | "socialInteractions"
   | "moderationInteractions"
-  | "blockchainInteractions";
+  | "actionInteractions";
 
 type DBSchema = typeof schema;
 export type DB = {
@@ -51,10 +51,10 @@ export type DB = {
 
 const sqlite = new Database(env.DB_FILE_NAME || "beaver.db");
 sqlite.exec("PRAGMA foreign_keys = ON");
-const beaverDB = drizzle({
+const db = drizzle({
   client: sqlite,
   schema: schema,
   casing: "snake_case",
 });
 
-export default beaverDB;
+export default db;

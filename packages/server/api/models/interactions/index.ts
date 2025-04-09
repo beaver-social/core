@@ -1,7 +1,7 @@
 import * as contentInteractions from "./content";
 import * as socialInteractions from "./social";
 import * as moderationInteractions from "./moderation";
-import * as blockchainInteractions from "./actions";
+import * as actionInteractions from "./actions";
 import { contentTypes } from "./types";
 
 export {
@@ -9,7 +9,7 @@ export {
   contentInteractions,
   socialInteractions,
   moderationInteractions,
-  blockchainInteractions,
+  actionInteractions,
 };
 
 // Convenience exports for common tables
@@ -19,4 +19,4 @@ export const { likes, bookmarks, views, reactions, comments } =
 export const { follows, spaceFollows } = socialInteractions;
 export const { reports } = moderationInteractions;
 export const { actions, actionFunctions, actionRequests, contentActions } =
-  blockchainInteractions;
+  actionInteractions;
