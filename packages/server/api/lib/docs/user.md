@@ -114,17 +114,17 @@ All endpoints are relative to: `/api/v1/`
 | `/blocked`                                | GET    | Get list of blocked users       | `?page=1&limit=20`                    | -                                                   | `{ users: [], pagination }`          |
 | `/search`                                 | GET    | Search messages                 | `?q=string`                           | -                                                   | `{ results: [] }`                    |
 
-## 6. Spaces
+## 6. Topics
 
-### Base Path: `/user/spaces`
+### Base Path: `/user/topics`
 
 | Endpoint               | Method | Description                | Query Params       | Request Body                                    | Response                      |
 | ---------------------- | ------ | -------------------------- | ------------------ | ----------------------------------------------- | ----------------------------- |
-| `/`                    | GET    | Get user's spaces          | `?page=1&limit=20` | -                                               | `{ spaces: [], pagination }`  |
-| `/`                    | POST   | Create a new space         | -                  | `{ name, description?, image?, members: [] }`   | `{ space, gunChannelKey }`    |
-| `/:id`                 | GET    | Get space details          | -                  | -                                               | `{ space, members: [] }`      |
-| `/:id`                 | PATCH  | Update space               | -                  | `{ name?, description?, image? }`               | `{ space }`                   |
-| `/:id`                 | DELETE | Delete/leave space         | -                  | -                                               | `{ success }`                 |
+| `/`                    | GET    | Get user's topics          | `?page=1&limit=20` | -                                               | `{ topics: [], pagination }`  |
+| `/`                    | POST   | Create a new topic         | -                  | `{ name, description?, image?, members: [] }`   | `{ topic, gunChannelKey }`    |
+| `/:id`                 | GET    | Get topic details          | -                  | -                                               | `{ topic, members: [] }`      |
+| `/:id`                 | PATCH  | Update topic               | -                  | `{ name?, description?, image? }`               | `{ topic }`                   |
+| `/:id`                 | DELETE | Delete/leave topic         | -                  | -                                               | `{ success }`                 |
 | `/:id/members`         | GET    | Get space members          | `?page=1&limit=50` | -                                               | `{ members: [], pagination }` |
 | `/:id/members`         | POST   | Add member to space        | -                  | `{ userId, role?: "member"\|"admin"\|"owner" }` | `{ success, member }`         |
 | `/:id/members/:userId` | DELETE | Remove member from group   | -                  | -                                               | `{ success }`                 |

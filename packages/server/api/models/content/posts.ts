@@ -2,7 +2,7 @@ import { sqliteTable as table } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
 import { timestamps } from "../helpers";
 import { users } from "../user/users";
-import { spaces } from "./spaces";
+import { topics } from "./topics";
 
 export const posts = table(
   "posts",
@@ -13,9 +13,9 @@ export const posts = table(
       .int("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    spaceId: t
+    topicId: t
       .int("space_id")
-      .references(() => spaces.id, { onDelete: "cascade" }), // Optional reference to a space
+      .references(() => topics.id, { onDelete: "cascade" }), // Optional reference to a topic
     replyToId: t
       .int("reply_to_id")
       .references((): t.AnySQLiteColumn => posts.id), // Optional reference to another post (for replies/comments)
@@ -28,7 +28,7 @@ export const posts = table(
   },
   (table) => [
     t.index("author_idx").on(table.authorId),
-    t.index("space_idx").on(table.spaceId),
+    t.index("topic_idx").on(table.topicId),
     t.index("reply_idx").on(table.replyToId),
   ]
 );

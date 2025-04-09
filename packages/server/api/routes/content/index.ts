@@ -3,8 +3,8 @@ import posts from "./posts";
 import post from "./post";
 import shorts from "./shorts";
 import short from "./short";
-import spaces from "./spaces";
-import space from "./space";
+import topics from "./topics";
+import topic from "./topic";
 
 export default new Hono()
   // feed posts
@@ -15,6 +15,6 @@ export default new Hono()
   .route("/shorts", shorts)
   .route("/shorts/:id", short)
 
-  // spaces (public or private communities / topics that curate content which users can follow)
-  .route("/spaces", spaces)
-  .route("/spaces/:id", space);
+  // topics (public or private communities / topics that curate content which users can follow)
+  .route("/topics", topics)
+  .route("/topics/:id", topic);
