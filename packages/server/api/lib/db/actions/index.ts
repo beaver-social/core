@@ -2,7 +2,6 @@ import { and, eq, sql } from "drizzle-orm";
 import { likes } from "../schema/like";
 import { post_action, post_media, posts } from "../schema/post";
 import { createAction } from "./factory";
-import { toHEX } from "@mysten/sui/utils";
 
 export const makePost = createAction<{
   content: string;
