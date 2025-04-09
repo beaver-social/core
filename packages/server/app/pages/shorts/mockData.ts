@@ -24,7 +24,7 @@ export const sampleShorts: ShortVideoData[] = [
     comments: 124,
     shares: 56,
     saves: 10,
-    avatarUrl: "/images/user.png",
+    avatarUrl: "/images/user.webp",
   },
   {
     id: "2",
@@ -38,7 +38,7 @@ export const sampleShorts: ShortVideoData[] = [
     comments: 245,
     shares: 89,
     saves: 10,
-    avatarUrl: "/images/user.png",
+    avatarUrl: "/images/user.webp",
   },
   {
     id: "3",
@@ -52,7 +52,7 @@ export const sampleShorts: ShortVideoData[] = [
     comments: 312,
     shares: 154,
     saves: 10,
-    avatarUrl: "/images/user.png",
+    avatarUrl: "/images/user.webp",
   },
   {
     id: "4",
@@ -66,7 +66,7 @@ export const sampleShorts: ShortVideoData[] = [
     comments: 178,
     shares: 92,
     saves: 10,
-    avatarUrl: "/images/user.png",
+    avatarUrl: "/images/user.webp",
   },
   {
     id: "5",
@@ -79,7 +79,7 @@ export const sampleShorts: ShortVideoData[] = [
     comments: 321,
     shares: 210,
     saves: 10,
-    avatarUrl: "/images/user.png",
+    avatarUrl: "/images/user.webp",
   },
   {
     id: "6",
@@ -93,6 +93,6 @@ export const sampleShorts: ShortVideoData[] = [
     comments: 156,
     shares: 64,
     saves: 10,
-    avatarUrl: "/images/user.png",
+    avatarUrl: "/images/user.webp",
   },
 ];

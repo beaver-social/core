@@ -2,6 +2,12 @@ import { and, eq, sql } from "drizzle-orm";
 import { likes } from "../schema/like";
 import { post_action, post_media, posts } from "../schema/post";
 import { createAction } from "./factory";
+import { users } from "../schema/user";
+import { contracts } from "../../sui/contracts";
+import { Transaction } from "@mysten/sui/transactions";
+import { defaultAdminCapId } from "../../sui/constants";
+import suiClient, { serverKeypair } from "../../sui/client";
+import { tryCatch } from "../../tryCatch";
 
 export const makePost = createAction<{
   content: string;
@@ -158,3 +164,120 @@ export const unlikePost = createAction<{ postId: number }>()(
       .where(eq(posts.id, postId));
   }
 );
+
+export const pinPost = createAction<{ postId: number }>()(
+  async (tx, { postId, userId }) => {
+    const [post] = await tx
+      .select({ deletedAt: posts.deletedAt })
+      .from(posts)
+      .where(and(eq(posts.id, postId), eq(posts.authorId, userId)))
+      .limit(1);
+
+    if (!post) {
+      throw new Error("Post not found");
+    }
+
+    if (post.deletedAt) {
+      throw new Error("Cannot pin a deleted post");
+    }
+
+    const [user] = await tx
+      .select({ pinned: users.pinned })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (user?.pinned === postId) {
+      throw new Error("Post is already pinned");
+    }
+
+    await tx
+      .update(users)
+      .set({
+        pinned: postId,
+      })
+      .where(eq(users.id, userId));
+  }
+);
+
+export const unpinPost = createAction<{}>()(async (tx, { userId }) => {
+  const [user] = await tx
+    .select({ pinned: users.pinned })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  if (!user?.pinned) {
+    throw new Error("No post is currently pinned");
+  }
+
+  await tx
+    .update(users)
+    .set({
+      pinned: null,
+    })
+    .where(eq(users.id, userId));
+});
+
+export const createIdentity = createAction<{
+  username: string;
+  about: string;
+  receiver: string;
+  fullName: string;
+  imageUrl: string;
+}>()(async (tx, { username, about, receiver, fullName, imageUrl }) => {
+  const suiTx = new Transaction();
+  contracts.admin.mint_for(suiTx, {
+    username: username,
+    about: about,
+    receiver: receiver,
+    adminCap: { id: defaultAdminCapId },
+  });
+
+  const suiTxResp = await tryCatch(
+    suiClient.signAndExecuteTransaction({
+      signer: serverKeypair,
+      transaction: suiTx,
+    })
+  );
+
+  if (suiTxResp.error) {
+    throw new Error("Failed to create identity on-chain", {
+      cause: suiTxResp.error.message,
+    });
+  }
+
+  const { objectChanges } = suiTxResp.data;
+
+  if (!objectChanges) {
+    return tx.rollback();
+  }
+
+  let identityAddress = "";
+  for (const change of objectChanges) {
+    if (
+      change.type === "created" &&
+      change.objectType === "0x2::identity::Identity"
+    ) {
+      identityAddress = change.objectId;
+      break;
+    }
+  }
+
+  const addUser = await tryCatch(
+    tx.insert(users).values({
+      address: receiver,
+      identity: identityAddress,
+      username: username,
+      fullName: fullName,
+      imageUrl: imageUrl,
+      about: about,
+    })
+  );
+
+  if (addUser.error) {
+    throw new Error("Failed to insert user into database", {
+      cause: addUser.error.message,
+    });
+  }
+});

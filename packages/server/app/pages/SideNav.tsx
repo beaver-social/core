@@ -19,7 +19,7 @@ export const sidebarItems: sidebarItems[] = [
     {
         name: "Explore",
         iconName: "Search",
-        to: "/explore",
+        to: "/explore/search",
     },
     {
         name: "Shorts",
@@ -44,8 +44,8 @@ export default function SideNav() {
             <div className="flex flex-col w-[4.5rem] items-center ">
                 <Link to="/">
                     <Image src={
-                        "/icons/logo_icon.png"
-                    } alt="logo" className="py-4 px-4 w-[5.5rem]" />
+                        "/images/page2.png"
+                    } alt="logo" className="p-5 object-contain w-[5.5rem]" />
                 </Link>
             </div>
 
@@ -74,7 +74,7 @@ export default function SideNav() {
                                 <Link to="/profile/ishtails">
                                     <li>
                                         <Image src={
-                                            "/images/user.png"
+                                            "/images/user.webp"
                                         } alt="user" className="w-[2rem] border rounded-full bg-background" />
                                     </li>
                                 </Link>
@@ -91,7 +91,7 @@ export default function SideNav() {
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Link to="/dashboard/settings">
+                            <Link to="/settings">
                                 <Icon name="Settings" className="text-hover" />
                             </Link>
                         </TooltipTrigger>

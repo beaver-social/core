@@ -10,7 +10,7 @@ type Props = {
 export function Image({ src, alt, className, ...props }: Props) {
     return (
         <img src={src} alt={alt} className={cn(className)} {...props} onError={(e) => {
-            e.currentTarget.src = "/images/placeholder.webp";
+            e.currentTarget.src = "/images/placeholder.jpg";
         }} />
     )
 }

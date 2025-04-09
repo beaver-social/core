@@ -14,7 +14,7 @@ function Tabs({ className, tabClassName }: TabsProps) {
   return (
     <div className={cn("w-full", className)}>
       {/* Tabs Header */}
-      <div className="sticky glass top-0 z-10 bg-background/50 border-b">
+      <div className="sticky glass top-0 z-10 bg-background/50 border-b border-t">
         <div className="flex">
           {tabs && tabs.length > 0 && tabs.map((tab) => (
             <button

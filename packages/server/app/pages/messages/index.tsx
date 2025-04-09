@@ -1,5 +1,5 @@
 import Layout from "@/pages/layout"
-import SecondaryPanel from "../SecondaryPanel"
+import SecondaryPanel from "../explore/SecondaryPanel"
 import MessagesFeed from "./Feed"
 import PageTitle from "@/shared/components/PageTitle"
 import { useGlobalUI } from "@/shared/hooks/useGlobalUI"

@@ -20,7 +20,7 @@ function BottomBar() {
                 ))}
 
                 <Link to={"/profile/1"} className="flex flex-col items-center justify-center text-xs text-grey-300 hover:text-primary bg-grey-900 rounded-full p-1 hover:bg-grey-800 transition-all">
-                    <Image src="/images/user.png" alt="logo" className="w-6 h-6" />
+                    <Image src="/images/user.webp" alt="logo" className="w-6 h-6" />
                 </Link>
             </nav>
         </div>

@@ -10,16 +10,21 @@ export const users = table(
     identity: suiAddressType().notNull(),
     username: t.text().notNull(),
     fullName: t.text().notNull(),
+    about: t.text().notNull(),
     address: suiAddressType().notNull(),
-    suins_domain_name: t.text(),
-    image_url: t.text().notNull(),
-    banner_url: t.text(),
-    about: t.text(),
+    suinsDomainName: t.text(),
+    imageUrl: t.text().notNull(),
+    bannerUrl: t.text(),
     timezone: t.int(),
     pinned: t.int("pinned_post").references((): t.AnySQLiteColumn => posts.id),
     ...timestamps,
   },
-  (table) => [t.uniqueIndex("identity_idx").on(table.identity)]
+  (table) => [
+    t.uniqueIndex("identity_idx").on(table.identity),
+    t.uniqueIndex("username_idx").on(table.username),
+    t.uniqueIndex("address_idx").on(table.address),
+    t.uniqueIndex("suins_idx").on(table.suinsDomainName)
+  ]
 );
 
 export const follows = table("follows", {

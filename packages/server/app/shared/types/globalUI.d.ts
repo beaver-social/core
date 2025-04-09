@@ -7,7 +7,6 @@ export interface Tab {
 export type Screen =
   | "home"
   | "profile"
-  | "search"
   | "alerts"
   | "messages"
   | "settings"

@@ -11,8 +11,6 @@ export const useGlobalUI = () => {
         return tabs.home;
       case "profile":
         return tabs.profile;
-      case "search":
-        return tabs.search;
       case "alerts":
         return tabs.alerts;
       case "messages":

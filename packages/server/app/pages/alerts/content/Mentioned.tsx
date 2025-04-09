@@ -6,7 +6,7 @@ const sampleMentionedNotifications = [
         username: "John Doe",
         timestamp: "2h",
         content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         type: "mention"
     },
     {
@@ -14,7 +14,7 @@ const sampleMentionedNotifications = [
         username: "John Doe",
         timestamp: "2h",
         content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         type: "mention"
     },
     {
@@ -22,7 +22,7 @@ const sampleMentionedNotifications = [
         username: "John Doe",
         timestamp: "2h",
         content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         type: "mention"
     },
     {
@@ -30,7 +30,7 @@ const sampleMentionedNotifications = [
         username: "John Doe",
         timestamp: "2h",
         content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
-        avatarUrl: "/images/user.png",
+        avatarUrl: "/images/user.webp",
         type: "mention"
     },
 ];
