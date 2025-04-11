@@ -3,7 +3,7 @@ import * as t from "drizzle-orm/sqlite-core";
 import { timestamps } from "../helpers";
 import { contentTypes } from "../interactions/types";
 
-// Unified media table for all content types (posts, shorts, spaces, etc.)
+// Unified media table for all content types (posts, shorts, topics, etc.)
 export const media = table(
   "media",
   {

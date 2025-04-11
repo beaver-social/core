@@ -30,7 +30,6 @@ export const users = table(
   (table) => [
     t.uniqueIndex("username_idx").on(table.username),
     t.uniqueIndex("address_idx").on(table.address),
-    t.uniqueIndex("email_idx").on(table.email),
     t.uniqueIndex("identity_idx").on(table.identity),
     t.uniqueIndex("suins_idx").on(table.suinsDomainName),
   ]

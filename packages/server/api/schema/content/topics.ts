@@ -3,8 +3,8 @@ import * as t from "drizzle-orm/sqlite-core";
 import { timestamps } from "../helpers";
 import { users } from "../user/users";
 
-export const spaces = table(
-  "spaces",
+export const topics = table(
+  "topics",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
     name: t.text().notNull(),
@@ -26,18 +26,18 @@ export const spaces = table(
   },
   (table) => [
     t.index("owner_idx").on(table.ownerId),
-    t.index("space_name_idx").on(table.name),
+    t.index("topic_name_idx").on(table.name),
   ]
 );
 
-export const spaceMembers = table(
-  "space_members",
+export const topicMembers = table(
+  "topic_members",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
-    spaceId: t
-      .int("space_id")
+    topicId: t
+      .int("topic_id")
       .notNull()
-      .references(() => spaces.id, { onDelete: "cascade" }),
+      .references(() => topics.id, { onDelete: "cascade" }),
     userId: t
       .int("user_id")
       .notNull()
@@ -52,35 +52,35 @@ export const spaceMembers = table(
     ...timestamps,
   },
   (table) => [
-    t.uniqueIndex("space_user_idx").on(table.spaceId, table.userId),
-    t.index("space_member_idx").on(table.spaceId),
+    t.uniqueIndex("topic_user_idx").on(table.topicId, table.userId),
+    t.index("topic_member_idx").on(table.topicId),
     t.index("user_member_idx").on(table.userId),
   ]
 );
 
-export const spaceRules = table(
-  "space_rules",
+export const topicRules = table(
+  "topic_rules",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
-    spaceId: t
-      .int("space_id")
+    topicId: t
+      .int("topic_id")
       .notNull()
-      .references(() => spaces.id, { onDelete: "cascade" }),
+      .references(() => topics.id, { onDelete: "cascade" }),
     title: t.text().notNull(),
     description: t.text(),
     ...timestamps,
   },
-  (table) => [t.index("space_rules_idx").on(table.spaceId)]
+  (table) => [t.index("topic_rules_idx").on(table.topicId)]
 );
 
 export const joinRequests = table(
   "join_requests",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
-    spaceId: t
-      .int("space_id")
+    topicId: t
+      .int("topic_id")
       .notNull()
-      .references(() => spaces.id, { onDelete: "cascade" }),
+      .references(() => topics.id, { onDelete: "cascade" }),
     userId: t
       .int("user_id")
       .notNull()
@@ -95,19 +95,19 @@ export const joinRequests = table(
     ...timestamps,
   },
   (table) => [
-    t.uniqueIndex("space_user_request_idx").on(table.spaceId, table.userId),
-    t.index("space_request_idx").on(table.spaceId),
+    t.uniqueIndex("topic_user_request_idx").on(table.topicId, table.userId),
+    t.index("topic_request_idx").on(table.topicId),
   ]
 );
 
-export const spaceEvents = table(
-  "space_events",
+export const topicEvents = table(
+  "topic_events",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
-    spaceId: t
-      .int("space_id")
+    topicId: t
+      .int("topic_id")
       .notNull()
-      .references(() => spaces.id, { onDelete: "cascade" }),
+      .references(() => topics.id, { onDelete: "cascade" }),
     creatorId: t
       .int("creator_id")
       .notNull()
@@ -121,7 +121,7 @@ export const spaceEvents = table(
     ...timestamps,
   },
   (table) => [
-    t.index("space_events_idx").on(table.spaceId),
+    t.index("topic_events_idx").on(table.topicId),
     t.index("creator_events_idx").on(table.creatorId),
   ]
 );
@@ -133,7 +133,7 @@ export const eventRsvps = table(
     eventId: t
       .int("event_id")
       .notNull()
-      .references(() => spaceEvents.id, { onDelete: "cascade" }),
+      .references(() => topicEvents.id, { onDelete: "cascade" }),
     userId: t
       .int("user_id")
       .notNull()

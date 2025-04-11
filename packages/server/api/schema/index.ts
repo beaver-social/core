@@ -1,7 +1,7 @@
 import * as user from "./user/users";
 import * as post from "./content/posts";
 import * as short from "./content/shorts";
-import * as space from "./content/spaces";
+import * as topic from "./content/topics";
 import * as interaction from "./interactions";
 import * as media from "./content/media";
 import * as timezone from "./misc/timezones";
@@ -15,7 +15,7 @@ const schema = {
   ...user,
   ...post,
   ...short,
-  ...space,
+  ...topic,
   ...interaction,
   ...media,
   ...timezone,
