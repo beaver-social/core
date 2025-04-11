@@ -1,22 +1,20 @@
-import { ensureEnv } from "./env";
-
-const isProd =
-  process.env.NODE_ENV === "production" || process.env.NODE_ENV === "prod";
-if (!isProd) ensureEnv();
-
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import api from "./api";
 import path from "path";
+import { ensureEnv } from "./env";
 import staticRequestsHandler from "./api/middlewares/staticRequestsHandler";
 import { fileURLToPath } from "url";
 import {
+  ContentfulStatusCode,
   ClientErrorStatusCode,
   ServerErrorStatusCode,
 } from "hono/utils/http-status";
 import { ResponseHeader } from "hono/utils/headers";
 import { BaseMime } from "hono/utils/mime";
 
+const isProd =
+  process.env.NODE_ENV === "production" || process.env.NODE_ENV === "prod";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
