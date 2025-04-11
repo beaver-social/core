@@ -8,20 +8,6 @@ This document outlines the API endpoints for user profiles, settings, analytics,
 
 All endpoints are relative to: `/api/v1/`
 
-## 1. User Profile Management
-
-### Base Path: `/user/profile`
-
-| Endpoint       | Method | Description                   | Query Params            | Request Body                                           | Response              |
-| -------------- | ------ | ----------------------------- | ----------------------- | ------------------------------------------------------ | --------------------- |
-| `/`            | GET    | Get current user's profile    | -                       | -                                                      | `{ user }`            |
-| `/:username`   | GET    | Get user profile by username  | -                       | -                                                      | `{ user }`            |
-| `/`            | PATCH  | Update user profile           | -                       | `{ fullName?, image_url?, banner_url?, about?, etc. }` | `{ user }`            |
-| `/search`      | GET    | Search for users              | `?q=string&limit=10`    | -                                                      | `{ users: [] }`       |
-| `/suggestions` | GET    | Get suggested users to follow | `?limit=number`         | -                                                      | `{ suggestions: [] }` |
-| `/request`     | POST   | Request account verification  | `{ reason, evidence? }` | `{ success, requestId }`                               |
-| `/status`      | GET    | Check verification status     | -                       | `{ status, message?, verifiedAt? }`                    |
-
 ### Base Path: `/user/profile/collections`
 
 | Endpoint             | Method | Description                 | Query Params       | Request Body                        | Response                    |
@@ -258,7 +244,7 @@ All endpoints are relative to: `/api/v1/`
 
 ### Base Path: `/user/identity`
 
-| Endpoint | Method      | Description | Request Body                         | Response                     |
-| -------- | ----------- | ----------- | ------------------------------------ | ---------------------------- | ------------------------------ | -------------------- |
-| `/`         | GET         | Get identity NFT details             | -                            | `{ identityNFT, owner, user }` | owns nft already --> |
-| `/transfer` | POST        | Transfer identity to another address | `{ targetAddress, reason? }` | `{ success, transactionHash }` | client side only --> |
+| Endpoint    | Method | Description                          | Request Body                 | Response                       |
+| ----------- | ------ | ------------------------------------ | ---------------------------- | ------------------------------ | -------------------- |
+| `/`         | GET    | Get identity NFT details             | -                            | `{ identityNFT, owner, user }` | owns nft already --> |
+| `/transfer` | POST   | Transfer identity to another address | `{ targetAddress, reason? }` | `{ success, transactionHash }` | client side only --> |

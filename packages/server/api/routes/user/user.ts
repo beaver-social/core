@@ -100,13 +100,6 @@ export default new Hono()
     });
   })
 
-  // get user profile by username
-  .get("/:username", (ctx) => {
-    return ctx.json({
-      message: "get user profile by username",
-    });
-  })
-
   // get suggested users to follow
   .get("/suggestions", (ctx) => {
     return ctx.json({

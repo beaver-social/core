@@ -2,10 +2,10 @@ import {
   actionFunctions,
   actionRequests,
   actions,
-} from "../../../models/interactions/actions";
+} from "../../../schema/interactions/actions";
 import { verifyPersonalMessageSignature } from "@mysten/sui/verify";
-import { users } from "../../../models/user/users";
-import db from "../../../models";
+import { users } from "../../../schema/user/users";
+import db from "../../../schema";
 import { tryCatch } from "../../tryCatch";
 import { desc, eq } from "drizzle-orm";
 import { camelToDotCase } from "../../utils";

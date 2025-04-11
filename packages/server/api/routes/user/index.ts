@@ -6,7 +6,6 @@ import topics from "./topics";
 import alerts from "./alerts";
 import analytics from "./analytics/analytics";
 import monetization from "./monetization";
-import nft from "./nft";
 
 export default new Hono()
   .route("/", user)
@@ -15,5 +14,4 @@ export default new Hono()
   .route("/topics", topics)
   .route("/alerts", alerts)
   .route("/analytics", analytics)
-  .route("/monetization", monetization)
-  .route("/nft", nft);
+  .route("/monetization", monetization);
