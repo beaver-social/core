@@ -13,9 +13,8 @@ use suins::{
 };
 
 #[test_only]
-public(package) fun new_dummy_suins(): suins_registration::SuinsRegistration {
-    let mut ctx = tx_context::dummy();
-    let clock = clock::create_for_testing(&mut ctx);
+public(package) fun new_dummy_suins(ctx: &mut TxContext): suins_registration::SuinsRegistration {
+    let clock = clock::create_for_testing(ctx);
     let suins = suins_registration::new_for_testing(
         domain::new(string::utf8(b"test.sui")),
         1,

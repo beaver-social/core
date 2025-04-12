@@ -2,10 +2,7 @@
   "java.configuration.updateBuildConfiguration": "interactive",
   "editor.formatOnSave": true,
   "tailwindCSS.experimental.classRegex": [
-    [
-      "cva\\(([^)]*)\\)",
-      "[\"']([^\"']).?[\"'`]"
-    ]
+    ["cva\\(([^)]*)\\)", "[\"']([^\"']).?[\"'`]"]
   ],
   "[move]": {
     "files.autoSave": "onFocusChange"

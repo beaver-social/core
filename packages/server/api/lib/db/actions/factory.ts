@@ -63,13 +63,9 @@ export function createAction<T>() {
           );
         }
 
-        const hash = new Bun.CryptoHasher("sha3-256")
-          .update(payload)
-          .digest("hex");
+        const hash = generateHash(payload);
 
-        const fnHash = new Bun.CryptoHasher("sha3-256")
-          .update(fn.toString())
-          .digest("hex");
+        const fnHash = generateHash(fn.toString());
 
         let fnId = 0;
 
@@ -115,4 +111,8 @@ export function createAction<T>() {
       });
     };
   };
+}
+
+function generateHash(data: string): string {
+  return new Bun.CryptoHasher("sha3-256").update(data).digest("hex");
 }

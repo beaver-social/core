@@ -1,6 +1,6 @@
 import { and, eq, sql } from "drizzle-orm";
 import { likes } from "../schema/like";
-import { post_action, post_media, posts } from "../schema/post";
+import { post_media, posts } from "../schema/post";
 import { createAction } from "./factory";
 import { users } from "../schema/user";
 import { contracts } from "../../sui/contracts";
@@ -12,13 +12,16 @@ import { tryCatch } from "../../tryCatch";
 export const makePost = createAction<{
   content: string;
   media: { url: string; type: string }[];
+  flags?: { nsfw?: boolean; paid?: boolean };
 }>()(
-  async (tx, { userId, content, media }) => {
+  async (tx, { userId, content, media, flags }) => {
     const [post] = await tx
       .insert(posts)
       .values({
         authorId: userId,
         content: content.trim(),
+        nsfw: !!flags?.nsfw,
+        isPaid: !!flags?.paid,
       })
       .returning();
 
@@ -33,10 +36,12 @@ export const makePost = createAction<{
     return post;
   },
   async (tx, post, action) => {
-    await tx.insert(post_action).values({
-      actionId: action.id,
-      postId: post.id,
-    });
+    await tx
+      .update(posts)
+      .set({
+        actionId: action.id,
+      })
+      .where(eq(posts.id, post.id));
   }
 );
 
@@ -44,9 +49,10 @@ export const reply = createAction<{
   postId: number;
   content: string;
   media: string[];
+  flags?: { nsfw?: boolean };
 }>()(
-  async (tx, { userId, content, media, postId }) => {
-    const [{ deletedAt }] = await tx
+  async (tx, { userId, content, media, postId, flags }) => {
+    const [{ deletedAt, nsfw: isParentNsfw }] = await tx
       .select()
       .from(posts)
       .where(eq(posts.id, postId))
@@ -56,12 +62,16 @@ export const reply = createAction<{
       throw new Error("Cannot reply to a deleted post");
     }
 
+    if (!isParentNsfw && flags?.nsfw) {
+      throw new Error("Cannot make NSFW reply on non NSFW post");
+    }
+
     const [post] = await tx
       .insert(posts)
       .values({
         authorId: userId,
         content: content.trim(),
-        parent: postId,
+        parentId: postId,
       })
       .returning();
 
@@ -83,7 +93,7 @@ export const reply = createAction<{
         .where(eq(posts.id, current));
 
       const [next] = await tx
-        .select({ parent: posts.parent })
+        .select({ parent: posts.parentId })
         .from(posts)
         .where(eq(posts.id, current))
         .limit(1);
@@ -95,110 +105,106 @@ export const reply = createAction<{
   },
   async (tx, post, action) => {
     await tx
-      .update(post_action)
+      .update(posts)
       .set({
         actionId: action.id,
-        postId: post.id,
       })
-      .where(
-        and(
-          eq(post_action.postId, post.id),
-          eq(post_action.actionId, action.id)
-        )
-      );
+      .where(eq(posts.id, post.id));
   }
 );
 
-export const deletePost = createAction<{ postId: number }>()(
-  async (tx, { postId }) => {
-    const [post] = await tx
-      .update(posts)
-      .set({
-        deletedAt: Date.now(),
-        likesCount: 0,
-        content: "deleted",
-        authorId: -1,
-      })
-      .where(eq(posts.id, postId))
-      .returning();
+export const deletePost = createAction<{
+  postId: number;
+}>()(async (tx, { postId }) => {
+  const [post] = await tx
+    .update(posts)
+    .set({
+      deletedAt: Date.now(),
+      likesCount: 0,
+      content: "deleted",
+      authorId: -1,
+    })
+    .where(eq(posts.id, postId))
+    .returning();
 
-    await tx.delete(post_media).where(eq(post_media.postId, postId));
+  await tx.delete(post_media).where(eq(post_media.postId, postId));
 
-    return post;
-  },
-  async (tx, post) => {
-    await tx
-      .update(post_action)
-      .set({ deleted: true })
-      .where(eq(post_action.postId, post.id));
+  return post;
+});
+
+export const likePost = createAction<{
+  postId: number;
+}>()(async (tx, { postId, userId }) => {
+  await tx.insert(likes).values({
+    userId: userId,
+    postId: postId,
+  });
+
+  await tx
+    .update(posts)
+    .set({
+      likesCount: sql`${posts.likesCount} + 1`,
+    })
+    .where(eq(posts.id, postId));
+});
+
+export const unlikePost = createAction<{
+  postId: number;
+}>()(async (tx, { postId, userId }) => {
+  const [like] = await tx
+    .select()
+    .from(likes)
+    .where(and(eq(likes.userId, userId), eq(likes.postId, postId)))
+    .limit(1);
+
+  if (!like) {
+    throw new Error("The user has not liked this post yet");
   }
-);
 
-export const likePost = createAction<{ postId: number }>()(
-  async (tx, { postId, userId }) => {
-    await tx.insert(likes).values({
-      userId: userId,
-      postId: postId,
-    });
+  await tx.delete(likes).where(eq(likes.id, like.id));
 
-    await tx
-      .update(posts)
-      .set({
-        likesCount: sql`${posts.likesCount} + 1`,
-      })
-      .where(eq(posts.id, postId));
+  await tx
+    .update(posts)
+    .set({
+      likesCount: sql`GREATEST(${posts.likesCount} - 1, 0)`,
+    })
+    .where(eq(posts.id, postId));
+});
+
+export const pinPost = createAction<{
+  postId: number;
+}>()(async (tx, { postId, userId }) => {
+  const [post] = await tx
+    .select({ deletedAt: posts.deletedAt })
+    .from(posts)
+    .where(and(eq(posts.id, postId), eq(posts.authorId, userId)))
+    .limit(1);
+
+  if (!post) {
+    throw new Error("Post not found");
   }
-);
 
-export const unlikePost = createAction<{ postId: number }>()(
-  async (tx, { postId, userId }) => {
-    await tx
-      .delete(likes)
-      .where(and(eq(likes.userId, userId), eq(likes.postId, postId)));
-
-    await tx
-      .update(posts)
-      .set({
-        likesCount: sql`GREATEST(${posts.likesCount} - 1, 0)`,
-      })
-      .where(eq(posts.id, postId));
+  if (post.deletedAt) {
+    throw new Error("Cannot pin a deleted post");
   }
-);
 
-export const pinPost = createAction<{ postId: number }>()(
-  async (tx, { postId, userId }) => {
-    const [post] = await tx
-      .select({ deletedAt: posts.deletedAt })
-      .from(posts)
-      .where(and(eq(posts.id, postId), eq(posts.authorId, userId)))
-      .limit(1);
+  const [user] = await tx
+    .select({ pinned: users.pinned })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
 
-    if (!post) {
-      throw new Error("Post not found");
-    }
-
-    if (post.deletedAt) {
-      throw new Error("Cannot pin a deleted post");
-    }
-
-    const [user] = await tx
-      .select({ pinned: users.pinned })
-      .from(users)
-      .where(eq(users.id, userId))
-      .limit(1);
-
-    if (user?.pinned === postId) {
-      throw new Error("Post is already pinned");
-    }
-
-    await tx
-      .update(users)
-      .set({
-        pinned: postId,
-      })
-      .where(eq(users.id, userId));
+  if (user?.pinned === postId) {
+    throw new Error("Post is already pinned");
   }
-);
+
+  await tx
+    .update(users)
+    .set({
+      pinned: postId,
+    })
+    .where(eq(users.id, userId));
+});
 
 export const unpinPost = createAction<{}>()(async (tx, { userId }) => {
   const [user] = await tx

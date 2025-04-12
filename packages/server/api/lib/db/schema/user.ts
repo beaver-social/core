@@ -23,18 +23,44 @@ export const users = table(
     t.uniqueIndex("identity_idx").on(table.identity),
     t.uniqueIndex("username_idx").on(table.username),
     t.uniqueIndex("address_idx").on(table.address),
-    t.uniqueIndex("suins_idx").on(table.suinsDomainName)
+    t.uniqueIndex("suins_idx").on(table.suinsDomainName),
   ]
 );
 
-export const follows = table("follows", {
-  id: t.int().primaryKey({ autoIncrement: true }),
-  followerId: t
-    .int()
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  followingId: t
-    .int()
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-});
+export const follows = table(
+  "follows",
+  {
+    id: t.int().primaryKey({ autoIncrement: true }),
+    followerId: t
+      .int()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    followingId: t
+      .int()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    t.index("follower_idx").on(table.followerId),
+    t.index("following_idx").on(table.followingId),
+  ]
+);
+
+export const subscriptions = table(
+  "subscriptions",
+  {
+    id: t.int().primaryKey({ autoIncrement: true }),
+    subscriberId: t
+      .int()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    creatorId: t
+      .int()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    t.index("creator_idx").on(table.creatorId),
+    t.index("subscriber_idx").on(table.subscriberId),
+  ]
+);

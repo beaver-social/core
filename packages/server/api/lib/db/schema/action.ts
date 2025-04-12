@@ -21,7 +21,8 @@ export const actions = table(
 );
 
 export const actionRequests = table("action_requests", {
-  hash: t.text().notNull().primaryKey(),
+  id: t.int().notNull().primaryKey({ autoIncrement: true }),
+  hash: t.text().notNull(),
   function: t
     .int()
     .notNull()
