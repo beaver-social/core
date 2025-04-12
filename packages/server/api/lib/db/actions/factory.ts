@@ -7,6 +7,7 @@ import db from "..";
 import { desc, eq } from "drizzle-orm";
 import { compressActionRequest } from "./compression";
 import { DB } from "../schema";
+import { generateHash } from "../../utils/utils";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>["0"]>["0"];
 
@@ -111,8 +112,4 @@ export function createAction<T>() {
       });
     };
   };
-}
-
-function generateHash(data: string): string {
-  return new Bun.CryptoHasher("sha3-256").update(data).digest("hex");
 }

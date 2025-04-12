@@ -32,12 +32,10 @@ export const zSuiAddress = z
   })
   .transform((value) => normalizeSuiAddress(value));
 
-export const zJwt = z.object({
-  iss: z.string().optional(),
-  sub: z.string(),
-  aud: z.union([z.array(z.string()), z.string()]).optional(),
-  exp: z.number().optional(),
-  nbf: z.number().optional(),
-  iat: z.number().optional(),
-  jti: z.string().optional(),
+export const zJwtPayload = z.object({
+  app: z.number(),
+  sub: z.number(),
+  exp: z.number(),
+  nbf: z.number(),
+  iat: z.number(),
 });
