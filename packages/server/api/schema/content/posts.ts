@@ -23,6 +23,8 @@ export const posts = table(
     repliesCount: t.int("replies_count").default(0),
     sharesCount: t.int("shares_count").default(0),
     repostsCount: t.int("reposts_count").default(0),
+    hashtags: t.text("hashtags").default(""),
+    mentions: t.text("mentions").default(""),
     ...timestamps,
   },
   (table) => [

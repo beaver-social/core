@@ -6,6 +6,7 @@ import { createAction } from "../../lib/actions/factory";
 import { z } from "zod";
 import { zMedia } from "../../lib/zod/helpers";
 import db from "../../schema";
+import * as postHelpers from "./post.helpers";
 
 // POST ACTIONS
 export const createPost = createAction<{
@@ -15,11 +16,19 @@ export const createPost = createAction<{
   media: z.infer<typeof zMedia>[];
 }>()(
   async (tx, { userId, content, parentId, topicId, media }) => {
+    // Sanitize and validate content
+    const sanitizedContent = postHelpers.sanitizePostContent(content);
+    const validation = postHelpers.validatePostContent(sanitizedContent);
+
+    if (!validation.valid) {
+      throw new Error(validation.message);
+    }
+
     const [post] = await tx
       .insert(contentSchema.posts)
       .values({
         authorId: userId,
-        content: content.trim(),
+        content: sanitizedContent,
         parent: parentId ?? null,
         topicId: topicId ?? null,
       })
@@ -27,14 +36,69 @@ export const createPost = createAction<{
         id: contentSchema.posts.id,
       });
 
+    // Process media items
     for (const mediaItem of media) {
-      await tx.insert(contentSchema.media).values({
-        contentId: post.id,
-        contentTypeId: 1,
-        url: mediaItem.url,
-        type: mediaItem.type,
-      });
+      // Process different media types
+      if (mediaItem.type === "image") {
+        try {
+          // Convert Base64 to Buffer
+          const imageData = Buffer.from(
+            mediaItem.url.split(",")[1] || mediaItem.url,
+            "base64"
+          );
+
+          // Process and upload to S3, get back the URL
+          const s3Url = await postHelpers.processAndUploadImage(imageData);
+
+          // Store the S3 URL in the database
+          await tx.insert(contentSchema.media).values({
+            contentId: post.id,
+            contentTypeId: 1,
+            url: s3Url,
+            type: mediaItem.type,
+          });
+        } catch (error: any) {
+          throw new Error(`Failed to process image: ${error.message}`);
+        }
+      } else if (mediaItem.type === "video") {
+        try {
+          // Convert Base64 to Buffer
+          const videoData = Buffer.from(
+            mediaItem.url.split(",")[1] || mediaItem.url,
+            "base64"
+          );
+
+          // Process and upload to S3, get back both video URL and thumbnail URL
+          const { videoUrl, thumbnailUrl } =
+            await postHelpers.processAndUploadVideo(videoData);
+
+          // Store the video URL in the database
+          await tx.insert(contentSchema.media).values({
+            contentId: post.id,
+            contentTypeId: 1,
+            url: videoUrl,
+            type: mediaItem.type,
+            thumbnailUrl: thumbnailUrl, // Store the thumbnail URL
+          });
+        } catch (error: any) {
+          throw new Error(`Failed to process video: ${error.message}`);
+        }
+      } else {
+        // For other media types, just store the URL as-is
+        await tx.insert(contentSchema.media).values({
+          contentId: post.id,
+          contentTypeId: 1,
+          url: mediaItem.url,
+          type: mediaItem.type,
+        });
+      }
     }
+
+    // Extract hashtags and mentions for later processing if needed
+    const hashtags = postHelpers.extractHashtags(sanitizedContent);
+    const mentions = postHelpers.extractMentions(sanitizedContent);
+
+    // Additional processing could be done with hashtags and mentions here
 
     return post;
   },
@@ -47,7 +111,22 @@ export const createPost = createAction<{
 );
 
 export const deletePost = createAction<{ postId: number }>()(
-  async (tx, { postId }) => {
+  async (tx, { postId, userId }) => {
+    // Check if user has permission to delete
+    const [postToDelete] = await tx
+      .select({ authorId: contentSchema.posts.authorId })
+      .from(contentSchema.posts)
+      .where(eq(contentSchema.posts.id, postId))
+      .limit(1);
+
+    if (!postToDelete) {
+      throw new Error("Post not found");
+    }
+
+    if (!postHelpers.canUserModifyPost(userId, postToDelete.authorId)) {
+      throw new Error("You don't have permission to delete this post");
+    }
+
     const [post] = await tx
       .update(contentSchema.posts)
       .set({
@@ -73,8 +152,41 @@ export const deletePost = createAction<{ postId: number }>()(
   }
 );
 
-export const likePost = createAction<{ postId: number }>()(
-  async (tx, { postId, userId }) => {
+export const likePost = createAction<{ postId: number }>()(function (
+  tx,
+  { postId, userId }
+) {
+  return (async () => {
+    // Check if post exists
+    const [post] = await tx
+      .select({
+        id: contentSchema.posts.id,
+        deletedAt: contentSchema.posts.deletedAt,
+      })
+      .from(contentSchema.posts)
+      .where(eq(contentSchema.posts.id, postId))
+      .limit(1);
+
+    if (!post || post.deletedAt) {
+      throw new Error("Post not found or has been deleted");
+    }
+
+    // Check if already liked
+    const [existingLike] = await tx
+      .select()
+      .from(interactionSchema.likes)
+      .where(
+        and(
+          eq(interactionSchema.likes.userId, userId),
+          eq(interactionSchema.likes.contentId, postId)
+        )
+      )
+      .limit(1);
+
+    if (existingLike) {
+      throw new Error("You've already liked this post");
+    }
+
     await tx.insert(interactionSchema.likes).values({
       userId: userId,
       contentId: postId,
@@ -87,11 +199,32 @@ export const likePost = createAction<{ postId: number }>()(
         likesCount: sql`${contentSchema.posts.likesCount} + 1`,
       })
       .where(eq(contentSchema.posts.id, postId));
-  }
-);
 
-export const unlikePost = createAction<{ postId: number }>()(
-  async (tx, { postId, userId }) => {
+    return { success: true };
+  })();
+});
+
+export const unlikePost = createAction<{ postId: number }>()(function (
+  tx,
+  { postId, userId }
+) {
+  return (async () => {
+    // Check if like exists
+    const [existingLike] = await tx
+      .select()
+      .from(interactionSchema.likes)
+      .where(
+        and(
+          eq(interactionSchema.likes.userId, userId),
+          eq(interactionSchema.likes.contentId, postId)
+        )
+      )
+      .limit(1);
+
+    if (!existingLike) {
+      throw new Error("You haven't liked this post");
+    }
+
     await tx
       .delete(interactionSchema.likes)
       .where(
@@ -107,13 +240,21 @@ export const unlikePost = createAction<{ postId: number }>()(
         likesCount: sql`GREATEST(${contentSchema.posts.likesCount} - 1, 0)`,
       })
       .where(eq(contentSchema.posts.id, postId));
-  }
-);
 
-export const pinPost = createAction<{ postId: number }>()(
-  async (tx, { postId, userId }) => {
+    return { success: true };
+  })();
+});
+
+export const pinPost = createAction<{ postId: number }>()(function (
+  tx,
+  { postId, userId }
+) {
+  return (async () => {
     const [post] = await tx
-      .select({ deletedAt: contentSchema.posts.deletedAt })
+      .select({
+        deletedAt: contentSchema.posts.deletedAt,
+        authorId: contentSchema.posts.authorId,
+      })
       .from(contentSchema.posts)
       .where(
         and(
@@ -129,6 +270,11 @@ export const pinPost = createAction<{ postId: number }>()(
 
     if (post.deletedAt) {
       throw new Error("Cannot pin a deleted post");
+    }
+
+    // Ensure user can pin the post
+    if (!postHelpers.canUserModifyPost(userId, post.authorId)) {
+      throw new Error("You don't have permission to pin this post");
     }
 
     const [user] = await tx
@@ -147,8 +293,10 @@ export const pinPost = createAction<{ postId: number }>()(
         pinnedPost: postId,
       })
       .where(eq(userSchema.users.id, userId));
-  }
-);
+
+    return { success: true };
+  })();
+});
 
 export const unpinPost = createAction<{
   postId: number;
@@ -177,6 +325,14 @@ export const reply = createAction<{
   media: string[];
 }>()(
   async (tx, { userId, content, media, postId }) => {
+    // Sanitize and validate content
+    const sanitizedContent = postHelpers.sanitizePostContent(content);
+    const validation = postHelpers.validatePostContent(sanitizedContent);
+
+    if (!validation.valid) {
+      throw new Error(validation.message);
+    }
+
     const [{ deletedAt }] = await tx
       .select()
       .from(contentSchema.posts)
@@ -191,7 +347,7 @@ export const reply = createAction<{
       .insert(contentSchema.posts)
       .values({
         authorId: userId,
-        content: content.trim(),
+        content: sanitizedContent,
         parent: postId,
       })
       .returning();
@@ -240,3 +396,374 @@ export const reply = createAction<{
       );
   }
 );
+
+export const updatePost = createAction<{
+  postId: number;
+  content: string;
+  media: z.infer<typeof zMedia>[];
+}>()(async (tx, { postId, userId, content, media }) => {
+  // Sanitize and validate content
+  const sanitizedContent = postHelpers.sanitizePostContent(content);
+  const validation = postHelpers.validatePostContent(sanitizedContent);
+
+  if (!validation.valid) {
+    throw new Error(validation.message);
+  }
+
+  // Check if post exists and user is the author
+  const [post] = await tx
+    .select({
+      id: contentSchema.posts.id,
+      authorId: contentSchema.posts.authorId,
+    })
+    .from(contentSchema.posts)
+    .where(
+      and(
+        eq(contentSchema.posts.id, postId),
+        eq(contentSchema.posts.authorId, userId)
+      )
+    )
+    .limit(1);
+
+  if (!post) {
+    throw new Error("Post not found or you don't have permission to edit");
+  }
+
+  // Ensure user can modify the post
+  if (!postHelpers.canUserModifyPost(userId, post.authorId)) {
+    throw new Error("You don't have permission to edit this post");
+  }
+
+  // Update post content
+  await tx
+    .update(contentSchema.posts)
+    .set({ content: sanitizedContent })
+    .where(eq(contentSchema.posts.id, postId));
+
+  // Delete existing media
+  await tx
+    .delete(contentSchema.media)
+    .where(
+      and(
+        eq(contentSchema.media.contentId, postId),
+        eq(contentSchema.media.contentTypeId, 1)
+      )
+    );
+
+  // Add new media
+  for (const mediaItem of media) {
+    // Process different media types
+    if (mediaItem.type === "image") {
+      try {
+        // Convert Base64 to Buffer
+        const imageData = Buffer.from(
+          mediaItem.url.split(",")[1] || mediaItem.url,
+          "base64"
+        );
+
+        // Process and upload to S3, get back the URL
+        const s3Url = await postHelpers.processAndUploadImage(imageData);
+
+        // Store the S3 URL in the database
+        await tx.insert(contentSchema.media).values({
+          contentId: postId,
+          contentTypeId: 1,
+          url: s3Url,
+          type: mediaItem.type,
+        });
+      } catch (error: any) {
+        throw new Error(`Failed to process image: ${error.message}`);
+      }
+    } else if (mediaItem.type === "video") {
+      try {
+        // Convert Base64 to Buffer
+        const videoData = Buffer.from(
+          mediaItem.url.split(",")[1] || mediaItem.url,
+          "base64"
+        );
+
+        // Process and upload to S3, get back URLs
+        const { videoUrl, thumbnailUrl } =
+          await postHelpers.processAndUploadVideo(videoData);
+
+        // Store the video URL in the database
+        await tx.insert(contentSchema.media).values({
+          contentId: postId,
+          contentTypeId: 1,
+          url: videoUrl,
+          type: mediaItem.type,
+          thumbnailUrl: thumbnailUrl, // Store the thumbnail URL
+        });
+      } catch (error: any) {
+        throw new Error(`Failed to process video: ${error.message}`);
+      }
+    } else {
+      // For other media types, just store the URL as-is
+      await tx.insert(contentSchema.media).values({
+        contentId: postId,
+        contentTypeId: 1,
+        url: mediaItem.url,
+        type: mediaItem.type,
+      });
+    }
+  }
+
+  return { success: true, id: postId };
+});
+
+export const viewPost = createAction<{
+  postId: number;
+  viewerId: number | null;
+}>()(async (tx, { postId, viewerId }) => {
+  // Check if post exists
+  const [post] = await tx
+    .select({ id: contentSchema.posts.id })
+    .from(contentSchema.posts)
+    .where(eq(contentSchema.posts.id, postId))
+    .limit(1);
+
+  if (!post) {
+    throw new Error("Post not found");
+  }
+
+  // Increment view count on post
+  await tx
+    .update(contentSchema.posts)
+    .set({
+      viewCount: sql`${contentSchema.posts.viewCount} + 1`,
+    })
+    .where(eq(contentSchema.posts.id, postId));
+
+  // Record view in views table if userId is provided
+  if (viewerId) {
+    await tx.insert(interactionSchema.views).values({
+      userId: viewerId,
+      contentId: postId,
+      contentTypeId: 1,
+      viewedAt: Date.now(),
+    });
+  }
+
+  return { success: true };
+});
+
+export const repostPost = createAction<{
+  postId: number;
+  content: string | null;
+}>()(
+  async (tx, { postId, userId, content }) => {
+    // Sanitize content if provided
+    let sanitizedContent = "";
+    if (content) {
+      sanitizedContent = postHelpers.sanitizePostContent(content);
+      const validation = postHelpers.validatePostContent(sanitizedContent);
+
+      if (!validation.valid) {
+        throw new Error(validation.message);
+      }
+    }
+
+    // Check if post exists and is not deleted
+    const [originalPost] = await tx
+      .select({
+        id: contentSchema.posts.id,
+        deletedAt: contentSchema.posts.deletedAt,
+      })
+      .from(contentSchema.posts)
+      .where(eq(contentSchema.posts.id, postId))
+      .limit(1);
+
+    if (!originalPost) {
+      throw new Error("Original post not found");
+    }
+
+    if (originalPost.deletedAt) {
+      throw new Error("Cannot repost a deleted post");
+    }
+
+    // Create a new post with reference to original
+    const [repost] = await tx
+      .insert(contentSchema.posts)
+      .values({
+        authorId: userId,
+        content: sanitizedContent,
+        parent: postId,
+      })
+      .returning({ id: contentSchema.posts.id });
+
+    // Update repost count on original post
+    await tx
+      .update(contentSchema.posts)
+      .set({
+        repostsCount: sql`${contentSchema.posts.repostsCount} + 1`,
+      })
+      .where(eq(contentSchema.posts.id, postId));
+
+    return repost;
+  },
+  async (tx, repost, action) => {
+    await tx.insert(interactionSchema.contentActions).values({
+      actionId: action.id,
+      contentId: repost.id,
+    });
+  }
+);
+
+export const unrepostPost = createAction<{
+  postId: number;
+  repostId: number;
+}>()(async (tx, { postId, repostId, userId }) => {
+  // Check if repost exists and user is the author
+  const [repost] = await tx
+    .select({ authorId: contentSchema.posts.authorId })
+    .from(contentSchema.posts)
+    .where(
+      and(
+        eq(contentSchema.posts.id, repostId),
+        eq(contentSchema.posts.authorId, userId),
+        eq(contentSchema.posts.parent, postId)
+      )
+    )
+    .limit(1);
+
+  if (!repost) {
+    throw new Error("Repost not found or you don't have permission");
+  }
+
+  // Ensure user can modify the post
+  if (!postHelpers.canUserModifyPost(userId, repost.authorId)) {
+    throw new Error("You don't have permission to delete this repost");
+  }
+
+  // Delete the repost
+  await tx
+    .update(contentSchema.posts)
+    .set({ deletedAt: Date.now() })
+    .where(eq(contentSchema.posts.id, repostId));
+
+  // Update repost count on original post
+  await tx
+    .update(contentSchema.posts)
+    .set({
+      repostsCount: sql`GREATEST(${contentSchema.posts.repostsCount} - 1, 0)`,
+    })
+    .where(eq(contentSchema.posts.id, postId));
+
+  return { success: true, repostId };
+});
+
+export const savePost = createAction<{
+  postId: number;
+}>()(async (tx, { postId, userId }) => {
+  // Check if post exists and is not deleted
+  const [post] = await tx
+    .select({
+      id: contentSchema.posts.id,
+      deletedAt: contentSchema.posts.deletedAt,
+    })
+    .from(contentSchema.posts)
+    .where(eq(contentSchema.posts.id, postId))
+    .limit(1);
+
+  if (!post) {
+    throw new Error("Post not found");
+  }
+
+  if (post.deletedAt) {
+    throw new Error("Cannot save a deleted post");
+  }
+
+  // Check if already saved
+  const [saved] = await tx
+    .select()
+    .from(interactionSchema.saves)
+    .where(
+      and(
+        eq(interactionSchema.saves.contentId, postId),
+        eq(interactionSchema.saves.userId, userId),
+        eq(interactionSchema.saves.contentTypeId, 1)
+      )
+    )
+    .limit(1);
+
+  if (saved) {
+    throw new Error("Post already saved");
+  }
+
+  // Save the post
+  await tx.insert(interactionSchema.saves).values({
+    userId,
+    contentId: postId,
+    contentTypeId: 1,
+  });
+
+  return { success: true, postId };
+});
+
+export const unsavePost = createAction<{
+  postId: number;
+}>()(async (tx, { postId, userId }) => {
+  // Check if save exists
+  const [savedPost] = await tx
+    .select()
+    .from(interactionSchema.saves)
+    .where(
+      and(
+        eq(interactionSchema.saves.contentId, postId),
+        eq(interactionSchema.saves.userId, userId),
+        eq(interactionSchema.saves.contentTypeId, 1)
+      )
+    )
+    .limit(1);
+
+  if (!savedPost) {
+    throw new Error("Post is not in your saved posts");
+  }
+
+  // Delete the save record
+  await tx
+    .delete(interactionSchema.saves)
+    .where(
+      and(
+        eq(interactionSchema.saves.contentId, postId),
+        eq(interactionSchema.saves.userId, userId),
+        eq(interactionSchema.saves.contentTypeId, 1)
+      )
+    );
+
+  return { success: true, postId };
+});
+
+export const reportPost = createAction<{
+  postId: number;
+  reason: string;
+  details?: string;
+}>()(async (tx, { postId, userId, reason, details }) => {
+  // Check if post exists
+  const [post] = await tx
+    .select({ id: contentSchema.posts.id })
+    .from(contentSchema.posts)
+    .where(eq(contentSchema.posts.id, postId))
+    .limit(1);
+
+  if (!post) {
+    throw new Error("Post not found");
+  }
+
+  // Validate reason
+  if (!reason || reason.trim().length === 0) {
+    throw new Error("A reason for reporting is required");
+  }
+
+  // Create a report record
+  await tx.insert(interactionSchema.reports).values({
+    reporterId: userId,
+    contentId: postId,
+    contentTypeId: 1,
+    reason,
+    details: details || "",
+    status: "pending",
+  });
+
+  return { success: true, postId };
+});
