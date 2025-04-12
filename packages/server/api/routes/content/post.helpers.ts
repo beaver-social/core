@@ -1,6 +1,5 @@
 import sharp from "sharp";
 import {
-  handleImageUpload,
   uploadProcessedImage,
   uploadProcessedVideo,
 } from "../../lib/s3/upload";

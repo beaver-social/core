@@ -7,9 +7,6 @@ import * as actions from "./post.action";
 import { desc, eq, and, sql } from "drizzle-orm";
 import db from "../../schema";
 import { posts } from "../../schema/content";
-import * as mediaSchema from "../../schema/content/media";
-import * as interactionSchema from "../../schema/interactions";
-import { reports } from "../../schema/interactions/moderation";
 import * as postHelpers from "./post.helpers";
 
 export default new Hono()
