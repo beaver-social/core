@@ -6,7 +6,10 @@ type ActionOptions<T> = T & { userId: number };
 
 export function createAction<T>() {
   return function <R>(
-    fn: (tx: Transaction, args: ActionOptions<T>) => Promise<R>,
+    fn: (
+      tx: Transaction,
+      args: ActionOptions<T> & { _user: DB["user"] }
+    ) => Promise<R>,
     callback?: (
       tx: Transaction,
       result: R,
@@ -33,9 +36,7 @@ export function createAction<T>() {
       const payload = JSON.stringify(actionRequest);
       const [compressedPayload, keys] =
         helpers.compressActionRequest(actionRequest);
-      const message = new TextEncoder().encode(payload);
-
-      // Verify user signature
+      const message = new TextEncoder().encode(payload); // Verify user signature
       const user = await helpers.getUser(options.userId);
       await helpers.verifyUserSignature(message, signature, user.address);
 
@@ -45,7 +46,10 @@ export function createAction<T>() {
         const result = await helpers.executeActionFunction(
           tx,
           fn,
-          options,
+          {
+            ...options,
+            _user: user,
+          },
           actionType
         );
 

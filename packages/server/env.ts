@@ -11,6 +11,7 @@ const envKeys = [
   "SUI_NETWORK",
   "GOOGLE_CLIENT_SECRET",
   "OAUTH_SALT_MASTER_SEED",
+  "JWT_SECRET",
 
   // "localnet", "devnet", "testnet", "mainnet"
   "VITE_SUI_NETWORK",

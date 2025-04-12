@@ -10,8 +10,7 @@ import { promisify } from "util";
 import { createWriteStream, unlink } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
-
-// Type definitions for ffmpeg metadata using the library's expected types
+import { DB } from "../../schema";
 import { FfprobeData, FfprobeStream } from "fluent-ffmpeg";
 
 // Convert stream or buffer to temporary file
@@ -409,7 +408,7 @@ export function canUserModifyPost(
   return userId === authorId || isAdmin;
 }
 
-export function processPostForDisplay(post: any): any {
+export function processPostForDisplay(post: DB["post"]): any {
   // Calculate time elapsed since post creation
   const now = Date.now();
   const createdAt = new Date(post.createdAt).getTime();

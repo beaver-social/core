@@ -23,6 +23,16 @@ const app = new Hono()
       allowHeaders: ["Content-Type", "Authorization"],
     })
   )
+  .use("*", async (ctx, next) => {
+    ctx.text = () => {
+      throw new Error("c.text() is disabled — use c.ok() or c.err() instead");
+    };
+    // ctx.json = () => {
+    //   throw new Error("c.json() is disabled — use c.ok() or c.err() instead");
+    // };
+
+    await next();
+  })
 
   // routes
   .route("auth", authIndex)

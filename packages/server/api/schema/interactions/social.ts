@@ -17,13 +17,15 @@ export const follows = table(
       .int("following_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    type: t.text("type").notNull(), // follow, notify, subscribe, join
+    type: t.text("type").default("follow").notNull(), // follow / notify / subscribe
     ...timestamps,
   },
   (table) => [
     t
       .uniqueIndex("follower_following_idx")
       .on(table.followerId, table.followingId),
+    t.index("follower_idx").on(table.followerId),
+    t.index("following_idx").on(table.followingId),
   ]
 );
 

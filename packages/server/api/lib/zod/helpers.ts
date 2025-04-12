@@ -52,3 +52,13 @@ export const zMedia = z.object({
   height: z.number(),
   altText: z.string(),
 });
+
+export const zJwtPayload = z.object({
+  app: z.number(),
+  sub: z.number(),
+  exp: z.number(),
+  nbf: z.number(),
+  iat: z.number(),
+});
+
+export const zSignType = z.enum(["wallet", "zk"]);

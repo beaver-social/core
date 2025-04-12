@@ -1,10 +1,9 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { zSuiAddress } from "../../lib/zod/helpers";
-import { checkUsernameAvailability, isAddressRegistered } from "./helpers";
+import { zSignType, zSuiAddress } from "../../lib/zod/helpers";
 import { tryCatch } from "../../lib/tryCatch";
-import * as actions from "../user/actions";
+import { createIdentity } from "./auth.action";
 
 export default new Hono()
   // landing route
@@ -30,25 +29,27 @@ export default new Hono()
     zValidator(
       "query",
       z.object({
+        userId: z.number(),
         signature: z.string(),
+        type: zSignType,
       })
     ),
     async (ctx) => {
       const { username, fullName, address, imageUrl, about } =
         ctx.req.valid("json");
-      const { signature } = ctx.req.valid("query");
+      const { signature, type, userId } = ctx.req.valid("query");
 
       const resp = await tryCatch(
-        actions.createIdentity(
+        createIdentity(
           {
-            userId: -1,
+            userId,
             username,
             about,
             fullName,
             imageUrl,
             receiver: address,
           },
-          signature
+          { type, signature }
         )
       );
 
@@ -60,7 +61,6 @@ export default new Hono()
     }
   )
 
-  // challenge service
   .post(
     "/challenge",
     zValidator("json", z.object({ address: zSuiAddress })),

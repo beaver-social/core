@@ -2,20 +2,19 @@ import { and, eq, sql } from "drizzle-orm";
 import * as interactionSchema from "../../schema/interactions";
 import * as contentSchema from "../../schema/content";
 import * as userSchema from "../../schema/user";
-import { createAction } from "../../lib/actions/factory";
 import { z } from "zod";
 import { zMedia } from "../../lib/zod/helpers";
-import db from "../../schema";
 import * as postHelpers from "./post.helpers";
+import { createAction } from "../../lib/actions/factory";
 
 // POST ACTIONS
 export const createPost = createAction<{
   content: string;
   parentId: number | undefined;
-  topicId: number | undefined;
   media: z.infer<typeof zMedia>[];
+  flags?: { nsfw?: boolean; subscriberOnly?: boolean };
 }>()(
-  async (tx, { userId, content, parentId, topicId, media }) => {
+  async (tx, { userId, content, parentId, media, flags }) => {
     // Sanitize and validate content
     const sanitizedContent = postHelpers.sanitizePostContent(content);
     const validation = postHelpers.validatePostContent(sanitizedContent);
@@ -24,21 +23,81 @@ export const createPost = createAction<{
       throw new Error(validation.message);
     }
 
+    // checks for replies
+    if (parentId) {
+      const [parentPost] = await tx
+        .select()
+        .from(contentSchema.posts)
+        .where(eq(contentSchema.posts.id, parentId))
+        .limit(1);
+
+      if (!parentPost) {
+        throw new Error("Parent post not found");
+      }
+
+      if (parentPost.deletedAt) {
+        throw new Error("Cannot reply to a deleted post");
+      }
+
+      if (parentPost.authorId === userId) {
+        throw new Error("You cannot reply to your own post");
+      }
+
+      if (parentPost.subscriberOnly) {
+        const [{ id: parentAuthorId }] = await tx
+          .select({ id: userSchema.users.id })
+          .from(userSchema.users)
+          .where(eq(userSchema.users.id, parentPost.authorId))
+          .limit(1);
+
+        if (!parentAuthorId) {
+          throw new Error("Parent post author not found");
+        }
+
+        const [{ type: followType }] = await tx
+          .select({
+            type: interactionSchema.follows.type,
+          })
+          .from(interactionSchema.follows)
+          .where(
+            and(
+              eq(interactionSchema.follows.followerId, userId),
+              eq(interactionSchema.follows.followingId, parentAuthorId)
+            )
+          )
+          .limit(1);
+
+        if (!followType) {
+          throw new Error("You are not following this user");
+        }
+
+        if (followType !== "subscribe") {
+          throw new Error("You are not subscribed to this user");
+        }
+      }
+    }
+
+    const tags = postHelpers.extractHashtags(sanitizedContent);
+    const mentions = postHelpers.extractMentions(sanitizedContent);
+
     const [post] = await tx
       .insert(contentSchema.posts)
       .values({
         authorId: userId,
         content: sanitizedContent,
-        parent: parentId ?? null,
-        topicId: topicId ?? null,
+        parentId: parentId ?? null,
+        nsfw: !!flags?.nsfw,
+        subscriberOnly: !!flags?.subscriberOnly,
+        tags: tags.join(","),
+        mentions: mentions.join(","),
       })
       .returning({
         id: contentSchema.posts.id,
+        parentId: contentSchema.posts.parentId,
       });
 
     // Process media items
     for (const mediaItem of media) {
-      // Process different media types
       if (mediaItem.type === "image") {
         try {
           // Convert Base64 to Buffer
@@ -84,7 +143,6 @@ export const createPost = createAction<{
           throw new Error(`Failed to process video: ${error.message}`);
         }
       } else {
-        // For other media types, just store the URL as-is
         await tx.insert(contentSchema.media).values({
           contentId: post.id,
           contentTypeId: 1,
@@ -94,19 +152,26 @@ export const createPost = createAction<{
       }
     }
 
-    // Extract hashtags and mentions for later processing if needed
-    const hashtags = postHelpers.extractHashtags(sanitizedContent);
-    const mentions = postHelpers.extractMentions(sanitizedContent);
-
-    // Additional processing could be done with hashtags and mentions here
-
     return post;
   },
   async (tx, post, action) => {
-    await tx.insert(interactionSchema.contentActions).values({
-      actionId: action.id,
-      contentId: post.id,
-    });
+    // update post action id
+    await tx
+      .update(contentSchema.posts)
+      .set({
+        actionId: action.id,
+      })
+      .where(eq(contentSchema.posts.id, post.id));
+
+    // update parent's reply count
+    if (post.parentId) {
+      await tx
+        .update(contentSchema.posts)
+        .set({
+          repliesCount: sql`${contentSchema.posts.repliesCount} + 1`,
+        })
+        .where(eq(contentSchema.posts.id, post.parentId));
+    }
   }
 );
 
@@ -319,84 +384,6 @@ export const unpinPost = createAction<{
     .where(eq(userSchema.users.id, userId));
 });
 
-export const reply = createAction<{
-  postId: number;
-  content: string;
-  media: string[];
-}>()(
-  async (tx, { userId, content, media, postId }) => {
-    // Sanitize and validate content
-    const sanitizedContent = postHelpers.sanitizePostContent(content);
-    const validation = postHelpers.validatePostContent(sanitizedContent);
-
-    if (!validation.valid) {
-      throw new Error(validation.message);
-    }
-
-    const [{ deletedAt }] = await tx
-      .select()
-      .from(contentSchema.posts)
-      .where(eq(contentSchema.posts.id, postId))
-      .limit(1);
-
-    if (deletedAt) {
-      throw new Error("Cannot reply to a deleted post");
-    }
-
-    const [post] = await tx
-      .insert(contentSchema.posts)
-      .values({
-        authorId: userId,
-        content: sanitizedContent,
-        parent: postId,
-      })
-      .returning();
-
-    for (const mediaItem of media) {
-      await tx.insert(contentSchema.media).values({
-        contentId: post.id,
-        contentTypeId: 1,
-        url: mediaItem,
-        type: "image",
-      });
-    }
-
-    let current: number | null = postId;
-    while (current) {
-      await tx
-        .update(contentSchema.posts)
-        .set({
-          repliesCount: sql`${contentSchema.posts.repliesCount} + 1`,
-        })
-        .where(eq(contentSchema.posts.id, current));
-
-      const [next] = await tx
-        .select({ parent: contentSchema.posts.parent })
-        .from(contentSchema.posts)
-        .where(eq(contentSchema.posts.id, current))
-        .limit(1);
-
-      current = next?.parent ?? null;
-    }
-
-    return post;
-  },
-  async (tx, post, action) => {
-    await tx
-      .update(interactionSchema.contentActions)
-      .set({
-        actionId: action.id,
-        contentId: post.id,
-      })
-      .where(
-        and(
-          eq(interactionSchema.contentActions.contentId, post.id),
-          eq(interactionSchema.contentActions.actionId, action.id)
-        )
-      );
-  }
-);
-
 export const updatePost = createAction<{
   postId: number;
   content: string;
@@ -587,7 +574,7 @@ export const repostPost = createAction<{
       .values({
         authorId: userId,
         content: sanitizedContent,
-        parent: postId,
+        parentId: postId,
       })
       .returning({ id: contentSchema.posts.id });
 
@@ -621,7 +608,7 @@ export const unrepostPost = createAction<{
       and(
         eq(contentSchema.posts.id, repostId),
         eq(contentSchema.posts.authorId, userId),
-        eq(contentSchema.posts.parent, postId)
+        eq(contentSchema.posts.parentId, postId)
       )
     )
     .limit(1);

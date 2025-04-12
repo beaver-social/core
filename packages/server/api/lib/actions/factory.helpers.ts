@@ -6,6 +6,7 @@ import {
 import { verifyPersonalMessageSignature } from "@mysten/sui/verify";
 import { users } from "../../schema/user/users";
 import db from "../../schema";
+import { DB } from "../../schema";
 import { tryCatch } from "../../lib/tryCatch";
 import { desc, eq } from "drizzle-orm";
 import { camelToDotCase } from "../../lib/utils";
@@ -79,7 +80,7 @@ export async function verifyUserSignature(
 export async function executeActionFunction<T, R>(
   tx: Transaction,
   fn: (tx: Transaction, args: ActionOptions<T>) => Promise<R>,
-  options: ActionOptions<T>,
+  options: ActionOptions<T> & { _user: DB["user"] },
   actionType: string
 ): Promise<R> {
   const result = await tryCatch(fn(tx, options));

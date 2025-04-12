@@ -1,7 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
-import { zMedia, zNumberString } from "../../lib/zod/helpers";
+import { zMedia, zNumberString, zSignType } from "../../lib/zod/helpers";
 import { tryCatch } from "../../lib/tryCatch";
 import * as actions from "./post.action";
 import { desc, eq, and, sql } from "drizzle-orm";
@@ -235,7 +235,7 @@ export default new Hono()
   )
 
   // ***write actions on a post - using custom actions from post.action.ts***
-  // create a new post
+  // create a new post (pass parentId to reply to a post)
   .post(
     "/create",
     zValidator(
@@ -243,8 +243,13 @@ export default new Hono()
       z.object({
         content: z.string(),
         media: zMedia.array(),
-        topicId: z.number().optional(),
         parentId: z.number().optional(),
+        flags: z
+          .object({
+            nsfw: z.boolean().optional(),
+            subscriberOnly: z.boolean().optional(),
+          })
+          .optional(),
       })
     ),
     zValidator(
@@ -252,11 +257,11 @@ export default new Hono()
       z.object({
         userId: z.number(),
         signature: z.string(),
-        type: z.enum(["wallet", "zk"]),
+        type: zSignType,
       })
     ),
     async (ctx) => {
-      const { content, media, topicId, parentId } = ctx.req.valid("json");
+      const { content, media, parentId } = ctx.req.valid("json");
       const { userId, signature, type } = ctx.req.valid("query");
 
       // Pre-validate content before sending to action
@@ -267,7 +272,7 @@ export default new Hono()
 
       const result = await tryCatch(
         actions.createPost(
-          { userId, content, media, topicId, parentId },
+          { userId, content, media, parentId },
           { signature, type }
         )
       );
@@ -287,7 +292,7 @@ export default new Hono()
       z.object({
         userId: z.number(),
         signature: z.string(),
-        type: z.enum(["wallet", "zk"]),
+        type: zSignType,
       })
     ),
     zValidator("param", z.object({ id: z.string() })),
@@ -325,7 +330,7 @@ export default new Hono()
       z.object({
         userId: z.number(),
         signature: z.string(),
-        type: z.enum(["wallet", "zk"]),
+        type: zSignType,
       })
     ),
     async (ctx) => {
@@ -363,7 +368,7 @@ export default new Hono()
       z.object({
         userId: z.number(),
         signature: z.string(),
-        type: z.enum(["wallet", "zk"]),
+        type: zSignType,
         reaction: z.string().optional(),
       })
     ),
@@ -391,7 +396,7 @@ export default new Hono()
       z.object({
         userId: z.number(),
         signature: z.string(),
-        type: z.enum(["wallet", "zk"]),
+        type: zSignType,
       })
     ),
     async (ctx) => {
@@ -427,7 +432,7 @@ export default new Hono()
       z.object({
         userId: z.number(),
         signature: z.string(),
-        type: z.enum(["wallet", "zk"]),
+        type: zSignType,
       })
     ),
     async (ctx) => {
@@ -471,7 +476,7 @@ export default new Hono()
       z.object({
         userId: z.number(),
         signature: z.string(),
-        type: z.enum(["wallet", "zk"]),
+        type: zSignType,
       })
     ),
     async (ctx) => {
@@ -503,7 +508,7 @@ export default new Hono()
       z.object({
         userId: z.number(),
         signature: z.string(),
-        type: z.enum(["wallet", "zk"]),
+        type: zSignType,
       })
     ),
     async (ctx) => {
@@ -535,7 +540,7 @@ export default new Hono()
       z.object({
         userId: z.number(),
         signature: z.string(),
-        type: z.enum(["wallet", "zk"]),
+        type: zSignType,
       })
     ),
     async (ctx) => {
@@ -569,7 +574,7 @@ export default new Hono()
       z.object({
         userId: z.number(),
         signature: z.string(),
-        type: z.enum(["wallet", "zk"]),
+        type: zSignType,
       })
     ),
     async (ctx) => {
@@ -609,7 +614,7 @@ export default new Hono()
       z.object({
         userId: z.number(),
         signature: z.string(),
-        type: z.enum(["wallet", "zk"]),
+        type: zSignType,
       })
     ),
     async (ctx) => {
@@ -641,7 +646,7 @@ export default new Hono()
       z.object({
         userId: z.number(),
         signature: z.string(),
-        type: z.enum(["wallet", "zk"]),
+        type: zSignType,
       })
     ),
     async (ctx) => {

@@ -1,11 +1,11 @@
-import * as contentInteractions from "./content";
-import * as socialInteractions from "./social";
-import * as moderationInteractions from "./moderation";
-import * as actionInteractions from "./actions";
+import * as contentInteractionsSchema from "./content";
+import * as socialInteractionsSchema from "./social";
+import * as moderationInteractionsSchema from "./moderation";
+import * as actionInteractionsSchema from "./actions";
 
 // Convenience exports for common tables
-export const { likes, saves, views, comments } = contentInteractions;
-export const { follows, topicFollows } = socialInteractions;
-export const { reports } = moderationInteractions;
+export const { likes, saves, views, comments } = contentInteractionsSchema;
+export const { follows, topicFollows } = socialInteractionsSchema;
+export const { reports } = moderationInteractionsSchema;
 export const { actions, actionFunctions, actionRequests, contentActions } =
-  actionInteractions;
+  actionInteractionsSchema;

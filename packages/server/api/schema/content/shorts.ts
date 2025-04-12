@@ -2,7 +2,7 @@ import { sqliteTable as table } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
 import { timestamps } from "../helpers";
 import { users } from "../user/users";
-import { topics } from "./topics";
+import { actions } from "../interactions/actions";
 
 export const shorts = table(
   "shorts",
@@ -13,17 +13,17 @@ export const shorts = table(
       .int("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    topicId: t
-      .int("space_id")
-      .references(() => topics.id, { onDelete: "cascade" }), // Optional reference to a topic
     viewCount: t.int("view_count").default(0),
     likesCount: t.int("likes_count").default(0),
     commentsCount: t.int("comments_count").default(0),
     sharesCount: t.int("shares_count").default(0),
+    repostsCount: t.int("reposts_count").default(0),
+    tags: t.text("tags").default(""),
+    mentions: t.text("mentions").default(""),
     ...timestamps,
+    subscriberOnly: t
+      .int("subscriber_only", { mode: "boolean" })
+      .default(false),
   },
-  (table) => [
-    t.index("author_short_idx").on(table.authorId),
-    t.index("topic_short_idx").on(table.topicId),
-  ]
+  (table) => [t.index("author_short_idx").on(table.authorId)]
 );

@@ -1,3 +1,3 @@
-import * as user from "./users";
+import * as userSchema from "./users";
 
-export const { users } = user;
+export const { users } = userSchema;
