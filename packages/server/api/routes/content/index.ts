@@ -9,12 +9,12 @@ import topic from "./topic";
 export default new Hono()
   // feed posts
   .route("/posts", posts)
-  .route("/posts/:id", post)
+  .route("/post/:id", post)
 
   // shorts (separated to improve performance by using a different database table for shorts)
   .route("/shorts", shorts)
-  .route("/shorts/:id", short)
+  .route("/short/:id", short)
 
   // topics (public or private communities / topics that curate content which users can follow)
   .route("/topics", topics)
-  .route("/topics/:id", topic);
+  .route("/topic/:id", topic);

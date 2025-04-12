@@ -19,6 +19,7 @@ export const likes = table(
       .notNull()
       .references(() => contentTypes.id),
     ...timestamps,
+    reaction: t.text().default("like"),
   },
   (table) => [
     t
@@ -29,9 +30,9 @@ export const likes = table(
   ]
 );
 
-// Bookmarks for posts and shorts
-export const bookmarks = table(
-  "bookmarks",
+// Saves for posts and shorts
+export const saves = table(
+  "saves",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
     userId: t
@@ -47,36 +48,10 @@ export const bookmarks = table(
   },
   (table) => [
     t
-      .uniqueIndex("content_user_bookmark_idx")
+      .uniqueIndex("content_user_save_idx")
       .on(table.contentId, table.userId, table.contentTypeId),
-    t.index("content_bookmark_idx").on(table.contentId, table.contentTypeId),
-    t.index("user_bookmark_idx").on(table.userId),
-  ]
-);
-
-// Emoji reactions
-export const reactions = table(
-  "reactions",
-  {
-    id: t.int().primaryKey({ autoIncrement: true }),
-    userId: t
-      .int("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    contentId: t.int("content_id").notNull(), // ID of the post or short
-    contentTypeId: t
-      .int("content_type_id")
-      .notNull()
-      .references(() => contentTypes.id),
-    emoji: t.text().notNull(),
-    ...timestamps,
-  },
-  (table) => [
-    t
-      .uniqueIndex("content_user_emoji_idx")
-      .on(table.contentId, table.userId, table.emoji, table.contentTypeId),
-    t.index("content_reaction_idx").on(table.contentId, table.contentTypeId),
-    t.index("user_reaction_idx").on(table.userId),
+    t.index("content_save_idx").on(table.contentId, table.contentTypeId),
+    t.index("user_save_idx").on(table.userId),
   ]
 );
 
@@ -103,10 +78,12 @@ export const views = table(
   (table) => [
     t.index("content_view_idx").on(table.contentId, table.contentTypeId),
     t.index("user_view_idx").on(table.userId),
+    t.index("content_view_idx").on(table.contentId, table.contentTypeId),
+    t.index("viewed_at_idx").on(table.viewedAt),
   ]
 );
 
-// Comments for posts and shorts
+// Comments for content only
 export const comments = table(
   "comments",
   {
@@ -115,14 +92,13 @@ export const comments = table(
       .int("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    contentId: t.int("content_id").notNull(), // ID of the post or short
+    contentId: t.int("content_id").notNull(), // ID of the short
     contentTypeId: t
       .int("content_type_id")
       .notNull()
       .references(() => contentTypes.id),
     content: t.text().notNull(),
     parentId: t.int("parent_id"), // For nested comments (replies to comments)
-    isDeleted: t.int("is_deleted", { mode: "boolean" }).default(false),
     ...timestamps,
   },
   (table) => [

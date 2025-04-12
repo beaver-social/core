@@ -1,0 +1,215 @@
+import { and, eq, sql } from "drizzle-orm";
+import { likes } from "../../lib/db/schema/like";
+import { post_action, post_media, posts } from "../../lib/db/schema/post";
+import { createAction } from "../../lib/db/actions/factory";
+import { users } from "../../lib/db/schema/user";
+
+export const createPost = createAction<{
+  content: string;
+  media: { url: string; type: string }[];
+}>()(
+  async (tx, { userId, content, media }) => {
+    const [post] = await tx
+      .insert(posts)
+      .values({
+        authorId: userId,
+        content: content.trim(),
+      })
+      .returning();
+
+    for (const mediaItem of media) {
+      await tx.insert(post_media).values({
+        postId: post.id,
+        url: mediaItem.url,
+        type: mediaItem.type,
+      });
+    }
+
+    return post;
+  },
+  async (tx, post, action) => {
+    await tx.insert(post_action).values({
+      actionId: action.id,
+      postId: post.id,
+    });
+  }
+);
+
+export const deletePost = createAction<{ postId: number }>()(
+  async (tx, { postId }) => {
+    const [post] = await tx
+      .update(posts)
+      .set({
+        deletedAt: Date.now(),
+        likesCount: 0,
+        content: "deleted",
+        authorId: -1,
+      })
+      .where(eq(posts.id, postId))
+      .returning();
+
+    await tx.delete(post_media).where(eq(post_media.postId, postId));
+
+    return post;
+  },
+  async (tx, post) => {
+    await tx
+      .update(post_action)
+      .set({ deleted: true })
+      .where(eq(post_action.postId, post.id));
+  }
+);
+
+export const likePost = createAction<{ postId: number }>()(
+  async (tx, { postId, userId }) => {
+    await tx.insert(likes).values({
+      userId: userId,
+      postId: postId,
+    });
+
+    await tx
+      .update(posts)
+      .set({
+        likesCount: sql`${posts.likesCount} + 1`,
+      })
+      .where(eq(posts.id, postId));
+  }
+);
+
+export const unlikePost = createAction<{ postId: number }>()(
+  async (tx, { postId, userId }) => {
+    await tx
+      .delete(likes)
+      .where(and(eq(likes.userId, userId), eq(likes.postId, postId)));
+
+    await tx
+      .update(posts)
+      .set({
+        likesCount: sql`GREATEST(${posts.likesCount} - 1, 0)`,
+      })
+      .where(eq(posts.id, postId));
+  }
+);
+
+export const pinPost = createAction<{ postId: number }>()(
+  async (tx, { postId, userId }) => {
+    const [post] = await tx
+      .select({ deletedAt: posts.deletedAt })
+      .from(posts)
+      .where(and(eq(posts.id, postId), eq(posts.authorId, userId)))
+      .limit(1);
+
+    if (!post) {
+      throw new Error("Post not found");
+    }
+
+    if (post.deletedAt) {
+      throw new Error("Cannot pin a deleted post");
+    }
+
+    const [user] = await tx
+      .select({ pinned: users.pinned })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (user?.pinned === postId) {
+      throw new Error("Post is already pinned");
+    }
+
+    await tx
+      .update(users)
+      .set({
+        pinned: postId,
+      })
+      .where(eq(users.id, userId));
+  }
+);
+
+export const unpinPost = createAction<{}>()(async (tx, { userId }) => {
+  const [user] = await tx
+    .select({ pinned: users.pinned })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  if (!user?.pinned) {
+    throw new Error("No post is currently pinned");
+  }
+
+  await tx
+    .update(users)
+    .set({
+      pinned: null,
+    })
+    .where(eq(users.id, userId));
+});
+
+export const reply = createAction<{
+  postId: number;
+  content: string;
+  media: string[];
+}>()(
+  async (tx, { userId, content, media, postId }) => {
+    const [{ deletedAt }] = await tx
+      .select()
+      .from(posts)
+      .where(eq(posts.id, postId))
+      .limit(1);
+
+    if (deletedAt) {
+      throw new Error("Cannot reply to a deleted post");
+    }
+
+    const [post] = await tx
+      .insert(posts)
+      .values({
+        authorId: userId,
+        content: content.trim(),
+        parent: postId,
+      })
+      .returning();
+
+    for (const mediaItem of media) {
+      await tx.insert(post_media).values({
+        postId: post.id,
+        url: mediaItem,
+        type: "image",
+      });
+    }
+
+    let current: number | null = postId;
+    while (current) {
+      await tx
+        .update(posts)
+        .set({
+          repliesCount: sql`${posts.repliesCount} + 1`,
+        })
+        .where(eq(posts.id, current));
+
+      const [next] = await tx
+        .select({ parent: posts.parent })
+        .from(posts)
+        .where(eq(posts.id, current))
+        .limit(1);
+
+      current = next?.parent ?? null;
+    }
+
+    return post;
+  },
+  async (tx, post, action) => {
+    await tx
+      .update(post_action)
+      .set({
+        actionId: action.id,
+        postId: post.id,
+      })
+      .where(
+        and(
+          eq(post_action.postId, post.id),
+          eq(post_action.actionId, action.id)
+        )
+      );
+  }
+);

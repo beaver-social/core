@@ -20,6 +20,7 @@ export const media = table(
     duration: t.int(), // For audio/video content
     width: t.int(), // For image/video dimensions
     height: t.int(), // For image/video dimensions
+    altText: t.text(), // Optional alt text for accessibility
     ...timestamps,
   },
   (table) => [

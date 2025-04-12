@@ -4,7 +4,7 @@ import { z } from "zod";
 import { zSuiAddress } from "../../lib/zod/helpers";
 import { checkUsernameAvailability, isAddressRegistered } from "./helpers";
 import { tryCatch } from "../../lib/tryCatch";
-import * as actions from "../../lib/db/actions"
+import * as actions from "../user/actions";
 
 export default new Hono()
   // landing route
@@ -15,7 +15,8 @@ export default new Hono()
   })
 
   // register identity
-  .post("/register",
+  .post(
+    "/register",
     zValidator(
       "json",
       z.object({
@@ -24,26 +25,35 @@ export default new Hono()
         address: zSuiAddress,
         imageUrl: z.string(),
         about: z.string(),
-      }),
+      })
     ),
-    zValidator("query", z.object({
-      signature: z.string(),
-    })),
+    zValidator(
+      "query",
+      z.object({
+        signature: z.string(),
+      })
+    ),
     async (ctx) => {
-      const { username, fullName, address, imageUrl, about } = ctx.req.valid("json")
-      const { signature } = ctx.req.valid("query")
+      const { username, fullName, address, imageUrl, about } =
+        ctx.req.valid("json");
+      const { signature } = ctx.req.valid("query");
 
-      const resp = await tryCatch(actions.createIdentity({
-        userId: -1,
-        username,
-        about,
-        fullName,
-        imageUrl,
-        receiver: address,
-      }, signature))
+      const resp = await tryCatch(
+        actions.createIdentity(
+          {
+            userId: -1,
+            username,
+            about,
+            fullName,
+            imageUrl,
+            receiver: address,
+          },
+          signature
+        )
+      );
 
       if (resp.error) {
-        return ctx.err(resp.error?.message || "Failed to create identity", 400)
+        return ctx.err(resp.error?.message || "Failed to create identity", 400);
       }
 
       return ctx.ok({}, "Identity Created Successfully", 201);

@@ -15,9 +15,9 @@ const schema = {
   ...user,
   ...post,
   ...short,
+  ...media,
   ...topic,
   ...interaction,
-  ...media,
   ...timezone,
   ...helper,
 };

@@ -13,15 +13,13 @@ export const shorts = table(
       .int("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    thumbnailUrl: t.text("thumbnail_url"), // Optional thumbnail
     topicId: t
       .int("space_id")
       .references(() => topics.id, { onDelete: "cascade" }), // Optional reference to a topic
-    isPinned: t.int("is_pinned", { mode: "boolean" }).default(false),
-    isDeleted: t.int("is_deleted", { mode: "boolean" }).default(false),
     viewCount: t.int("view_count").default(0),
     likesCount: t.int("likes_count").default(0),
     commentsCount: t.int("comments_count").default(0),
+    sharesCount: t.int("shares_count").default(0),
     ...timestamps,
   },
   (table) => [

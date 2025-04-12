@@ -12,6 +12,7 @@ function err(msg: string) {
 }
 
 export default new Hono()
+  // get all posts
   .get(
     "/",
     zValidator(
@@ -53,6 +54,7 @@ export default new Hono()
     }
   )
 
+  // get post by id
   .get(
     "/:id",
     zValidator(

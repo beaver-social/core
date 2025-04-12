@@ -23,7 +23,7 @@ export const users = table(
     t.uniqueIndex("identity_idx").on(table.identity),
     t.uniqueIndex("username_idx").on(table.username),
     t.uniqueIndex("address_idx").on(table.address),
-    t.uniqueIndex("suins_idx").on(table.suinsDomainName)
+    t.uniqueIndex("suins_idx").on(table.suinsDomainName),
   ]
 );
 

@@ -2,7 +2,7 @@ import { Hono } from "hono";
 
 export default new Hono()
   // Public post actions
-  // Get details for a post by id
+  // Get details for a post
   .get("/", (ctx) => {
     return ctx.json({
       message: "get details for a post by id",

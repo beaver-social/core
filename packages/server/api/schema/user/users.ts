@@ -10,14 +10,14 @@ export const users = table(
     id: t.int().primaryKey({ autoIncrement: true }),
     identity: suiAddressType().notNull(),
     username: t.text().notNull().unique(),
-    displayName: t.text("display_name").notNull(),
-    bio: t.text("bio"),
-    avatarUrl: t.text("avatar_url"),
+    fullName: t.text("full_name").notNull(),
+    about: t.text("about"),
+    imageUrl: t.text("image_url"),
     bannerUrl: t.text("banner_url"),
-    address: suiAddressType("address").notNull(),
+    suiAddress: suiAddressType("address").notNull(),
+    suinsDomainName: t.text("suins_domain_name"),
     email: t.text("email"),
     isVerified: t.int("is_verified", { mode: "boolean" }).default(false),
-    suinsDomainName: t.text("suins_domain_name"),
     timezone: t.int("timezone"),
     pinnedPost: t
       .int("pinned_post")
@@ -29,7 +29,7 @@ export const users = table(
   },
   (table) => [
     t.uniqueIndex("username_idx").on(table.username),
-    t.uniqueIndex("address_idx").on(table.address),
+    t.uniqueIndex("address_idx").on(table.suiAddress),
     t.uniqueIndex("identity_idx").on(table.identity),
     t.uniqueIndex("suins_idx").on(table.suinsDomainName),
   ]

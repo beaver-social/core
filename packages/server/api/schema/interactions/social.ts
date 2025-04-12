@@ -17,6 +17,7 @@ export const follows = table(
       .int("following_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    type: t.text("type").notNull(), // follow, notify, subscribe, join
     ...timestamps,
   },
   (table) => [
@@ -28,7 +29,7 @@ export const follows = table(
 
 // Topic follows
 export const topicFollows = table(
-  "space_follows",
+  "topic_follows",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
     userId: t
@@ -36,11 +37,11 @@ export const topicFollows = table(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     topicId: t
-      .int("space_id")
+      .int("topic_id")
       .notNull()
       .references(() => topics.id, { onDelete: "cascade" }),
-    isMuted: t.int("is_muted", { mode: "boolean" }).default(false),
     ...timestamps,
+    type: t.text("type").notNull(), // follow, notify
   },
   (table) => [
     t.uniqueIndex("user_topic_follow_idx").on(table.userId, table.topicId),
