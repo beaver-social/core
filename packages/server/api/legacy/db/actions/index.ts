@@ -3,11 +3,11 @@ import { likes } from "../schema/like";
 import { post_action, post_media, posts } from "../schema/post";
 import { createAction } from "./factory";
 import { users } from "../schema/user";
-import { contracts } from "../../sui/contracts";
+import { contracts } from "../../../lib/sui/contracts";
 import { Transaction } from "@mysten/sui/transactions";
-import { defaultAdminCapId } from "../../sui/constants";
-import suiClient, { serverKeypair } from "../../sui/client";
-import { tryCatch } from "../../tryCatch";
+import { defaultAdminCapId } from "../../../lib/sui/constants";
+import suiClient, { serverKeypair } from "../../../lib/sui/client";
+import { tryCatch } from "../../../lib/tryCatch";
 
 export const makePost = createAction<{
   content: string;

@@ -56,7 +56,7 @@ export default new Hono()
         const data = await db
           .select()
           .from(userSchema.users)
-          .where(eq(userSchema.users.suiAddress, address))
+          .where(eq(userSchema.users.address, address))
           .limit(1);
         user = data[0];
       }

@@ -2,13 +2,13 @@ import {
   actionFunctions,
   actionRequests,
   actions,
-} from "../../../schema/interactions/actions";
+} from "../../schema/interactions";
 import { verifyPersonalMessageSignature } from "@mysten/sui/verify";
-import { users } from "../../../schema/user/users";
-import db from "../../../schema";
-import { tryCatch } from "../../tryCatch";
+import { users } from "../../schema/user/users";
+import db from "../../schema";
+import { tryCatch } from "../../lib/tryCatch";
 import { desc, eq } from "drizzle-orm";
-import { camelToDotCase } from "../../utils";
+import { camelToDotCase } from "../../lib/utils";
 import { createAction } from "./factory";
 import { encode as msgpackEncode, decode as msgpackDecode } from "msgpackr";
 

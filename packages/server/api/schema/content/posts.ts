@@ -3,6 +3,7 @@ import * as t from "drizzle-orm/sqlite-core";
 import { timestamps } from "../helpers";
 import { users } from "../user/users";
 import { topics } from "./topics";
+
 export const posts = table(
   "posts",
   {

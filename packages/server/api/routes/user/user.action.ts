@@ -3,7 +3,7 @@ import { Transaction } from "@mysten/sui/transactions";
 import { defaultAdminCapId } from "../../lib/sui/constants";
 import suiClient, { serverKeypair } from "../../lib/sui/client";
 import { tryCatch } from "../../lib/tryCatch";
-import { createAction } from "../../lib/utils/actions/factory";
+import { createAction } from "../../lib/actions/factory";
 import * as userSchema from "../../schema/user";
 
 export const createIdentity = createAction<{
@@ -58,7 +58,7 @@ export const createIdentity = createAction<{
       fullName: fullName,
       imageUrl: imageUrl,
       about: about,
-      suiAddress: receiver,
+      address: receiver,
     })
   );
 

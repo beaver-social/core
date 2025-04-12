@@ -14,7 +14,7 @@ export const users = table(
     about: t.text("about"),
     imageUrl: t.text("image_url"),
     bannerUrl: t.text("banner_url"),
-    suiAddress: suiAddressType("address").notNull(),
+    address: suiAddressType("address").notNull(),
     suinsDomainName: t.text("suins_domain_name"),
     email: t.text("email"),
     isVerified: t.int("is_verified", { mode: "boolean" }).default(false),
@@ -29,7 +29,7 @@ export const users = table(
   },
   (table) => [
     t.uniqueIndex("username_idx").on(table.username),
-    t.uniqueIndex("address_idx").on(table.suiAddress),
+    t.uniqueIndex("address_idx").on(table.address),
     t.uniqueIndex("identity_idx").on(table.identity),
     t.uniqueIndex("suins_idx").on(table.suinsDomainName),
   ]

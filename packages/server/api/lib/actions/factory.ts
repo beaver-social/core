@@ -1,4 +1,4 @@
-import db, { DB } from "../../../schema";
+import db, { DB } from "../../schema";
 import * as helpers from "./factory.helpers";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>["0"]>["0"];

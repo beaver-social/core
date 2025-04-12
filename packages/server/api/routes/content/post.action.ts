@@ -1,8 +1,8 @@
 import { and, eq, sql } from "drizzle-orm";
-import { createAction } from "../../lib/actions/factory";
 import * as interactionSchema from "../../schema/interactions";
 import * as contentSchema from "../../schema/content";
 import * as userSchema from "../../schema/user";
+import { createAction } from "../../lib/actions/factory";
 
 export const createPost = createAction<{
   content: string;

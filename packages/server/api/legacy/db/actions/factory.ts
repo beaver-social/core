@@ -1,7 +1,7 @@
 import { actionFunctions, actionRequests, actions } from "../schema/action";
 import { verifyPersonalMessageSignature } from "@mysten/sui/verify";
 import { users } from "../schema/user";
-import { tryCatch } from "../../tryCatch";
+import { tryCatch } from "../../../lib/tryCatch";
 import { deriveActionNameFromFn } from "./utils";
 import db from "..";
 import { desc, eq } from "drizzle-orm";
