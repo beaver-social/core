@@ -1,5 +1,6 @@
 import db, { DB } from "../../schema";
 import * as helpers from "./factory.helpers";
+import * as utils from "../utils";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>["0"]>["0"];
 type ActionOptions<T> = T & { userId: number };
@@ -54,8 +55,8 @@ export function createAction<T>() {
         );
 
         // Store action metadata
-        const hash = helpers.generateHash(payload);
-        const fnHash = helpers.generateHash(fn.toString());
+        const hash = utils.generateHash(payload);
+        const fnHash = utils.generateHash(fn.toString());
 
         // Store function definition if needed
         const fnId = await helpers.storeFunctionDefinition(tx, fnHash, keys);

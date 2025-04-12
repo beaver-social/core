@@ -9,3 +9,7 @@ export function camelToDotCase(str: string | null | undefined): string {
 
   return "v1." + dotSeparated.toLowerCase();
 }
+
+export function generateHash(data: string): string {
+  return new Bun.CryptoHasher("sha3-256").update(data).digest("hex");
+}

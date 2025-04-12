@@ -9,7 +9,7 @@ import db from "../schema";
 import { eq } from "drizzle-orm";
 import { zJwtPayload } from "../lib/zod/helpers";
 import { users } from "../schema/user/users";
-import { generateHash } from "../lib/actions/factory.helpers";
+import { generateHash } from "../lib/utils";
 
 const cache = new LRUCache<string, DB["user"]>({
   max: 1000,

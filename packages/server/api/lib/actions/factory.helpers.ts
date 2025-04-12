@@ -94,10 +94,6 @@ export async function executeActionFunction<T, R>(
   return result.data;
 }
 
-export function generateHash(data: string): string {
-  return new Bun.CryptoHasher("sha3-256").update(data).digest("hex");
-}
-
 export async function storeFunctionDefinition(
   tx: Transaction,
   fnHash: string,
