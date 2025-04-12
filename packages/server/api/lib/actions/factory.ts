@@ -13,7 +13,13 @@ export function createAction<T>() {
       action: DB["action"]
     ) => void | Promise<void>
   ) {
-    return async function (options: ActionOptions<T>, signature: string) {
+    return async function (
+      options: ActionOptions<T>,
+      signature: {
+        type: "wallet" | "zk";
+        signature: string;
+      }
+    ) {
       // Prepare action request
       const actionType = helpers.deriveActionNameFromFn(fn);
       const prevHash = await helpers.getPreviousActionHash(options.userId);

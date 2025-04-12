@@ -1,104 +1,228 @@
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { z } from "zod";
+import { zMedia, zNumberString } from "../../lib/zod/helpers";
+import { tryCatch } from "../../lib/tryCatch";
+import * as actions from "./post.action";
+import { desc } from "drizzle-orm";
+import db from "../../schema";
+import { posts } from "../../schema/content";
 
 export default new Hono()
-  // Public post actions
-  // Get details for a post
-  .get("/", (ctx) => {
+  // ***read actions on a post - using direct db calls***
+  // get all posts (post feed)
+  .get(
+    "/",
+    zValidator(
+      "query",
+      z.object({
+        page: zNumberString,
+        limit: zNumberString,
+        type: z.enum(["trending", "following", "for_you"]),
+      })
+    ),
+    async (ctx) => {
+      const { page, limit, type } = ctx.req.valid("query");
+      const offset = (page - 1) * limit;
+
+      if (type === "trending") {
+        const result = await tryCatch(
+          db
+            .select()
+            .from(posts)
+            .orderBy(desc(posts.likesCount))
+            .limit(limit)
+            .offset(offset)
+        );
+
+        if (result.error) {
+          return ctx.err(
+            result.error?.message || "Failed to get posts feed",
+            400
+          );
+        }
+
+        return ctx.ok(result, "Posts feed fetched successfully", 200);
+      } else if (type === "following") {
+        const result = await tryCatch(
+          db
+            .select()
+            .from(posts)
+            .orderBy(desc(posts.likesCount))
+            .limit(limit)
+            .offset(offset)
+        );
+
+        if (result.error) {
+          return ctx.err(
+            result.error?.message || "Failed to get posts feed",
+            400
+          );
+        }
+
+        return ctx.ok(result, "Posts feed fetched successfully", 200);
+      } else if (type === "for_you") {
+        const result = await tryCatch(
+          db
+            .select()
+            .from(posts)
+            .orderBy(desc(posts.likesCount))
+            .limit(limit)
+            .offset(offset)
+        );
+
+        if (result.error) {
+          return ctx.err(
+            result.error?.message || "Failed to get posts feed",
+            400
+          );
+        }
+
+        return ctx.ok(result, "Posts feed fetched successfully", 200);
+      }
+    }
+  )
+  // get details for a post by id
+  .get("/:id", (ctx) => {
     return ctx.json({
       message: "get details for a post by id",
     });
   })
-  // View a post
-  .get("/view", (ctx) => {
+  // get view count of a post
+  .get("/views/:id", (ctx) => {
     return ctx.json({
-      message: "view a post",
+      message: "get view count of a post",
     });
   })
-  // Like a post
-  .post("/like", (ctx) => {
+  // get interactions data for a post
+  .get("/interactions/:id", (ctx) => {
+    return ctx.json({
+      message:
+        "get interactions data for post: like, repost, save, reply, view count",
+    });
+  })
+
+  // ***write actions on a post - using custom actions from post.action.ts***
+  // create a new post
+  .post(
+    "/create",
+    zValidator(
+      "json",
+      z.object({
+        content: z.string(),
+        media: zMedia.array(),
+        topicId: z.number().optional(),
+        parentId: z.number().optional(),
+      })
+    ),
+    zValidator(
+      "query",
+      z.object({
+        userId: z.number(),
+        signature: z.string(),
+        type: z.enum(["wallet", "zk"]),
+      })
+    ),
+    async (ctx) => {
+      const { content, media, topicId, parentId } = ctx.req.valid("json");
+      const { userId, signature, type } = ctx.req.valid("query");
+
+      const result = await tryCatch(
+        actions.createPost(
+          { userId, content, media, topicId, parentId },
+          { signature, type }
+        )
+      );
+
+      if (result.error) {
+        return ctx.err(result.error?.message || "Failed to create post", 400);
+      }
+
+      return ctx.ok({}, "Post Created Successfully", 201);
+    }
+  )
+  // Delete a post
+  .delete(
+    "/:id",
+    zValidator(
+      "query",
+      z.object({
+        userId: z.number(),
+        signature: z.string(),
+        type: z.enum(["wallet", "zk"]),
+      })
+    ),
+    zValidator("param", z.object({ id: z.string() })),
+    async (ctx) => {
+      const { id } = ctx.req.valid("param");
+      const { userId, signature, type } = ctx.req.valid("query");
+
+      const result = await tryCatch(
+        actions.deletePost(
+          { postId: parseInt(id), userId },
+          { signature, type }
+        )
+      );
+
+      if (result.error) {
+        return ctx.err(result.error?.message || "Failed to delete post", 400);
+      }
+
+      return ctx.ok({}, "Post Deleted Successfully", 201);
+    }
+  )
+  // Update a post
+  .patch("/:id", (ctx) => {
+    return ctx.json({
+      message: "update a post",
+    });
+  })
+  // increment view count of a post
+  .post("/view/:id", (ctx) => {
+    return ctx.json({
+      message: "increment view count of a post",
+    });
+  })
+  // like a post (optionally with an emoji)
+  .post("/like/:id", (ctx) => {
     return ctx.json({
       message: "like a post",
     });
   })
-  // Unlike a post
-  .post("/unlike", (ctx) => {
+  // unlike a post
+  .post("/unlike/:id", (ctx) => {
     return ctx.json({
       message: "unlike a post",
     });
   })
-  // Comment on a post
-  .post("/comment", (ctx) => {
+  // repost a post
+  .post("/repost", (ctx) => {
     return ctx.json({
-      message: "comment on a post",
+      message: "repost a post",
     });
   })
-  // Repost/share a post
-  .post("/share", (ctx) => {
+  // unrepost a post
+  .post("/unrepost", (ctx) => {
     return ctx.json({
-      message: "share a post on your profile",
+      message: "unrepost a post",
     });
   })
-  // Unrepost/unshare a post
-  .post("/unshare", (ctx) => {
+  // save a post
+  .post("/save", (ctx) => {
     return ctx.json({
-      message: "unshare a post from your profile",
+      message: "save a post",
     });
   })
-  // Bookmark a post
-  .post("/bookmark", (ctx) => {
+  // remove post from saved posts
+  .post("/unsave", (ctx) => {
     return ctx.json({
-      message: "bookmark a post",
+      message: "remove post from saved posts",
     });
   })
-  // Remove post from bookmarks
-  .post("/unbookmark", (ctx) => {
-    return ctx.json({
-      message: "remove post from bookmarks",
-    });
-  })
-  // Report a post
+  // report a post
   .post("/report", (ctx) => {
     return ctx.json({
       message: "report a post",
-    });
-  })
-  // React with emoji to post (future feature)
-  .post("/reactions", (ctx) => {
-    return ctx.json({
-      message: "react with emoji",
-    });
-  })
-  // Get action counts for a post
-  .get("/action-count", (ctx) => {
-    return ctx.json({
-      message:
-        "get data for post like count, repost count, comments count, view count",
-    });
-  })
-  // Get comments on a post
-  .get("/comments", (ctx) => {
-    return ctx.json({
-      message: "get comments on a post",
-    });
-  })
-  // Get reactions to a post (future feature)
-  .get("/reactions", (ctx) => {
-    return ctx.json({
-      message: "get reactions to a post",
-    });
-  })
-
-  // Your post actions
-  // Delete a post
-  .delete("/", (ctx) => {
-    return ctx.json({
-      message: "delete a post",
-    });
-  })
-  // Update a post
-  .patch("/", (ctx) => {
-    return ctx.json({
-      message: "update a post",
     });
   })
   // Pin post to profile

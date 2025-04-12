@@ -3,19 +3,29 @@ import * as interactionSchema from "../../schema/interactions";
 import * as contentSchema from "../../schema/content";
 import * as userSchema from "../../schema/user";
 import { createAction } from "../../lib/actions/factory";
+import { z } from "zod";
+import { zMedia } from "../../lib/zod/helpers";
+import db from "../../schema";
 
+// POST ACTIONS
 export const createPost = createAction<{
   content: string;
-  media: { url: string; type: string }[];
+  parentId: number | undefined;
+  topicId: number | undefined;
+  media: z.infer<typeof zMedia>[];
 }>()(
-  async (tx, { userId, content, media }) => {
+  async (tx, { userId, content, parentId, topicId, media }) => {
     const [post] = await tx
       .insert(contentSchema.posts)
       .values({
         authorId: userId,
         content: content.trim(),
+        parent: parentId ?? null,
+        topicId: topicId ?? null,
       })
-      .returning();
+      .returning({
+        id: contentSchema.posts.id,
+      });
 
     for (const mediaItem of media) {
       await tx.insert(contentSchema.media).values({
@@ -43,7 +53,7 @@ export const deletePost = createAction<{ postId: number }>()(
       .set({
         deletedAt: Date.now(),
         likesCount: 0,
-        content: "deleted",
+        content: "NA",
         authorId: -1,
       })
       .where(eq(contentSchema.posts.id, postId))

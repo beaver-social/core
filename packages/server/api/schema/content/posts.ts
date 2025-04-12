@@ -8,12 +8,12 @@ export const posts = table(
   "posts",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
-    content: t.text().notNull(),
-    parent: t.int("parent_id").references((): t.AnySQLiteColumn => posts.id),
     authorId: t
       .int("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    content: t.text().notNull(),
+    parent: t.int("parent_id").references((): t.AnySQLiteColumn => posts.id),
     topicId: t
       .int("space_id")
       .references(() => topics.id, { onDelete: "cascade" }), // Optional reference to a topic

@@ -11,6 +11,7 @@ import { desc, eq } from "drizzle-orm";
 import { camelToDotCase } from "../../lib/utils";
 import { createAction } from "./factory";
 import { encode as msgpackEncode, decode as msgpackDecode } from "msgpackr";
+import { SuiGraphQLClient } from "@mysten/sui/graphql";
 
 export function deriveActionNameFromFn(fn: Function) {
   return "user." + camelToDotCase(fn.name);
@@ -43,14 +44,35 @@ export async function getUser(userId: number) {
 
 export async function verifyUserSignature(
   message: Uint8Array,
-  signature: string,
+  signature: {
+    type: "wallet" | "zk";
+    signature: string;
+  },
   address: string
 ) {
-  const { toSuiAddress: getVerifiedAddress } =
-    await verifyPersonalMessageSignature(message, signature, { address });
+  if (signature.type === "wallet") {
+    const { toSuiAddress: getVerifiedAddress } =
+      await verifyPersonalMessageSignature(message, signature.signature, {
+        address,
+      });
 
-  if (address !== getVerifiedAddress()) {
-    throw new Error("Invalid signature");
+    if (address !== getVerifiedAddress()) {
+      throw new Error("Invalid signature");
+    }
+  } else if (signature.type === "zk") {
+    const { toSuiAddress: getVerifiedAddress } =
+      await verifyPersonalMessageSignature(message, signature.signature, {
+        address,
+        client: new SuiGraphQLClient({
+          url: "https://fullnode.mainnet.sui.io:443",
+        }),
+      });
+
+    if (address !== getVerifiedAddress()) {
+      throw new Error("Invalid signature");
+    }
+  } else {
+    throw new Error("Invalid signature type");
   }
 }
 
@@ -120,7 +142,10 @@ export async function storeActionRecord(
   hash: string,
   previous: string,
   type: string,
-  signature: string
+  signature: {
+    type: "wallet" | "zk";
+    signature: string;
+  }
 ) {
   const [action] = await tx
     .insert(actions)
@@ -129,7 +154,8 @@ export async function storeActionRecord(
       hash,
       previous,
       type,
-      signature,
+      signatureType: signature.type,
+      signature: signature.signature,
     })
     .returning();
 

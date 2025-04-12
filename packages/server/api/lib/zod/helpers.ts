@@ -41,3 +41,14 @@ export const zJwt = z.object({
   iat: z.number().optional(),
   jti: z.string().optional(),
 });
+
+export const zMedia = z.object({
+  url: z.string(),
+  type: z.string(),
+  order: z.number(),
+  thumbnailUrl: z.string(),
+  duration: z.number(),
+  width: z.number(),
+  height: z.number(),
+  altText: z.string(),
+});
