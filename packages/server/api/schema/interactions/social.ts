@@ -2,7 +2,7 @@ import { sqliteTable as table } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
 import { timestamps } from "../helpers";
 import { users } from "../user/users";
-import { spaces } from "../content/spaces";
+import { topics } from "../content/topics";
 
 // User follows
 export const follows = table(
@@ -26,8 +26,8 @@ export const follows = table(
   ]
 );
 
-// Space follows
-export const spaceFollows = table(
+// Topic follows
+export const topicFollows = table(
   "space_follows",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
@@ -35,16 +35,16 @@ export const spaceFollows = table(
       .int("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    spaceId: t
+    topicId: t
       .int("space_id")
       .notNull()
-      .references(() => spaces.id, { onDelete: "cascade" }),
+      .references(() => topics.id, { onDelete: "cascade" }),
     isMuted: t.int("is_muted", { mode: "boolean" }).default(false),
     ...timestamps,
   },
   (table) => [
-    t.uniqueIndex("user_space_follow_idx").on(table.userId, table.spaceId),
+    t.uniqueIndex("user_topic_follow_idx").on(table.userId, table.topicId),
     t.index("user_follow_idx").on(table.userId),
-    t.index("space_follow_idx").on(table.spaceId),
+    t.index("topic_follow_idx").on(table.topicId),
   ]
 );

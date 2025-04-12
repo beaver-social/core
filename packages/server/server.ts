@@ -5,7 +5,11 @@ import path from "path";
 import { ensureEnv } from "./env";
 import staticRequestsHandler from "./api/middlewares/staticRequestsHandler";
 import { fileURLToPath } from "url";
-import { ContentfulStatusCode, ClientErrorStatusCode, ServerErrorStatusCode } from "hono/utils/http-status";
+import {
+  ContentfulStatusCode,
+  ClientErrorStatusCode,
+  ServerErrorStatusCode,
+} from "hono/utils/http-status";
 import { ResponseHeader } from "hono/utils/headers";
 import { BaseMime } from "hono/utils/mime";
 
@@ -28,10 +32,10 @@ app.use((ctx, next) => {
   ctx.log = log;
   ctx.ok = (data, message, status, headers) => {
     return ctx.json({ data, message }, status, headers);
-  }
+  };
   ctx.err = (message, status, headers) => {
     return ctx.json({ error: message }, status, headers);
-  }
+  };
   return next();
 });
 
@@ -68,9 +72,21 @@ export default {
 declare module "hono" {
   interface Context {
     log: (...data: any[]) => void;
-    err: (message: string, status: ClientErrorStatusCode | ServerErrorStatusCode, headers?: HeaderRecord) => void;
-    ok: (data: unknown, message: string, status: 200 | 201 | 202, headers?: HeaderRecord) => void;
+    err: (
+      message: string,
+      status: ClientErrorStatusCode | ServerErrorStatusCode,
+      headers?: HeaderRecord
+    ) => void;
+    ok: (
+      data: unknown,
+      message: string,
+      status: 200 | 201 | 202,
+      headers?: HeaderRecord
+    ) => void;
   }
 }
 
-type HeaderRecord = Record<"Content-Type", BaseMime> | Record<ResponseHeader, string | string[]> | Record<string, string | string[]>;
+type HeaderRecord =
+  | Record<"Content-Type", BaseMime>
+  | Record<ResponseHeader, string | string[]>
+  | Record<string, string | string[]>;

@@ -8,13 +8,13 @@ export function validateContentForSpace(
   return true;
 }
 
-export function determineSpaceRelevancy(
+export function determineTopicRelevancy(
   contentId: string,
   contentType: "post" | "short",
-  spaceIds: string[]
+  topicIds: string[]
 ) {
-  // Determine how relevant content is to specific spaces
-  // Return relevancy scores by space
+  // Determine how relevant content is to specific topics
+  // Return relevancy scores by topic
   return {};
 }
 

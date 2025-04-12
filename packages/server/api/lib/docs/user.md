@@ -8,20 +8,6 @@ This document outlines the API endpoints for user profiles, settings, analytics,
 
 All endpoints are relative to: `/api/v1/`
 
-## 1. User Profile Management
-
-### Base Path: `/user/profile`
-
-| Endpoint       | Method | Description                   | Query Params            | Request Body                                           | Response              |
-| -------------- | ------ | ----------------------------- | ----------------------- | ------------------------------------------------------ | --------------------- |
-| `/`            | GET    | Get current user's profile    | -                       | -                                                      | `{ user }`            |
-| `/:username`   | GET    | Get user profile by username  | -                       | -                                                      | `{ user }`            |
-| `/`            | PATCH  | Update user profile           | -                       | `{ fullName?, image_url?, banner_url?, about?, etc. }` | `{ user }`            |
-| `/search`      | GET    | Search for users              | `?q=string&limit=10`    | -                                                      | `{ users: [] }`       |
-| `/suggestions` | GET    | Get suggested users to follow | `?limit=number`         | -                                                      | `{ suggestions: [] }` |
-| `/request`     | POST   | Request account verification  | `{ reason, evidence? }` | `{ success, requestId }`                               |
-| `/status`      | GET    | Check verification status     | -                       | `{ status, message?, verifiedAt? }`                    |
-
 ### Base Path: `/user/profile/collections`
 
 | Endpoint             | Method | Description                 | Query Params       | Request Body                        | Response                    |
@@ -114,17 +100,17 @@ All endpoints are relative to: `/api/v1/`
 | `/blocked`                                | GET    | Get list of blocked users       | `?page=1&limit=20`                    | -                                                   | `{ users: [], pagination }`          |
 | `/search`                                 | GET    | Search messages                 | `?q=string`                           | -                                                   | `{ results: [] }`                    |
 
-## 6. Spaces
+## 6. Topics
 
-### Base Path: `/user/spaces`
+### Base Path: `/user/topics`
 
 | Endpoint               | Method | Description                | Query Params       | Request Body                                    | Response                      |
 | ---------------------- | ------ | -------------------------- | ------------------ | ----------------------------------------------- | ----------------------------- |
-| `/`                    | GET    | Get user's spaces          | `?page=1&limit=20` | -                                               | `{ spaces: [], pagination }`  |
-| `/`                    | POST   | Create a new space         | -                  | `{ name, description?, image?, members: [] }`   | `{ space, gunChannelKey }`    |
-| `/:id`                 | GET    | Get space details          | -                  | -                                               | `{ space, members: [] }`      |
-| `/:id`                 | PATCH  | Update space               | -                  | `{ name?, description?, image? }`               | `{ space }`                   |
-| `/:id`                 | DELETE | Delete/leave space         | -                  | -                                               | `{ success }`                 |
+| `/`                    | GET    | Get user's topics          | `?page=1&limit=20` | -                                               | `{ topics: [], pagination }`  |
+| `/`                    | POST   | Create a new topic         | -                  | `{ name, description?, image?, members: [] }`   | `{ topic, gunChannelKey }`    |
+| `/:id`                 | GET    | Get topic details          | -                  | -                                               | `{ topic, members: [] }`      |
+| `/:id`                 | PATCH  | Update topic               | -                  | `{ name?, description?, image? }`               | `{ topic }`                   |
+| `/:id`                 | DELETE | Delete/leave topic         | -                  | -                                               | `{ success }`                 |
 | `/:id/members`         | GET    | Get space members          | `?page=1&limit=50` | -                                               | `{ members: [], pagination }` |
 | `/:id/members`         | POST   | Add member to space        | -                  | `{ userId, role?: "member"\|"admin"\|"owner" }` | `{ success, member }`         |
 | `/:id/members/:userId` | DELETE | Remove member from group   | -                  | -                                               | `{ success }`                 |
@@ -258,7 +244,7 @@ All endpoints are relative to: `/api/v1/`
 
 ### Base Path: `/user/identity`
 
-| Endpoint | Method      | Description | Request Body                         | Response                     |
-| -------- | ----------- | ----------- | ------------------------------------ | ---------------------------- | ------------------------------ | -------------------- |
-| `/`         | GET         | Get identity NFT details             | -                            | `{ identityNFT, owner, user }` | owns nft already --> |
-| `/transfer` | POST        | Transfer identity to another address | `{ targetAddress, reason? }` | `{ success, transactionHash }` | client side only --> |
+| Endpoint    | Method | Description                          | Request Body                 | Response                       |
+| ----------- | ------ | ------------------------------------ | ---------------------------- | ------------------------------ | -------------------- |
+| `/`         | GET    | Get identity NFT details             | -                            | `{ identityNFT, owner, user }` | owns nft already --> |
+| `/transfer` | POST   | Transfer identity to another address | `{ targetAddress, reason? }` | `{ success, transactionHash }` | client side only --> |

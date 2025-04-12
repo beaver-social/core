@@ -2,30 +2,33 @@ import { sqliteTable as table } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
 import { timestamps } from "../helpers";
 import { users } from "../user/users";
-import { spaces } from "./spaces";
+import { topics } from "./topics";
 
-export const shorts = table(
-  "shorts",
+export const posts = table(
+  "posts",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
-    caption: t.text(),
+    content: t.text().notNull(),
     authorId: t
       .int("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    thumbnailUrl: t.text("thumbnail_url"), // Optional thumbnail
-    spaceId: t
+    topicId: t
       .int("space_id")
-      .references(() => spaces.id, { onDelete: "cascade" }), // Optional reference to a space
+      .references(() => topics.id, { onDelete: "cascade" }), // Optional reference to a topic
+    replyToId: t
+      .int("reply_to_id")
+      .references((): t.AnySQLiteColumn => posts.id), // Optional reference to another post (for replies/comments)
     isPinned: t.int("is_pinned", { mode: "boolean" }).default(false),
     isDeleted: t.int("is_deleted", { mode: "boolean" }).default(false),
     viewCount: t.int("view_count").default(0),
     likesCount: t.int("likes_count").default(0),
-    commentsCount: t.int("comments_count").default(0),
+    repliesCount: t.int("replies_count").default(0),
     ...timestamps,
   },
   (table) => [
-    t.index("author_short_idx").on(table.authorId),
-    t.index("space_short_idx").on(table.spaceId),
+    t.index("author_idx").on(table.authorId),
+    t.index("topic_idx").on(table.topicId),
+    t.index("reply_idx").on(table.replyToId),
   ]
 );
