@@ -2,10 +2,9 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 import { zNumberString, zSuiAddress } from "../../lib/zod/helpers";
-import db from "../../lib/db";
-import { users } from "../../lib/db/schema/user";
 import { eq } from "drizzle-orm";
-import { DB } from "../../lib/db/schema";
+import db, { DB } from "../../schema";
+import * as userSchema from "../../schema/user";
 
 export default new Hono()
   // get user id from identity, username, suinsDomainName, address
@@ -29,8 +28,8 @@ export default new Hono()
       if (identity) {
         const data = await db
           .select()
-          .from(users)
-          .where(eq(users.identity, identity))
+          .from(userSchema.users)
+          .where(eq(userSchema.users.identity, identity))
           .limit(1);
         user = data[0];
       }
@@ -38,8 +37,8 @@ export default new Hono()
       if (username) {
         const data = await db
           .select()
-          .from(users)
-          .where(eq(users.username, username))
+          .from(userSchema.users)
+          .where(eq(userSchema.users.username, username))
           .limit(1);
         user = data[0];
       }
@@ -47,8 +46,8 @@ export default new Hono()
       if (suinsDomainName) {
         const data = await db
           .select()
-          .from(users)
-          .where(eq(users.suinsDomainName, suinsDomainName))
+          .from(userSchema.users)
+          .where(eq(userSchema.users.suinsDomainName, suinsDomainName))
           .limit(1);
         user = data[0];
       }
@@ -56,8 +55,8 @@ export default new Hono()
       if (address) {
         const data = await db
           .select()
-          .from(users)
-          .where(eq(users.address, address))
+          .from(userSchema.users)
+          .where(eq(userSchema.users.suiAddress, address))
           .limit(1);
         user = data[0];
       }
@@ -80,7 +79,10 @@ export default new Hono()
     async (ctx) => {
       const { id } = ctx.req.valid("param");
 
-      const user = await db.select().from(users).where(eq(users.id, id));
+      const user = await db
+        .select()
+        .from(userSchema.users)
+        .where(eq(userSchema.users.id, id));
 
       return ctx.ok({ user }, "User details fetched from ID successfully", 200);
     }

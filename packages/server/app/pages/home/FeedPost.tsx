@@ -116,7 +116,7 @@ function FeedPost({
         </div>
 
         {/* Content */}
-        <div className="flex-1">
+        <div className="flex flex-col overflow-hidden px-4">
           {/* Header */}
           <div className="flex items-center gap-2">
             <Link
@@ -132,7 +132,7 @@ function FeedPost({
           </div>
 
           {/* Post Content */}
-          <div className="mt-2 text-sm">{content}</div>
+          <div className="mt-2 text-md">{content}</div>
 
           {/* Images if present */}
           <div className="max-w-[32rem]">

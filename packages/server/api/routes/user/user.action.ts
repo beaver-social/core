@@ -1,10 +1,10 @@
-import { createAction } from "../../lib/db/actions/factory";
-import { users } from "../../lib/db/schema/user";
 import { contracts } from "../../lib/sui/contracts";
 import { Transaction } from "@mysten/sui/transactions";
 import { defaultAdminCapId } from "../../lib/sui/constants";
 import suiClient, { serverKeypair } from "../../lib/sui/client";
 import { tryCatch } from "../../lib/tryCatch";
+import { createAction } from "../../lib/utils/actions/factory";
+import * as userSchema from "../../schema/user";
 
 export const createIdentity = createAction<{
   username: string;
@@ -52,13 +52,13 @@ export const createIdentity = createAction<{
   }
 
   const addUser = await tryCatch(
-    tx.insert(users).values({
-      address: receiver,
+    tx.insert(userSchema.users).values({
       identity: identityAddress,
       username: username,
       fullName: fullName,
       imageUrl: imageUrl,
       about: about,
+      suiAddress: receiver,
     })
   );
 

@@ -1,8 +1,8 @@
 import { and, eq, sql } from "drizzle-orm";
-import { likes } from "../../lib/db/schema/like";
-import { post_action, post_media, posts } from "../../lib/db/schema/post";
-import { createAction } from "../../lib/db/actions/factory";
-import { users } from "../../lib/db/schema/user";
+import { createAction } from "../../lib/actions/factory";
+import * as interactionSchema from "../../schema/interactions";
+import * as contentSchema from "../../schema/content";
+import * as userSchema from "../../schema/user";
 
 export const createPost = createAction<{
   content: string;
@@ -10,7 +10,7 @@ export const createPost = createAction<{
 }>()(
   async (tx, { userId, content, media }) => {
     const [post] = await tx
-      .insert(posts)
+      .insert(contentSchema.posts)
       .values({
         authorId: userId,
         content: content.trim(),
@@ -18,8 +18,9 @@ export const createPost = createAction<{
       .returning();
 
     for (const mediaItem of media) {
-      await tx.insert(post_media).values({
-        postId: post.id,
+      await tx.insert(contentSchema.media).values({
+        contentId: post.id,
+        contentTypeId: 1,
         url: mediaItem.url,
         type: mediaItem.type,
       });
@@ -28,9 +29,9 @@ export const createPost = createAction<{
     return post;
   },
   async (tx, post, action) => {
-    await tx.insert(post_action).values({
+    await tx.insert(interactionSchema.contentActions).values({
       actionId: action.id,
-      postId: post.id,
+      contentId: post.id,
     });
   }
 );
@@ -38,65 +39,78 @@ export const createPost = createAction<{
 export const deletePost = createAction<{ postId: number }>()(
   async (tx, { postId }) => {
     const [post] = await tx
-      .update(posts)
+      .update(contentSchema.posts)
       .set({
         deletedAt: Date.now(),
         likesCount: 0,
         content: "deleted",
         authorId: -1,
       })
-      .where(eq(posts.id, postId))
+      .where(eq(contentSchema.posts.id, postId))
       .returning();
 
-    await tx.delete(post_media).where(eq(post_media.postId, postId));
+    await tx
+      .delete(contentSchema.media)
+      .where(eq(contentSchema.media.contentId, postId));
 
     return post;
   },
   async (tx, post) => {
     await tx
-      .update(post_action)
+      .update(interactionSchema.contentActions)
       .set({ deleted: true })
-      .where(eq(post_action.postId, post.id));
+      .where(eq(interactionSchema.contentActions.contentId, post.id));
   }
 );
 
 export const likePost = createAction<{ postId: number }>()(
   async (tx, { postId, userId }) => {
-    await tx.insert(likes).values({
+    await tx.insert(interactionSchema.likes).values({
       userId: userId,
-      postId: postId,
+      contentId: postId,
+      contentTypeId: 1,
     });
 
     await tx
-      .update(posts)
+      .update(contentSchema.posts)
       .set({
-        likesCount: sql`${posts.likesCount} + 1`,
+        likesCount: sql`${contentSchema.posts.likesCount} + 1`,
       })
-      .where(eq(posts.id, postId));
+      .where(eq(contentSchema.posts.id, postId));
   }
 );
 
 export const unlikePost = createAction<{ postId: number }>()(
   async (tx, { postId, userId }) => {
     await tx
-      .delete(likes)
-      .where(and(eq(likes.userId, userId), eq(likes.postId, postId)));
+      .delete(interactionSchema.likes)
+      .where(
+        and(
+          eq(interactionSchema.likes.userId, userId),
+          eq(interactionSchema.likes.contentId, postId)
+        )
+      );
 
     await tx
-      .update(posts)
+      .update(contentSchema.posts)
       .set({
-        likesCount: sql`GREATEST(${posts.likesCount} - 1, 0)`,
+        likesCount: sql`GREATEST(${contentSchema.posts.likesCount} - 1, 0)`,
       })
-      .where(eq(posts.id, postId));
+      .where(eq(contentSchema.posts.id, postId));
   }
 );
 
 export const pinPost = createAction<{ postId: number }>()(
   async (tx, { postId, userId }) => {
     const [post] = await tx
-      .select({ deletedAt: posts.deletedAt })
-      .from(posts)
-      .where(and(eq(posts.id, postId), eq(posts.authorId, userId)))
+      .select({ deletedAt: contentSchema.posts.deletedAt })
+      .from(contentSchema.posts)
+      .where(
+        and(
+          eq(contentSchema.posts.id, postId),
+          eq(contentSchema.posts.authorId, userId)
+        )
+      )
       .limit(1);
 
     if (!post) {
@@ -108,29 +122,31 @@ export const pinPost = createAction<{ postId: number }>()(
     }
 
     const [user] = await tx
-      .select({ pinned: users.pinned })
-      .from(users)
-      .where(eq(users.id, userId))
+      .select({ pinned: contentSchema.posts.isPinned })
+      .from(contentSchema.posts)
+      .where(eq(contentSchema.posts.id, postId))
       .limit(1);
 
-    if (user?.pinned === postId) {
+    if (user?.pinned) {
       throw new Error("Post is already pinned");
     }
 
     await tx
-      .update(users)
+      .update(userSchema.users)
       .set({
-        pinned: postId,
+        pinnedPost: postId,
       })
-      .where(eq(users.id, userId));
+      .where(eq(userSchema.users.id, userId));
   }
 );
 
-export const unpinPost = createAction<{}>()(async (tx, { userId }) => {
+export const unpinPost = createAction<{
+  postId: number;
+}>()(async (tx, { postId, userId }) => {
   const [user] = await tx
-    .select({ pinned: users.pinned })
-    .from(users)
-    .where(eq(users.id, userId))
+    .select({ pinned: contentSchema.posts.isPinned })
+    .from(contentSchema.posts)
+    .where(eq(contentSchema.posts.id, postId))
     .limit(1);
 
   if (!user?.pinned) {
@@ -138,11 +154,11 @@ export const unpinPost = createAction<{}>()(async (tx, { userId }) => {
   }
 
   await tx
-    .update(users)
+    .update(userSchema.users)
     .set({
-      pinned: null,
+      pinnedPost: null,
     })
-    .where(eq(users.id, userId));
+    .where(eq(userSchema.users.id, userId));
 });
 
 export const reply = createAction<{
@@ -153,8 +169,8 @@ export const reply = createAction<{
   async (tx, { userId, content, media, postId }) => {
     const [{ deletedAt }] = await tx
       .select()
-      .from(posts)
-      .where(eq(posts.id, postId))
+      .from(contentSchema.posts)
+      .where(eq(contentSchema.posts.id, postId))
       .limit(1);
 
     if (deletedAt) {
@@ -162,7 +178,7 @@ export const reply = createAction<{
     }
 
     const [post] = await tx
-      .insert(posts)
+      .insert(contentSchema.posts)
       .values({
         authorId: userId,
         content: content.trim(),
@@ -171,8 +187,9 @@ export const reply = createAction<{
       .returning();
 
     for (const mediaItem of media) {
-      await tx.insert(post_media).values({
-        postId: post.id,
+      await tx.insert(contentSchema.media).values({
+        contentId: post.id,
+        contentTypeId: 1,
         url: mediaItem,
         type: "image",
       });
@@ -181,16 +198,16 @@ export const reply = createAction<{
     let current: number | null = postId;
     while (current) {
       await tx
-        .update(posts)
+        .update(contentSchema.posts)
         .set({
-          repliesCount: sql`${posts.repliesCount} + 1`,
+          repliesCount: sql`${contentSchema.posts.repliesCount} + 1`,
         })
-        .where(eq(posts.id, current));
+        .where(eq(contentSchema.posts.id, current));
 
       const [next] = await tx
-        .select({ parent: posts.parent })
-        .from(posts)
-        .where(eq(posts.id, current))
+        .select({ parent: contentSchema.posts.parent })
+        .from(contentSchema.posts)
+        .where(eq(contentSchema.posts.id, current))
         .limit(1);
 
       current = next?.parent ?? null;
@@ -200,15 +217,15 @@ export const reply = createAction<{
   },
   async (tx, post, action) => {
     await tx
-      .update(post_action)
+      .update(interactionSchema.contentActions)
       .set({
         actionId: action.id,
-        postId: post.id,
+        contentId: post.id,
       })
       .where(
         and(
-          eq(post_action.postId, post.id),
-          eq(post_action.actionId, action.id)
+          eq(interactionSchema.contentActions.contentId, post.id),
+          eq(interactionSchema.contentActions.actionId, action.id)
         )
       );
   }
