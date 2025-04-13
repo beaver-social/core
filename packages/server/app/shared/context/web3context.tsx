@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ThemeVars } from '@mysten/dapp-kit';
 import { useTheme } from "./theme-provider";
 import { registerEnokiWallets, isEnokiNetwork } from '@mysten/enoki';
+import { Network } from "../types/sui";
 
 const { networkConfig } = createNetworkConfig({
     localnet: { url: getFullnodeUrl('localnet') },
@@ -11,8 +12,6 @@ const { networkConfig } = createNetworkConfig({
     testnet: { url: getFullnodeUrl('testnet') },
     mainnet: { url: getFullnodeUrl('mainnet') },
 });
-
-export type Network = keyof typeof networkConfig;
 
 export function Web3Provider({ children }: { children: React.ReactNode }) {
     const [activeNetwork, setActiveNetwork] = useState<Network>(import.meta.env.VITE_SUI_NETWORK as Network);

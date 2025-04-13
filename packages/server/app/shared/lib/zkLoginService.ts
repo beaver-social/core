@@ -17,6 +17,7 @@ import {
   EphemeralKeyPair,
   ZkLoginData,
 } from "../types/zk";
+import { Network } from "../types/sui";
 import {
   verifyPersonalMessageSignature,
   verifyTransactionSignature,
@@ -315,17 +316,18 @@ class zkLoginService {
       userSignature,
     });
 
-    // const publicKey = await verifyTransactionSignature(
-    //   txBytes,
-    //   zkLoginSignature,
-    //   {
-    //     client: new SuiGraphQLClient({
-    //       url: "https://sui-devnet.mystenlabs.com/graphql",
-    //     }),
-    //   }
-    // );
+    const fullnodeUrl = getFullnodeUrl(import.meta.env.SUI_NETWORK as Network);
+    const publicKey = await verifyTransactionSignature(
+      txBytes,
+      zkLoginSignature,
+      {
+        client: new SuiGraphQLClient({
+          url: fullnodeUrl,
+        }),
+      }
+    );
 
-    // const verified = publicKey.toSuiAddress() === zkLoginData.userAddress;
+    const verified = publicKey.toSuiAddress() === zkLoginData.userAddress;
 
     return {
       zkLoginSignature,

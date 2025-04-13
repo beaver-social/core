@@ -17,13 +17,7 @@ export function createAction<T>() {
       action: DB["action"]
     ) => void | Promise<void>
   ) {
-    return async function (
-      options: ActionOptions<T>,
-      signature: {
-        type: "wallet" | "zk";
-        signature: string;
-      }
-    ) {
+    return async function (options: ActionOptions<T>, signature: string) {
       // Prepare action request
       const actionType = helpers.deriveActionNameFromFn(fn);
       const prevHash = await helpers.getPreviousActionHash(options.userId);
@@ -39,7 +33,13 @@ export function createAction<T>() {
         helpers.compressActionRequest(actionRequest);
       const message = new TextEncoder().encode(payload); // Verify user signature
       const user = await helpers.getUser(options.userId);
-      await helpers.verifyUserSignature(message, signature, user.address);
+      const loginType = user.loginType;
+      await helpers.verifyUserSignature(
+        message,
+        signature,
+        loginType,
+        user.address
+      );
 
       // Execute transaction
       await db.transaction(async (tx) => {
@@ -69,7 +69,8 @@ export function createAction<T>() {
           hash,
           prevHash,
           actionType,
-          signature
+          signature,
+          loginType
         );
 
         // Execute optional callback

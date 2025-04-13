@@ -17,7 +17,7 @@ export const actions = table(
     previous: t.text().notNull(),
     hash: t.text().notNull(),
     signature: t.text().notNull().unique(),
-    signatureType: t.text().notNull(),
+    loginType: t.text().notNull(),
     ...timestamps,
   },
   (table) => [t.uniqueIndex("user_action_idx").on(table.userId)]

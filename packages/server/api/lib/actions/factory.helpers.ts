@@ -13,6 +13,8 @@ import { camelToDotCase } from "../../lib/utils";
 import { createAction } from "./factory";
 import { encode as msgpackEncode, decode as msgpackDecode } from "msgpackr";
 import { SuiGraphQLClient } from "@mysten/sui/graphql";
+import { getFullnodeUrl } from "@mysten/sui/client";
+import { Network } from "../types";
 
 export function deriveActionNameFromFn(fn: Function) {
   return "user." + camelToDotCase(fn.name);
@@ -45,27 +47,27 @@ export async function getUser(userId: number) {
 
 export async function verifyUserSignature(
   message: Uint8Array,
-  signature: {
-    type: "wallet" | "zk";
-    signature: string;
-  },
+  signature: string,
+  loginType: "wallet" | "zk",
   address: string
 ) {
-  if (signature.type === "wallet") {
+  if (loginType === "wallet") {
     const { toSuiAddress: getVerifiedAddress } =
-      await verifyPersonalMessageSignature(message, signature.signature, {
+      await verifyPersonalMessageSignature(message, signature, {
         address,
       });
 
     if (address !== getVerifiedAddress()) {
       throw new Error("Invalid signature");
     }
-  } else if (signature.type === "zk") {
+  } else if (loginType === "zk") {
+    const fullnodeUrl = getFullnodeUrl(import.meta.env.SUI_NETWORK as Network);
+
     const { toSuiAddress: getVerifiedAddress } =
-      await verifyPersonalMessageSignature(message, signature.signature, {
+      await verifyPersonalMessageSignature(message, signature, {
         address,
         client: new SuiGraphQLClient({
-          url: "https://fullnode.mainnet.sui.io:443",
+          url: fullnodeUrl,
         }),
       });
 
@@ -139,10 +141,8 @@ export async function storeActionRecord(
   hash: string,
   previous: string,
   type: string,
-  signature: {
-    type: "wallet" | "zk";
-    signature: string;
-  }
+  signature: string,
+  loginType: "wallet" | "zk"
 ) {
   const [action] = await tx
     .insert(actions)
@@ -151,8 +151,8 @@ export async function storeActionRecord(
       hash,
       previous,
       type,
-      signatureType: signature.type,
-      signature: signature.signature,
+      loginType: loginType,
+      signature: signature,
     })
     .returning();
 

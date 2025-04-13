@@ -366,7 +366,7 @@ export default new Hono()
       "json",
       z.object({
         content: z.string(),
-        media: zMedia.array(),
+        media: zMedia.array().optional(),
         parentId: z.number().optional(),
         flags: z.object({
           nsfw: z.boolean(),
@@ -378,12 +378,11 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-        type: zSignType,
       })
     ),
     async (ctx) => {
       const { content, media, parentId, flags } = ctx.req.valid("json");
-      const { signature, type } = ctx.req.valid("query");
+      const { signature } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
 
       // Pre-validate content before sending to action
@@ -395,7 +394,7 @@ export default new Hono()
       const result = await tryCatch(
         actions.createPost(
           { userId, content, media, parentId, flags },
-          { signature, type }
+          signature
         )
       );
 
@@ -422,7 +421,7 @@ export default new Hono()
       const { signature, type } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
       const result = await tryCatch(
-        actions.deletePost({ postId, userId }, { signature, type })
+        actions.deletePost({ postId, userId }, signature)
       );
 
       if (result.error) {
@@ -462,10 +461,7 @@ export default new Hono()
       }
 
       const result = await tryCatch(
-        actions.updatePost(
-          { postId, userId, content, media },
-          { signature, type }
-        )
+        actions.updatePost({ postId, userId, content, media }, signature)
       );
 
       if (result.error) {
@@ -492,7 +488,7 @@ export default new Hono()
       const { signature, type } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
       const result = await tryCatch(
-        actions.likePost({ postId, userId }, { signature, type })
+        actions.likePost({ postId, userId }, signature)
       );
 
       if (result.error) {
@@ -518,7 +514,7 @@ export default new Hono()
       const { signature, type } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
       const result = await tryCatch(
-        actions.unlikePost({ postId, userId }, { signature, type })
+        actions.unlikePost({ postId, userId }, signature)
       );
 
       if (result.error) {
@@ -561,7 +557,7 @@ export default new Hono()
       const result = await tryCatch(
         actions.repostPost(
           { postId, userId, content: content || null },
-          { signature, type }
+          signature
         )
       );
 
@@ -595,7 +591,7 @@ export default new Hono()
       const userId = ctx.get("user").id;
 
       const result = await tryCatch(
-        actions.unrepostPost({ postId, repostId, userId }, { signature, type })
+        actions.unrepostPost({ postId, repostId, userId }, signature)
       );
 
       if (result.error) {
@@ -627,7 +623,7 @@ export default new Hono()
       const userId = ctx.get("user").id;
 
       const result = await tryCatch(
-        actions.savePost({ postId, userId }, { signature, type })
+        actions.savePost({ postId, userId }, signature)
       );
 
       if (result.error) {
@@ -659,7 +655,7 @@ export default new Hono()
       const userId = ctx.get("user").id;
 
       const result = await tryCatch(
-        actions.unsavePost({ postId, userId }, { signature, type })
+        actions.unsavePost({ postId, userId }, signature)
       );
 
       if (result.error) {
@@ -698,10 +694,7 @@ export default new Hono()
       }
 
       const result = await tryCatch(
-        actions.reportPost(
-          { postId, userId, reason, details },
-          { signature, type }
-        )
+        actions.reportPost({ postId, userId, reason, details }, signature)
       );
 
       if (result.error) {
@@ -733,7 +726,7 @@ export default new Hono()
       const userId = ctx.get("user").id;
 
       const result = await tryCatch(
-        actions.pinPost({ postId, userId }, { signature, type })
+        actions.pinPost({ postId, userId }, signature)
       );
 
       if (result.error) {
@@ -765,7 +758,7 @@ export default new Hono()
       const userId = ctx.get("user").id;
 
       const result = await tryCatch(
-        actions.unpinPost({ postId, userId }, { signature, type })
+        actions.unpinPost({ postId, userId }, signature)
       );
 
       if (result.error) {

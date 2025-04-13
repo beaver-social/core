@@ -11,7 +11,7 @@ import { createAction } from "../../lib/actions/factory";
 export const createPost = createAction<{
   content: string;
   parentId: number | undefined;
-  media: z.infer<typeof zMedia>[];
+  media: z.infer<typeof zMedia>[] | undefined;
   flags: { nsfw: boolean; subscriberOnly?: boolean };
 }>()(
   async (tx, { userId, content, parentId, media, flags }) => {
@@ -97,58 +97,60 @@ export const createPost = createAction<{
       });
 
     // Process media items
-    for (const mediaItem of media) {
-      if (mediaItem.type === "image") {
-        try {
-          // Convert Base64 to Buffer
-          const imageData = Buffer.from(
-            mediaItem.url.split(",")[1] || mediaItem.url,
-            "base64"
-          );
+    if (media && media.length > 0) {
+      for (const mediaItem of media) {
+        if (mediaItem.type === "image") {
+          try {
+            // Convert Base64 to Buffer
+            const imageData = Buffer.from(
+              mediaItem.url.split(",")[1] || mediaItem.url,
+              "base64"
+            );
 
-          // Process and upload to S3, get back the URL
-          const s3Url = await postHelpers.processAndUploadImage(imageData);
+            // Process and upload to S3, get back the URL
+            const s3Url = await postHelpers.processAndUploadImage(imageData);
 
-          // Store the S3 URL in the database
+            // Store the S3 URL in the database
+            await tx.insert(contentSchema.media).values({
+              contentId: post.id,
+              contentTypeId: 1,
+              url: s3Url,
+              type: mediaItem.type,
+            });
+          } catch (error: any) {
+            throw new Error(`Failed to process image: ${error.message}`);
+          }
+        } else if (mediaItem.type === "video") {
+          try {
+            // Convert Base64 to Buffer
+            const videoData = Buffer.from(
+              mediaItem.url.split(",")[1] || mediaItem.url,
+              "base64"
+            );
+
+            // Process and upload to S3, get back both video URL and thumbnail URL
+            const { videoUrl, thumbnailUrl } =
+              await postHelpers.processAndUploadVideo(videoData);
+
+            // Store the video URL in the database
+            await tx.insert(contentSchema.media).values({
+              contentId: post.id,
+              contentTypeId: 1,
+              url: videoUrl,
+              type: mediaItem.type,
+              thumbnailUrl: thumbnailUrl, // Store the thumbnail URL
+            });
+          } catch (error: any) {
+            throw new Error(`Failed to process video: ${error.message}`);
+          }
+        } else {
           await tx.insert(contentSchema.media).values({
             contentId: post.id,
             contentTypeId: 1,
-            url: s3Url,
+            url: mediaItem.url,
             type: mediaItem.type,
           });
-        } catch (error: any) {
-          throw new Error(`Failed to process image: ${error.message}`);
         }
-      } else if (mediaItem.type === "video") {
-        try {
-          // Convert Base64 to Buffer
-          const videoData = Buffer.from(
-            mediaItem.url.split(",")[1] || mediaItem.url,
-            "base64"
-          );
-
-          // Process and upload to S3, get back both video URL and thumbnail URL
-          const { videoUrl, thumbnailUrl } =
-            await postHelpers.processAndUploadVideo(videoData);
-
-          // Store the video URL in the database
-          await tx.insert(contentSchema.media).values({
-            contentId: post.id,
-            contentTypeId: 1,
-            url: videoUrl,
-            type: mediaItem.type,
-            thumbnailUrl: thumbnailUrl, // Store the thumbnail URL
-          });
-        } catch (error: any) {
-          throw new Error(`Failed to process video: ${error.message}`);
-        }
-      } else {
-        await tx.insert(contentSchema.media).values({
-          contentId: post.id,
-          contentTypeId: 1,
-          url: mediaItem.url,
-          type: mediaItem.type,
-        });
       }
     }
 

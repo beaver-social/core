@@ -32,6 +32,17 @@ export const zSuiAddress = z
   })
   .transform((value) => normalizeSuiAddress(value));
 
+export const zMedia = z.object({
+  url: z.string(),
+  type: z.enum(["image", "video", "audio"]),
+  order: z.number(),
+  thumbnailUrl: z.string().optional(),
+  duration: z.number().optional(),
+  width: z.number().optional(),
+  height: z.number().optional(),
+  altText: z.string().optional(),
+});
+
 export const zJwt = z.object({
   iss: z.string().optional(),
   sub: z.string(),
@@ -40,17 +51,6 @@ export const zJwt = z.object({
   nbf: z.number().optional(),
   iat: z.number().optional(),
   jti: z.string().optional(),
-});
-
-export const zMedia = z.object({
-  url: z.string(),
-  type: z.string(),
-  order: z.number(),
-  thumbnailUrl: z.string(),
-  duration: z.number(),
-  width: z.number(),
-  height: z.number(),
-  altText: z.string(),
 });
 
 export const zJwtPayload = z.object({
