@@ -31,7 +31,7 @@ export function createAction<T>() {
       const payload = JSON.stringify(actionRequest);
       const [compressedPayload, keys] =
         helpers.compressActionRequest(actionRequest);
-      const message = new TextEncoder().encode(payload); // Verify user signature
+      const message = new TextEncoder().encode(payload);
       const user = await helpers.getUser(options.userId);
       const loginType = user.loginType;
       await helpers.verifyUserSignature(
