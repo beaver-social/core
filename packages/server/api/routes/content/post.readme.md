@@ -1,681 +1,773 @@
-# Posts API Documentation
+# 📝 Post Route Documentation
 
-## Overview
+This document provides detailed information about the post-related endpoints, actions, helpers, and media processing flow in the Beaver Social API.
 
-The Posts API provides a comprehensive set of endpoints to manage social media content creation, interaction, and consumption. This document outlines the architecture, routes, schemas, actions, and helper functions that make up the Posts API.
+![Beaver Social](https://raw.githubusercontent.com/beaver-social/assets/main/banner.png)
 
-## Table of Contents
+## 📚 Table of Contents
 
-- [Routes](#routes)
-- [Schema](#schema)
-- [Actions](#actions)
-- [Helpers](#helpers)
-- [Media Processing](#media-processing)
-- [S3 Integration](#s3-integration)
-- [Error Handling](#error-handling)
+- [📡 Route Structure](#-route-structure)
+- [⚙️ Post Actions](#️-post-actions)
+- [🛠️ Helper Functions](#️-helper-functions)
+- [🖼️ Media Processing Flow](#️-media-processing-flow)
+- [📋 Development Guidelines](#-development-guidelines)
 
-## Routes
+## 📡 Route Structure
 
-The Posts API is accessible through the `/posts` endpoint. All routes are defined in `post.ts` and follow a RESTful architecture.
+The post route is implemented using the Hono framework and provides endpoints for creating, retrieving, updating, and interacting with posts.
 
-### Read Operations
+> **Base Path:** `/api/content/post`
 
-| Endpoint            | Method | Description               | Query Parameters                                     |
-| ------------------- | ------ | ------------------------- | ---------------------------------------------------- |
-| `/`                 | GET    | Get posts feed            | `page`, `limit`, `type` (trending/following/for_you) |
-| `/:id`              | GET    | Get post details by ID    | -                                                    |
-| `/interactions/:id` | GET    | Get post interaction data | -                                                    |
-| `/views/:id`        | GET    | Get post view count       | -                                                    |
+### 🌐 Public Endpoints
 
-### Write Operations
+#### Get Public Feed
 
-| Endpoint      | Method | Description               | Body                                      | Query Parameters              |
-| ------------- | ------ | ------------------------- | ----------------------------------------- | ----------------------------- |
-| `/create`     | POST   | Create a new post         | `content`, `media`, `topicId`, `parentId` | `userId`, `signature`, `type` |
-| `/:id`        | DELETE | Delete a post             | -                                         | `userId`, `signature`, `type` |
-| `/:id`        | PATCH  | Update post content       | `content`, `media`                        | `userId`, `signature`, `type` |
-| `/like/:id`   | POST   | Like a post               | Optional `reaction`                       | `userId`, `signature`, `type` |
-| `/unlike/:id` | POST   | Unlike a post             | -                                         | `userId`, `signature`, `type` |
-| `/repost`     | POST   | Repost existing content   | `postId`, `content`                       | `userId`, `signature`, `type` |
-| `/unrepost`   | POST   | Remove a repost           | `postId`, `repostId`                      | `userId`, `signature`, `type` |
-| `/pin/:id`    | POST   | Pin a post to profile     | -                                         | `userId`, `signature`, `type` |
-| `/unpin/:id`  | POST   | Unpin a post from profile | -                                         | `userId`, `signature`, `type` |
-| `/view/:id`   | POST   | Record a view on a post   | -                                         | `userId`, `signature`, `type` |
-| `/save/:id`   | POST   | Save a post               | -                                         | `userId`, `signature`, `type` |
-| `/unsave/:id` | POST   | Unsave a post             | -                                         | `userId`, `signature`, `type` |
-| `/report/:id` | POST   | Report a post             | `reason`, `details`                       | `userId`, `signature`, `type` |
-
-## Schema
-
-The posts API relies on several database schemas that work together. Below is the detailed schema structure with table relationships.
-
-### Content Schema
-
-- **posts**: Stores the main content data including:
-
-  - `id`: Unique identifier (PRIMARY KEY)
-  - `authorId`: User who created the post (FOREIGN KEY → users.id)
-  - `content`: Post text content
-  - `parent`: Optional parent post ID for replies (FOREIGN KEY → posts.id, self-referential)
-  - `topicId`: Optional topic association (FOREIGN KEY → topics.id)
-  - `likesCount`: Counter for likes
-  - `repliesCount`: Counter for replies
-  - `sharesCount`: Counter for shares
-  - `repostsCount`: Counter for reposts
-  - `viewCount`: Counter for views
-  - `isPinned`: Whether post is pinned
-  - `hashtags`: Comma-separated list of hashtags in the post
-  - `mentions`: Comma-separated list of user mentions in the post
-  - `createdAt`: Post creation timestamp
-  - `deletedAt`: Soft deletion timestamp
-
-- **media**: Stores media attachments for posts:
-  - `id`: Unique identifier (PRIMARY KEY)
-  - `contentId`: Associated post ID (FOREIGN KEY → posts.id)
-  - `contentTypeId`: Type of content (FOREIGN KEY → contentTypes.id)
-  - `url`: S3 URL to media
-  - `type`: Media type (image, video, audio)
-  - `thumbnailUrl`: Thumbnail URL for videos
-  - `duration`: Length of video/audio in seconds
-  - `width`: Image/video width in pixels
-  - `height`: Image/video height in pixels
-  - `altText`: Accessibility text for images
-  - `order`: Display order for multiple media attachments
-  - `createdAt`: Media creation timestamp
-
-### Interaction Schema
-
-- **contentTypes**: Defines types of content in the system (posts, shorts, comments, etc.)
-
-  - `id`: Unique identifier (PRIMARY KEY)
-  - `name`: Content type name (e.g., "post", "short", "comment")
-
-- **likes**: Records user likes on posts
-
-  - `id`: Unique identifier (PRIMARY KEY)
-  - `userId`: User who liked the content (FOREIGN KEY → users.id)
-  - `contentId`: ID of the liked content
-  - `contentTypeId`: Type of content (FOREIGN KEY → contentTypes.id)
-  - `reaction`: Type of reaction (default: "like")
-  - `createdAt`: Like creation timestamp
-
-- **views**: Tracks post views by users
-
-  - `id`: Unique identifier (PRIMARY KEY)
-  - `userId`: User who viewed the content (FOREIGN KEY → users.id, optional)
-  - `contentId`: ID of the viewed content
-  - `contentTypeId`: Type of content (FOREIGN KEY → contentTypes.id)
-  - `viewedAt`: Timestamp of view
-  - `duration`: View duration in seconds
-  - `createdAt`: Record creation timestamp
-
-- **saves**: Records saved posts by users
-
-  - `id`: Unique identifier (PRIMARY KEY)
-  - `userId`: User who saved the content (FOREIGN KEY → users.id)
-  - `contentId`: ID of the saved content
-  - `contentTypeId`: Type of content (FOREIGN KEY → contentTypes.id)
-  - `createdAt`: Save creation timestamp
-
-- **reports**: Stores user reports on posts
-
-  - `id`: Unique identifier (PRIMARY KEY)
-  - `reporterId`: User reporting the content (FOREIGN KEY → users.id)
-  - `contentId`: ID of the reported content
-  - `contentTypeId`: Type of content (FOREIGN KEY → contentTypes.id)
-  - `reason`: Reason for report
-  - `details`: Additional report details
-  - `status`: Report status (pending, reviewed, rejected, etc.)
-  - `reviewerId`: Moderator who reviewed the report (FOREIGN KEY → users.id)
-  - `reviewedAt`: Timestamp of review
-  - `createdAt`: Report creation timestamp
-
-- **contentActions**: Records content-related actions
-  - `id`: Unique identifier (PRIMARY KEY)
-  - `contentId`: ID of the content
-  - `actionId`: Action performed (FOREIGN KEY → actions.id)
-  - `deleted`: Whether the action was undone/deleted
-
-### Schema Relationships Diagram
-
-```
-users
-  ↑
-  |
-  +---------------------+
-  |                     |
-  |                     |
-posts ----------------→ topics
-  |
-  |
-  +---------+
-  |         |
-  |         |
-  ↓         |
-media      views
-            |
-            |
-            ↓
-contentTypes ←-----+
-  ↑                |
-  |                |
-  +-------+        |
-  |       |        |
-  |       |        |
-likes   saves    reports
+```http
+GET /
 ```
 
-This diagram shows the primary relationships between tables in the Posts API schema.
+| Parameter | Type   | Required | Description                 |
+| --------- | ------ | -------- | --------------------------- |
+| `page`    | number | Yes      | The page number to retrieve |
+| `limit`   | number | Yes      | Number of posts per page    |
 
-## Actions
+**Response:**
 
-All business logic is implemented in actions (defined in `post.action.ts`) to ensure data integrity, security, and consistent behavior across the application. Each action performs specific validations and database operations.
+```json
+{
+  "data": [
+    {
+      "id": 123,
+      "content": "Post content",
+      "authorId": 456,
+      "createdAt": 1649123456789,
+      "media": [
+        {
+          "url": "https://example.com/image.jpg",
+          "type": "image"
+        }
+      ]
+    }
+  ],
+  "message": "Posts feed fetched successfully",
+  "statusCode": 200
+}
+```
+
+#### Get Post by ID
+
+```http
+GET /:id
+```
+
+| Parameter | Type   | Required | Description                    |
+| --------- | ------ | -------- | ------------------------------ |
+| `id`      | number | Yes      | The ID of the post to retrieve |
+
+**Response:**
+
+```json
+{
+  "data": {
+    "id": 123,
+    "content": "Post content",
+    "authorId": 456,
+    "createdAt": 1649123456789,
+    "media": [
+      {
+        "url": "https://example.com/image.jpg",
+        "type": "image"
+      }
+    ]
+  },
+  "message": "Post details fetched successfully",
+  "statusCode": 200
+}
+```
+
+#### Get Post Interaction Counts
+
+```http
+GET /:id/interaction/count
+```
+
+| Parameter | Type   | Required | Description        |
+| --------- | ------ | -------- | ------------------ |
+| `id`      | number | Yes      | The ID of the post |
+
+**Response:**
+
+```json
+{
+  "data": {
+    "likesCount": 42,
+    "repliesCount": 7,
+    "sharesCount": 3,
+    "repostsCount": 5,
+    "viewCount": 128
+  },
+  "message": "Post interactions fetched successfully",
+  "statusCode": 200
+}
+```
+
+#### Get Post Interactions by Type
+
+```http
+GET /:id/interaction
+```
+
+| Parameter | Type   | Required | Description                                            |
+| --------- | ------ | -------- | ------------------------------------------------------ |
+| `id`      | number | Yes      | The ID of the post                                     |
+| `type`    | string | Yes      | The interaction type: "likes", "replies", or "reposts" |
+
+**Example:** `GET /123/interaction?type=likes`
+
+**Response:**
+
+```json
+{
+  "data": [
+    {
+      "userId": 456,
+      "contentId": 123,
+      "createdAt": 1649123456789
+    }
+  ],
+  "message": "Likes fetched successfully",
+  "statusCode": 200
+}
+```
+
+### 🔒 Authenticated Endpoints
+
+> **Note:** These endpoints require user authentication via JWT token in the Authorization header.
+
+#### Get User Feed
+
+```
+GET /user/feed
+```
+
+- **Query Parameters**:
+  - `page` (number): The page number to retrieve
+  - `limit` (number): Number of posts per page
+  - `type` (string): Feed type ("following" or "for_you")
+- **Response**: Array of posts based on feed type
+
+#### Get User Profile Posts
+
+```
+GET /user/profile
+```
+
+- **Query Parameters**:
+  - `page` (number): The page number to retrieve
+  - `limit` (number): Number of posts per page
+  - `type` (string): Post type ("your-posts", "your-replies", "your-media", "your-saved", or "your-pinned")
+- **Response**: Array of posts based on the specified type
+
+#### Create Post
+
+```
+POST /create
+```
+
+- **Body**:
+  - `content` (string): The post content text
+  - `media` (array, optional): Media items to attach to the post
+  - `parentId` (number, optional): ID of the parent post if this is a reply
+  - `flags` (object): Object containing flags:
+    - `nsfw` (boolean): Whether the post is NSFW
+    - `subscriberOnly` (boolean, optional): Whether the post is for subscribers only
+- **Query Parameters**:
+  - `signature` (string): Cryptographic signature for the action
+- **Response**: Success message with post ID
+
+#### Delete Post
+
+```
+DELETE /:id
+```
+
+- **Path Parameters**:
+  - `id` (number): The ID of the post to delete
+- **Query Parameters**:
+  - `signature` (string): Cryptographic signature for the action
+  - `type` (string): Signature type
+- **Response**: Success message
+
+#### Update Post
+
+```
+PATCH /:id
+```
+
+- **Path Parameters**:
+  - `id` (number): The ID of the post to update
+- **Body**:
+  - `content` (string): Updated post content
+  - `media` (array): Updated media items
+- **Query Parameters**:
+  - `signature` (string): Cryptographic signature for the action
+  - `type` (string): Signature type
+- **Response**: Success message
+
+#### Like Post
+
+```
+POST /like/:id
+```
+
+- **Path Parameters**:
+  - `id` (number): The ID of the post to like
+- **Query Parameters**:
+  - `signature` (string): Cryptographic signature for the action
+  - `type` (string): Signature type
+  - `reaction` (string, optional): Emoji reaction type
+- **Response**: Success message
+
+#### Unlike Post
+
+```
+POST /unlike/:id
+```
+
+- **Path Parameters**:
+  - `id` (number): The ID of the post to unlike
+- **Query Parameters**:
+  - `signature` (string): Cryptographic signature for the action
+  - `type` (string): Signature type
+- **Response**: Success message
+
+#### Repost
+
+```
+POST /repost
+```
+
+- **Body**:
+  - `postId` (number): The ID of the post to repost
+  - `content` (string, optional): Additional content for the repost
+- **Query Parameters**:
+  - `signature` (string): Cryptographic signature for the action
+  - `type` (string): Signature type
+- **Response**: Success message with repost ID
+
+#### Unrepost
+
+```
+POST /unrepost
+```
+
+- **Body**:
+  - `postId` (number): The ID of the original post
+  - `repostId` (number): The ID of the repost to delete
+- **Query Parameters**:
+  - `signature` (string): Cryptographic signature for the action
+  - `type` (string): Signature type
+- **Response**: Success message
+
+#### Save Post
+
+```
+POST /save
+```
+
+- **Body**:
+  - `postId` (number): The ID of the post to save
+- **Query Parameters**:
+  - `signature` (string): Cryptographic signature for the action
+  - `type` (string): Signature type
+- **Response**: Success message
+
+#### Unsave Post
+
+```
+POST /unsave
+```
+
+- **Body**:
+  - `postId` (number): The ID of the post to unsave
+- **Query Parameters**:
+  - `signature` (string): Cryptographic signature for the action
+  - `type` (string): Signature type
+- **Response**: Success message
+
+#### Report Post
+
+```
+POST /report
+```
+
+- **Body**:
+  - `postId` (number): The ID of the post to report
+  - `reason` (string): Reason for reporting
+  - `details` (string, optional): Additional details about the report
+- **Query Parameters**:
+  - `signature` (string): Cryptographic signature for the action
+  - `type` (string): Signature type
+- **Response**: Success message
+
+#### Pin Post
+
+```
+POST /pin
+```
+
+- **Body**:
+  - `postId` (number): The ID of the post to pin to profile
+- **Query Parameters**:
+  - `signature` (string): Cryptographic signature for the action
+  - `type` (string): Signature type
+- **Response**: Success message
+
+#### Unpin Post
+
+```
+POST /unpin
+```
+
+- **Body**:
+  - `postId` (number): The ID of the post to unpin
+- **Query Parameters**:
+  - `signature` (string): Cryptographic signature for the action
+  - `type` (string): Signature type
+- **Response**: Success message
+
+## ⚙️ Post Actions
+
+The post actions are defined in `post.action.ts` and encapsulate the business logic for interacting with posts in the database.
 
 ### `createPost`
 
-Creates a new social media post with optional media attachments.
+Creates a new post with content, optional parent ID (for replies), media, and flags.
 
-**Parameters:**
+**Steps:**
 
-- `userId`: ID of the user creating the post (required)
-- `content`: Text content of the post (required, 1-5000 characters)
-- `media`: Array of media objects to attach (optional)
-- `topicId`: Associated topic/space ID (optional)
-- `parentId`: Parent post ID for replies/comments (optional)
+1. **Sanitize and validate** the post content.
+2. If it's a reply (`parentId` provided):
+   - Verify the parent post exists and isn't deleted.
+   - Check if the user is trying to reply to their own post (not allowed).
+   - For subscriber-only posts, verify the user is a subscriber.
+3. Extract **hashtags** and **mentions** from the content.
+4. Insert the post into the database.
+5. Process and store media items if provided:
+   - For images: Convert from base64, process, upload to S3, and store URL.
+   - For videos: Convert from base64, process, generate thumbnail, upload both to S3.
+6. Update the post with an action ID and increment the parent's reply count if it's a reply.
 
-**Process:**
+**Code Example:**
 
-1. **Authentication & Authorization**: Verifies user exists and has permission to post
-2. **Content Validation**:
-   - Sanitizes HTML to prevent XSS attacks
-   - Trims whitespace and normalizes line breaks
-   - Validates content against length requirements (1-5000 chars)
-   - Rejects posts with only whitespace
-3. **Media Processing**:
-   - Validates media formats (supported image/video types)
-   - Compresses images/videos for efficient storage and delivery
-   - Generates thumbnails for preview purposes
-   - Uploads media to S3 storage with proper content type headers
-4. **Metadata Extraction**:
-   - Parses hashtags using regex pattern matching (#tag)
-   - Extracts user mentions using regex pattern matching (@user)
-   - Stores as comma-separated values for efficient search
-5. **Database Operations**:
-   - Creates post record with all metadata
-   - Creates separate media records for each attachment
-   - Updates user's post count
-   - If replying, increments parent post's reply count
-6. **Activity Tracking**:
-   - Records post creation in contentActions for analytics
-   - Updates activity timestamps on user profile
-
-**Error Handling:**
-
-- Returns validation errors for invalid content/media
-- Handles S3 upload failures with proper error reporting
-- Rolls back database operations on failure
+```typescript
+const result = await actions.createPost(
+  {
+    userId,
+    content: "Hello World!",
+    media: [],
+    parentId: null,
+    flags: { nsfw: false },
+  },
+  signature
+);
+```
 
 ### `deletePost`
 
-Removes a post from the system with proper cleanup of associated data.
+Deletes a post if the user has permission.
 
-**Parameters:**
+**Steps:**
 
-- `postId`: ID of the post to delete
-- `userId`: ID of the user requesting deletion
+1. Check if the post exists.
+2. Verify the user has permission to delete (is the author).
+3. Soft delete by updating fields (deleted timestamp, reset like count, anonymize content).
+4. Delete associated media.
+5. Mark associated content actions as deleted.
 
-**Process:**
+**Code Example:**
 
-1. **Authentication & Authorization**:
-   - Verifies post exists
-   - Checks if user is post author or has admin/moderator permissions
-2. **Child Content Handling**:
-   - Identifies replies/comments linked to this post
-   - Updates reference links or cascade deletes as appropriate
-3. **Database Operations**:
-   - Soft deletes post by setting deletedAt timestamp
-   - Resets counter values (views, likes, etc.)
-   - Marks post content as "[deleted]" to preserve thread continuity
-   - Updates parent post's reply count if applicable
-4. **Media Cleanup**:
-   - Identifies all media assets associated with the post
-   - Marks media as deleted in database
-   - Schedules background job to remove media from S3 (with grace period)
-5. **Activity Cleanup**:
-   - Updates contentActions to reflect deletion
-   - Removes post from trending calculations
-
-**Security Considerations:**
-
-- Prevents deletion of posts with legal hold requirements
-- Maintains audit trail of deletion for compliance purposes
+```typescript
+const result = await actions.deletePost(
+  {
+    postId: 123,
+    userId: 456,
+  },
+  signature
+);
+```
 
 ### `likePost`
 
-Records a user's like/reaction on a post and updates relevant counters.
+Likes a post if it exists and hasn't been liked by the user yet.
 
-**Parameters:**
+**Steps:**
 
-- `postId`: ID of the post to like
-- `userId`: ID of the user performing the action
-- `reaction`: Optional reaction type (default: "like")
+1. Check if the post exists and isn't deleted.
+2. Verify the user hasn't already liked the post.
+3. Insert a new like record.
+4. Increment the post's like count.
 
-**Process:**
+**Code Example:**
 
-1. **Validation**:
-   - Verifies post exists and is not deleted
-   - Ensures the post is not already liked by this user
-2. **Database Operations**:
-   - Creates a record in the likes table
-   - Atomically increments the likesCount on the post
-3. **Notifications**:
-   - Triggers notification to post author (unless disabled)
-   - Includes reaction type in notification data
-4. **Analytics**:
-   - Records timestamp for engagement metrics
-   - Updates post's algorithmic ranking score
-
-**Optimizations:**
-
-- Uses database transactions to ensure counter consistency
-- Implements rate limiting to prevent spam
-- Maintains counter cache to avoid expensive COUNT queries
+```typescript
+const result = await actions.likePost(
+  {
+    postId: 123,
+    userId: 456,
+  },
+  signature
+);
+```
 
 ### `unlikePost`
 
-Removes a user's like/reaction from a post.
+Unlikes a post if it has been liked by the user.
 
-**Parameters:**
+**Steps:**
 
-- `postId`: ID of the post to unlike
-- `userId`: ID of the user performing the action
+1. Check if the user has liked the post.
+2. Delete the like record.
+3. Decrement the post's like count (ensuring it doesn't go below zero).
 
-**Process:**
+**Code Example:**
 
-1. **Validation**:
-   - Verifies like record exists for this user+post combination
-2. **Database Operations**:
-   - Removes the record from the likes table
-   - Atomically decrements the likesCount on the post (with floor of 0)
-3. **Analytics**:
-   - Records unlike action for engagement metrics
-   - Updates post's algorithmic ranking score
-
-**Error Handling:**
-
-- Returns appropriate error if like doesn't exist
-- Ensures counter never goes below zero
+```typescript
+const result = await actions.unlikePost(
+  {
+    postId: 123,
+    userId: 456,
+  },
+  signature
+);
+```
 
 ### `pinPost`
 
-Pins a post to a user's profile, making it appear at the top.
+Pins a post to the user's profile.
 
-**Parameters:**
+**Steps:**
 
-- `postId`: ID of the post to pin
-- `userId`: ID of the user performing the action
+1. Verify the post exists, isn't deleted, and the user is the author.
+2. Check if the user has permission to pin the post.
+3. Verify the post isn't already pinned.
+4. Update the user's pinned post field.
 
-**Process:**
+**Code Example:**
 
-1. **Validation**:
-   - Verifies post exists and is not deleted
-   - Confirms user is the post author
-   - Checks if user already has maximum pins (configurable limit)
-2. **Database Operations**:
-   - Sets isPinned flag to true on the post
-   - Updates user's pinned posts list
-3. **UI State**:
-   - Returns updated pin status for immediate UI feedback
-
-**Business Rules:**
-
-- Users can pin up to 5 posts at once
-- Only original posts can be pinned (not replies)
-- Only the post author can pin their own posts
+```typescript
+const result = await actions.pinPost(
+  {
+    postId: 123,
+    userId: 456,
+  },
+  signature
+);
+```
 
 ### `unpinPost`
 
-Removes a post from pinned status on a user's profile.
+Unpins a post from the user's profile.
 
-**Parameters:**
+**Steps:**
 
-- `postId`: ID of the post to unpin
-- `userId`: ID of the user performing the action
+1. Check if a post is currently pinned.
+2. Update the user's pinned post field to null.
 
-**Process:**
+**Code Example:**
 
-1. **Validation**:
-   - Verifies post is currently pinned
-   - Confirms user is the post author
-2. **Database Operations**:
-   - Sets isPinned flag to false on the post
-   - Updates user's pinned posts list
-3. **UI State**:
-   - Returns updated pin status for immediate UI feedback
-
-### `reply`
-
-Creates a reply to an existing post, establishing a parent-child relationship.
-
-**Parameters:**
-
-- `userId`: ID of the user creating the reply
-- `content`: Text content of the reply
-- `media`: Optional array of media attachments
-- `parentId`: ID of the post being replied to
-
-**Process:**
-
-1. **Validation**:
-   - Verifies parent post exists and is not deleted
-   - Validates content and media (same as createPost)
-2. **Content Processing**:
-   - Sanitizes and processes content (same as createPost)
-   - Handles media uploads (same as createPost)
-3. **Database Operations**:
-   - Creates new post with parent reference
-   - Atomically increments repliesCount on parent post
-   - Updates reply chain statistics
-4. **Notifications**:
-   - Notifies parent post author of new reply
-   - Notifies mentioned users in reply content
-5. **Thread Management**:
-   - Maintains proper thread depth counters
-   - Updates conversation participants list
-
-**Performance Considerations:**
-
-- Implements efficient nested reply querying using materialized paths
-- Optimizes notification batching for active discussions
+```typescript
+const result = await actions.unpinPost(
+  {
+    postId: 123,
+    userId: 456,
+  },
+  signature
+);
+```
 
 ### `updatePost`
 
-Modifies an existing post's content and/or media.
+Updates an existing post with new content and media.
 
-**Parameters:**
+**Steps:**
 
-- `postId`: ID of the post to update
-- `userId`: ID of the user performing the update
-- `content`: New text content
-- `media`: New array of media objects
+1. Sanitize and validate the new content.
+2. Check if the post exists and the user is the author.
+3. Verify the user has permission to edit the post.
+4. Update the post content.
+5. Delete existing media associated with the post.
+6. Process and add new media (similar to `createPost`).
 
-**Process:**
+**Code Example:**
 
-1. **Authentication & Authorization**:
-   - Verifies post exists and is not deleted
-   - Checks if user is post author or has admin rights
-   - Verifies post is within editable timeframe (configurable)
-2. **Content Processing**:
-   - Validates and sanitizes updated content
-   - Extracts updated hashtags and mentions
-3. **Media Handling**:
-   - Identifies media to keep, remove, or add
-   - Processes new media uploads
-   - Deletes removed media from storage
-   - Maintains media ordering
-4. **Database Operations**:
-   - Updates post content and metadata
-   - Updates or creates media records
-   - Records edit history for compliance (optional)
-5. **Notification**:
-   - Notifies newly mentioned users
-   - Does not re-notify previously mentioned users
-
-**Edit Limitations:**
-
-- Posts can only be edited within 24 hours of creation
-- Edit history is maintained for moderation purposes
-- Some posts may be non-editable based on platform rules
+```typescript
+const result = await actions.updatePost(
+  {
+    postId: 123,
+    userId: 456,
+    content: "Updated content",
+    media: [],
+  },
+  signature
+);
+```
 
 ### `viewPost`
 
-Records a view event on a post and updates view counters.
+Records a view for a post and increments the view count.
 
-**Parameters:**
+**Steps:**
 
-- `postId`: ID of the post being viewed
-- `userId`: Optional ID of the viewing user
-- `duration`: Optional viewing duration in seconds
+1. Check if the post exists.
+2. Increment the view count on the post.
+3. Record the view in the views table if a user ID is provided.
 
-**Process:**
+**Code Example:**
 
-1. **Validation**:
-   - Verifies post exists
-   - Implements view counting logic to prevent duplicate counts
-2. **Anonymous vs. Authenticated**:
-   - For authenticated users: creates view record with userId
-   - For anonymous users: updates view counter only
-3. **Database Operations**:
-   - Atomically increments post's viewCount
-   - Records view timestamp and duration if authenticated
-4. **Analytics**:
-   - Updates post's trending score based on view patterns
-   - Records geographical and device metadata for analytics
-
-**Anti-Abuse Measures:**
-
-- Rate limits views from same IP/user
-- Uses fingerprinting to detect fraudulent views
-- Implements cooldown periods between counted views
+```typescript
+const result = await actions.viewPost(
+  {
+    postId: 123,
+    viewerId: 456,
+  },
+  signature
+);
+```
 
 ### `repostPost`
 
-Shares an existing post to the user's followers with optional additional content.
+Reposts an existing post with optional new content.
 
-**Parameters:**
+**Steps:**
 
-- `postId`: ID of the post to repost
-- `userId`: ID of the user reposting
-- `content`: Optional additional commentary
+1. If content is provided, sanitize and validate it.
+2. Check if the original post exists and isn't deleted.
+3. Create a new post with reference to the original.
+4. Increment the repost count on the original post.
+5. Add a content action record for the repost.
 
-**Process:**
+**Code Example:**
 
-1. **Validation**:
-   - Verifies original post exists and is not deleted
-   - Checks if user has already reposted this post
-   - Validates additional content if provided
-2. **Database Operations**:
-   - Creates new post with reference to original
-   - Sets appropriate repost metadata
-   - Increments repostsCount on original post
-   - Records in contentActions table
-3. **Notifications**:
-   - Notifies original post author of repost
-4. **Distribution**:
-   - Makes repost visible in user's followers' feeds
-   - Applies appropriate algorithmic boosts
-
-**Business Rules:**
-
-- Users cannot repost their own posts
-- Reposting deleted content is prevented
-- Repost chains limited to prevent spam (max 1 level deep)
+```typescript
+const result = await actions.repostPost(
+  {
+    postId: 123,
+    userId: 456,
+    content: "Check this out!",
+  },
+  signature
+);
+```
 
 ### `unrepostPost`
 
-Removes a previously created repost.
+Deletes a repost if the user has permission.
 
-**Parameters:**
+**Steps:**
 
-- `postId`: ID of the original post
-- `repostId`: ID of the repost to remove
-- `userId`: ID of the user who created the repost
+1. Check if the repost exists and the user is the author.
+2. Verify the user has permission to delete the repost.
+3. Soft delete the repost.
+4. Decrement the repost count on the original post.
 
-**Process:**
+**Code Example:**
 
-1. **Validation**:
-   - Verifies repost exists and belongs to user
-2. **Database Operations**:
-   - Soft deletes the repost
-   - Decrements repostsCount on original post
-   - Updates contentActions to reflect deletion
-3. **Feed Updates**:
-   - Removes repost from followers' feeds
-   - Updates aggregated content metrics
+```typescript
+const result = await actions.unrepostPost(
+  {
+    postId: 123,
+    repostId: 789,
+    userId: 456,
+  },
+  signature
+);
+```
 
 ### `savePost`
 
-Bookmarks a post for the user to access later.
+Saves a post for the user if it hasn't been saved already.
 
-**Parameters:**
+**Steps:**
 
-- `postId`: ID of the post to save
-- `userId`: ID of the user saving the post
+1. Check if the post exists and isn't deleted.
+2. Verify the post isn't already saved by the user.
+3. Create a save record.
 
-**Process:**
+**Code Example:**
 
-1. **Validation**:
-   - Verifies post exists and is not deleted
-   - Checks if post is already saved by user
-2. **Database Operations**:
-   - Creates save record linking user to post
-   - Optionally adds to user-defined collection
-3. **Privacy**:
-   - Respects privacy settings (public vs private saves)
-4. **UI State**:
-   - Returns updated save status for immediate feedback
-
-**Features:**
-
-- Supports organizing saves into collections
-- Enables syncing saves across devices
-- Provides offline access to saved content (mobile)
+```typescript
+const result = await actions.savePost(
+  {
+    postId: 123,
+    userId: 456,
+  },
+  signature
+);
+```
 
 ### `unsavePost`
 
-Removes a post from user's bookmarks.
+Unsaves a post for the user.
 
-**Parameters:**
+**Steps:**
 
-- `postId`: ID of the post to unsave
-- `userId`: ID of the user unsaving the post
+1. Check if the post is saved by the user.
+2. Delete the save record.
 
-**Process:**
+**Code Example:**
 
-1. **Validation**:
-   - Verifies save record exists
-2. **Database Operations**:
-   - Removes save record from database
-   - Updates collection metadata if applicable
-3. **UI State**:
-   - Returns updated save status for immediate feedback
+```typescript
+const result = await actions.unsavePost(
+  {
+    postId: 123,
+    userId: 456,
+  },
+  signature
+);
+```
 
 ### `reportPost`
 
-Flags a post for review by moderators due to policy violations.
+Reports a post for inappropriate content.
 
-**Parameters:**
+**Steps:**
 
-- `postId`: ID of the post being reported
-- `userId`: ID of the reporting user
-- `reason`: Category of violation being reported
-- `details`: Optional additional details about the violation
+1. Check if the post exists.
+2. Validate that a reason is provided.
+3. Create a report record with pending status.
 
-**Process:**
+**Code Example:**
 
-1. **Validation**:
-   - Verifies post exists
-   - Validates report reason against allowed categories
-   - Checks for duplicate reports from same user
-2. **Database Operations**:
-   - Creates report record with all details
-   - Increments report count on post
-3. **Moderation Workflow**:
-   - Triggers review if threshold reached
-   - Adds to moderation queue with priority level
-   - May automatically limit visibility if multiple reports
-4. **Reporter Experience**:
-   - Provides confirmation of report receipt
-   - Optionally allows blocking post author
-   - Removes post from reporter's feed
+```typescript
+const result = await actions.reportPost(
+  {
+    postId: 123,
+    userId: 456,
+    reason: "Inappropriate content",
+    details: "Contains offensive language",
+  },
+  signature
+);
+```
 
-**Abuse Prevention:**
+## 🛠️ Helper Functions
 
-- Rate limits reports from individual users
-- Analyzes reporting patterns to identify misuse
-- Implements reviewer assignment algorithm based on report type
+The helper functions in `post.helpers.ts` provide utility functionality for the post actions:
 
-## Helpers
+### User Permission Helpers
 
-Helper functions provide reusable utilities for processing posts and media:
+- `canUserModifyPost`: Determines if a user can modify a post based on their ID and the author's ID
 
-### Content Helpers
+### Pagination Helpers
 
-| Function                | Description                                                      | Used By                            |
-| ----------------------- | ---------------------------------------------------------------- | ---------------------------------- |
-| `sanitizePostContent`   | Removes unsafe HTML, controls max length, normalizes line breaks | createPost, updatePost, repostPost |
-| `validatePostContent`   | Checks content for minimum/maximum length requirements           | createPost, updatePost, repostPost |
-| `extractHashtags`       | Extracts hashtags from post content                              | createPost, processPostForDisplay  |
-| `extractMentions`       | Extracts user mentions from post content                         | createPost, processPostForDisplay  |
-| `processPostForDisplay` | Formats posts for display with time elapsed, hashtags, mentions  | GET routes                         |
-| `canUserModifyPost`     | Checks if user has permission to modify a post                   | deletePost, updatePost, pinPost    |
-| `getPaginationParams`   | Creates pagination parameters based on page and limit            | GET routes                         |
+- `getPaginationParams`: Generates pagination parameters (offset) based on page and limit
 
-### Media Processing Helpers
+### Content Processing Helpers
 
-| Function                   | Description                                         | Used By                  |
-| -------------------------- | --------------------------------------------------- | ------------------------ |
-| `compressImage`            | Optimizes image size using quality adjustment       | processAndUploadImage    |
-| `optimizeImageForFeed`     | Resizes images for feed display (max 1200px width)  | processAndUploadImage    |
-| `validateImageFormat`      | Ensures image is in a supported format              | processAndUploadImage    |
-| `generateThumbnail`        | Creates small thumbnails for image previews         | createAndUploadThumbnail |
-| `processAndUploadImage`    | End-to-end image processing and S3 upload           | createPost, updatePost   |
-| `createAndUploadThumbnail` | Creates and uploads image thumbnails                | createPost, updatePost   |
-| `validateVideoFormat`      | Checks if video is in supported format/codec        | processAndUploadVideo    |
-| `compressVideo`            | Compresses video for efficient storage and playback | processAndUploadVideo    |
-| `generateVideoThumbnail`   | Creates thumbnails from video frames                | processAndUploadVideo    |
-| `processAndUploadVideo`    | End-to-end video processing and S3 upload           | createPost, updatePost   |
+- `extractHashtags`: Extracts hashtags from content using regex
+- `extractMentions`: Extracts mentions from content using regex
+- `validatePostContent`: Checks if content is empty or exceeds maximum length
+- `sanitizePostContent`: Removes harmful HTML elements and normalizes line breaks
 
-## Media Processing
+### Image Processing Helpers
 
-The Posts API handles sophisticated media processing for both images and videos:
+- `compressImage`: Compresses images using Sharp with 80% quality and mozjpeg optimization
+- `generateThumbnail`: Creates a 150x150px thumbnail maintaining aspect ratio
+- `validateImageFormat`: Checks if an image is in a supported format (jpeg, jpg, png, webp, gif)
+- `optimizeImageForFeed`: Resizes images to max width of 1200px while preserving aspect ratio
+- `processAndUploadImage`: Validates format, optimizes, and uploads image to S3
+- `createAndUploadThumbnail`: Creates and uploads a thumbnail image to S3
 
-### Image Processing
+### Video Processing Helpers
 
-1. **Validation**: Checks image format against supported types (JPEG, PNG, WebP, GIF)
-2. **Compression**: Reduces file size while maintaining quality (80% JPEG quality with mozjpeg)
-3. **Resizing**: Maintains aspect ratio while limiting dimensions for feed (max width 1200px)
-4. **Thumbnail Generation**: Creates 150x150px thumbnails for previews
-5. **S3 Upload**: Stores processed images in the media folder
+- `bufferToTempFile`: Converts a buffer to a temporary file for processing
+- `cleanupTempFile`: Removes temporary files after processing
+- `validateVideoFormat`: Checks if a video is in a supported format with a supported codec
+- `compressVideo`: Compresses videos using ffmpeg with H.264 codec, 1Mbps bitrate, 720p max height
+- `generateVideoThumbnail`: Creates a thumbnail from the 10% mark of a video
+- `processAndUploadVideo`: Validates format, compresses, generates thumbnail, and uploads both to S3
 
-### Video Processing
+### Utilities from `lib` Folder
 
-1. **Validation**: Verifies video format and codec compatibility
+The post routes make use of several utility functions and helpers from the `lib` folder to streamline operations and ensure consistency:
+
+1. **`tryCatch` (from `lib/tryCatch.ts`)**:
+
+   - Simplifies error handling by wrapping asynchronous operations.
+   - Returns a consistent result object with `data` and `error` properties.
+
+2. **`zod` Helpers (from `lib/zod/helpers.ts`)**:
+
+   - `zMedia`: Validates media objects with properties like `url`, `type`, `order`, etc.
+   - `zNumberString`: Ensures numeric strings are properly parsed and validated.
+   - `zSignType`: Enum for signature types (e.g., `wallet`, `zk`).
+
+3. **Pagination Helper (from `lib/utils.ts`)**:
+
+   - `getPaginationParams`: Calculates the offset for paginated queries based on page and limit.
+
+4. **Hashing Utility (from `lib/utils.ts`)**:
+
+   - `generateHash`: Creates a SHA3-256 hash for data integrity and verification.
+
+5. **S3 Upload Utilities (from `lib/s3/upload.ts`)**:
+
+   - `uploadToS3`: Handles direct uploads of files to S3.
+   - `processAndUploadImage`: Validates, optimizes, and uploads images.
+   - `processAndUploadVideo`: Compresses, generates thumbnails, and uploads videos.
+
+6. **Post Content Helpers (from `post.helpers.ts`)**:
+   - `sanitizePostContent`: Cleans and normalizes post content.
+   - `validatePostContent`: Ensures content meets length and format requirements.
+   - `extractHashtags` and `extractMentions`: Parses hashtags and mentions from content.
+
+These utilities ensure modularity, reusability, and maintainability across the post routes.
+
+## 🖼️ Media Processing Flow
+
+The API handles both image and video processing with a comprehensive pipeline:
+
+### Image Processing Flow
+
+1. **Validation**: Check if the image is in a supported format (JPEG, PNG, WebP, GIF)
+2. **Optimization**:
+   - Resize to a maximum width of 1200px while preserving aspect ratio
+   - Compress using Sharp with 85% quality and mozjpeg for better compression
+3. **Thumbnail Generation**:
+   - Create a 150x150px thumbnail with "cover" fit to maintain aspect ratio
+   - Compress the thumbnail with 80% quality
+4. **Upload**:
+   - Upload both the optimized image and thumbnail to S3
+   - Store URLs in the database
+
+### Video Processing Flow
+
+1. **Validation**: Check if the video has valid video streams with supported codecs (H.264, VP8, VP9, etc.)
 2. **Compression**:
-   - H.264 codec with medium preset for optimal quality/size balance
-   - 720p resolution maximum
-   - 30fps frame rate
-   - 1Mbps video bitrate
-   - AAC audio at 128kbps
-3. **Thumbnail Extraction**: Captures frame at 10% mark for video preview
-4. **S3 Upload**: Stores processed videos in the videos folder
-5. **DB Storage**: Saves both video URL and thumbnail URL in the media table
+   - Convert to MP4 with H.264 codec using "medium" preset
+   - Limit bitrate to 1Mbps for balanced quality/size
+   - Resize to max height of 720p while maintaining aspect ratio
+   - Limit to 30fps
+   - Use AAC audio codec with 128k bitrate
+3. **Thumbnail Generation**:
+   - Take a screenshot at the 10% mark of the video
+   - Resize to 480px width
+4. **Upload**:
+   - Upload compressed video and thumbnail to S3
+   - Store URLs in the database, including reference to the thumbnail
 
-## S3 Integration
+### Processing Steps for Post Creation/Update
 
-Media content is stored in S3-compatible storage:
+1. Extract media items from the request
+2. For each media item:
+   - Identify the type (image, video)
+   - Convert from base64 to buffer
+   - Process according to type (using the flows above)
+   - Upload to S3 and get URLs
+   - Store URLs and metadata in the database
 
-- **Configuration**: Uses Bun.S3Client to connect to R2 or other S3 providers
-- **Upload Process**: Randomized filenames with UUID to prevent collisions
-- **Directory Structure**:
-  - `/media/` for images
-  - `/videos/` for video content
-- **URL Construction**: Uses R2_PUBLIC_URL or builds URL from endpoint and bucket name
-- **Error Handling**: Graceful handling of upload failures
-
-## Error Handling
-
-The Posts API implements robust error handling:
-
-- **Input Validation**: Zod schemas validate all input data
-- **Permission Checks**: Verifies user permissions before mutations
-- **Media Processing**: Gracefully handles media processing failures
-- **Transactional Actions**: Uses transaction-based actions to ensure data consistency
-- **Client Responses**: Clear error messages with appropriate HTTP status codes
-
-## Development Guidelines
-
-When extending or modifying the Posts API, consider the following:
+## 📋 Development Guidelines
 
 1. **Add new routes in post.ts**
 2. **Implement business logic in post.action.ts**

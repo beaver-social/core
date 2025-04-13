@@ -7,7 +7,16 @@ import { zMedia } from "../../lib/zod/helpers";
 import * as postHelpers from "./post.helpers";
 import { createAction } from "../../lib/actions/factory";
 
-// POST ACTIONS
+/**
+ * Creates a new post with the given content, parent ID, media, and flags.
+ * @param tx - The database transaction object.
+ * @param {Object} params - The parameters for creating the post.
+ * @param {string} params.content - The content of the post.
+ * @param {number | undefined} params.parentId - The ID of the parent post, if it's a reply.
+ * @param {z.infer<typeof zMedia>[] | undefined} params.media - An array of media items to attach.
+ * @param {{ nsfw: boolean; subscriberOnly?: boolean }} params.flags - Flags for the post, including NSFW status.
+ * @returns {Promise<{ id: number; parentId: number | null }>} A promise that resolves to the created post object.
+ */
 export const createPost = createAction<{
   content: string;
   parentId: number | undefined;
@@ -177,6 +186,14 @@ export const createPost = createAction<{
   }
 );
 
+/**
+ * Deletes a post if the user has permission.
+ * @param tx - The database transaction object.
+ * @param {Object} params - The parameters for deleting the post.
+ * @param {number} params.postId - The ID of the post to delete.
+ * @param {number} params.userId - The ID of the user attempting to delete.
+ * @returns {Promise<any>} A promise that resolves to the updated post object.
+ */
 export const deletePost = createAction<{ postId: number }>()(
   async (tx, { postId, userId }) => {
     // Check if user has permission to delete
@@ -219,6 +236,14 @@ export const deletePost = createAction<{ postId: number }>()(
   }
 );
 
+/**
+ * Likes a post if it exists and hasn't been liked by the user yet.
+ * @param tx - The database transaction object.
+ * @param {Object} params - The parameters for liking the post.
+ * @param {number} params.postId - The ID of the post to like.
+ * @param {number} params.userId - The ID of the user liking the post.
+ * @returns {Promise<{ success: boolean }>} A promise that resolves to an object indicating success.
+ */
 export const likePost = createAction<{ postId: number }>()(function (
   tx,
   { postId, userId }
@@ -271,6 +296,14 @@ export const likePost = createAction<{ postId: number }>()(function (
   })();
 });
 
+/**
+ * Unlikes a post if it has been liked by the user.
+ * @param tx - The database transaction object.
+ * @param {Object} params - The parameters for unliking the post.
+ * @param {number} params.postId - The ID of the post to unlike.
+ * @param {number} params.userId - The ID of the user unliking the post.
+ * @returns {Promise<{ success: boolean }>} A promise that resolves to an object indicating success.
+ */
 export const unlikePost = createAction<{ postId: number }>()(function (
   tx,
   { postId, userId }
@@ -312,6 +345,14 @@ export const unlikePost = createAction<{ postId: number }>()(function (
   })();
 });
 
+/**
+ * Pins a post for the user if they have permission.
+ * @param tx - The database transaction object.
+ * @param {Object} params - The parameters for pinning the post.
+ * @param {number} params.postId - The ID of the post to pin.
+ * @param {number} params.userId - The ID of the user pinning the post.
+ * @returns {Promise<{ success: boolean }>} A promise that resolves to an object indicating success.
+ */
 export const pinPost = createAction<{ postId: number }>()(function (
   tx,
   { postId, userId }
@@ -365,6 +406,14 @@ export const pinPost = createAction<{ postId: number }>()(function (
   })();
 });
 
+/**
+ * Unpins a post for the user.
+ * @param tx - The database transaction object.
+ * @param {Object} params - The parameters for unpinning the post.
+ * @param {number} params.postId - The ID of the post to unpin.
+ * @param {number} params.userId - The ID of the user unpinning the post.
+ * @returns {Promise<void>} A promise that resolves when the operation is complete.
+ */
 export const unpinPost = createAction<{
   postId: number;
 }>()(async (tx, { postId, userId }) => {
@@ -386,6 +435,16 @@ export const unpinPost = createAction<{
     .where(eq(userSchema.users.id, userId));
 });
 
+/**
+ * Updates an existing post with new content and media if the user is the author.
+ * @param tx - The database transaction object.
+ * @param {Object} params - The parameters for updating the post.
+ * @param {number} params.postId - The ID of the post to update.
+ * @param {string} params.content - The new content for the post.
+ * @param {z.infer<typeof zMedia>[]} params.media - The new media items to attach.
+ * @param {number} params.userId - The ID of the user updating the post.
+ * @returns {Promise<{ success: boolean; id: number }>} A promise that resolves to an object indicating success and the post ID.
+ */
 export const updatePost = createAction<{
   postId: number;
   content: string;
@@ -500,6 +559,14 @@ export const updatePost = createAction<{
   return { success: true, id: postId };
 });
 
+/**
+ * Records a view for a post and increments the view count.
+ * @param tx - The database transaction object.
+ * @param {Object} params - The parameters for viewing the post.
+ * @param {number} params.postId - The ID of the post being viewed.
+ * @param {number | null} params.viewerId - The ID of the viewer, if applicable.
+ * @returns {Promise<{ success: boolean }>} A promise that resolves to an object indicating success.
+ */
 export const viewPost = createAction<{
   postId: number;
   viewerId: number | null;
@@ -536,6 +603,15 @@ export const viewPost = createAction<{
   return { success: true };
 });
 
+/**
+ * Reposts an existing post with optional new content.
+ * @param tx - The database transaction object.
+ * @param {Object} params - The parameters for reposting the post.
+ * @param {number} params.postId - The ID of the post to repost.
+ * @param {string | null} params.content - Optional new content for the repost.
+ * @param {number} params.userId - The ID of the user reposting.
+ * @returns {Promise<{ id: number }>} A promise that resolves to the reposted post object.
+ */
 export const repostPost = createAction<{
   postId: number;
   content: string | null;
@@ -598,6 +674,15 @@ export const repostPost = createAction<{
   }
 );
 
+/**
+ * Deletes a repost if the user has permission.
+ * @param tx - The database transaction object.
+ * @param {Object} params - The parameters for unreposting.
+ * @param {number} params.postId - The ID of the original post.
+ * @param {number} params.repostId - The ID of the repost to delete.
+ * @param {number} params.userId - The ID of the user deleting the repost.
+ * @returns {Promise<{ success: boolean; repostId: number }>} A promise that resolves to an object indicating success and the repost ID.
+ */
 export const unrepostPost = createAction<{
   postId: number;
   repostId: number;
@@ -641,6 +726,14 @@ export const unrepostPost = createAction<{
   return { success: true, repostId };
 });
 
+/**
+ * Saves a post for the user if it hasn't been saved already.
+ * @param tx - The database transaction object.
+ * @param {Object} params - The parameters for saving the post.
+ * @param {number} params.postId - The ID of the post to save.
+ * @param {number} params.userId - The ID of the user saving the post.
+ * @returns {Promise<{ success: boolean; postId: number }>} A promise that resolves to an object indicating success and the post ID.
+ */
 export const savePost = createAction<{
   postId: number;
 }>()(async (tx, { postId, userId }) => {
@@ -689,6 +782,14 @@ export const savePost = createAction<{
   return { success: true, postId };
 });
 
+/**
+ * Unsaves a post for the user if it has been saved.
+ * @param tx - The database transaction object.
+ * @param {Object} params - The parameters for unsaving the post.
+ * @param {number} params.postId - The ID of the post to unsave.
+ * @param {number} params.userId - The ID of the user unsaving the post.
+ * @returns {Promise<{ success: boolean; postId: number }>} A promise that resolves to an object indicating success and the post ID.
+ */
 export const unsavePost = createAction<{
   postId: number;
 }>()(async (tx, { postId, userId }) => {
@@ -723,6 +824,16 @@ export const unsavePost = createAction<{
   return { success: true, postId };
 });
 
+/**
+ * Reports a post for inappropriate content.
+ * @param tx - The database transaction object.
+ * @param {Object} params - The parameters for reporting the post.
+ * @param {number} params.postId - The ID of the post to report.
+ * @param {string} params.reason - The reason for reporting.
+ * @param {string} [params.details] - Additional details about the report.
+ * @param {number} params.userId - The ID of the user reporting.
+ * @returns {Promise<{ success: boolean; postId: number }>} A promise that resolves to an object indicating success and the post ID.
+ */
 export const reportPost = createAction<{
   postId: number;
   reason: string;
