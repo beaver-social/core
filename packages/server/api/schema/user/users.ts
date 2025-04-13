@@ -9,13 +9,13 @@ export const users = table(
   {
     id: t.int().primaryKey({ autoIncrement: true }),
     identity: suiAddressType().notNull(),
+    address: suiAddressType("address").notNull(),
+    suinsDomainName: t.text("suins_domain_name"),
     username: t.text().notNull().unique(),
     fullName: t.text("full_name").notNull(),
     about: t.text("about"),
     imageUrl: t.text("image_url"),
     bannerUrl: t.text("banner_url"),
-    address: suiAddressType("address").notNull(),
-    suinsDomainName: t.text("suins_domain_name"),
     loginType: t
       .text({
         enum: ["wallet", "zk"],

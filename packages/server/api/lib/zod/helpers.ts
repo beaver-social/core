@@ -63,3 +63,31 @@ export const zJwtPayload = z.object({
 
 export const zSignType = z.enum(["wallet", "zk"]);
 export const zReactionType = z.enum(["like", "haha", "wow", "sad", "angry"]);
+
+export const zUserUpdate = z
+  .object({
+    username: z.string().optional(),
+    fullName: z.string().optional(),
+    about: z.string().optional(),
+    imageUrl: z.string().optional(),
+    bannerUrl: z.string().optional(),
+    timezone: z.number().optional(),
+    isVerified: z.boolean().optional(),
+    pinnedPost: z.number().optional(),
+    pinnedShort: z.number().optional(),
+    email: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      return Object.keys(data).length > 0;
+    },
+    {
+      message: "At least one field is required",
+    }
+  )
+  .transform((data) => {
+    const processedData = Object.fromEntries(
+      Object.entries(data).filter(([_, value]) => value !== undefined)
+    );
+    return processedData;
+  });
