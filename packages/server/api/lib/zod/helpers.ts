@@ -62,3 +62,4 @@ export const zJwtPayload = z.object({
 });
 
 export const zSignType = z.enum(["wallet", "zk"]);
+export const zReactionType = z.enum(["like", "haha", "wow", "sad", "angry"]);

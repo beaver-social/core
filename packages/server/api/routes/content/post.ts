@@ -1,20 +1,27 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
-import { zMedia, zNumberString, zSignType } from "../../lib/zod/helpers";
+import {
+  zMedia,
+  zNumberString,
+  zReactionType,
+  zSignType,
+} from "../../lib/zod/helpers";
 import { tryCatch } from "../../lib/tryCatch";
-import * as actions from "./post.action";
 import { and, desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
-import db from "../../schema";
-import { posts } from "../../schema/content";
-import * as postHelpers from "./post.helpers";
-import * as InteractionSchema from "../../schema/interactions";
-import { media } from "../../schema/content/media";
 import { authenticated } from "../../middlewares/auth";
+import { posts } from "../../schema/content";
+import { media } from "../../schema/content/media";
+import db from "../../schema";
+import * as InteractionSchema from "../../schema/interactions";
+import * as postHelpers from "./post.helpers";
+import * as actions from "./post.actions";
 
 export default new Hono()
-  // **get actions on a post - using direct db calls***
-  // get public feed
+  /**
+   *PUBLIC ROUTES
+   **/
+  // Get public feed
   .get(
     "/",
     zValidator(
@@ -49,7 +56,7 @@ export default new Hono()
       return ctx.ok(result.data, "Posts feed fetched successfully", 200);
     }
   )
-  // get single post by id
+  // Get single post by id
   .get(
     "/:id",
     zValidator("param", z.object({ id: zNumberString })),
@@ -79,7 +86,7 @@ export default new Hono()
       return ctx.ok(result.data[0], "Post details fetched successfully", 200);
     }
   )
-  // get interactions count for a post
+  // Get interactions count for a post
   .get(
     "/:id/interaction/count",
     zValidator("param", z.object({ id: zNumberString })),
@@ -118,7 +125,7 @@ export default new Hono()
       );
     }
   )
-  // get interaction by type for a post
+  // Get interaction by type for a post
   .get(
     "/:id/interaction",
     zValidator("param", z.object({ id: zNumberString })),
@@ -175,9 +182,11 @@ export default new Hono()
     }
   )
 
-  // ***AUTH BASED POST ROUTES***
+  /**
+   *AUTH BASED ROUTES
+   **/
   .use(authenticated)
-  // get posts based on user's preferences
+  // Get posts based on user's preferences
   .get(
     "/user/feed",
     zValidator(
@@ -250,7 +259,7 @@ export default new Hono()
       }
     }
   )
-  // get posts where author is the user
+  // Get posts where author is the user
   .get(
     "/user/profile",
     zValidator(
@@ -357,9 +366,7 @@ export default new Hono()
       }
     }
   )
-
-  // ***write actions on a post - using custom actions from post.action.ts***
-  // create a new post (pass parentId to reply to a post)
+  // Create a new post (pass parentId to reply to a post)
   .post(
     "/create",
     zValidator(
@@ -471,24 +478,23 @@ export default new Hono()
       return ctx.ok({}, "Post updated successfully", 200);
     }
   )
-  // like a post (optionally with an emoji)
+  // Like a post (optionally with an emoji)
   .post(
-    "/like/:id",
+    "/:id/like",
     zValidator("param", z.object({ id: zNumberString })),
     zValidator(
       "query",
       z.object({
         signature: z.string(),
-        type: zSignType,
-        reaction: z.string().optional(),
+        reaction: zReactionType.optional(),
       })
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
-      const { signature, type } = ctx.req.valid("query");
+      const { signature, reaction } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
       const result = await tryCatch(
-        actions.likePost({ postId, userId }, signature)
+        actions.likePost({ postId, userId, reaction }, signature)
       );
 
       if (result.error) {
@@ -498,9 +504,9 @@ export default new Hono()
       return ctx.ok({}, "Post liked successfully", 200);
     }
   )
-  // unlike a post
+  // Unlike a post
   .post(
-    "/unlike/:id",
+    "/:id/unlike",
     zValidator("param", z.object({ id: zNumberString })),
     zValidator(
       "query",
@@ -524,13 +530,13 @@ export default new Hono()
       return ctx.ok({}, "Post unliked successfully", 200);
     }
   )
-  // repost a post
+  // Repost a post
   .post(
-    "/repost",
+    ":id/repost",
+    zValidator("param", z.object({ id: zNumberString })),
     zValidator(
       "json",
       z.object({
-        postId: z.number(),
         content: z.string().optional(),
       })
     ),
@@ -542,8 +548,9 @@ export default new Hono()
       })
     ),
     async (ctx) => {
-      const { postId, content } = ctx.req.valid("json");
-      const { signature, type } = ctx.req.valid("query");
+      const { id: postId } = ctx.req.valid("param");
+      const { content } = ctx.req.valid("json");
+      const { signature } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
 
       // If content is provided, validate it
@@ -568,9 +575,10 @@ export default new Hono()
       return ctx.ok(result.data, "Post reposted successfully", 200);
     }
   )
-  // unrepost a post
+  // Unrepost a post
   .post(
-    "/unrepost",
+    "/:id/unrepost",
+    zValidator("param", z.object({ id: zNumberString })),
     zValidator(
       "json",
       z.object({
@@ -586,8 +594,9 @@ export default new Hono()
       })
     ),
     async (ctx) => {
-      const { postId, repostId } = ctx.req.valid("json");
-      const { signature, type } = ctx.req.valid("query");
+      const { id: postId } = ctx.req.valid("param");
+      const { repostId } = ctx.req.valid("json");
+      const { signature } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
 
       const result = await tryCatch(
@@ -601,9 +610,10 @@ export default new Hono()
       return ctx.ok({}, "Post unreposted successfully", 200);
     }
   )
-  // save a post
+  // Save a post
   .post(
-    "/save",
+    "/:id/save",
+    zValidator("param", z.object({ id: zNumberString })),
     zValidator(
       "json",
       z.object({
@@ -618,8 +628,8 @@ export default new Hono()
       })
     ),
     async (ctx) => {
-      const { postId } = ctx.req.valid("json");
-      const { signature, type } = ctx.req.valid("query");
+      const { id: postId } = ctx.req.valid("param");
+      const { signature } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
 
       const result = await tryCatch(
@@ -633,9 +643,10 @@ export default new Hono()
       return ctx.ok({}, "Post saved successfully", 200);
     }
   )
-  // remove post from saved posts
+  // Remove post from saved posts
   .post(
-    "/unsave",
+    "/:id/unsave",
+    zValidator("param", z.object({ id: zNumberString })),
     zValidator(
       "json",
       z.object({
@@ -650,8 +661,8 @@ export default new Hono()
       })
     ),
     async (ctx) => {
-      const { postId } = ctx.req.valid("json");
-      const { signature, type } = ctx.req.valid("query");
+      const { id: postId } = ctx.req.valid("param");
+      const { signature } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
 
       const result = await tryCatch(
@@ -665,9 +676,10 @@ export default new Hono()
       return ctx.ok({}, "Post unsaved successfully", 200);
     }
   )
-  // report a post
+  // Report a post
   .post(
-    "/report",
+    "/:id/report",
+    zValidator("param", z.object({ id: zNumberString })),
     zValidator(
       "json",
       z.object({
@@ -684,8 +696,9 @@ export default new Hono()
       })
     ),
     async (ctx) => {
-      const { postId, reason, details } = ctx.req.valid("json");
-      const { signature, type } = ctx.req.valid("query");
+      const { id: postId } = ctx.req.valid("param");
+      const { reason, details } = ctx.req.valid("json");
+      const { signature } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
 
       // Validate reason
@@ -706,7 +719,8 @@ export default new Hono()
   )
   // Pin post to profile
   .post(
-    "/pin",
+    "/:id/pin",
+    zValidator("param", z.object({ id: zNumberString })),
     zValidator(
       "json",
       z.object({
@@ -721,8 +735,8 @@ export default new Hono()
       })
     ),
     async (ctx) => {
-      const { postId } = ctx.req.valid("json");
-      const { signature, type } = ctx.req.valid("query");
+      const { id: postId } = ctx.req.valid("param");
+      const { signature } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
 
       const result = await tryCatch(
@@ -738,7 +752,8 @@ export default new Hono()
   )
   // Unpin post from profile
   .post(
-    "/unpin",
+    "/:id/unpin",
+    zValidator("param", z.object({ id: zNumberString })),
     zValidator(
       "json",
       z.object({
@@ -753,8 +768,8 @@ export default new Hono()
       })
     ),
     async (ctx) => {
-      const { postId } = ctx.req.valid("json");
-      const { signature, type } = ctx.req.valid("query");
+      const { id: postId } = ctx.req.valid("param");
+      const { signature } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
 
       const result = await tryCatch(
