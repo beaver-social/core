@@ -4,15 +4,10 @@ import { z } from "zod";
 import { zSignType, zSuiAddress } from "../../lib/zod/helpers";
 import { tryCatch } from "../../lib/tryCatch";
 import { createIdentity } from "./auth.action";
+import { generateNonce, verifyChallenge } from "./helpers";
+import { authenticated } from "../../middlewares/auth";
 
 export default new Hono()
-  // landing route
-  .get("/", (ctx) => {
-    return ctx.json({
-      message: "auth service",
-    });
-  })
-
   // register identity
   .post(
     "/register",
@@ -24,6 +19,7 @@ export default new Hono()
         address: zSuiAddress,
         imageUrl: z.string(),
         about: z.string(),
+        loginType: z.enum(["wallet", "zk"]),
       })
     ),
     zValidator(
@@ -31,13 +27,12 @@ export default new Hono()
       z.object({
         userId: z.number(),
         signature: z.string(),
-        type: zSignType,
       })
     ),
     async (ctx) => {
-      const { username, fullName, address, imageUrl, about } =
+      const { username, fullName, address, imageUrl, about, loginType } =
         ctx.req.valid("json");
-      const { signature, type, userId } = ctx.req.valid("query");
+      const { signature, userId } = ctx.req.valid("query");
 
       const resp = await tryCatch(
         createIdentity(
@@ -48,8 +43,9 @@ export default new Hono()
             fullName,
             imageUrl,
             receiver: address,
+            loginType,
           },
-          { type, signature }
+          signature
         )
       );
 
@@ -61,29 +57,31 @@ export default new Hono()
     }
   )
 
-  .post(
-    "/challenge",
-    zValidator("json", z.object({ address: zSuiAddress })),
-    (ctx) => {
-      const { address } = ctx.req.valid("json");
+  // generate nonce
+  .post("/challenge", async (ctx) => {
+    const nonce = generateNonce();
+    return ctx.ok({ nonce }, "Challenge Generated Successfully", 200);
+  })
 
-      return ctx.json({
-        message: "challenge service",
-      });
-    }
-  )
-
+  // verify challenge (nonce) for wallet login
   .post(
     "/challenge/verify",
+    authenticated,
     zValidator(
       "json",
-      z.object({ address: zSuiAddress, signature: z.string() })
+      z.object({ message: z.string(), signature: z.string() })
     ),
-    (ctx) => {
-      const { address, signature } = ctx.req.valid("json");
+    async (ctx) => {
+      const { message, signature } = ctx.req.valid("json");
+      const userId = ctx.get("user").id;
 
-      return ctx.json({
-        message: "challenge verification service",
-      });
+      const resp = await tryCatch(verifyChallenge(message, userId, signature));
+
+      if (resp.error) {
+        return ctx.err(
+          resp.error?.message || "Failed to verify challenge",
+          400
+        );
+      }
     }
   );
