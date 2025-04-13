@@ -2,7 +2,7 @@ import { sqliteTable as table } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
 import { timestamps, suiAddressType } from "../helpers";
 import { posts } from "../content/posts";
-import { shorts } from "../content/swipes";
+import { swipes } from "../content/swipes";
 
 export const users = table(
   "users",
@@ -16,6 +16,11 @@ export const users = table(
     bannerUrl: t.text("banner_url"),
     address: suiAddressType("address").notNull(),
     suinsDomainName: t.text("suins_domain_name"),
+    loginType: t
+      .text({
+        enum: ["wallet", "zk"],
+      })
+      .notNull(),
     email: t.text("email"),
     isVerified: t.int("is_verified", { mode: "boolean" }).default(false),
     timezone: t.int("timezone"),
@@ -24,7 +29,7 @@ export const users = table(
       .references((): t.AnySQLiteColumn => posts.id),
     pinnedShort: t
       .int("pinned_short")
-      .references((): t.AnySQLiteColumn => shorts.id),
+      .references((): t.AnySQLiteColumn => swipes.id),
     ...timestamps,
   },
   (table) => [

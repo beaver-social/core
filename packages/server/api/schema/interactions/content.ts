@@ -19,7 +19,11 @@ export const likes = table(
       .notNull()
       .references(() => contentTypes.id),
     ...timestamps,
-    reaction: t.text().default("like"), // for emoji reactions
+    reaction: t
+      .text({
+        enum: ["like", "haha", "wow", "sad", "angry"],
+      })
+      .default("like"), // for emoji reactions
   },
   (table) => [
     t

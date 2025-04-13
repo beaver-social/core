@@ -4,7 +4,6 @@ import settings from "./settings";
 import messages from "./messages";
 import topics from "./topics";
 import alerts from "./alerts";
-import analytics from "./analytics/analytics";
 import monetization from "./monetization";
 
 export default new Hono()
@@ -13,5 +12,4 @@ export default new Hono()
   .route("/messages", messages)
   .route("/topics", topics)
   .route("/alerts", alerts)
-  .route("/analytics", analytics)
   .route("/monetization", monetization);

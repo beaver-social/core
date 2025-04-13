@@ -20,7 +20,12 @@ export const reports = table(
       .references(() => contentTypes.id),
     reason: t.text().notNull(),
     details: t.text(),
-    status: t.text().notNull().default("pending"), // pending, reviewed, resolved
+    status: t
+      .text({
+        enum: ["pending", "reviewed", "resolved"],
+      })
+      .notNull()
+      .default("pending"), // pending, reviewed, resolved
     reviewerId: t.int("reviewer_id").references(() => users.id),
     reviewedAt: t.int("reviewed_at"),
     ...timestamps,

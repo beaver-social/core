@@ -9,8 +9,8 @@ export const topics = table(
     id: t.int().primaryKey({ autoIncrement: true }),
     name: t.text().notNull(),
     description: t.text(),
-    imageUrl: t.text("image_url"),
-    bannerUrl: t.text("banner_url"),
+    imageUrl: t.text(),
+    bannerUrl: t.text(),
     tags: t.text(), // JSON string array of tags
     ...timestamps,
     followerCount: t.int("follower_count").default(0),

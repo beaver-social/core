@@ -17,6 +17,7 @@ export const swipes = table(
     commentsCount: t.int("comments_count").default(0),
     sharesCount: t.int("shares_count").default(0),
     repostsCount: t.int("reposts_count").default(0),
+    nsfw: t.int("nsfw", { mode: "boolean" }).default(false),
     tags: t.text("tags").default(""),
     mentions: t.text("mentions").default(""),
     ...timestamps,

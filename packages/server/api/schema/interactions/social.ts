@@ -17,7 +17,12 @@ export const follows = table(
       .int("following_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    type: t.text("type").default("follow").notNull(), // follow / notify / subscribe
+    type: t
+      .text({
+        enum: ["follow", "notify", "subscribe"],
+      })
+      .default("follow")
+      .notNull(), // follow / notify / subscribe
     ...timestamps,
   },
   (table) => [

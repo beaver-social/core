@@ -5,6 +5,11 @@ import { timestamps } from "../helpers";
 // Content type enum table (0 = post, 1 = swipe)
 export const contentTypes = table("content_types", {
   id: t.int().primaryKey({ autoIncrement: true }),
-  name: t.text().notNull().unique(),
+  name: t
+    .text({
+      enum: ["post", "swipe"],
+    })
+    .notNull()
+    .unique(),
   ...timestamps,
 });

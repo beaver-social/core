@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 import post from "./post";
 import topics from "./topics";
-import topic from "./topic";
 import swipe from "./swipe";
 
 export default new Hono()

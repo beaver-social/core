@@ -8,19 +8,23 @@ export const media = table(
   "media",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
-    contentId: t.int("content_id").notNull(), // ID of the post, short, etc.
+    contentId: t.int("content_id").notNull(),
     contentTypeId: t
       .int("content_type_id")
       .notNull()
       .references(() => contentTypes.id),
-    url: t.text().notNull(), // Media URL
-    type: t.text().notNull(), // image, video, audio, etc.
-    order: t.int().default(0), // For ordering multiple media items
-    thumbnailUrl: t.text("thumbnail_url"), // Optional thumbnail for videos
-    duration: t.int(), // For audio/video content
-    width: t.int(), // For image/video dimensions
-    height: t.int(), // For image/video dimensions
-    altText: t.text(), // Optional alt text for accessibility
+    url: t.text().notNull(),
+    type: t
+      .text({
+        enum: ["image", "video", "audio"],
+      })
+      .notNull(),
+    order: t.int().default(0), // for ordering multiple media items
+    thumbnailUrl: t.text("thumbnail_url"),
+    duration: t.int(),
+    width: t.int(),
+    height: t.int(),
+    altText: t.text(),
     ...timestamps,
   },
   (table) => [
