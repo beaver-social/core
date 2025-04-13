@@ -1,18 +1,15 @@
 import { Hono } from "hono";
 import post from "./post";
-import shorts from "./shorts";
-import short from "./short";
 import topics from "./topics";
 import topic from "./topic";
+import swipe from "./swipe";
 
 export default new Hono()
   // feed posts
   .route("/posts", post)
 
   // shorts (separated to improve performance by using a different database table for shorts)
-  .route("/shorts", shorts)
-  .route("/short/:id", short)
+  .route("/swipes", swipe)
 
   // topics (public or private communities / topics that curate content which users can follow)
-  .route("/topics", topics)
-  .route("/topic/:id", topic);
+  .route("/topics", topics);

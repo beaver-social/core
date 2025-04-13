@@ -230,7 +230,24 @@ export default new Hono()
       return ctx.ok({}, "View recorded successfully", 200);
     }
   )
+  // get all posts for a user
+  .get(
+    "/user/",
+    zValidator("query", z.object({ userId: zNumberString })),
+    async (ctx) => {
+      const { userId } = ctx.req.valid("query");
 
+      const result = await tryCatch(
+        db.select().from(posts).where(eq(posts.authorId, userId))
+      );
+
+      if (result.error) {
+        return ctx.err(result.error?.message || "Failed to get posts", 400);
+      }
+
+      return ctx.ok(result.data, "Posts fetched successfully", 200);
+    }
+  )
   // ***write actions on a post - using custom actions from post.action.ts***
   // create a new post (pass parentId to reply to a post)
   .post(
