@@ -12,7 +12,7 @@ export const createPost = createAction<{
   content: string;
   parentId: number | undefined;
   media: z.infer<typeof zMedia>[];
-  flags?: { nsfw?: boolean; subscriberOnly?: boolean };
+  flags: { nsfw: boolean; subscriberOnly?: boolean };
 }>()(
   async (tx, { userId, content, parentId, media, flags }) => {
     // Sanitize and validate content
@@ -86,8 +86,8 @@ export const createPost = createAction<{
         authorId: userId,
         content: sanitizedContent,
         parentId: parentId ?? null,
-        nsfw: !!flags?.nsfw,
-        subscriberOnly: !!flags?.subscriberOnly,
+        nsfw: flags?.nsfw,
+        subscriberOnly: flags?.subscriberOnly,
         tags: tags.join(","),
         mentions: mentions.join(","),
       })

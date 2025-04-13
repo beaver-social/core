@@ -4,14 +4,17 @@ import { z } from "zod";
 import { zMedia, zNumberString, zSignType } from "../../lib/zod/helpers";
 import { tryCatch } from "../../lib/tryCatch";
 import * as actions from "./post.action";
-import { desc, eq, and, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import db from "../../schema";
 import { posts } from "../../schema/content";
 import * as postHelpers from "./post.helpers";
+import * as InteractionSchema from "../../schema/interactions";
+import { media } from "../../schema/content/media";
+import { authenticated } from "../../middlewares/auth";
 
 export default new Hono()
-  // ***read actions on a post - using direct db calls***
-  // get all posts (post feed)
+  // **get actions on a post - using direct db calls***
+  // get public feed
   .get(
     "/",
     zValidator(
@@ -19,105 +22,47 @@ export default new Hono()
       z.object({
         page: zNumberString,
         limit: zNumberString,
-        type: z.enum(["trending", "following", "for_you"]),
       })
     ),
     async (ctx) => {
-      const { page, limit, type } = ctx.req.valid("query");
+      const { page, limit } = ctx.req.valid("query");
+      const { offset } = postHelpers.getPaginationParams(page, limit);
 
-      // Use the pagination helper
-      const { limit: limitNum, offset } = postHelpers.getPaginationParams(
-        page,
-        limit
-      );
-
-      if (type === "trending") {
-        const result = await tryCatch(
-          db
-            .select()
-            .from(posts)
-            .orderBy(desc(posts.likesCount))
-            .limit(limitNum)
-            .offset(offset)
-        );
-
-        if (result.error) {
-          return ctx.err(
-            result.error?.message || "Failed to get posts feed",
-            400
-          );
-        }
-
-        // Process posts for display
-        const processedPosts = result.data.map((post) =>
-          postHelpers.processPostForDisplay(post)
-        );
-
-        return ctx.ok(processedPosts, "Posts feed fetched successfully", 200);
-      } else if (type === "following") {
-        const result = await tryCatch(
-          db
-            .select()
-            .from(posts)
-            .orderBy(desc(posts.likesCount))
-            .limit(limitNum)
-            .offset(offset)
-        );
-
-        if (result.error) {
-          return ctx.err(
-            result.error?.message || "Failed to get posts feed",
-            400
-          );
-        }
-
-        // Process posts for display
-        const processedPosts = result.data.map((post) =>
-          postHelpers.processPostForDisplay(post)
-        );
-
-        return ctx.ok(processedPosts, "Posts feed fetched successfully", 200);
-      } else if (type === "for_you") {
-        const result = await tryCatch(
-          db
-            .select()
-            .from(posts)
-            .orderBy(desc(posts.likesCount))
-            .limit(limitNum)
-            .offset(offset)
-        );
-
-        if (result.error) {
-          return ctx.err(
-            result.error?.message || "Failed to get posts feed",
-            400
-          );
-        }
-
-        // Process posts for display
-        const processedPosts = result.data.map((post) =>
-          postHelpers.processPostForDisplay(post)
-        );
-
-        return ctx.ok(processedPosts, "Posts feed fetched successfully", 200);
-      }
-    }
-  )
-  // get details for a post by id
-  .get(
-    "/:id",
-    zValidator("param", z.object({ id: z.string() })),
-    async (ctx) => {
-      const { id } = ctx.req.valid("param");
-
-      // Using db.select() instead of db.query
       const result = await tryCatch(
         db
           .select()
           .from(posts)
-          .where(eq(posts.id, parseInt(id)))
+          .where(isNull(posts.parentId))
+          .orderBy(desc(posts.likesCount))
+          .limit(limit)
+          .offset(offset)
+          .leftJoin(media, eq(posts.id, media.contentId))
+      );
+
+      if (result.error) {
+        return ctx.err(
+          result.error?.message || "Failed to get posts feed",
+          400
+        );
+      }
+
+      return ctx.ok(result.data, "Posts feed fetched successfully", 200);
+    }
+  )
+  // get single post by id
+  .get(
+    "/:id",
+    zValidator("param", z.object({ id: zNumberString })),
+    async (ctx) => {
+      const { id: postId } = ctx.req.valid("param");
+
+      const result = await tryCatch(
+        db
+          .select()
+          .from(posts)
+          .where(eq(posts.id, postId))
           .limit(1)
-        // To join author, media, topic this would need more joins here
+          .leftJoin(media, eq(posts.id, media.contentId))
       );
 
       if (result.error) {
@@ -131,18 +76,15 @@ export default new Hono()
         return ctx.err("Post not found", 404);
       }
 
-      // Process the post for display
-      const processedPost = postHelpers.processPostForDisplay(result.data[0]);
-
-      return ctx.ok(processedPost, "Post details fetched successfully", 200);
+      return ctx.ok(result.data[0], "Post details fetched successfully", 200);
     }
   )
-  // get interactions data for a post
+  // get interactions count for a post
   .get(
-    "/interactions/:id",
-    zValidator("param", z.object({ id: z.string() })),
+    "/:id/interaction/count",
+    zValidator("param", z.object({ id: zNumberString })),
     async (ctx) => {
-      const { id } = ctx.req.valid("param");
+      const { id: postId } = ctx.req.valid("param");
 
       const result = await tryCatch(
         db
@@ -154,7 +96,7 @@ export default new Hono()
             viewCount: posts.viewCount,
           })
           .from(posts)
-          .where(eq(posts.id, parseInt(id)))
+          .where(eq(posts.id, postId))
           .limit(1)
       );
 
@@ -176,78 +118,246 @@ export default new Hono()
       );
     }
   )
-  // get view count of a post
+  // get interaction by type for a post
   .get(
-    "/views/:id",
-    zValidator("param", z.object({ id: z.string() })),
+    "/:id/interaction",
+    zValidator("param", z.object({ id: zNumberString })),
+    zValidator(
+      "query",
+      z.object({ type: z.enum(["likes", "replies", "reposts"]) })
+    ),
     async (ctx) => {
-      const { id } = ctx.req.valid("param");
+      const { id: postId } = ctx.req.valid("param");
+      const { type } = ctx.req.valid("query");
 
-      const result = await tryCatch(
-        db
-          .select({ viewCount: posts.viewCount })
-          .from(posts)
-          .where(eq(posts.id, parseInt(id)))
-          .limit(1)
-      );
-
-      if (result.error) {
-        return ctx.err(
-          result.error?.message || "Failed to get post view count",
-          400
+      if (type === "likes") {
+        const result = await tryCatch(
+          db
+            .select()
+            .from(InteractionSchema.likes)
+            .where(eq(InteractionSchema.likes.contentTypeId, postId))
         );
-      }
 
-      if (!result.data || result.data.length === 0) {
-        return ctx.err("Post not found", 404);
-      }
+        if (result.error) {
+          return ctx.err(result.error?.message || "Failed to get likes", 400);
+        }
 
-      return ctx.ok(
-        { viewCount: result.data[0].viewCount },
-        "Post view count fetched successfully",
-        200
-      );
+        return ctx.ok(result.data, "Likes fetched successfully", 200);
+      } else if (type === "replies") {
+        const result = await tryCatch(
+          db.select().from(posts).where(eq(posts.parentId, postId))
+        );
+
+        if (result.error) {
+          return ctx.err(result.error?.message || "Failed to get replies", 400);
+        }
+
+        return ctx.ok(result.data, "Replies fetched successfully", 200);
+      } else if (type === "reposts") {
+        const result = await tryCatch(
+          db
+            .select()
+            .from(InteractionSchema.reposts)
+            .where(
+              and(
+                eq(InteractionSchema.reposts.contentId, postId),
+                eq(InteractionSchema.reposts.contentTypeId, 0)
+              )
+            )
+        );
+
+        if (result.error) {
+          return ctx.err(result.error?.message || "Failed to get reposts", 400);
+        }
+
+        return ctx.ok(result.data, "Reposts fetched successfully", 200);
+      }
     }
   )
-  // increment view count of a post
-  .post(
-    "/view/:id",
-    zValidator("param", z.object({ id: z.string() })),
-    async (ctx) => {
-      const { id } = ctx.req.valid("param");
 
-      const result = await tryCatch(
-        db
-          .update(posts)
-          .set({ viewCount: sql`${posts.viewCount} + 1` })
-          .where(eq(posts.id, parseInt(id)))
-      );
-
-      if (result.error) {
-        return ctx.err(result.error?.message || "Failed to record view", 400);
-      }
-
-      return ctx.ok({}, "View recorded successfully", 200);
-    }
-  )
-  // get all posts for a user
+  // ***AUTH BASED POST ROUTES***
+  .use(authenticated)
+  // get posts based on user's preferences
   .get(
-    "/user/",
-    zValidator("query", z.object({ userId: zNumberString })),
+    "/user/feed",
+    zValidator(
+      "query",
+      z.object({
+        page: zNumberString,
+        limit: zNumberString,
+        type: z.enum(["following", "for_you"]),
+      })
+    ),
     async (ctx) => {
-      const { userId } = ctx.req.valid("query");
+      const userId = ctx.get("user").id;
+      const { page, limit, type } = ctx.req.valid("query");
+      const { offset } = postHelpers.getPaginationParams(page, limit);
+      if (type === "following") {
+        // fetch posts from following users
+        const following = await db
+          .select()
+          .from(InteractionSchema.follows)
+          .where(eq(InteractionSchema.follows.followerId, userId));
 
-      const result = await tryCatch(
-        db.select().from(posts).where(eq(posts.authorId, userId))
-      );
+        const followingIds = following.map((follow) => follow.followingId);
 
-      if (result.error) {
-        return ctx.err(result.error?.message || "Failed to get posts", 400);
+        const followingPosts = await tryCatch(
+          db
+            .select()
+            .from(posts)
+            .where(
+              inArray(posts.authorId, followingIds) && isNull(posts.parentId)
+            )
+            .orderBy(desc(posts.createdAt))
+            .limit(limit)
+            .offset(offset)
+            .leftJoin(media, eq(posts.id, media.contentId))
+        );
+
+        if (followingPosts.error) {
+          return ctx.err(
+            followingPosts.error?.message || "Failed to get posts feed",
+            400
+          );
+        }
+
+        return ctx.ok(
+          followingPosts.data,
+          "Posts feed fetched successfully",
+          200
+        );
+      } else if (type === "for_you") {
+        // curated for you (future implementation)
+        const result = await tryCatch(
+          db
+            .select()
+            .from(posts)
+            .where(isNull(posts.parentId))
+            .orderBy(sql`RAND()`)
+            .limit(limit)
+            .offset(offset)
+            .leftJoin(media, eq(posts.id, media.contentId))
+        );
+
+        if (result.error) {
+          return ctx.err(
+            result.error?.message || "Failed to get posts feed",
+            400
+          );
+        }
+
+        return ctx.ok(result.data, "Posts feed fetched successfully", 200);
       }
-
-      return ctx.ok(result.data, "Posts fetched successfully", 200);
     }
   )
+  // get posts where author is the user
+  .get(
+    "/user/profile",
+    zValidator(
+      "query",
+      z.object({
+        page: zNumberString,
+        limit: zNumberString,
+        type: z.enum([
+          "your-posts",
+          "your-replies",
+          "your-media",
+          "your-saved",
+          "your-pinned",
+        ]),
+      })
+    ),
+    async (ctx) => {
+      const userId = ctx.get("user").id;
+      const { page, limit, type } = ctx.req.valid("query");
+      const { offset } = postHelpers.getPaginationParams(page, limit);
+
+      if (type === "your-posts") {
+        const result = await tryCatch(
+          db
+            .select()
+            .from(posts)
+            .where(eq(posts.authorId, userId))
+            .orderBy(desc(posts.createdAt))
+            .limit(limit)
+            .offset(offset)
+        );
+
+        if (result.error) {
+          return ctx.err(result.error?.message || "Failed to get posts", 400);
+        }
+
+        return ctx.ok(result.data, "Posts fetched successfully", 200);
+      } else if (type === "your-replies") {
+        // fetch all posts, where you have replied to (post has a parentId and you are the author)
+        const result = await tryCatch(
+          db
+            .select()
+            .from(posts)
+            .where(and(eq(posts.authorId, userId), isNotNull(posts.parentId)))
+            .orderBy(desc(posts.createdAt))
+            .limit(limit)
+            .offset(offset)
+            .leftJoin(media, eq(posts.id, media.contentId))
+        );
+
+        if (result.error) {
+          return ctx.err(result.error?.message || "Failed to get posts", 400);
+        }
+
+        return ctx.ok(result.data, "Posts fetched successfully", 200);
+      } else if (type === "your-media") {
+        const result = await tryCatch(
+          db
+            .select()
+            .from(posts)
+            .where(eq(posts.authorId, userId))
+            .orderBy(desc(posts.createdAt))
+            .limit(limit)
+            .offset(offset)
+            .innerJoin(media, eq(posts.id, media.contentId))
+        );
+
+        if (result.error) {
+          return ctx.err(result.error?.message || "Failed to get posts", 400);
+        }
+
+        return ctx.ok(result.data, "Posts fetched successfully", 200);
+      } else if (type === "your-saved") {
+        const result = await tryCatch(
+          db
+            .select()
+            .from(posts)
+            .where(eq(posts.authorId, userId))
+            .orderBy(desc(posts.createdAt))
+            .limit(limit)
+            .offset(offset)
+        );
+
+        if (result.error) {
+          return ctx.err(result.error?.message || "Failed to get posts", 400);
+        }
+
+        return ctx.ok(result.data, "Posts fetched successfully", 200);
+      } else if (type === "your-pinned") {
+        const result = await tryCatch(
+          db
+            .select()
+            .from(posts)
+            .where(eq(posts.authorId, userId))
+            .orderBy(desc(posts.createdAt))
+            .limit(1)
+        );
+
+        if (result.error) {
+          return ctx.err(result.error?.message || "Failed to get posts", 400);
+        }
+
+        return ctx.ok(result.data, "Posts fetched successfully", 200);
+      }
+    }
+  )
+
   // ***write actions on a post - using custom actions from post.action.ts***
   // create a new post (pass parentId to reply to a post)
   .post(
@@ -258,35 +368,33 @@ export default new Hono()
         content: z.string(),
         media: zMedia.array(),
         parentId: z.number().optional(),
-        flags: z
-          .object({
-            nsfw: z.boolean().optional(),
-            subscriberOnly: z.boolean().optional(),
-          })
-          .optional(),
+        flags: z.object({
+          nsfw: z.boolean(),
+          subscriberOnly: z.boolean().optional(),
+        }),
       })
     ),
     zValidator(
       "query",
       z.object({
-        userId: z.number(),
         signature: z.string(),
         type: zSignType,
       })
     ),
     async (ctx) => {
-      const { content, media, parentId } = ctx.req.valid("json");
-      const { userId, signature, type } = ctx.req.valid("query");
+      const { content, media, parentId, flags } = ctx.req.valid("json");
+      const { signature, type } = ctx.req.valid("query");
+      const userId = ctx.get("user").id;
 
       // Pre-validate content before sending to action
-      const validation = postHelpers.validatePostContent(content);
-      if (!validation.valid) {
-        return ctx.err(validation.message ?? "Invalid post content", 400);
+      const { valid, message } = postHelpers.validatePostContent(content);
+      if (!valid) {
+        return ctx.err(message ?? "Invalid post content", 400);
       }
 
       const result = await tryCatch(
         actions.createPost(
-          { userId, content, media, parentId },
+          { userId, content, media, parentId, flags },
           { signature, type }
         )
       );
@@ -301,24 +409,20 @@ export default new Hono()
   // Delete a post
   .delete(
     "/:id",
+    zValidator("param", z.object({ id: zNumberString })),
     zValidator(
       "query",
       z.object({
-        userId: z.number(),
         signature: z.string(),
         type: zSignType,
       })
     ),
-    zValidator("param", z.object({ id: z.string() })),
     async (ctx) => {
-      const { id } = ctx.req.valid("param");
-      const { userId, signature, type } = ctx.req.valid("query");
-
+      const { id: postId } = ctx.req.valid("param");
+      const { signature, type } = ctx.req.valid("query");
+      const userId = ctx.get("user").id;
       const result = await tryCatch(
-        actions.deletePost(
-          { postId: parseInt(id), userId },
-          { signature, type }
-        )
+        actions.deletePost({ postId, userId }, { signature, type })
       );
 
       if (result.error) {
@@ -331,7 +435,7 @@ export default new Hono()
   // Update a post
   .patch(
     "/:id",
-    zValidator("param", z.object({ id: z.string() })),
+    zValidator("param", z.object({ id: zNumberString })),
     zValidator(
       "json",
       z.object({
@@ -342,16 +446,15 @@ export default new Hono()
     zValidator(
       "query",
       z.object({
-        userId: z.number(),
         signature: z.string(),
         type: zSignType,
       })
     ),
     async (ctx) => {
-      const { id } = ctx.req.valid("param");
+      const { id: postId } = ctx.req.valid("param");
       const { content, media } = ctx.req.valid("json");
-      const { userId, signature, type } = ctx.req.valid("query");
-
+      const { signature, type } = ctx.req.valid("query");
+      const userId = ctx.get("user").id;
       // Pre-validate content before sending to action
       const validation = postHelpers.validatePostContent(content);
       if (!validation.valid) {
@@ -360,7 +463,7 @@ export default new Hono()
 
       const result = await tryCatch(
         actions.updatePost(
-          { postId: parseInt(id), userId, content, media },
+          { postId, userId, content, media },
           { signature, type }
         )
       );
@@ -372,26 +475,24 @@ export default new Hono()
       return ctx.ok({}, "Post updated successfully", 200);
     }
   )
-
   // like a post (optionally with an emoji)
   .post(
     "/like/:id",
-    zValidator("param", z.object({ id: z.string() })),
+    zValidator("param", z.object({ id: zNumberString })),
     zValidator(
       "query",
       z.object({
-        userId: z.number(),
         signature: z.string(),
         type: zSignType,
         reaction: z.string().optional(),
       })
     ),
     async (ctx) => {
-      const { id } = ctx.req.valid("param");
-      const { userId, signature, type } = ctx.req.valid("query");
-
+      const { id: postId } = ctx.req.valid("param");
+      const { signature, type } = ctx.req.valid("query");
+      const userId = ctx.get("user").id;
       const result = await tryCatch(
-        actions.likePost({ postId: parseInt(id), userId }, { signature, type })
+        actions.likePost({ postId, userId }, { signature, type })
       );
 
       if (result.error) {
@@ -404,24 +505,20 @@ export default new Hono()
   // unlike a post
   .post(
     "/unlike/:id",
-    zValidator("param", z.object({ id: z.string() })),
+    zValidator("param", z.object({ id: zNumberString })),
     zValidator(
       "query",
       z.object({
-        userId: z.number(),
         signature: z.string(),
         type: zSignType,
       })
     ),
     async (ctx) => {
-      const { id } = ctx.req.valid("param");
-      const { userId, signature, type } = ctx.req.valid("query");
-
+      const { id: postId } = ctx.req.valid("param");
+      const { signature, type } = ctx.req.valid("query");
+      const userId = ctx.get("user").id;
       const result = await tryCatch(
-        actions.unlikePost(
-          { postId: parseInt(id), userId },
-          { signature, type }
-        )
+        actions.unlikePost({ postId, userId }, { signature, type })
       );
 
       if (result.error) {
@@ -444,14 +541,14 @@ export default new Hono()
     zValidator(
       "query",
       z.object({
-        userId: z.number(),
         signature: z.string(),
         type: zSignType,
       })
     ),
     async (ctx) => {
       const { postId, content } = ctx.req.valid("json");
-      const { userId, signature, type } = ctx.req.valid("query");
+      const { signature, type } = ctx.req.valid("query");
+      const userId = ctx.get("user").id;
 
       // If content is provided, validate it
       if (content) {
@@ -488,14 +585,14 @@ export default new Hono()
     zValidator(
       "query",
       z.object({
-        userId: z.number(),
         signature: z.string(),
         type: zSignType,
       })
     ),
     async (ctx) => {
       const { postId, repostId } = ctx.req.valid("json");
-      const { userId, signature, type } = ctx.req.valid("query");
+      const { signature, type } = ctx.req.valid("query");
+      const userId = ctx.get("user").id;
 
       const result = await tryCatch(
         actions.unrepostPost({ postId, repostId, userId }, { signature, type })
@@ -520,14 +617,14 @@ export default new Hono()
     zValidator(
       "query",
       z.object({
-        userId: z.number(),
         signature: z.string(),
         type: zSignType,
       })
     ),
     async (ctx) => {
       const { postId } = ctx.req.valid("json");
-      const { userId, signature, type } = ctx.req.valid("query");
+      const { signature, type } = ctx.req.valid("query");
+      const userId = ctx.get("user").id;
 
       const result = await tryCatch(
         actions.savePost({ postId, userId }, { signature, type })
@@ -552,14 +649,14 @@ export default new Hono()
     zValidator(
       "query",
       z.object({
-        userId: z.number(),
         signature: z.string(),
         type: zSignType,
       })
     ),
     async (ctx) => {
       const { postId } = ctx.req.valid("json");
-      const { userId, signature, type } = ctx.req.valid("query");
+      const { signature, type } = ctx.req.valid("query");
+      const userId = ctx.get("user").id;
 
       const result = await tryCatch(
         actions.unsavePost({ postId, userId }, { signature, type })
@@ -586,14 +683,14 @@ export default new Hono()
     zValidator(
       "query",
       z.object({
-        userId: z.number(),
         signature: z.string(),
         type: zSignType,
       })
     ),
     async (ctx) => {
       const { postId, reason, details } = ctx.req.valid("json");
-      const { userId, signature, type } = ctx.req.valid("query");
+      const { signature, type } = ctx.req.valid("query");
+      const userId = ctx.get("user").id;
 
       // Validate reason
       if (!reason || reason.trim().length === 0) {
@@ -626,14 +723,14 @@ export default new Hono()
     zValidator(
       "query",
       z.object({
-        userId: z.number(),
         signature: z.string(),
         type: zSignType,
       })
     ),
     async (ctx) => {
       const { postId } = ctx.req.valid("json");
-      const { userId, signature, type } = ctx.req.valid("query");
+      const { signature, type } = ctx.req.valid("query");
+      const userId = ctx.get("user").id;
 
       const result = await tryCatch(
         actions.pinPost({ postId, userId }, { signature, type })
@@ -658,14 +755,14 @@ export default new Hono()
     zValidator(
       "query",
       z.object({
-        userId: z.number(),
         signature: z.string(),
         type: zSignType,
       })
     ),
     async (ctx) => {
       const { postId } = ctx.req.valid("json");
-      const { userId, signature, type } = ctx.req.valid("query");
+      const { signature, type } = ctx.req.valid("query");
+      const userId = ctx.get("user").id;
 
       const result = await tryCatch(
         actions.unpinPost({ postId, userId }, { signature, type })

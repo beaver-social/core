@@ -2,10 +2,9 @@ import { sqliteTable as table } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
 import { timestamps } from "../helpers";
 import { users } from "../user/users";
-import { actions } from "../interactions/actions";
 
-export const shorts = table(
-  "shorts",
+export const swipes = table(
+  "swipes",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
     caption: t.text(),

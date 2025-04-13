@@ -2,7 +2,7 @@ import { sqliteTable as table } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
 import { timestamps, suiAddressType } from "../helpers";
 import { posts } from "../content/posts";
-import { shorts } from "../content/shorts";
+import { shorts } from "../content/swipes";
 
 export const users = table(
   "users",

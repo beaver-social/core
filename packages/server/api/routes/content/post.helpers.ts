@@ -9,42 +9,106 @@ import { promisify } from "util";
 import { createWriteStream, unlink } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
-import { DB } from "../../schema";
 import { FfprobeData, FfprobeStream } from "fluent-ffmpeg";
 
-// Convert stream or buffer to temporary file
-async function bufferToTempFile(
-  buffer: Buffer,
-  extension: string
-): Promise<string> {
-  const tempFilePath = path.join(
-    process.cwd(),
-    "tmp",
-    `${randomUUID()}.${extension}`
-  );
-  return new Promise((resolve, reject) => {
-    const writeStream = createWriteStream(tempFilePath);
-    const readable = new Readable();
-    readable._read = () => {};
-    readable.push(buffer);
-    readable.push(null);
-
-    readable.pipe(writeStream);
-    writeStream.on("finish", () => resolve(tempFilePath));
-    writeStream.on("error", reject);
-  });
+/**
+ * Checks if a user is authorized to modify a post based on their ID.
+ * @param userId The ID of the user attempting to modify the post.
+ * @param authorId The ID of the post's author.
+ * @returns A boolean indicating whether the user can modify the post.
+ */
+export function canUserModifyPost(userId: number, authorId: number): boolean {
+  return userId === authorId;
 }
 
-// Clean up temporary file
-const unlinkAsync = promisify(unlink);
-async function cleanupTempFile(filePath: string): Promise<void> {
-  try {
-    await unlinkAsync(filePath);
-  } catch (error) {
-    console.error("Error cleaning up temp file:", error);
+/**
+ * Generates pagination parameters based on the provided page and limit.
+ * @param page The page number to paginate from.
+ * @param limit The number of items per page.
+ * @returns An object containing the offset for pagination.
+ */
+export function getPaginationParams(page: number, limit: number) {
+  return {
+    offset: (page - 1) * limit,
+  };
+}
+
+// Post Content Related Helpers
+/**
+ * Extracts hashtags from the given content string.
+ * @param content The string content to extract hashtags from.
+ * @returns An array of extracted hashtags without the '#' symbol.
+ */
+export function extractHashtags(content: string): string[] {
+  const hashtagRegex = /#(\w+)/g;
+  const matches = content.match(hashtagRegex);
+
+  if (!matches) return [];
+
+  return matches.map((tag) => tag.slice(1)); // Remove the # symbol
+}
+
+/**
+ * Extracts mentions from the given content string.
+ * @param content The string content to extract mentions from.
+ * @returns An array of extracted mentions without the '@' symbol.
+ */
+export function extractMentions(content: string): string[] {
+  const mentionRegex = /@(\w+)/g;
+  const matches = content.match(mentionRegex);
+
+  if (!matches) return [];
+
+  return matches.map((mention) => mention.slice(1)); // Remove the @ symbol
+}
+
+/**
+ * Validates the provided post content for emptiness and length.
+ * @param content The string content to validate.
+ * @returns An object indicating if the content is valid and an optional error message.
+ */
+export function validatePostContent(content: string): {
+  valid: boolean;
+  message?: string;
+} {
+  if (!content || content.trim().length === 0) {
+    return { valid: false, message: "Post content cannot be empty" };
   }
+
+  if (content.length > 5000) {
+    return {
+      valid: false,
+      message: "Post content exceeds maximum length of 5000 characters",
+    };
+  }
+
+  return { valid: true };
 }
 
+/**
+ * Sanitizes the provided post content by removing harmful elements and normalizing it.
+ * @param content The string content to sanitize.
+ * @returns The sanitized string content.
+ */
+export function sanitizePostContent(content: string): string {
+  // Remove any potentially harmful HTML if not using markdown
+  const sanitized = content
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, "");
+
+  // Normalize line breaks
+  const normalized = sanitized.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+  // Trim whitespace and limit length (e.g., 5000 chars max)
+  return normalized.trim().slice(0, 5000);
+}
+
+// Image Related Helpers
+/**
+ * Compresses an image using Sharp with a quality of 80% and mozjpeg for better optimization.
+ * @param imageBuffer The buffer of the image to compress.
+ * @returns A promise that resolves to the compressed image buffer.
+ */
 export async function compressImage(imageBuffer: Buffer): Promise<Buffer> {
   try {
     // Compress the image using a quality of 80% which balances size and quality well
@@ -58,6 +122,11 @@ export async function compressImage(imageBuffer: Buffer): Promise<Buffer> {
   }
 }
 
+/**
+ * Generates a thumbnail from an image buffer, resizing it to 150x150 pixels while maintaining aspect ratio.
+ * @param imageBuffer The buffer of the image to generate a thumbnail from.
+ * @returns A promise that resolves to the thumbnail image buffer.
+ */
 export async function generateThumbnail(imageBuffer: Buffer): Promise<Buffer> {
   try {
     // Create a small thumbnail for previews (150x150px)
@@ -75,6 +144,11 @@ export async function generateThumbnail(imageBuffer: Buffer): Promise<Buffer> {
   }
 }
 
+/**
+ * Validates if the provided image buffer is in a supported format.
+ * @param imageBuffer The buffer of the image to validate.
+ * @returns A promise that resolves to a boolean indicating if the format is supported.
+ */
 export async function validateImageFormat(
   imageBuffer: Buffer
 ): Promise<boolean> {
@@ -92,6 +166,11 @@ export async function validateImageFormat(
   }
 }
 
+/**
+ * Optimizes an image for feed display by resizing it to a maximum width of 1200px while preserving aspect ratio.
+ * @param imageBuffer The buffer of the image to optimize.
+ * @returns A promise that resolves to the optimized image buffer.
+ */
 export async function optimizeImageForFeed(
   imageBuffer: Buffer
 ): Promise<Buffer> {
@@ -119,6 +198,81 @@ export async function optimizeImageForFeed(
     console.error("Error optimizing image for feed:", error);
     return imageBuffer; // Return original if optimization fails
   }
+}
+
+/**
+ * Compresses, optimizes and uploads an image to S3
+ * @param imageBuffer The image buffer to process and upload
+ * @returns The URL of the uploaded image
+ */
+export async function processAndUploadImage(
+  imageBuffer: Buffer
+): Promise<string> {
+  // Validate format first
+  const isValid = await validateImageFormat(imageBuffer);
+  if (!isValid) {
+    throw new Error("Invalid image format");
+  }
+
+  // Compress and optimize image
+  const optimizedBuffer = await optimizeImageForFeed(imageBuffer);
+
+  // Upload to S3 and get URL
+  return await uploadProcessedImage(optimizedBuffer);
+}
+
+/**
+ * Creates a thumbnail and uploads it to S3
+ * @param imageBuffer The original image buffer
+ * @returns The URL of the uploaded thumbnail
+ */
+export async function createAndUploadThumbnail(
+  imageBuffer: Buffer
+): Promise<string> {
+  const thumbnailBuffer = await generateThumbnail(imageBuffer);
+  return await uploadProcessedImage(thumbnailBuffer, "jpeg");
+}
+
+// Video Related Helpers
+/**
+ * Cleans up a temporary file
+ * @param filePath The path of the file to clean up
+ */
+const unlinkAsync = promisify(unlink);
+async function cleanupTempFile(filePath: string): Promise<void> {
+  try {
+    await unlinkAsync(filePath);
+  } catch (error) {
+    console.error("Error cleaning up temp file:", error);
+  }
+}
+
+/**
+ * Converts a buffer to a temporary file
+ * @param buffer The buffer to convert
+ * @param extension The extension of the file
+ * @returns The path of the temporary file
+ */
+async function bufferToTempFile(
+  buffer: Buffer,
+  extension: string
+): Promise<string> {
+  const tempFilePath = path.join(
+    process.cwd(),
+    "tmp",
+    `${randomUUID()}.${extension}`
+  );
+  return new Promise((resolve, reject) => {
+    const writeStream = createWriteStream(tempFilePath);
+    const readable = new Readable();
+    readable._read = () => {};
+    readable.push(buffer);
+    readable.push(null);
+
+    readable.pipe(writeStream);
+    writeStream.on("finish", () => resolve(tempFilePath));
+    writeStream.on("error", reject);
+  });
 }
 
 /**
@@ -285,27 +439,6 @@ export async function generateVideoThumbnail(
 }
 
 /**
- * Compresses, optimizes and uploads an image to S3
- * @param imageBuffer The image buffer to process and upload
- * @returns The URL of the uploaded image
- */
-export async function processAndUploadImage(
-  imageBuffer: Buffer
-): Promise<string> {
-  // Validate format first
-  const isValid = await validateImageFormat(imageBuffer);
-  if (!isValid) {
-    throw new Error("Invalid image format");
-  }
-
-  // Compress and optimize image
-  const optimizedBuffer = await optimizeImageForFeed(imageBuffer);
-
-  // Upload to S3 and get URL
-  return await uploadProcessedImage(optimizedBuffer);
-}
-
-/**
  * Compresses, optimizes and uploads a video to S3
  * @param videoBuffer The video buffer to process and upload
  * @returns The URL of the uploaded video and its thumbnail URL
@@ -334,114 +467,5 @@ export async function processAndUploadVideo(
   return {
     videoUrl,
     thumbnailUrl,
-  };
-}
-
-/**
- * Creates a thumbnail and uploads it to S3
- * @param imageBuffer The original image buffer
- * @returns The URL of the uploaded thumbnail
- */
-export async function createAndUploadThumbnail(
-  imageBuffer: Buffer
-): Promise<string> {
-  const thumbnailBuffer = await generateThumbnail(imageBuffer);
-  return await uploadProcessedImage(thumbnailBuffer, "jpeg");
-}
-
-export function sanitizePostContent(content: string): string {
-  // Remove any potentially harmful HTML if not using markdown
-  const sanitized = content
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, "");
-
-  // Normalize line breaks
-  const normalized = sanitized.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-
-  // Trim whitespace and limit length (e.g., 5000 chars max)
-  return normalized.trim().slice(0, 5000);
-}
-
-export function extractHashtags(content: string): string[] {
-  const hashtagRegex = /#(\w+)/g;
-  const matches = content.match(hashtagRegex);
-
-  if (!matches) return [];
-
-  return matches.map((tag) => tag.slice(1)); // Remove the # symbol
-}
-
-export function extractMentions(content: string): string[] {
-  const mentionRegex = /@(\w+)/g;
-  const matches = content.match(mentionRegex);
-
-  if (!matches) return [];
-
-  return matches.map((mention) => mention.slice(1)); // Remove the @ symbol
-}
-
-export function validatePostContent(content: string): {
-  valid: boolean;
-  message?: string;
-} {
-  if (!content || content.trim().length === 0) {
-    return { valid: false, message: "Post content cannot be empty" };
-  }
-
-  if (content.length > 5000) {
-    return {
-      valid: false,
-      message: "Post content exceeds maximum length of 5000 characters",
-    };
-  }
-
-  return { valid: true };
-}
-
-export function canUserModifyPost(
-  userId: number,
-  authorId: number,
-  isAdmin: boolean = false
-): boolean {
-  // User can modify if they are the author or an admin
-  return userId === authorId || isAdmin;
-}
-
-export function processPostForDisplay(post: DB["post"]): any {
-  // Calculate time elapsed since post creation
-  const now = Date.now();
-  const createdAt = new Date(post.createdAt).getTime();
-  const timeElapsed = Math.floor((now - createdAt) / 1000); // in seconds
-
-  let timeAgo = "";
-  if (timeElapsed < 60) {
-    timeAgo = `${timeElapsed}s`;
-  } else if (timeElapsed < 3600) {
-    timeAgo = `${Math.floor(timeElapsed / 60)}m`;
-  } else if (timeElapsed < 86400) {
-    timeAgo = `${Math.floor(timeElapsed / 3600)}h`;
-  } else {
-    timeAgo = `${Math.floor(timeElapsed / 86400)}d`;
-  }
-
-  // Add computed fields to post
-  return {
-    ...post,
-    timeAgo,
-    hashtags: post.content ? extractHashtags(post.content) : [],
-    mentions: post.content ? extractMentions(post.content) : [],
-  };
-}
-
-export function getPaginationParams(
-  page: number | string,
-  limit: number | string
-) {
-  const pageNum = typeof page === "string" ? parseInt(page) : page;
-  const limitNum = typeof limit === "string" ? parseInt(limit) : limit;
-
-  return {
-    limit: limitNum,
-    offset: (pageNum - 1) * limitNum,
   };
 }

@@ -680,8 +680,9 @@ When extending or modifying the Posts API, consider the following:
 1. **Add new routes in post.ts**
 2. **Implement business logic in post.action.ts**
 3. **Keep helper functions in post.helpers.ts**
-4. **Add media processing in post.helpers.ts**
-5. **Update schema as needed in schema/content or schema/interactions**
-6. **Add appropriate validation using Zod**
-7. **Ensure proper error handling**
-8. **Document changes in this README**
+4. **Add JSDoc comments to all helper functions.**
+5. **Add media processing in post.helpers.ts**
+6. **Update schema as needed in schema/content or schema/interactions**
+7. **Add appropriate validation using Zod**
+8. **Ensure proper error handling**
+9. **Document changes in this README**

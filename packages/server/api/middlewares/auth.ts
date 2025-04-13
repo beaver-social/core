@@ -16,7 +16,7 @@ const cache = new LRUCache<string, DB["user"]>({
   ttlAutopurge: true,
 });
 
-const authenticated = createMiddleware<{
+export const authenticated = createMiddleware<{
   Variables: {
     user: DB["user"];
   };
@@ -41,7 +41,6 @@ const authenticated = createMiddleware<{
   const { sub } = zJwtPayload.parse(decodedJwt.data);
 
   let [user] = await db.select().from(users).where(eq(users.id, sub)).limit(1);
-
   ctx.set("user", user);
 
   await next();

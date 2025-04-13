@@ -1,6 +1,6 @@
 import * as user from "./user/users";
 import * as post from "./content/posts";
-import * as short from "./content/shorts";
+import * as short from "./content/swipes";
 import * as topic from "./content/topics";
 import * as interaction from "./interactions";
 import * as media from "./content/media";

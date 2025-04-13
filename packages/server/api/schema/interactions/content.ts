@@ -19,7 +19,7 @@ export const likes = table(
       .notNull()
       .references(() => contentTypes.id),
     ...timestamps,
-    reaction: t.text().default("like"),
+    reaction: t.text().default("like"), // for emoji reactions
   },
   (table) => [
     t
@@ -105,5 +105,22 @@ export const comments = table(
     t.index("content_comment_idx").on(table.contentId, table.contentTypeId),
     t.index("user_comment_idx").on(table.userId),
     t.index("parent_comment_idx").on(table.parentId),
+  ]
+);
+
+// Reposts for posts and shorts
+export const reposts = table(
+  "reposts",
+  {
+    id: t.int().primaryKey({ autoIncrement: true }),
+    userId: t.int("user_id").notNull(),
+    contentId: t.int("content_id").notNull(),
+    contentTypeId: t.int("content_type_id").notNull(),
+    quote: t.text(),
+    ...timestamps,
+  },
+  (table) => [
+    t.index("content_repost_idx").on(table.contentId, table.contentTypeId),
+    t.index("user_repost_idx").on(table.userId),
   ]
 );

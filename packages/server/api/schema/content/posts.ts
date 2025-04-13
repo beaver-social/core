@@ -2,7 +2,6 @@ import { sqliteTable as table } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
 import { suiAddressType, timestamps } from "../helpers";
 import { users } from "../user/users";
-import { topics } from "./topics";
 import { actions } from "../interactions/actions";
 
 export const posts = table(

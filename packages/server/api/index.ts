@@ -6,8 +6,9 @@ import miscIndex from "./routes/misc";
 import userIndex from "./routes/user";
 
 let servedSessions = 0;
+
 const app = new Hono()
-  // middleware
+  // middlewares
   .use(
     cors({
       origin: (origin, ctx) => {
@@ -27,6 +28,8 @@ const app = new Hono()
     ctx.text = () => {
       throw new Error("c.text() is disabled — use c.ok() or c.err() instead");
     };
+
+    // will be used in the future
     // ctx.json = () => {
     //   throw new Error("c.json() is disabled — use c.ok() or c.err() instead");
     // };
