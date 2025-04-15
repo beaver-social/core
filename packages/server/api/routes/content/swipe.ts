@@ -1,134 +1,64 @@
 import { Hono } from "hono";
+import { authenticated } from "../../middlewares/auth";
 
 export default new Hono()
-  // Public swipe actions
-  // Get swipes feed
-  .get("/", (ctx) => {
-    return ctx.json({
-      message:
-        "get shorts feed (for you) - curated topics for you based on your following and interests. use query params to filter by type like trending, following etc",
-    });
+  /**
+   *PUBLIC ROUTES
+   **/
+  // Public routes for swipes
+  .get("/", async (ctx) => {
+    return ctx.text("Get swipes feed");
   })
-  // get your swipes
-  .get("/your", (ctx) => {
-    return ctx.json({
-      message: "get your swipes",
-    });
+  .get("/:id", async (ctx) => {
+    return ctx.text("Get swipe data by ID");
   })
-  // get details for a swipe by id
-  .get("/:id", (ctx) => {
-    return ctx.json({
-      message: "get details for a swipe by id",
-    });
-  })
-  // View a swipe
-  .get("/view", (ctx) => {
-    return ctx.json({
-      message: "view a swipe",
-    });
-  })
-  // Like a swipe
-  .post("/like", (ctx) => {
-    return ctx.json({
-      message: "like a swipe",
-    });
-  })
-  // Unlike a swipe
-  .post("/unlike", (ctx) => {
-    return ctx.json({
-      message: "unlike a swipe",
-    });
-  })
-  // Comment on a swipe
-  .post("/comment", (ctx) => {
-    return ctx.json({
-      message: "comment on a swipe",
-    });
-  })
-  // Repost/share a swipe
-  .post("/share", (ctx) => {
-    return ctx.json({
-      message: "share a swipe on your profile",
-    });
-  })
-  // Unrepost/unshare a swipe
-  .post("/unshare", (ctx) => {
-    return ctx.json({
-      message: "unshare a swipe from your profile",
-    });
-  })
-  // Bookmark a swipe
-  .post("/bookmark", (ctx) => {
-    return ctx.json({
-      message: "bookmark a swipe",
-    });
-  })
-  // Remove swipe from bookmarks
-  .post("/unbookmark", (ctx) => {
-    return ctx.json({
-      message: "remove swipe from bookmarks",
-    });
-  })
-  // Report a swipe
-  .post("/report", (ctx) => {
-    return ctx.json({
-      message: "report a swipe",
-    });
-  })
-  // React with emoji to swipe (future feature)
-  .post("/reactions", (ctx) => {
-    return ctx.json({
-      message: "react with emoji",
-    });
-  })
-  // Get action counts for a swipe
-  .get("/action-count", (ctx) => {
-    return ctx.json({
-      message:
-        "get data for swipe like count, repost count, comments count, view count",
-    });
-  })
-  // Get comments on a swipe
-  .get("/comments", (ctx) => {
-    return ctx.json({
-      message: "get comments on a swipe",
-    });
-  })
-  // Get reactions to a swipe (future feature)
-  .get("/reactions", (ctx) => {
-    return ctx.json({
-      message: "get reactions to a swipe",
-    });
+  .get("/:id/interaction", async (ctx) => {
+    return ctx.text("Get swipe interaction data by type");
   })
 
-  // Your swipe actions
-  // create a new swipe
-  .post("/create", (ctx) => {
-    return ctx.json({
-      message: "create a new short",
-    });
+  /**
+   *AUTHENTICATED ROUTES
+   **/
+  .use(authenticated)
+  .get("/user/feed", async (ctx) => {
+    return ctx.text("Get user swipes feed");
   })
-  // Delete a swipe
-  .delete("/", (ctx) => {
-    return ctx.json({
-      message: "delete a swipe",
-    });
+  .get("/user/profile", async (ctx) => {
+    return ctx.text("Get user profile swipes");
   })
-  // Update a swipe
-  .patch("/", (ctx) => {
-    return ctx.json({
-      message: "update a swipe",
-    });
+  .post("/create", async (ctx) => {
+    return ctx.text("Create swipe");
   })
-  // Pin swipe to profile
-  .post("/pin", (ctx) => {
-    return ctx.json({
-      message: "pin your swipe to profile",
-    });
+  .delete("/:id", async (ctx) => {
+    return ctx.text("Delete swipe");
   })
-  // Unpin swipe from profile
-  .post("/unpin", (ctx) => {
-    return ctx.json({
-      message: "unpin your swipe from profile",
-    });
+  .patch("/:id", async (ctx) => {
+    return ctx.text("Update swipe");
+  })
+  .post("/:id/like", async (ctx) => {
+    return ctx.text("Like swipe");
+  })
+  .post("/:id/unlike", async (ctx) => {
+    return ctx.text("Unlike swipe");
+  })
+  .post("/:id/repost", async (ctx) => {
+    return ctx.text("Repost swipe");
+  })
+  .post("/:id/unrepost", async (ctx) => {
+    return ctx.text("Unrepost swipe");
+  })
+  .post("/:id/save", async (ctx) => {
+    return ctx.text("Save swipe");
+  })
+  .post("/:id/unsave", async (ctx) => {
+    return ctx.text("Unsave swipe");
+  })
+  .post("/:id/report", async (ctx) => {
+    return ctx.text("Report swipe");
+  })
+  .post("/:id/pin", async (ctx) => {
+    return ctx.text("Pin swipe");
+  })
+  .post("/:id/unpin", async (ctx) => {
+    return ctx.text("Unpin swipe");
   });

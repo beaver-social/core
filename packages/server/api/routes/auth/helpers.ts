@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { tryCatch } from "../../lib/tryCatch";
-import db from "../../schema";
+import db from "../../schema/db";
 import { users } from "../../schema/user";
 import crypto from "crypto";
 import { verifyPersonalMessageSignature } from "@mysten/sui/verify";

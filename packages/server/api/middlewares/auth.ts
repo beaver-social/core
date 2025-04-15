@@ -1,11 +1,11 @@
 import { createMiddleware } from "hono/factory";
 import { verify } from "hono/jwt";
-import { DB } from "../schema";
+import { DB } from "../schema/db";
 import { JWTalgorithm } from "../constants";
 import env from "../../env";
 import { tryCatch } from "../lib/tryCatch";
 import { LRUCache } from "lru-cache";
-import db from "../schema";
+import db from "../schema/db";
 import { eq } from "drizzle-orm";
 import { zJwtPayload } from "../lib/zod/helpers";
 import { users } from "../schema/user/users";

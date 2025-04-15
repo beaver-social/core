@@ -12,8 +12,8 @@ import { and, desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import { authenticated } from "../../middlewares/auth";
 import { posts } from "../../schema/content";
 import { media } from "../../schema/content/media";
-import db from "../../schema";
-import * as InteractionSchema from "../../schema/interactions";
+import { likes, reposts, follows } from "../../schema/interactions";
+import db from "../../schema/db";
 import * as postHelpers from "./post.helpers";
 import * as actions from "./post.actions";
 
@@ -86,45 +86,6 @@ export default new Hono()
       return ctx.ok(result.data[0], "Post details fetched successfully", 200);
     }
   )
-  // Get interactions count for a post
-  .get(
-    "/:id/interaction/count",
-    zValidator("param", z.object({ id: zNumberString })),
-    async (ctx) => {
-      const { id: postId } = ctx.req.valid("param");
-
-      const result = await tryCatch(
-        db
-          .select({
-            likesCount: posts.likesCount,
-            repliesCount: posts.repliesCount,
-            sharesCount: posts.sharesCount,
-            repostsCount: posts.repostsCount,
-            viewCount: posts.viewCount,
-          })
-          .from(posts)
-          .where(eq(posts.id, postId))
-          .limit(1)
-      );
-
-      if (result.error) {
-        return ctx.err(
-          result.error?.message || "Failed to get post interactions",
-          400
-        );
-      }
-
-      if (!result.data || result.data.length === 0) {
-        return ctx.err("Post not found", 404);
-      }
-
-      return ctx.ok(
-        result.data[0],
-        "Post interactions fetched successfully",
-        200
-      );
-    }
-  )
   // Get interaction by type for a post
   .get(
     "/:id/interaction",
@@ -139,10 +100,7 @@ export default new Hono()
 
       if (type === "likes") {
         const result = await tryCatch(
-          db
-            .select()
-            .from(InteractionSchema.likes)
-            .where(eq(InteractionSchema.likes.contentTypeId, postId))
+          db.select().from(likes).where(eq(likes.contentTypeId, postId))
         );
 
         if (result.error) {
@@ -164,12 +122,9 @@ export default new Hono()
         const result = await tryCatch(
           db
             .select()
-            .from(InteractionSchema.reposts)
+            .from(reposts)
             .where(
-              and(
-                eq(InteractionSchema.reposts.contentId, postId),
-                eq(InteractionSchema.reposts.contentTypeId, 0)
-              )
+              and(eq(reposts.contentId, postId), eq(reposts.contentTypeId, 0))
             )
         );
 
@@ -205,8 +160,8 @@ export default new Hono()
         // fetch posts from following users
         const following = await db
           .select()
-          .from(InteractionSchema.follows)
-          .where(eq(InteractionSchema.follows.followerId, userId));
+          .from(follows)
+          .where(eq(follows.followerId, userId));
 
         const followingIds = following.map((follow) => follow.followingId);
 

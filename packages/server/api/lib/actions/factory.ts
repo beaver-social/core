@@ -1,6 +1,7 @@
-import db, { DB } from "../../schema";
-import * as helpers from "./factory.helpers";
+import * as helpers from "./helpers";
 import * as utils from "../utils";
+import type { DB } from "../../schema";
+import db from "../../schema/db";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>["0"]>["0"];
 type ActionOptions<T> = T & { userId: number };
@@ -33,11 +34,10 @@ export function createAction<T>() {
         helpers.compressActionRequest(actionRequest);
       const message = new TextEncoder().encode(payload);
       const user = await helpers.getUser(options.userId);
-      const loginType = user.loginType;
       await helpers.verifyUserSignature(
         message,
         signature,
-        loginType,
+        user.loginType,
         user.address
       );
 
@@ -70,7 +70,7 @@ export function createAction<T>() {
           prevHash,
           actionType,
           signature,
-          loginType
+          user.loginType
         );
 
         // Execute optional callback

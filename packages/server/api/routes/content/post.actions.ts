@@ -4,9 +4,9 @@ import { zMedia, zReactionType } from "../../lib/zod/helpers";
 import { createAction } from "../../lib/actions/factory";
 import * as postHelpers from "./post.helpers";
 import * as mediaHelpers from "./media.helpers";
-import * as interactionSchema from "../../schema/interactions";
 import * as contentSchema from "../../schema/content";
 import * as userSchema from "../../schema/user";
+import * as interactionSchema from "../../schema/interactions";
 
 // Creates a new post with content, parent post reference, media items, and flags
 export const createPost = createAction<{
