@@ -413,12 +413,11 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-        type: zSignType,
       })
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
-      const { signature, type } = ctx.req.valid("query");
+      const { signature } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
       const result = await tryCatch(
         actions.deletePost({ postId, userId }, signature)
@@ -446,13 +445,12 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-        type: zSignType,
       })
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
       const { content, media } = ctx.req.valid("json");
-      const { signature, type } = ctx.req.valid("query");
+      const { signature } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
       // Pre-validate content before sending to action
       const validation = postHelpers.validatePostContent(content);
@@ -479,13 +477,12 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-        type: zSignType,
         reaction: z.string().optional(),
       })
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
-      const { signature, type } = ctx.req.valid("query");
+      const { signature } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
       const result = await tryCatch(
         actions.likePost({ postId, userId }, signature)
@@ -506,12 +503,11 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-        type: zSignType,
       })
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
-      const { signature, type } = ctx.req.valid("query");
+      const { signature } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
       const result = await tryCatch(
         actions.unlikePost({ postId, userId }, signature)
@@ -538,12 +534,11 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-        type: zSignType,
       })
     ),
     async (ctx) => {
       const { postId, content } = ctx.req.valid("json");
-      const { signature, type } = ctx.req.valid("query");
+      const { signature } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
 
       // If content is provided, validate it
