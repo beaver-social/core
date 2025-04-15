@@ -6,9 +6,6 @@ import * as interaction from "./interactions";
 import * as media from "./content/media";
 import * as timezone from "./misc/timezones";
 import * as helper from "./helpers";
-import { drizzle } from "drizzle-orm/bun-sqlite";
-import { Database } from "bun:sqlite";
-import env from "../../env";
 
 // Combine all schema parts
 const schema = {
@@ -21,6 +18,8 @@ const schema = {
   ...timezone,
   ...helper,
 };
+
+export default schema;
 
 type UtilityFunctions =
   | "timestamps"
@@ -48,13 +47,3 @@ export type DB = {
       : never
     : never;
 };
-
-const sqlite = new Database(env.DB_FILE_NAME || "beaver.db");
-sqlite.exec("PRAGMA foreign_keys = ON");
-const db = drizzle({
-  client: sqlite,
-  schema: schema,
-  casing: "snake_case",
-});
-
-export default db;

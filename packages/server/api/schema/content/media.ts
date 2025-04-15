@@ -21,10 +21,10 @@ export const media = table(
       .notNull(),
     order: t.int().default(0), // for ordering multiple media items
     thumbnailUrl: t.text("thumbnail_url"),
-    duration: t.int(),
-    width: t.int(),
-    height: t.int(),
-    altText: t.text(),
+    duration: t.int(), // in seconds
+    width: t.int(), // in pixels
+    height: t.int(), // in pixels
+    altText: t.text(), // for accessibility
     ...timestamps,
   },
   (table) => [

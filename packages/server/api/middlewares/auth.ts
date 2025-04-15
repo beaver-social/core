@@ -5,12 +5,12 @@ import { JWTalgorithm } from "../constants";
 import env from "../../env";
 import { tryCatch } from "../lib/tryCatch";
 import { LRUCache } from "lru-cache";
-import db from "../schema";
+import db from "../schema/db";
 import { eq } from "drizzle-orm";
 import { zJwtPayload } from "../lib/zod/helpers";
 import { users } from "../schema/user/users";
 import { generateHash } from "../lib/utils";
-
+import { verifyChallenge as verifyChallengeHelper } from "../routes/auth/helpers";
 const cache = new LRUCache<string, DB["user"]>({
   max: 1000,
   ttlAutopurge: true,

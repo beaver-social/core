@@ -59,34 +59,6 @@ export const saves = table(
   ]
 );
 
-// Content views
-export const views = table(
-  "views",
-  {
-    id: t.int().primaryKey({ autoIncrement: true }),
-    userId: t
-      .int("user_id")
-      .references(() => users.id, { onDelete: "cascade" }),
-    contentId: t.int("content_id").notNull(), // ID of the post or short
-    contentTypeId: t
-      .int("content_type_id")
-      .notNull()
-      .references(() => contentTypes.id),
-    viewedAt: t
-      .int("viewed_at")
-      .notNull()
-      .$default(() => Date.now()),
-    duration: t.int("duration"), // For videos, how many seconds watched
-    ...timestamps,
-  },
-  (table) => [
-    t.index("content_view_idx").on(table.contentId, table.contentTypeId),
-    t.index("user_view_idx").on(table.userId),
-    t.index("content_view_idx").on(table.contentId, table.contentTypeId),
-    t.index("viewed_at_idx").on(table.viewedAt),
-  ]
-);
-
 // Comments for content only
 export const comments = table(
   "comments",

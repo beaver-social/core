@@ -653,7 +653,7 @@ const result = await actions.reportPost(
 
 ## 🛠️ Helper Functions
 
-The helper functions in `post.helpers.ts` provide utility functionality for the post actions:
+The helper functions in `post.helpers.ts` & `media.helpers.ts` provide utility functionality for the post actions:
 
 ### User Permission Helpers
 

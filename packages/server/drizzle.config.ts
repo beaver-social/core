@@ -4,10 +4,10 @@ import path from "path";
 
 export default defineConfig({
   out: "./drizzle",
-  schema: path.join(__dirname, "./api/lib/db/schema/index.ts"),
+  schema: path.join(__dirname, "./api/schema/schema.ts"),
   dialect: "sqlite",
   dbCredentials: {
-    url: env.DB_FILE_NAME || "data.db",
+    url: env.DB_FILE_NAME || "beaver.db",
   },
   casing: "snake_case",
 });
