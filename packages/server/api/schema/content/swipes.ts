@@ -12,6 +12,7 @@ export const swipes = table(
       .int("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    parentId: t.int("parent_id").references((): t.AnySQLiteColumn => swipes.id),
     viewCount: t.int("view_count").default(0),
     likesCount: t.int("likes_count").default(0),
     commentsCount: t.int("comments_count").default(0),

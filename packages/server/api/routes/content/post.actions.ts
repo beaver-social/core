@@ -2,10 +2,9 @@ import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { zMedia, zReactionType } from "../../lib/zod/helpers";
 import { createAction } from "../../lib/actions/factory";
-import * as postHelpers from "./post.helpers";
-import * as mediaHelpers from "./media.helpers";
-import * as contentSchema from "../../schema/content";
+import * as helpers from "./helpers";
 import * as userSchema from "../../schema/user";
+import * as contentSchema from "../../schema/content";
 import * as interactionSchema from "../../schema/interactions";
 
 // Creates a new post with content, parent post reference, media items, and flags
@@ -17,8 +16,8 @@ export const createPost = createAction<{
 }>()(
   async (tx, { userId, content, parentId, media, flags }) => {
     // Sanitize and validate content
-    const sanitizedContent = postHelpers.sanitizePostContent(content);
-    const validation = postHelpers.validatePostContent(sanitizedContent);
+    const sanitizedContent = helpers.sanitizePostContent(content);
+    const validation = helpers.validatePostContent(sanitizedContent);
 
     if (!validation.valid) {
       throw new Error(validation.message);
@@ -78,8 +77,8 @@ export const createPost = createAction<{
       }
     }
 
-    const tags = postHelpers.extractHashtags(sanitizedContent);
-    const mentions = postHelpers.extractMentions(sanitizedContent);
+    const tags = helpers.extractHashtags(sanitizedContent);
+    const mentions = helpers.extractMentions(sanitizedContent);
 
     const [post] = await tx
       .insert(contentSchema.posts)
@@ -109,7 +108,7 @@ export const createPost = createAction<{
             );
 
             // Process and upload to S3, get back the URL
-            const s3Url = await mediaHelpers.processAndUploadImage(imageData);
+            const s3Url = await helpers.processAndUploadImage(imageData);
 
             // Store the S3 URL in the database
             await tx.insert(contentSchema.media).values({
@@ -131,7 +130,7 @@ export const createPost = createAction<{
 
             // Process and upload to S3, get back both video URL and thumbnail URL
             const { videoUrl, thumbnailUrl } =
-              await mediaHelpers.processAndUploadVideo(videoData);
+              await helpers.processAndUploadVideo(videoData);
 
             // Store the video URL in the database
             await tx.insert(contentSchema.media).values({
@@ -192,7 +191,7 @@ export const deletePost = createAction<{ postId: number }>()(
       throw new Error("Post not found");
     }
 
-    if (!postHelpers.canUserModifyPost(userId, postToDelete.authorId)) {
+    if (!helpers.canUserModifyPost(userId, postToDelete.authorId)) {
       throw new Error("You don't have permission to delete this post");
     }
 
@@ -346,7 +345,7 @@ export const pinPost = createAction<{ postId: number }>()(function (
     }
 
     // Ensure user can pin the post
-    if (!postHelpers.canUserModifyPost(userId, post.authorId)) {
+    if (!helpers.canUserModifyPost(userId, post.authorId)) {
       throw new Error("You don't have permission to pin this post");
     }
 
@@ -400,8 +399,8 @@ export const updatePost = createAction<{
   media: z.infer<typeof zMedia>[];
 }>()(async (tx, { postId, userId, content, media }) => {
   // Sanitize and validate content
-  const sanitizedContent = postHelpers.sanitizePostContent(content);
-  const validation = postHelpers.validatePostContent(sanitizedContent);
+  const sanitizedContent = helpers.sanitizePostContent(content);
+  const validation = helpers.validatePostContent(sanitizedContent);
 
   if (!validation.valid) {
     throw new Error(validation.message);
@@ -427,7 +426,7 @@ export const updatePost = createAction<{
   }
 
   // Ensure user can modify the post
-  if (!postHelpers.canUserModifyPost(userId, post.authorId)) {
+  if (!helpers.canUserModifyPost(userId, post.authorId)) {
     throw new Error("You don't have permission to edit this post");
   }
 
@@ -459,7 +458,7 @@ export const updatePost = createAction<{
         );
 
         // Process and upload to S3, get back the URL
-        const s3Url = await mediaHelpers.processAndUploadImage(imageData);
+        const s3Url = await helpers.processAndUploadImage(imageData);
 
         // Store the S3 URL in the database
         await tx.insert(contentSchema.media).values({
@@ -480,8 +479,9 @@ export const updatePost = createAction<{
         );
 
         // Process and upload to S3, get back URLs
-        const { videoUrl, thumbnailUrl } =
-          await mediaHelpers.processAndUploadVideo(videoData);
+        const { videoUrl, thumbnailUrl } = await helpers.processAndUploadVideo(
+          videoData
+        );
 
         // Store the video URL in the database
         await tx.insert(contentSchema.media).values({
@@ -517,8 +517,8 @@ export const repostPost = createAction<{
     // Sanitize content if provided
     let sanitizedContent = "";
     if (content) {
-      sanitizedContent = postHelpers.sanitizePostContent(content);
-      const validation = postHelpers.validatePostContent(sanitizedContent);
+      sanitizedContent = helpers.sanitizePostContent(content);
+      const validation = helpers.validatePostContent(sanitizedContent);
 
       if (!validation.valid) {
         throw new Error(validation.message);
@@ -594,7 +594,7 @@ export const unrepostPost = createAction<{
   }
 
   // Ensure user can modify the post
-  if (!postHelpers.canUserModifyPost(userId, repost.authorId)) {
+  if (!helpers.canUserModifyPost(userId, repost.authorId)) {
     throw new Error("You don't have permission to delete this repost");
   }
 

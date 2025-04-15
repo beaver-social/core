@@ -14,7 +14,7 @@ import { posts } from "../../schema/content";
 import { media } from "../../schema/content/media";
 import { likes, reposts, follows } from "../../schema/interactions";
 import db from "../../schema/db";
-import * as postHelpers from "./post.helpers";
+import * as helpers from "./helpers";
 import * as actions from "./post.actions";
 
 export default new Hono()
@@ -33,7 +33,7 @@ export default new Hono()
     ),
     async (ctx) => {
       const { page, limit } = ctx.req.valid("query");
-      const { offset } = postHelpers.getPaginationParams(page, limit);
+      const { offset } = helpers.getPaginationParams(page, limit);
 
       const result = await tryCatch(
         db
@@ -155,7 +155,7 @@ export default new Hono()
     async (ctx) => {
       const userId = ctx.get("user").id;
       const { page, limit, type } = ctx.req.valid("query");
-      const { offset } = postHelpers.getPaginationParams(page, limit);
+      const { offset } = helpers.getPaginationParams(page, limit);
       if (type === "following") {
         // fetch posts from following users
         const following = await db
@@ -234,7 +234,7 @@ export default new Hono()
     async (ctx) => {
       const userId = ctx.get("user").id;
       const { page, limit, type } = ctx.req.valid("query");
-      const { offset } = postHelpers.getPaginationParams(page, limit);
+      const { offset } = helpers.getPaginationParams(page, limit);
 
       if (type === "your-posts") {
         const result = await tryCatch(
@@ -348,7 +348,7 @@ export default new Hono()
       const userId = ctx.get("user").id;
 
       // Pre-validate content before sending to action
-      const { valid, message } = postHelpers.validatePostContent(content);
+      const { valid, message } = helpers.validatePostContent(content);
       if (!valid) {
         return ctx.err(message ?? "Invalid post content", 400);
       }
@@ -417,7 +417,7 @@ export default new Hono()
       const { signature, type } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
       // Pre-validate content before sending to action
-      const validation = postHelpers.validatePostContent(content);
+      const validation = helpers.validatePostContent(content);
       if (!validation.valid) {
         return ctx.err(validation.message ?? "Invalid post content", 400);
       }
@@ -510,7 +510,7 @@ export default new Hono()
 
       // If content is provided, validate it
       if (content) {
-        const validation = postHelpers.validatePostContent(content);
+        const validation = helpers.validatePostContent(content);
         if (!validation.valid) {
           return ctx.err(validation.message ?? "Invalid post content", 400);
         }

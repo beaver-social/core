@@ -1,6 +1,6 @@
 import { createMiddleware } from "hono/factory";
 import { verify } from "hono/jwt";
-import { DB } from "../schema/db";
+import { DB } from "../schema";
 import { JWTalgorithm } from "../constants";
 import env from "../../env";
 import { tryCatch } from "../lib/tryCatch";
@@ -10,7 +10,7 @@ import { eq } from "drizzle-orm";
 import { zJwtPayload } from "../lib/zod/helpers";
 import { users } from "../schema/user/users";
 import { generateHash } from "../lib/utils";
-
+import { verifyChallenge as verifyChallengeHelper } from "../routes/auth/helpers";
 const cache = new LRUCache<string, DB["user"]>({
   max: 1000,
   ttlAutopurge: true,
