@@ -257,7 +257,6 @@ export default class Post {
       },
       query: {
         signature: signatureResult.data.signature,
-        type: "personal",
       },
     });
   }
@@ -293,7 +292,6 @@ export default class Post {
       param: { id },
       query: {
         signature: signatureResult.data.signature,
-        type: "personal",
         reaction,
       },
     });
@@ -329,7 +327,6 @@ export default class Post {
       param: { id },
       query: {
         signature: signatureResult.data.signature,
-        type: "personal",
       },
     });
   }
@@ -368,7 +365,6 @@ export default class Post {
       },
       query: {
         signature: signatureResult.data.signature,
-        type: "personal",
       },
     });
   }
@@ -407,7 +403,6 @@ export default class Post {
       },
       query: {
         signature: signatureResult.data.signature,
-        type: "personal",
       },
     });
   }
@@ -444,7 +439,6 @@ export default class Post {
       },
       query: {
         signature: signatureResult.data.signature,
-        type: "personal",
       },
     });
   }
@@ -481,7 +475,6 @@ export default class Post {
       },
       query: {
         signature: signatureResult.data.signature,
-        type: "personal",
       },
     });
   }
@@ -526,7 +519,6 @@ export default class Post {
       },
       query: {
         signature: signatureResult.data.signature,
-        type: "personal",
       },
     });
   }
@@ -563,7 +555,6 @@ export default class Post {
       },
       query: {
         signature: signatureResult.data.signature,
-        type: "personal",
       },
     });
   }
@@ -600,7 +591,6 @@ export default class Post {
       },
       query: {
         signature: signatureResult.data.signature,
-        type: "personal",
       },
     });
   }

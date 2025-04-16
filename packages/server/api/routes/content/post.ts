@@ -541,7 +541,6 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-        type: zSignType,
       })
     ),
     async (ctx) => {
@@ -575,7 +574,6 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-        type: zSignType,
       })
     ),
     async (ctx) => {
@@ -608,7 +606,6 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-        type: zSignType,
       })
     ),
     async (ctx) => {
@@ -643,7 +640,6 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-        type: zSignType,
       })
     ),
     async (ctx) => {
@@ -682,7 +678,6 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-        type: zSignType,
       })
     ),
     async (ctx) => {
@@ -715,7 +710,6 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-        type: zSignType,
       })
     ),
     async (ctx) => {
