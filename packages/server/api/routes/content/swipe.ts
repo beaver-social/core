@@ -17,6 +17,7 @@ import {
 import { users } from "../../schema/user/users";
 import * as helpers from "./helpers";
 import * as actions from "./swipe.action";
+import { getPaginationParams } from "../../lib/utils";
 
 export default new Hono()
   /**
@@ -34,7 +35,7 @@ export default new Hono()
     ),
     async (ctx) => {
       const { page, limit } = ctx.req.valid("query");
-      const { offset } = helpers.getPaginationParams(page, limit);
+      const { offset } = getPaginationParams(page, limit);
 
       const result = await tryCatch(
         db
@@ -98,7 +99,7 @@ export default new Hono()
     async (ctx) => {
       const { id } = ctx.req.valid("param");
       const { type, page, limit } = ctx.req.valid("query");
-      const { offset } = helpers.getPaginationParams(page, limit);
+      const { offset } = getPaginationParams(page, limit);
 
       let result;
       // Check if swipe exists
@@ -210,7 +211,7 @@ export default new Hono()
     async (ctx) => {
       const userId = ctx.get("user").id;
       const { page, limit, type } = ctx.req.valid("query");
-      const { offset } = helpers.getPaginationParams(page, limit);
+      const { offset } = getPaginationParams(page, limit);
       if (type === "following") {
         // fetch posts from following users
         const following = await db
@@ -281,7 +282,7 @@ export default new Hono()
     async (ctx) => {
       const userId = ctx.get("user").id;
       const { page, limit } = ctx.req.valid("query");
-      const { offset } = helpers.getPaginationParams(page, limit);
+      const { offset } = getPaginationParams(page, limit);
 
       const result = await tryCatch(
         db

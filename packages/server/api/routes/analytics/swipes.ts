@@ -8,7 +8,7 @@ import { eq } from "drizzle-orm";
 import { swipes } from "../../schema/content/swipes";
 
 export default new Hono()
-  // Get interactions count for a post
+  // Get interactions count for a swipe
   .get(
     "/:id/interactions",
     zValidator("param", z.object({ id: zNumberString })),
