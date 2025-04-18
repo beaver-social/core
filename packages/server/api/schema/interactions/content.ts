@@ -59,7 +59,7 @@ export const saves = table(
   ]
 );
 
-// Comments for content only
+// Comments for swipes only
 export const comments = table(
   "comments",
   {

@@ -16,6 +16,8 @@ import { likes, reposts, follows } from "../../schema/interactions";
 import db from "../../schema/db";
 import * as helpers from "./helpers";
 import * as actions from "./post.actions";
+import { getPaginationParams } from "../../lib/utils";
+import { postAwards } from "../../schema/misc/awards";
 
 export default new Hono()
   /**
@@ -33,7 +35,7 @@ export default new Hono()
     ),
     async (ctx) => {
       const { page, limit } = ctx.req.valid("query");
-      const { offset } = helpers.getPaginationParams(page, limit);
+      const { offset } = getPaginationParams(page, limit);
 
       const result = await tryCatch(
         db
@@ -136,6 +138,42 @@ export default new Hono()
       }
     }
   )
+  // Get post awards
+  .get(
+    "/:id/awards",
+    zValidator("param", z.object({ id: zNumberString })),
+    zValidator(
+      "query",
+      z.object({
+        page: zNumberString,
+        limit: zNumberString,
+      })
+    ),
+    async (ctx) => {
+      const { id: postId } = ctx.req.valid("param");
+      const { page, limit } = ctx.req.valid("query");
+      const { offset } = getPaginationParams(page, limit);
+
+      const result = await tryCatch(
+        db
+          .select()
+          .from(postAwards)
+          .where(eq(postAwards.postId, postId))
+          .orderBy(desc(postAwards.createdAt))
+          .limit(limit)
+          .offset(offset)
+      );
+
+      if (result.error) {
+        return ctx.err(
+          result.error?.message || "Failed to get post awards",
+          400
+        );
+      }
+
+      return ctx.ok(result.data, "Post awards fetched successfully", 200);
+    }
+  )
 
   /**
    *AUTH BASED ROUTES
@@ -155,7 +193,7 @@ export default new Hono()
     async (ctx) => {
       const userId = ctx.get("user").id;
       const { page, limit, type } = ctx.req.valid("query");
-      const { offset } = helpers.getPaginationParams(page, limit);
+      const { offset } = getPaginationParams(page, limit);
       if (type === "following") {
         // fetch posts from following users
         const following = await db
@@ -234,7 +272,7 @@ export default new Hono()
     async (ctx) => {
       const userId = ctx.get("user").id;
       const { page, limit, type } = ctx.req.valid("query");
-      const { offset } = helpers.getPaginationParams(page, limit);
+      const { offset } = getPaginationParams(page, limit);
 
       if (type === "your-posts") {
         const result = await tryCatch(

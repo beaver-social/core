@@ -13,3 +13,9 @@ export function camelToDotCase(str: string | null | undefined): string {
 export function generateHash(data: string): string {
   return new Bun.CryptoHasher("sha3-256").update(data).digest("hex");
 }
+
+export function getPaginationParams(page: number, limit: number) {
+  return {
+    offset: (page - 1) * limit,
+  };
+}

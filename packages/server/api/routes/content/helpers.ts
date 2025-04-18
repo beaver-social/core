@@ -25,18 +25,6 @@ export function canUserModifyPost(userId: number, authorId: number): boolean {
 }
 
 /**
- * Generates pagination parameters based on the provided page and limit.
- * @param page The page number to paginate from.
- * @param limit The number of items per page.
- * @returns An object containing the offset for pagination.
- */
-export function getPaginationParams(page: number, limit: number) {
-  return {
-    offset: (page - 1) * limit,
-  };
-}
-
-/**
  * Extracts hashtags from the given content string.
  * @param content The string content to extract hashtags from.
  * @returns An array of extracted hashtags without the '#' symbol.
