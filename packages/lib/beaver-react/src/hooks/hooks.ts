@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { BeaverContext } from "./BeaverProvider";
+import { BeaverContext } from "../BeaverProvider";
 
 /**
  * Hook to access the Beaver client and its state
