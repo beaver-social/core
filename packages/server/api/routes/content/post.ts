@@ -561,7 +561,7 @@ export default new Hono()
         return ctx.err(result.error?.message || "Failed to repost", 400);
       }
 
-      return ctx.ok(result.data, "Post reposted successfully", 200);
+      return ctx.ok({}, "Post reposted successfully", 200);
     }
   )
   // Unrepost a post

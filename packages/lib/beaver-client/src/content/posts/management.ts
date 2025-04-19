@@ -1,5 +1,10 @@
 import Post from "./Post";
 import { tryCatch } from "../../utils/tryCatch";
+import {
+  CreatePostResponse,
+  DeletePostResponse,
+  UpdatePostResponse,
+} from "./types";
 
 /**
  * Creates a new post.
@@ -16,7 +21,7 @@ export async function create(
       subscriberOnly?: boolean;
     };
   }
-) {
+): Promise<CreatePostResponse> {
   const { apiClient, surface } = this.defaults;
   const { content, media, parentId, flags } = options;
 
@@ -55,7 +60,10 @@ export async function create(
  * Deletes a post.
  * @returns A promise that resolves when the post is deleted.
  */
-export async function deletePost(this: Post, options: { id: number }) {
+export async function deletePost(
+  this: Post,
+  options: { id: number }
+): Promise<DeletePostResponse> {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 
@@ -94,7 +102,7 @@ export async function update(
     content: string;
     media: Array<any>;
   }
-) {
+): Promise<UpdatePostResponse> {
   const { apiClient, surface } = this.defaults;
   const { id, content, media } = options;
 

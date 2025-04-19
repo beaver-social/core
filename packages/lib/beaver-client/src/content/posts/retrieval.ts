@@ -1,10 +1,19 @@
 import Post from "./Post";
+import {
+  GetPostResponse,
+  GetPostFeedResponse,
+  GetPostInteractionsResponse,
+  GetPostAwardsResponse,
+} from "./types";
 
 /**
  * Retrieves a post based on its id.
  * @returns A promise that resolves to the post, or null.
  */
-export async function getByID(this: Post, options: { id: number }) {
+export async function getByID(
+  this: Post,
+  options: { id: number }
+): Promise<GetPostResponse> {
   const { apiClient } = this.defaults;
   const { id } = options;
 
@@ -18,7 +27,7 @@ export async function getByID(this: Post, options: { id: number }) {
 export async function getFeed(
   this: Post,
   options: { page: number; limit: number }
-) {
+): Promise<GetPostFeedResponse> {
   const { apiClient } = this.defaults;
   const { page, limit } = options;
 
@@ -35,7 +44,7 @@ export async function getInteractionsByType(
     id: number;
     type: "likes" | "replies" | "reposts";
   }
-) {
+): Promise<GetPostInteractionsResponse> {
   const { apiClient } = this.defaults;
   const { id, type } = options;
 
@@ -56,7 +65,7 @@ export async function getUserFeed(
     limit: number;
     type: "following" | "for_you";
   }
-) {
+): Promise<GetPostFeedResponse> {
   const { apiClient } = this.defaults;
   const { page, limit, type } = options;
 
@@ -81,7 +90,7 @@ export async function getUserProfilePosts(
       | "your-saved"
       | "your-pinned";
   }
-) {
+): Promise<GetPostFeedResponse> {
   const { apiClient } = this.defaults;
   const { page, limit, type } = options;
 
@@ -101,7 +110,7 @@ export async function getAwards(
     page: number;
     limit: number;
   }
-) {
+): Promise<GetPostAwardsResponse> {
   const { apiClient } = this.defaults;
   const { id, page, limit } = options;
 

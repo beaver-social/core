@@ -1,5 +1,10 @@
 import Post from "./Post";
 import { tryCatch } from "../../utils/tryCatch";
+import {
+  ReportPostResponse,
+  PinPostResponse,
+  UnpinPostResponse,
+} from "./types";
 
 /**
  * Reports a post.
@@ -12,7 +17,7 @@ export async function report(
     reason: string;
     details?: string;
   }
-) {
+): Promise<ReportPostResponse> {
   const { apiClient, surface } = this.defaults;
   const { postId, reason, details } = options;
 
@@ -48,7 +53,10 @@ export async function report(
  * Pins a post to the user profile.
  * @returns A promise that resolves when the post is pinned.
  */
-export async function pin(this: Post, options: { postId: number }) {
+export async function pin(
+  this: Post,
+  options: { postId: number }
+): Promise<PinPostResponse> {
   const { apiClient, surface } = this.defaults;
   const { postId } = options;
 
@@ -82,7 +90,10 @@ export async function pin(this: Post, options: { postId: number }) {
  * Unpins a post from the user profile.
  * @returns A promise that resolves when the post is unpinned.
  */
-export async function unpin(this: Post, options: { postId: number }) {
+export async function unpin(
+  this: Post,
+  options: { postId: number }
+): Promise<UnpinPostResponse> {
   const { apiClient, surface } = this.defaults;
   const { postId } = options;
 
