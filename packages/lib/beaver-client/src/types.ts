@@ -22,7 +22,7 @@ export type Defaults = {
   suiClient: SuiClient;
   s3Client: S3Client;
   surface: Surface;
-  contracts: Contracts;
+  contracts: Contracts | null;
 };
 
 export type Surface = {
