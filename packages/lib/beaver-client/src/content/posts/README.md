@@ -35,10 +35,10 @@ const feed = await post.getFeed({ page: 1, limit: 10 });
 
 - `getByID`: Retrieve a post by ID
 - `getFeed`: Get the public post feed
-- `getInteractionCount`: Get interaction counts for a post
 - `getInteractionsByType`: Get interactions of a specific type
 - `getUserFeed`: Get user-specific feed
 - `getUserProfilePosts`: Get posts for user profile
+- `getAwards`: Get awards for a post
 
 ### Management Methods
 

@@ -26,19 +26,6 @@ export async function getFeed(
 }
 
 /**
- * Retrieves interaction counts for a post.
- * @returns A promise that resolves to the interaction counts.
- */
-export async function getInteractionCount(this: Post, options: { id: number }) {
-  const { apiClient } = this.defaults;
-  const { id } = options;
-
-  return apiClient.content.posts[":id"].interaction.count.$get({
-    param: { id },
-  });
-}
-
-/**
  * Retrieves interactions of a specific type for a post.
  * @returns A promise that resolves to the interactions.
  */

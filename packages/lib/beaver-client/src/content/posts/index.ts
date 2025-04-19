@@ -1,6 +1,3 @@
-import Logger from "../logger";
-import { Defaults } from "../types";
-import { tryCatch } from "../utils/tryCatch";
 import Post from "./Post";
 import * as retrievalMethods from "./retrieval";
 import * as managementMethods from "./management";

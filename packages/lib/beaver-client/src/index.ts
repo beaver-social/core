@@ -8,7 +8,7 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { tryCatch } from "./utils/tryCatch";
 import { Identity } from "./identity";
 import { Contracts } from "contracts";
-import Post from "./post";
+import Post from "./content/posts";
 
 // import { User } from "./user";
 

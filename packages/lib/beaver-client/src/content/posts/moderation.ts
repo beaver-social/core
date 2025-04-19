@@ -1,5 +1,5 @@
 import Post from "./Post";
-import { tryCatch } from "../utils/tryCatch";
+import { tryCatch } from "../../utils/tryCatch";
 
 /**
  * Reports a post.
