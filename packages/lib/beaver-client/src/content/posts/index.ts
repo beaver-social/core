@@ -18,7 +18,7 @@ Object.assign(Post.prototype, moderationMethods);
 
 // Rename deletePost to delete to match original API
 Object.defineProperty(Post.prototype, "delete", {
-  value: managementMethods.deletePost,
+  value: managementMethods.delete_,
 });
 
 export default Post;

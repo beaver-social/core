@@ -32,12 +32,22 @@ export class BeaverClient {
     );
     const s3Client = new S3Client();
 
+    // @marsian is this okay?
+    const contracts = new Contracts({
+      packageId: "0x2::beaver_social",
+      objects: {
+        registry: { id: "0x2::beaver_social::Registry" },
+        clock: { id: "0x2::beaver_social::Clock" },
+        adminsRecord: { id: "0x2::beaver_social::AdminsRecord" },
+      },
+    });
+
     this.defaults = {
       apiClient,
       suiClient,
       s3Client,
       surface,
-      contracts: null,
+      contracts,
     };
 
     this.config = config;
@@ -66,6 +76,12 @@ export class BeaverClient {
 
     this.ready = true;
     this.logger.info("Client Initialised", this.defaults.contracts);
+  }
+
+  // @marsian check this.
+  public destroy() {
+    this.ready = false;
+    this.logger.info("Client Destroyed");
   }
 
   get identity() {

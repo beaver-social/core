@@ -39,9 +39,8 @@ export const BeaverProvider: React.FC<BeaverProviderProps> = ({
         initializeClient();
 
         return () => {
-            // Cleanup if needed
             if (client) {
-                // Any cleanup logic for the client if needed
+                client.destroy();
             }
         };
     }, [surface, config]);

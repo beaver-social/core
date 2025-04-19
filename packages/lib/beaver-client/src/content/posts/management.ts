@@ -60,7 +60,7 @@ export async function create(
  * Deletes a post.
  * @returns A promise that resolves when the post is deleted.
  */
-export async function deletePost(
+export async function delete_(
   this: Post,
   options: { id: number }
 ): Promise<DeletePostResponse> {

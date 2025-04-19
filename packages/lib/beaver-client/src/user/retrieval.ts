@@ -20,6 +20,7 @@ export async function getCurrentUser(this: User): Promise<GetUserResponse> {
   const { apiClient } = this.defaults;
 
   try {
+    // @marsian why is the return type from apiClient unknown?
     return apiClient.user.$get();
   } catch (error) {
     this.logger.error(`${User.FETCH_ERROR}: ${error}`);
