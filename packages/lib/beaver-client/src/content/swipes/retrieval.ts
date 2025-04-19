@@ -1,10 +1,18 @@
 import Swipe from "./Swipe";
+import {
+  GetSwipeResponse,
+  GetSwipeFeedResponse,
+  GetInteractionsResponse,
+} from "./types";
 
 /**
  * Retrieves a swipe based on its id.
  * @returns A promise that resolves to the swipe, or null.
  */
-export async function getByID(this: Swipe, options: { id: number }) {
+export async function getByID(
+  this: Swipe,
+  options: { id: number }
+): Promise<GetSwipeResponse> {
   const { apiClient } = this.defaults;
   const { id } = options;
 
@@ -18,7 +26,7 @@ export async function getByID(this: Swipe, options: { id: number }) {
 export async function getFeed(
   this: Swipe,
   options: { page: number; limit: number }
-) {
+): Promise<GetSwipeFeedResponse> {
   const { apiClient } = this.defaults;
   const { page, limit } = options;
 
@@ -37,7 +45,7 @@ export async function getInteractionsByType(
     page: number;
     limit: number;
   }
-) {
+): Promise<GetInteractionsResponse> {
   const { apiClient } = this.defaults;
   const { id, type, page, limit } = options;
 
@@ -58,7 +66,7 @@ export async function getUserFeed(
     limit: number;
     type: "following" | "for_you";
   }
-) {
+): Promise<GetSwipeFeedResponse> {
   const { apiClient } = this.defaults;
   const { page, limit, type } = options;
 
@@ -77,7 +85,7 @@ export async function getUserProfileSwipes(
     page: number;
     limit: number;
   }
-) {
+): Promise<GetSwipeFeedResponse> {
   const { apiClient } = this.defaults;
   const { page, limit } = options;
 

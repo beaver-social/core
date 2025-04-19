@@ -1,11 +1,22 @@
 import Swipe from "./Swipe";
 import { tryCatch } from "../../utils/tryCatch";
+import {
+  LikeSwipeResponse,
+  UnlikeSwipeResponse,
+  RepostSwipeResponse,
+  UnrepostSwipeResponse,
+  SaveSwipeResponse,
+  UnsaveSwipeResponse,
+} from "./types";
 
 /**
  * Likes a swipe.
  * @returns A promise that resolves when the swipe is liked.
  */
-export async function like(this: Swipe, options: { id: number }) {
+export async function like(
+  this: Swipe,
+  options: { id: number }
+): Promise<LikeSwipeResponse> {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 
@@ -37,7 +48,10 @@ export async function like(this: Swipe, options: { id: number }) {
  * Unlikes a swipe.
  * @returns A promise that resolves when the swipe is unliked.
  */
-export async function unlike(this: Swipe, options: { id: number }) {
+export async function unlike(
+  this: Swipe,
+  options: { id: number }
+): Promise<UnlikeSwipeResponse> {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 
@@ -72,7 +86,7 @@ export async function unlike(this: Swipe, options: { id: number }) {
 export async function repost(
   this: Swipe,
   options: { id: number; quote?: string }
-) {
+): Promise<RepostSwipeResponse> {
   const { apiClient, surface } = this.defaults;
   const { id, quote } = options;
 
@@ -107,7 +121,10 @@ export async function repost(
  * Unrepost a swipe.
  * @returns A promise that resolves when the swipe is unreposted.
  */
-export async function unrepost(this: Swipe, options: { id: number }) {
+export async function unrepost(
+  this: Swipe,
+  options: { id: number }
+): Promise<UnrepostSwipeResponse> {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 
@@ -139,7 +156,10 @@ export async function unrepost(this: Swipe, options: { id: number }) {
  * Saves a swipe.
  * @returns A promise that resolves when the swipe is saved.
  */
-export async function save(this: Swipe, options: { id: number }) {
+export async function save(
+  this: Swipe,
+  options: { id: number }
+): Promise<SaveSwipeResponse> {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 
@@ -171,7 +191,10 @@ export async function save(this: Swipe, options: { id: number }) {
  * Unsaves a swipe.
  * @returns A promise that resolves when the swipe is unsaved.
  */
-export async function unsave(this: Swipe, options: { id: number }) {
+export async function unsave(
+  this: Swipe,
+  options: { id: number }
+): Promise<UnsaveSwipeResponse> {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 

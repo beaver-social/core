@@ -1,5 +1,10 @@
 import Swipe from "./Swipe";
 import { tryCatch } from "../../utils/tryCatch";
+import {
+  CreateSwipeApiResponse,
+  DeleteSwipeResponse,
+  UpdateSwipeResponse,
+} from "./types";
 
 /**
  * Creates a new swipe.
@@ -23,7 +28,7 @@ export async function create(
       subscriberOnly?: boolean;
     };
   }
-) {
+): Promise<CreateSwipeApiResponse> {
   const { apiClient, surface } = this.defaults;
   const { caption, media, parentId, flags } = options;
 
@@ -62,7 +67,10 @@ export async function create(
  * Deletes a swipe.
  * @returns A promise that resolves when the swipe is deleted.
  */
-export async function delete_(this: Swipe, options: { id: number }) {
+export async function delete_(
+  this: Swipe,
+  options: { id: number }
+): Promise<DeleteSwipeResponse> {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 
@@ -104,7 +112,7 @@ export async function update(
       subscriberOnly?: boolean;
     };
   }
-) {
+): Promise<UpdateSwipeResponse> {
   const { apiClient, surface } = this.defaults;
   const { id, caption, flags } = options;
 

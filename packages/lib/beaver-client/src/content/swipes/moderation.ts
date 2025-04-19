@@ -1,5 +1,10 @@
 import Swipe from "./Swipe";
 import { tryCatch } from "../../utils/tryCatch";
+import {
+  ReportSwipeResponse,
+  PinSwipeResponse,
+  UnpinSwipeResponse,
+} from "./types";
 
 /**
  * Reports a swipe.
@@ -20,7 +25,7 @@ export async function report(
       | "other";
     details?: string;
   }
-) {
+): Promise<ReportSwipeResponse> {
   const { apiClient, surface } = this.defaults;
   const { id, reason, details } = options;
 
@@ -56,7 +61,10 @@ export async function report(
  * Pins a swipe to the user profile.
  * @returns A promise that resolves when the swipe is pinned.
  */
-export async function pin(this: Swipe, options: { id: number }) {
+export async function pin(
+  this: Swipe,
+  options: { id: number }
+): Promise<PinSwipeResponse> {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 
@@ -88,7 +96,10 @@ export async function pin(this: Swipe, options: { id: number }) {
  * Unpins a swipe from the user profile.
  * @returns A promise that resolves when the swipe is unpinned.
  */
-export async function unpin(this: Swipe, options: { id: number }) {
+export async function unpin(
+  this: Swipe,
+  options: { id: number }
+): Promise<UnpinSwipeResponse> {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 
