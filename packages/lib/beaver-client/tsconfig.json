@@ -1,16 +1,10 @@
 {
-  "extends": "tsconfig/base.json",
-  "include": [
-    "."
-  ],
-  "exclude": [
-    "dist",
-    "build",
-    "node_modules"
-  ],
+  "extends": "../../tsconfig/base.json",
+  "include": ["."],
+  "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
     "outDir": "dist",
-    // "module": "",
+    "module": "ESNext",
     "moduleResolution": "bundler"
   }
 }

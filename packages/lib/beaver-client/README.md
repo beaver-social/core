@@ -23,6 +23,7 @@ packages/lib/beaver-client/
 └── tsconfig.json       # TypeScript configuration
 ```
 
+$$
 ## Development Setup
 
 1. Install dependencies:
@@ -176,3 +177,11 @@ npm run docs
 ```
 
 Documentation will be generated in the `docs/` directory.
+
+
+## VERIFY THE FOLLOWING CHANGES @MARSIAN
+
+- [ ] is the tsconfig/base.json file correct?
+- [ ] why did we have JSDoc comments in the methods? (i removed them for now, let me know if we need them)
+$$w
+$$

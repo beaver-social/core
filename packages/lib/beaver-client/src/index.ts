@@ -9,6 +9,7 @@ import { tryCatch } from "./utils/tryCatch";
 import { Identity } from "./identity";
 import { Contracts } from "contracts";
 import Post from "./content/posts";
+import Swipe from "./content/swipes";
 
 // import { User } from "./user";
 
@@ -72,5 +73,9 @@ export class BeaverClient {
 
   get post() {
     return new Post(this.defaults, this.logger);
+  }
+
+  get swipe() {
+    return new Swipe(this.defaults, this.logger);
   }
 }
