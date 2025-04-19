@@ -8,6 +8,7 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { tryCatch } from "./utils/tryCatch";
 import { Identity } from "./identity";
 import { Contracts } from "contracts";
+import Post from "./post";
 
 // import { User } from "./user";
 
@@ -67,5 +68,9 @@ export class BeaverClient {
 
   get identity() {
     return new Identity(this.defaults, this.logger);
+  }
+
+  get post() {
+    return new Post(this.defaults, this.logger);
   }
 }
