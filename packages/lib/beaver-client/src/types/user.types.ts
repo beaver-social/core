@@ -10,12 +10,12 @@ export type User = {
   bannerUrl: string | null;
   loginType: "wallet" | "zk";
   email: string | null;
-  isVerified: boolean;
+  isVerified: boolean | null;
   timezone: number | null;
   pinnedPost: number | null;
   pinnedShort: number | null;
   createdAt: string;
-  updatedAt: string;
+  deletedAt: string | null;
 };
 
 export type UserUpdateOptions = {
@@ -33,6 +33,7 @@ export type UserUpdateOptions = {
 
 export type GetUserResponse = {
   user: User;
+  message: string;
 };
 
 export type FindUserOptions = {

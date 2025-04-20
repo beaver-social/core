@@ -4,7 +4,7 @@ import { z } from "zod";
 import { zSuiAddress } from "../../lib/zod/helpers";
 import { tryCatch } from "../../lib/tryCatch";
 import { createIdentity } from "./auth.action";
-import { generateNonce, verifyChallenge } from "./helpers";
+import { generateNonce } from "./helpers";
 import { authenticated } from "../../middlewares/auth";
 import db from "../../schema/db";
 import { challenges } from "../../schema/misc";
@@ -55,7 +55,10 @@ export default new Hono()
         return ctx.err(resp.error?.message || "Failed to create identity", 400);
       }
 
-      return ctx.ok({}, "Identity Created Successfully", 201);
+      return ctx.json(
+        { data: {}, message: "Identity Created Successfully" },
+        201
+      );
     }
   )
 
@@ -69,7 +72,6 @@ export default new Hono()
       })
     ),
     async (ctx) => {
-      const { route } = ctx.req.valid("query");
       const nonce = generateNonce();
       const userId = ctx.get("user").id;
 
@@ -78,7 +80,6 @@ export default new Hono()
         db.insert(challenges).values({
           nonce,
           userId,
-          route,
         })
       );
 
@@ -89,6 +90,9 @@ export default new Hono()
         );
       }
 
-      return ctx.ok({ nonce }, "Challenge Generated Successfully", 200);
+      return ctx.json(
+        { data: { nonce }, message: "Challenge Generated Successfully" },
+        200
+      );
     }
   );

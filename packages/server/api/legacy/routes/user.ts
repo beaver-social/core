@@ -53,7 +53,10 @@ export default new Hono()
         return ctx.err(resp.error?.message || "Failed to create identity", 400);
       }
 
-      return ctx.ok({}, "Identity Created Successfully", 201);
+      return ctx.json(
+        { data: {}, message: "Identity Created Successfully" },
+        201
+      );
     }
   )
 

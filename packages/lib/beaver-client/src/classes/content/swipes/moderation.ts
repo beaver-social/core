@@ -25,7 +25,7 @@ export async function report(
       | "other";
     details?: string;
   }
-): Promise<ReportSwipeResponse> {
+) {
   const { apiClient, surface } = this.defaults;
   const { id, reason, details } = options;
 
@@ -61,10 +61,7 @@ export async function report(
  * Pins a swipe to the user profile.
  * @returns A promise that resolves when the swipe is pinned.
  */
-export async function pin(
-  this: Swipe,
-  options: { id: number }
-): Promise<PinSwipeResponse> {
+export async function pin(this: Swipe, options: { id: number }) {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 
@@ -96,10 +93,7 @@ export async function pin(
  * Unpins a swipe from the user profile.
  * @returns A promise that resolves when the swipe is unpinned.
  */
-export async function unpin(
-  this: Swipe,
-  options: { id: number }
-): Promise<UnpinSwipeResponse> {
+export async function unpin(this: Swipe, options: { id: number }) {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 

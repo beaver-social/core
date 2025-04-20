@@ -13,10 +13,7 @@ import {
  * Likes a swipe.
  * @returns A promise that resolves when the swipe is liked.
  */
-export async function like(
-  this: Swipe,
-  options: { id: number }
-): Promise<LikeSwipeResponse> {
+export async function like(this: Swipe, options: { id: number }) {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 
@@ -48,10 +45,7 @@ export async function like(
  * Unlikes a swipe.
  * @returns A promise that resolves when the swipe is unliked.
  */
-export async function unlike(
-  this: Swipe,
-  options: { id: number }
-): Promise<UnlikeSwipeResponse> {
+export async function unlike(this: Swipe, options: { id: number }) {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 
@@ -86,7 +80,7 @@ export async function unlike(
 export async function repost(
   this: Swipe,
   options: { id: number; quote?: string }
-): Promise<RepostSwipeResponse> {
+) {
   const { apiClient, surface } = this.defaults;
   const { id, quote } = options;
 
@@ -121,10 +115,7 @@ export async function repost(
  * Unrepost a swipe.
  * @returns A promise that resolves when the swipe is unreposted.
  */
-export async function unrepost(
-  this: Swipe,
-  options: { id: number }
-): Promise<UnrepostSwipeResponse> {
+export async function unrepost(this: Swipe, options: { id: number }) {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 
@@ -156,10 +147,7 @@ export async function unrepost(
  * Saves a swipe.
  * @returns A promise that resolves when the swipe is saved.
  */
-export async function save(
-  this: Swipe,
-  options: { id: number }
-): Promise<SaveSwipeResponse> {
+export async function save(this: Swipe, options: { id: number }) {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 
@@ -191,10 +179,7 @@ export async function save(
  * Unsaves a swipe.
  * @returns A promise that resolves when the swipe is unsaved.
  */
-export async function unsave(
-  this: Swipe,
-  options: { id: number }
-): Promise<UnsaveSwipeResponse> {
+export async function unsave(this: Swipe, options: { id: number }) {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 

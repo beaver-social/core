@@ -16,7 +16,7 @@ import {
 export async function like(
   this: Post,
   options: { id: number; reaction?: string }
-): Promise<LikePostResponse> {
+) {
   const { apiClient, surface } = this.defaults;
   const { id, reaction } = options;
 
@@ -49,10 +49,7 @@ export async function like(
  * Unlikes a post.
  * @returns A promise that resolves when the post is unliked.
  */
-export async function unlike(
-  this: Post,
-  options: { id: number }
-): Promise<UnlikePostResponse> {
+export async function unlike(this: Post, options: { id: number }) {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 
@@ -87,7 +84,7 @@ export async function unlike(
 export async function repost(
   this: Post,
   options: { postId: number; content?: string }
-): Promise<RepostResponse> {
+) {
   const { apiClient, surface } = this.defaults;
   const { postId, content } = options;
 
@@ -125,7 +122,7 @@ export async function repost(
 export async function unrepost(
   this: Post,
   options: { postId: number; repostId: number }
-): Promise<UnrepostResponse> {
+) {
   const { apiClient, surface } = this.defaults;
   const { postId, repostId } = options;
 
@@ -160,10 +157,7 @@ export async function unrepost(
  * Saves a post.
  * @returns A promise that resolves when the post is saved.
  */
-export async function save(
-  this: Post,
-  options: { postId: number }
-): Promise<SavePostResponse> {
+export async function save(this: Post, options: { postId: number }) {
   const { apiClient, surface } = this.defaults;
   const { postId } = options;
 
@@ -197,10 +191,7 @@ export async function save(
  * Removes a post from saved posts.
  * @returns A promise that resolves when the post is unsaved.
  */
-export async function unsave(
-  this: Post,
-  options: { postId: number }
-): Promise<UnsavePostResponse> {
+export async function unsave(this: Post, options: { postId: number }) {
   const { apiClient, surface } = this.defaults;
   const { postId } = options;
 

@@ -17,7 +17,7 @@ export async function report(
     reason: string;
     details?: string;
   }
-): Promise<ReportPostResponse> {
+) {
   const { apiClient, surface } = this.defaults;
   const { postId, reason, details } = options;
 
@@ -53,10 +53,7 @@ export async function report(
  * Pins a post to the user profile.
  * @returns A promise that resolves when the post is pinned.
  */
-export async function pin(
-  this: Post,
-  options: { postId: number }
-): Promise<PinPostResponse> {
+export async function pin(this: Post, options: { postId: number }) {
   const { apiClient, surface } = this.defaults;
   const { postId } = options;
 
@@ -90,10 +87,7 @@ export async function pin(
  * Unpins a post from the user profile.
  * @returns A promise that resolves when the post is unpinned.
  */
-export async function unpin(
-  this: Post,
-  options: { postId: number }
-): Promise<UnpinPostResponse> {
+export async function unpin(this: Post, options: { postId: number }) {
   const { apiClient, surface } = this.defaults;
   const { postId } = options;
 

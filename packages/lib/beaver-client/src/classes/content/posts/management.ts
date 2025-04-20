@@ -21,7 +21,7 @@ export async function create(
       subscriberOnly?: boolean;
     };
   }
-): Promise<CreatePostResponse> {
+) {
   const { apiClient, surface } = this.defaults;
   const { content, media, parentId, flags } = options;
 
@@ -60,10 +60,7 @@ export async function create(
  * Deletes a post.
  * @returns A promise that resolves when the post is deleted.
  */
-export async function delete_(
-  this: Post,
-  options: { id: number }
-): Promise<DeletePostResponse> {
+export async function delete_(this: Post, options: { id: number }) {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 
@@ -102,7 +99,7 @@ export async function update(
     content: string;
     media: Array<any>;
   }
-): Promise<UpdatePostResponse> {
+) {
   const { apiClient, surface } = this.defaults;
   const { id, content, media } = options;
 

@@ -1,30 +1,33 @@
 import User from "./User";
 import {
   FindUserOptions,
-  FindUserResponse,
-  GetUserResponse,
   GetInteractionsOptions,
-  GetInteractionsResponse,
-  GetSuggestionsResponse,
   GetAwardsOptions,
-  GetAwardsResponse,
-  UserAnalytics,
 } from "../../types/user.types";
+import { tryCatch } from "../../utils/tryCatch";
 
 /**
  * Get current user details
  * @returns A promise that resolves to the current user.
  */
-export async function getCurrentUser(this: User): Promise<GetUserResponse> {
+export async function getCurrentUser(this: User) {
   const { apiClient } = this.defaults;
 
-  try {
-    // @marsian why is the return type from apiClient unknown?
-    return apiClient.user.$get();
-  } catch (error) {
-    this.logger.error(`${User.FETCH_ERROR}: ${error}`);
-    throw new Error(`${User.FETCH_ERROR}: ${error}`);
+  const apiResponse = await tryCatch(apiClient.user.$get());
+
+  if (apiResponse.error) {
+    this.logger.error(`${User.FETCH_ERROR}: ${apiResponse.error}`);
+    throw new Error(`${User.FETCH_ERROR}: ${apiResponse.error}`);
   }
+
+  const parsedResponse = await tryCatch(apiResponse.data.json());
+
+  if (parsedResponse.error) {
+    this.logger.error(`${User.FETCH_ERROR}: ${parsedResponse.error}`);
+    throw new Error(`${User.FETCH_ERROR}: ${parsedResponse.error}`);
+  }
+
+  return parsedResponse.data;
 }
 
 /**
@@ -32,21 +35,25 @@ export async function getCurrentUser(this: User): Promise<GetUserResponse> {
  * @param options The user ID
  * @returns A promise that resolves to the user information.
  */
-export async function getById(
-  this: User,
-  options: { id: number }
-): Promise<GetUserResponse> {
+export async function getById(this: User, options: { id: number }) {
   const { apiClient } = this.defaults;
   const { id } = options;
 
-  try {
-    return apiClient.user[":id"].$get({
-      param: { id },
-    });
-  } catch (error) {
-    this.logger.error(`${User.FETCH_ERROR}: ${error}`);
-    throw new Error(`${User.FETCH_ERROR}: ${error}`);
+  const apiResponse = await tryCatch(apiClient.user.$get({ param: { id } }));
+
+  if (apiResponse.error) {
+    this.logger.error(`${User.FETCH_ERROR}: ${apiResponse.error}`);
+    throw new Error(`${User.FETCH_ERROR}: ${apiResponse.error}`);
   }
+
+  const parsedResponse = await tryCatch(apiResponse.data.json());
+
+  if (parsedResponse.error) {
+    this.logger.error(`${User.FETCH_ERROR}: ${parsedResponse.error}`);
+    throw new Error(`${User.FETCH_ERROR}: ${parsedResponse.error}`);
+  }
+
+  return parsedResponse.data;
 }
 
 /**
@@ -54,20 +61,26 @@ export async function getById(
  * @param options The search criteria
  * @returns A promise that resolves to the user ID.
  */
-export async function find(
-  this: User,
-  options: FindUserOptions
-): Promise<FindUserResponse> {
+export async function find(this: User, options: FindUserOptions) {
   const { apiClient } = this.defaults;
 
-  try {
-    return apiClient.user.find.$get({
-      query: { ...options },
-    });
-  } catch (error) {
-    this.logger.error(`${User.FETCH_ERROR}: ${error}`);
-    throw new Error(`${User.FETCH_ERROR}: ${error}`);
+  const apiResponse = await tryCatch(
+    apiClient.user.find.$get({ query: { ...options } })
+  );
+
+  if (apiResponse.error) {
+    this.logger.error(`${User.FETCH_ERROR}: ${apiResponse.error}`);
+    throw new Error(`${User.FETCH_ERROR}: ${apiResponse.error}`);
   }
+
+  const parsedResponse = await tryCatch(apiResponse.data.json());
+
+  if (parsedResponse.error) {
+    this.logger.error(`${User.FETCH_ERROR}: ${parsedResponse.error}`);
+    throw new Error(`${User.FETCH_ERROR}: ${parsedResponse.error}`);
+  }
+
+  return parsedResponse.data;
 }
 
 /**
@@ -78,39 +91,57 @@ export async function find(
 export async function getInteractions(
   this: User,
   options: GetInteractionsOptions
-): Promise<GetInteractionsResponse> {
+) {
   const { apiClient } = this.defaults;
   const { page, limit, type } = options;
 
-  try {
-    return apiClient.user.interactions.$get({
+  const apiResponse = await tryCatch(
+    apiClient.user.interactions.$get({
       query: {
         page: page.toString(),
         limit: limit.toString(),
         type,
       },
-    });
-  } catch (error) {
-    this.logger.error(`${User.INTERACTIONS_ERROR}: ${error}`);
-    throw new Error(`${User.INTERACTIONS_ERROR}: ${error}`);
+    })
+  );
+
+  if (apiResponse.error) {
+    this.logger.error(`${User.INTERACTIONS_ERROR}: ${apiResponse.error}`);
+    throw new Error(`${User.INTERACTIONS_ERROR}: ${apiResponse.error}`);
   }
+
+  const parsedResponse = await tryCatch(apiResponse.data.json());
+
+  if (parsedResponse.error) {
+    this.logger.error(`${User.INTERACTIONS_ERROR}: ${parsedResponse.error}`);
+    throw new Error(`${User.INTERACTIONS_ERROR}: ${parsedResponse.error}`);
+  }
+
+  return parsedResponse.data;
 }
 
 /**
  * Get suggested users to follow
  * @returns A promise that resolves to suggested users.
  */
-export async function getSuggestions(
-  this: User
-): Promise<GetSuggestionsResponse> {
+export async function getSuggestions(this: User) {
   const { apiClient } = this.defaults;
 
-  try {
-    return apiClient.user.suggestions.$get();
-  } catch (error) {
-    this.logger.error(`${User.FETCH_ERROR}: ${error}`);
-    throw new Error(`${User.FETCH_ERROR}: ${error}`);
+  const apiResponse = await tryCatch(apiClient.user.suggestions.$get());
+
+  if (apiResponse.error) {
+    this.logger.error(`${User.FETCH_ERROR}: ${apiResponse.error}`);
+    throw new Error(`${User.FETCH_ERROR}: ${apiResponse.error}`);
   }
+
+  const parsedResponse = await tryCatch(apiResponse.data.json());
+
+  if (parsedResponse.error) {
+    this.logger.error(`${User.FETCH_ERROR}: ${parsedResponse.error}`);
+    throw new Error(`${User.FETCH_ERROR}: ${parsedResponse.error}`);
+  }
+
+  return parsedResponse.data;
 }
 
 /**
@@ -118,25 +149,33 @@ export async function getSuggestions(
  * @param options The page, limit, and award type
  * @returns A promise that resolves to the awards data.
  */
-export async function getAwards(
-  this: User,
-  options: GetAwardsOptions
-): Promise<GetAwardsResponse> {
+export async function getAwards(this: User, options: GetAwardsOptions) {
   const { apiClient } = this.defaults;
   const { page, limit, type } = options;
 
-  try {
-    return apiClient.user.awards.$get({
+  const apiResponse = await tryCatch(
+    apiClient.user.awards.$get({
       query: {
         page: page.toString(),
         limit: limit.toString(),
         type,
       },
-    });
-  } catch (error) {
-    this.logger.error(`${User.AWARDS_ERROR}: ${error}`);
-    throw new Error(`${User.AWARDS_ERROR}: ${error}`);
+    })
+  );
+
+  if (apiResponse.error) {
+    this.logger.error(`${User.AWARDS_ERROR}: ${apiResponse.error}`);
+    throw new Error(`${User.AWARDS_ERROR}: ${apiResponse.error}`);
   }
+
+  const parsedResponse = await tryCatch(apiResponse.data.json());
+
+  if (parsedResponse.error) {
+    this.logger.error(`${User.AWARDS_ERROR}: ${parsedResponse.error}`);
+    throw new Error(`${User.AWARDS_ERROR}: ${parsedResponse.error}`);
+  }
+
+  return parsedResponse.data;
 }
 
 /**
@@ -144,19 +183,25 @@ export async function getAwards(
  * @param options The user ID to get analytics for
  * @returns A promise that resolves to the user analytics data.
  */
-export async function getAnalytics(
-  this: User,
-  options: { userId: number }
-): Promise<{ analytics: UserAnalytics }> {
+export async function getAnalytics(this: User, options: { userId: number }) {
   const { apiClient } = this.defaults;
   const { userId } = options;
 
-  try {
-    return apiClient.user[":id"].analytics.$get({
-      param: { id: userId },
-    });
-  } catch (error) {
-    this.logger.error(`${User.ANALYTICS_ERROR}: ${error}`);
-    throw new Error(`${User.ANALYTICS_ERROR}: ${error}`);
+  const apiResponse = await tryCatch(
+    apiClient.user[":id"].analytics.$get({ param: { id: userId } })
+  );
+
+  if (apiResponse.error) {
+    this.logger.error(`${User.ANALYTICS_ERROR}: ${apiResponse.error}`);
+    throw new Error(`${User.ANALYTICS_ERROR}: ${apiResponse.error}`);
   }
+
+  const parsedResponse = await tryCatch(apiResponse.data.json());
+
+  if (parsedResponse.error) {
+    this.logger.error(`${User.ANALYTICS_ERROR}: ${parsedResponse.error}`);
+    throw new Error(`${User.ANALYTICS_ERROR}: ${parsedResponse.error}`);
+  }
+
+  return parsedResponse.data;
 }

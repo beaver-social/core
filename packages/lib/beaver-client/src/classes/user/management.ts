@@ -11,10 +11,7 @@ import {
  * @param options The user details to update.
  * @returns A promise that resolves to the updated user.
  */
-export async function update(
-  this: User,
-  options: UserUpdateOptions
-): Promise<UpdateUserResponse> {
+export async function update(this: User, options: UserUpdateOptions) {
   const { apiClient, surface } = this.defaults;
 
   // Create payload string to sign
@@ -50,7 +47,7 @@ export async function update(
  * Syncs Suins domain names with user account.
  * @returns A promise that resolves when sync is complete.
  */
-export async function syncSuins(this: User): Promise<SyncSuinsResponse> {
+export async function syncSuins(this: User) {
   const { apiClient } = this.defaults;
 
   try {
