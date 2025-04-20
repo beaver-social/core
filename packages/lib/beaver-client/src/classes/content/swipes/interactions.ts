@@ -1,58 +1,22 @@
-import Post from "./Post";
+import Swipe from "./Swipe";
 import { tryCatch } from "../../utils/tryCatch";
 import {
-  LikePostResponse,
-  UnlikePostResponse,
-  RepostResponse,
-  UnrepostResponse,
-  SavePostResponse,
-  UnsavePostResponse,
-} from "./types";
+  LikeSwipeResponse,
+  UnlikeSwipeResponse,
+  RepostSwipeResponse,
+  UnrepostSwipeResponse,
+  SaveSwipeResponse,
+  UnsaveSwipeResponse,
+} from "../../types/swipe.types";
 
 /**
- * Likes a post.
- * @returns A promise that resolves when the post is liked.
+ * Likes a swipe.
+ * @returns A promise that resolves when the swipe is liked.
  */
 export async function like(
-  this: Post,
-  options: { id: number; reaction?: string }
-): Promise<LikePostResponse> {
-  const { apiClient, surface } = this.defaults;
-  const { id, reaction } = options;
-
-  // Create payload string to sign
-  const payload = JSON.stringify({ id, reaction });
-
-  // Convert string to Uint8Array
-  const messageBytes = new TextEncoder().encode(payload);
-
-  // Sign the payload using tryCatch
-  const signatureResult = await tryCatch(
-    surface.signPersonalMessage(messageBytes)
-  );
-
-  if (signatureResult.error) {
-    this.logger.error(`Unable to like post: ${signatureResult.error}`);
-    throw new Error(`Unable to like post: ${signatureResult.error}`);
-  }
-
-  return apiClient.content.posts.like[":id"].$post({
-    param: { id },
-    query: {
-      signature: signatureResult.data.signature,
-      reaction,
-    },
-  });
-}
-
-/**
- * Unlikes a post.
- * @returns A promise that resolves when the post is unliked.
- */
-export async function unlike(
-  this: Post,
+  this: Swipe,
   options: { id: number }
-): Promise<UnlikePostResponse> {
+): Promise<LikeSwipeResponse> {
   const { apiClient, surface } = this.defaults;
   const { id } = options;
 
@@ -68,11 +32,11 @@ export async function unlike(
   );
 
   if (signatureResult.error) {
-    this.logger.error(`Unable to unlike post: ${signatureResult.error}`);
-    throw new Error(`Unable to unlike post: ${signatureResult.error}`);
+    this.logger.error(`Unable to like swipe: ${signatureResult.error}`);
+    throw new Error(`Unable to like swipe: ${signatureResult.error}`);
   }
 
-  return apiClient.content.posts.unlike[":id"].$post({
+  return apiClient.content.swipes[":id"].like.$post({
     param: { id },
     query: {
       signature: signatureResult.data.signature,
@@ -81,18 +45,53 @@ export async function unlike(
 }
 
 /**
- * Reposts a post.
- * @returns A promise that resolves when the post is reposted.
+ * Unlikes a swipe.
+ * @returns A promise that resolves when the swipe is unliked.
+ */
+export async function unlike(
+  this: Swipe,
+  options: { id: number }
+): Promise<UnlikeSwipeResponse> {
+  const { apiClient, surface } = this.defaults;
+  const { id } = options;
+
+  // Create payload string to sign
+  const payload = JSON.stringify({ id });
+
+  // Convert string to Uint8Array
+  const messageBytes = new TextEncoder().encode(payload);
+
+  // Sign the payload using tryCatch
+  const signatureResult = await tryCatch(
+    surface.signPersonalMessage(messageBytes)
+  );
+
+  if (signatureResult.error) {
+    this.logger.error(`Unable to unlike swipe: ${signatureResult.error}`);
+    throw new Error(`Unable to unlike swipe: ${signatureResult.error}`);
+  }
+
+  return apiClient.content.swipes[":id"].unlike.$post({
+    param: { id },
+    query: {
+      signature: signatureResult.data.signature,
+    },
+  });
+}
+
+/**
+ * Reposts a swipe.
+ * @returns A promise that resolves when the swipe is reposted.
  */
 export async function repost(
-  this: Post,
-  options: { postId: number; content?: string }
-): Promise<RepostResponse> {
+  this: Swipe,
+  options: { id: number; quote?: string }
+): Promise<RepostSwipeResponse> {
   const { apiClient, surface } = this.defaults;
-  const { postId, content } = options;
+  const { id, quote } = options;
 
   // Create payload string to sign
-  const payload = JSON.stringify({ postId, content });
+  const payload = JSON.stringify({ id, quote });
 
   // Convert string to Uint8Array
   const messageBytes = new TextEncoder().encode(payload);
@@ -103,14 +102,14 @@ export async function repost(
   );
 
   if (signatureResult.error) {
-    this.logger.error(`Unable to repost: ${signatureResult.error}`);
-    throw new Error(`Unable to repost: ${signatureResult.error}`);
+    this.logger.error(`Unable to repost swipe: ${signatureResult.error}`);
+    throw new Error(`Unable to repost swipe: ${signatureResult.error}`);
   }
 
-  return apiClient.content.posts.repost.$post({
+  return apiClient.content.swipes[":id"].repost.$post({
+    param: { id },
     json: {
-      postId,
-      content,
+      quote,
     },
     query: {
       signature: signatureResult.data.signature,
@@ -119,18 +118,18 @@ export async function repost(
 }
 
 /**
- * Removes a repost.
- * @returns A promise that resolves when the repost is removed.
+ * Unrepost a swipe.
+ * @returns A promise that resolves when the swipe is unreposted.
  */
 export async function unrepost(
-  this: Post,
-  options: { postId: number; repostId: number }
-): Promise<UnrepostResponse> {
+  this: Swipe,
+  options: { id: number }
+): Promise<UnrepostSwipeResponse> {
   const { apiClient, surface } = this.defaults;
-  const { postId, repostId } = options;
+  const { id } = options;
 
   // Create payload string to sign
-  const payload = JSON.stringify({ postId, repostId });
+  const payload = JSON.stringify({ id });
 
   // Convert string to Uint8Array
   const messageBytes = new TextEncoder().encode(payload);
@@ -141,15 +140,12 @@ export async function unrepost(
   );
 
   if (signatureResult.error) {
-    this.logger.error(`Unable to unrepost: ${signatureResult.error}`);
-    throw new Error(`Unable to unrepost: ${signatureResult.error}`);
+    this.logger.error(`Unable to unrepost swipe: ${signatureResult.error}`);
+    throw new Error(`Unable to unrepost swipe: ${signatureResult.error}`);
   }
 
-  return apiClient.content.posts.unrepost.$post({
-    json: {
-      postId,
-      repostId,
-    },
+  return apiClient.content.swipes[":id"].unrepost.$post({
+    param: { id },
     query: {
       signature: signatureResult.data.signature,
     },
@@ -157,18 +153,18 @@ export async function unrepost(
 }
 
 /**
- * Saves a post.
- * @returns A promise that resolves when the post is saved.
+ * Saves a swipe.
+ * @returns A promise that resolves when the swipe is saved.
  */
 export async function save(
-  this: Post,
-  options: { postId: number }
-): Promise<SavePostResponse> {
+  this: Swipe,
+  options: { id: number }
+): Promise<SaveSwipeResponse> {
   const { apiClient, surface } = this.defaults;
-  const { postId } = options;
+  const { id } = options;
 
   // Create payload string to sign
-  const payload = JSON.stringify({ postId });
+  const payload = JSON.stringify({ id });
 
   // Convert string to Uint8Array
   const messageBytes = new TextEncoder().encode(payload);
@@ -179,14 +175,12 @@ export async function save(
   );
 
   if (signatureResult.error) {
-    this.logger.error(`Unable to save post: ${signatureResult.error}`);
-    throw new Error(`Unable to save post: ${signatureResult.error}`);
+    this.logger.error(`Unable to save swipe: ${signatureResult.error}`);
+    throw new Error(`Unable to save swipe: ${signatureResult.error}`);
   }
 
-  return apiClient.content.posts.save.$post({
-    json: {
-      postId,
-    },
+  return apiClient.content.swipes[":id"].save.$post({
+    param: { id },
     query: {
       signature: signatureResult.data.signature,
     },
@@ -194,18 +188,18 @@ export async function save(
 }
 
 /**
- * Removes a post from saved posts.
- * @returns A promise that resolves when the post is unsaved.
+ * Unsaves a swipe.
+ * @returns A promise that resolves when the swipe is unsaved.
  */
 export async function unsave(
-  this: Post,
-  options: { postId: number }
-): Promise<UnsavePostResponse> {
+  this: Swipe,
+  options: { id: number }
+): Promise<UnsaveSwipeResponse> {
   const { apiClient, surface } = this.defaults;
-  const { postId } = options;
+  const { id } = options;
 
   // Create payload string to sign
-  const payload = JSON.stringify({ postId });
+  const payload = JSON.stringify({ id });
 
   // Convert string to Uint8Array
   const messageBytes = new TextEncoder().encode(payload);
@@ -216,14 +210,12 @@ export async function unsave(
   );
 
   if (signatureResult.error) {
-    this.logger.error(`Unable to unsave post: ${signatureResult.error}`);
-    throw new Error(`Unable to unsave post: ${signatureResult.error}`);
+    this.logger.error(`Unable to unsave swipe: ${signatureResult.error}`);
+    throw new Error(`Unable to unsave swipe: ${signatureResult.error}`);
   }
 
-  return apiClient.content.posts.unsave.$post({
-    json: {
-      postId,
-    },
+  return apiClient.content.swipes[":id"].unsave.$post({
+    param: { id },
     query: {
       signature: signatureResult.data.signature,
     },

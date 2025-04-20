@@ -1,5 +1,5 @@
 import Logger from "../logger";
-import { Defaults } from "../types";
+import { Defaults } from "../types/types";
 
 export default class User {
   /** @hidden */

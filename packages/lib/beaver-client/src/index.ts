@@ -1,22 +1,17 @@
-import Logger from "./logger";
+import Logger from "./classes/misc/logger";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
-import { BeaverClientConfig, Surface } from "./types";
+import { BeaverClientConfig, Surface } from "./types/types";
 import type { API } from "server";
 import { hc } from "hono/client";
-import { Defaults } from "./types";
+import { Defaults } from "./types/types";
 import { S3Client } from "@aws-sdk/client-s3";
 import { tryCatch } from "./utils/tryCatch";
-import { Identity } from "./identity";
 import { Contracts } from "contracts";
-import Post from "./content/posts";
-import Swipe from "./content/swipes";
-import User from "./user";
+import { Identity } from "./classes/auth";
+import Post from "./classes/content/posts";
+import Swipe from "./classes/content/swipes";
+import User from "./classes/user";
 
-// import { User } from "./user";
-
-/**
- * Main client for interacting with the Beaver Social Layer.
- */
 export class BeaverClient {
   config: BeaverClientConfig;
   defaults: Defaults;
@@ -80,7 +75,6 @@ export class BeaverClient {
 
   // @marsian check this.
   public destroy() {
-    // @marsian check this.
     this.ready = false;
     this.logger.info("Client Destroyed");
   }

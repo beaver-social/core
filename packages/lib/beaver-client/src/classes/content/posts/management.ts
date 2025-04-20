@@ -4,7 +4,7 @@ import {
   CreatePostResponse,
   DeletePostResponse,
   UpdatePostResponse,
-} from "./types";
+} from "../../types/post.types";
 
 /**
  * Creates a new post.

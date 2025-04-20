@@ -4,7 +4,7 @@ import {
   ReportSwipeResponse,
   PinSwipeResponse,
   UnpinSwipeResponse,
-} from "./types";
+} from "../../types/swipe.types";
 
 /**
  * Reports a swipe.

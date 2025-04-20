@@ -4,7 +4,7 @@ import {
   ReportPostResponse,
   PinPostResponse,
   UnpinPostResponse,
-} from "./types";
+} from "../../types/post.types";
 
 /**
  * Reports a post.

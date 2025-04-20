@@ -4,7 +4,7 @@ import {
   CreateSwipeApiResponse,
   DeleteSwipeResponse,
   UpdateSwipeResponse,
-} from "./types";
+} from "../../types/swipe.types";
 
 /**
  * Creates a new swipe.

@@ -15,7 +15,7 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
-    "dev": "bun run build -- --watch",
+    "dev": "bun run build --watch",
     "docs": "typedoc --out docs"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
-import Logger from "../../logger";
-import { Defaults } from "../../types";
+import Logger from "../../misc/logger";
+import { Defaults } from "../../types/types";
 
 export default class Swipe {
   /** @hidden */
