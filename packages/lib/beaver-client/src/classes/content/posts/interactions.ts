@@ -1,13 +1,5 @@
 import Post from "./Post";
 import { tryCatch } from "../../../utils/tryCatch";
-import {
-  LikePostResponse,
-  UnlikePostResponse,
-  RepostResponse,
-  UnrepostResponse,
-  SavePostResponse,
-  UnsavePostResponse,
-} from "../../../types/post.types";
 
 /**
  * Likes a post.
@@ -36,13 +28,29 @@ export async function like(
     throw new Error(`Unable to like post: ${signatureResult.error}`);
   }
 
-  return apiClient.content.posts.like[":id"].$post({
-    param: { id },
-    query: {
-      signature: signatureResult.data.signature,
-      reaction,
-    },
-  });
+  const apiResponse = await tryCatch(
+    apiClient.content.posts.like[":id"].$post({
+      param: { id },
+      query: {
+        signature: signatureResult.data.signature,
+        reaction,
+      },
+    })
+  );
+
+  if (apiResponse.error) {
+    this.logger.error(`Unable to like post: ${apiResponse.error}`);
+    throw new Error(`Unable to like post: ${apiResponse.error}`);
+  }
+
+  const parsedResponse = await tryCatch(apiResponse.data.json());
+
+  if (parsedResponse.error) {
+    this.logger.error(`Unable to like post: ${parsedResponse.error}`);
+    throw new Error(`Unable to like post: ${parsedResponse.error}`);
+  }
+
+  return parsedResponse.data;
 }
 
 /**
@@ -69,12 +77,26 @@ export async function unlike(this: Post, options: { id: number }) {
     throw new Error(`Unable to unlike post: ${signatureResult.error}`);
   }
 
-  return apiClient.content.posts.unlike[":id"].$post({
-    param: { id },
-    query: {
-      signature: signatureResult.data.signature,
-    },
-  });
+  const apiResponse = await tryCatch(
+    apiClient.content.posts.unlike[":id"].$post({
+      param: { id },
+      query: { signature: signatureResult.data.signature },
+    })
+  );
+
+  if (apiResponse.error) {
+    this.logger.error(`Unable to unlike post: ${apiResponse.error}`);
+    throw new Error(`Unable to unlike post: ${apiResponse.error}`);
+  }
+
+  const parsedResponse = await tryCatch(apiResponse.data.json());
+
+  if (parsedResponse.error) {
+    this.logger.error(`Unable to unlike post: ${parsedResponse.error}`);
+    throw new Error(`Unable to unlike post: ${parsedResponse.error}`);
+  }
+
+  return parsedResponse.data;
 }
 
 /**
@@ -104,15 +126,26 @@ export async function repost(
     throw new Error(`Unable to repost: ${signatureResult.error}`);
   }
 
-  return apiClient.content.posts.repost.$post({
-    json: {
-      postId,
-      content,
-    },
-    query: {
-      signature: signatureResult.data.signature,
-    },
-  });
+  const apiResponse = await tryCatch(
+    apiClient.content.posts.repost.$post({
+      json: { postId, content },
+      query: { signature: signatureResult.data.signature },
+    })
+  );
+
+  if (apiResponse.error) {
+    this.logger.error(`Unable to repost: ${apiResponse.error}`);
+    throw new Error(`Unable to repost: ${apiResponse.error}`);
+  }
+
+  const parsedResponse = await tryCatch(apiResponse.data.json());
+
+  if (parsedResponse.error) {
+    this.logger.error(`Unable to repost: ${parsedResponse.error}`);
+    throw new Error(`Unable to repost: ${parsedResponse.error}`);
+  }
+
+  return parsedResponse.data;
 }
 
 /**
@@ -142,15 +175,26 @@ export async function unrepost(
     throw new Error(`Unable to unrepost: ${signatureResult.error}`);
   }
 
-  return apiClient.content.posts.unrepost.$post({
-    json: {
-      postId,
-      repostId,
-    },
-    query: {
-      signature: signatureResult.data.signature,
-    },
-  });
+  const apiResponse = await tryCatch(
+    apiClient.content.posts.unrepost.$post({
+      json: { postId, repostId },
+      query: { signature: signatureResult.data.signature },
+    })
+  );
+
+  if (apiResponse.error) {
+    this.logger.error(`Unable to unrepost: ${apiResponse.error}`);
+    throw new Error(`Unable to unrepost: ${apiResponse.error}`);
+  }
+
+  const parsedResponse = await tryCatch(apiResponse.data.json());
+
+  if (parsedResponse.error) {
+    this.logger.error(`Unable to unrepost: ${parsedResponse.error}`);
+    throw new Error(`Unable to unrepost: ${parsedResponse.error}`);
+  }
+
+  return parsedResponse.data;
 }
 
 /**
@@ -177,14 +221,26 @@ export async function save(this: Post, options: { postId: number }) {
     throw new Error(`Unable to save post: ${signatureResult.error}`);
   }
 
-  return apiClient.content.posts.save.$post({
-    json: {
-      postId,
-    },
-    query: {
-      signature: signatureResult.data.signature,
-    },
-  });
+  const apiResponse = await tryCatch(
+    apiClient.content.posts.save.$post({
+      json: { postId },
+      query: { signature: signatureResult.data.signature },
+    })
+  );
+
+  if (apiResponse.error) {
+    this.logger.error(`Unable to save post: ${apiResponse.error}`);
+    throw new Error(`Unable to save post: ${apiResponse.error}`);
+  }
+
+  const parsedResponse = await tryCatch(apiResponse.data.json());
+
+  if (parsedResponse.error) {
+    this.logger.error(`Unable to save post: ${parsedResponse.error}`);
+    throw new Error(`Unable to save post: ${parsedResponse.error}`);
+  }
+
+  return parsedResponse.data;
 }
 
 /**
@@ -211,12 +267,24 @@ export async function unsave(this: Post, options: { postId: number }) {
     throw new Error(`Unable to unsave post: ${signatureResult.error}`);
   }
 
-  return apiClient.content.posts.unsave.$post({
-    json: {
-      postId,
-    },
-    query: {
-      signature: signatureResult.data.signature,
-    },
-  });
+  const apiResponse = await tryCatch(
+    apiClient.content.posts.unsave.$post({
+      json: { postId },
+      query: { signature: signatureResult.data.signature },
+    })
+  );
+
+  if (apiResponse.error) {
+    this.logger.error(`Unable to unsave post: ${apiResponse.error}`);
+    throw new Error(`Unable to unsave post: ${apiResponse.error}`);
+  }
+
+  const parsedResponse = await tryCatch(apiResponse.data.json());
+
+  if (parsedResponse.error) {
+    this.logger.error(`Unable to unsave post: ${parsedResponse.error}`);
+    throw new Error(`Unable to unsave post: ${parsedResponse.error}`);
+  }
+
+  return parsedResponse.data;
 }

@@ -17,5 +17,4 @@ export function setAuthToken(token: string) {
   authToken = token;
   apiClient = createApiClient();
 }
-
 export default apiClient;

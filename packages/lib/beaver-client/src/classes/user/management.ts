@@ -30,17 +30,28 @@ export async function update(this: User, options: UserUpdateOptions) {
     throw new Error(`${User.UPDATE_ERROR}: ${signatureResult.error}`);
   }
 
-  try {
-    return apiClient.user.$patch({
+  const apiResponse = await tryCatch(
+    apiClient.user.$patch({
       json: options,
       query: {
         signature: signatureResult.data.signature,
       },
-    });
-  } catch (error) {
-    this.logger.error(`${User.UPDATE_ERROR}: ${error}`);
-    throw new Error(`${User.UPDATE_ERROR}: ${error}`);
+    })
+  );
+
+  if (apiResponse.error) {
+    this.logger.error(`${User.UPDATE_ERROR}: ${apiResponse.error}`);
+    throw new Error(`${User.UPDATE_ERROR}: ${apiResponse.error}`);
   }
+
+  const parsedResponse = await tryCatch(apiResponse.data.json());
+
+  if (parsedResponse.error) {
+    this.logger.error(`${User.UPDATE_ERROR}: ${parsedResponse.error}`);
+    throw new Error(`${User.UPDATE_ERROR}: ${parsedResponse.error}`);
+  }
+
+  return parsedResponse.data;
 }
 
 /**
@@ -50,10 +61,19 @@ export async function update(this: User, options: UserUpdateOptions) {
 export async function syncSuins(this: User) {
   const { apiClient } = this.defaults;
 
-  try {
-    return apiClient.user.suins.sync.$get();
-  } catch (error) {
-    this.logger.error(`${User.SUINS_SYNC_ERROR}: ${error}`);
-    throw new Error(`${User.SUINS_SYNC_ERROR}: ${error}`);
+  const apiResponse = await tryCatch(apiClient.user.suins.sync.$get());
+
+  if (apiResponse.error) {
+    this.logger.error(`${User.SUINS_SYNC_ERROR}: ${apiResponse.error}`);
+    throw new Error(`${User.SUINS_SYNC_ERROR}: ${apiResponse.error}`);
   }
+
+  const parsedResponse = await tryCatch(apiResponse.data.json());
+
+  if (parsedResponse.error) {
+    this.logger.error(`${User.SUINS_SYNC_ERROR}: ${parsedResponse.error}`);
+    throw new Error(`${User.SUINS_SYNC_ERROR}: ${parsedResponse.error}`);
+  }
+
+  return parsedResponse.data;
 }

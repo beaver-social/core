@@ -37,10 +37,8 @@ export type GetUserResponse = {
 };
 
 export type FindUserOptions = {
-  identity?: string;
-  username?: string;
-  suinsDomainName?: string;
-  address?: string;
+  type: "identity" | "username" | "suinsDomainName" | "address";
+  value: string;
 };
 
 export type FindUserResponse = {
