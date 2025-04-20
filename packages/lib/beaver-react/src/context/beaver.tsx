@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { BeaverContextValue, BeaverProviderProps } from '../types';
-import { BeaverClient } from '../../../beaver-client/src';
+import { BeaverClient } from '@beaver/client';
 
 export const BeaverContext = createContext<BeaverContextValue>({
     client: null,

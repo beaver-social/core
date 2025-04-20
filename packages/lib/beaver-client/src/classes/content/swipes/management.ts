@@ -1,10 +1,10 @@
 import Swipe from "./Swipe";
-import { tryCatch } from "../../utils/tryCatch";
+import { tryCatch } from "../../../utils/tryCatch";
 import {
   CreateSwipeApiResponse,
   DeleteSwipeResponse,
   UpdateSwipeResponse,
-} from "../../types/swipe.types";
+} from "../../../types/swipe.types";
 
 /**
  * Creates a new swipe.

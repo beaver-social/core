@@ -1,10 +1,10 @@
 import Post from "./Post";
-import { tryCatch } from "../../utils/tryCatch";
+import { tryCatch } from "../../../utils/tryCatch";
 import {
   CreatePostResponse,
   DeletePostResponse,
   UpdatePostResponse,
-} from "../../types/post.types";
+} from "../../../types/post.types";
 
 /**
  * Creates a new post.

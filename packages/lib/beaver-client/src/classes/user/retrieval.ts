@@ -1,5 +1,4 @@
 import User from "./User";
-import { tryCatch } from "../utils/tryCatch";
 import {
   FindUserOptions,
   FindUserResponse,
@@ -10,7 +9,7 @@ import {
   GetAwardsOptions,
   GetAwardsResponse,
   UserAnalytics,
-} from "./types";
+} from "../../types/user.types";
 
 /**
  * Get current user details

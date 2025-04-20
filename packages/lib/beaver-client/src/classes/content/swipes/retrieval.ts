@@ -3,7 +3,7 @@ import {
   GetSwipeResponse,
   GetSwipeFeedResponse,
   GetInteractionsResponse,
-} from "../../types/swipe.types";
+} from "../../../types/swipe.types";
 
 /**
  * Retrieves a swipe based on its id.

@@ -1,5 +1,5 @@
 import Swipe from "./Swipe";
-import { tryCatch } from "../../utils/tryCatch";
+import { tryCatch } from "../../../utils/tryCatch";
 import {
   LikeSwipeResponse,
   UnlikeSwipeResponse,
@@ -7,7 +7,7 @@ import {
   UnrepostSwipeResponse,
   SaveSwipeResponse,
   UnsaveSwipeResponse,
-} from "../../types/swipe.types";
+} from "../../../types/swipe.types";
 
 /**
  * Likes a swipe.

@@ -1,7 +1,7 @@
 import { BeaverProvider } from "../src/context/beaver";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { BeaverClientConfig } from "../src/types";
-import { useBeaverClient } from "../src/hooks";
+import { useBeaverClient, usePost } from "../src/hooks";
 
 export type Surface = {
     sign: Ed25519Keypair["sign"];
@@ -29,14 +29,8 @@ function App() {
     return (
         <BeaverProvider surface={surface} config={config}>
             <>
-                <div>
-                    <BeaverClientStatus />
-                </div>
-
-                <div>
-
-                </div>
-
+                <BeaverClientStatus />
+                <Post />
             </>
         </BeaverProvider>
     );
@@ -58,5 +52,11 @@ function BeaverClientStatus() {
             </div>
         </>
     );
+}
+
+function Post() {
+    const { post } = usePost();
+    console.log(post);
+    return <div>Post</div>;
 }
 

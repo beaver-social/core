@@ -1,10 +1,10 @@
 import Post from "./Post";
-import { tryCatch } from "../../utils/tryCatch";
+import { tryCatch } from "../../../utils/tryCatch";
 import {
   ReportPostResponse,
   PinPostResponse,
   UnpinPostResponse,
-} from "../../types/post.types";
+} from "../../../types/post.types";
 
 /**
  * Reports a post.

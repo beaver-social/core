@@ -9,7 +9,7 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 
-// src/logger/index.ts
+// src/classes/misc/logger/index.ts
 var Logger = class {
   prefix;
   isLoggingEnabled;
@@ -7682,7 +7682,10 @@ async function tryCatch(promise) {
   }
 }
 
-// src/identity/index.ts
+// src/index.ts
+import { Contracts } from "contracts";
+
+// src/classes/auth/Identity.ts
 var Identity = class {
   defaults;
   logger;
@@ -7723,10 +7726,7 @@ var Identity = class {
   }
 };
 
-// src/index.ts
-import { Contracts } from "contracts";
-
-// src/content/posts/Post.ts
+// src/classes/content/posts/Post.ts
 var Post = class {
   defaults;
   logger;
@@ -7743,7 +7743,7 @@ __publicField(Post, "UPDATE_ERROR", "unable to update post");
 /** @hidden */
 __publicField(Post, "DELETE_ERROR", "unable to delete post");
 
-// src/content/posts/retrieval.ts
+// src/classes/content/posts/retrieval.ts
 var retrieval_exports = {};
 __export(retrieval_exports, {
   getAwards: () => getAwards,
@@ -7794,7 +7794,7 @@ async function getAwards(options) {
   });
 }
 
-// src/content/posts/management.ts
+// src/classes/content/posts/management.ts
 var management_exports = {};
 __export(management_exports, {
   create: () => create,
@@ -7873,7 +7873,7 @@ async function update(options) {
   });
 }
 
-// src/content/posts/interactions.ts
+// src/classes/content/posts/interactions.ts
 var interactions_exports = {};
 __export(interactions_exports, {
   like: () => like,
@@ -8009,7 +8009,7 @@ async function unsave(options) {
   });
 }
 
-// src/content/posts/moderation.ts
+// src/classes/content/posts/moderation.ts
 var moderation_exports = {};
 __export(moderation_exports, {
   pin: () => pin,
@@ -8082,7 +8082,7 @@ async function unpin(options) {
   });
 }
 
-// src/content/posts/index.ts
+// src/classes/content/posts/index.ts
 Object.assign(Post.prototype, retrieval_exports);
 Object.assign(Post.prototype, management_exports);
 Object.assign(Post.prototype, interactions_exports);
@@ -8092,7 +8092,7 @@ Object.defineProperty(Post.prototype, "delete", {
 });
 var posts_default = Post;
 
-// src/content/swipes/Swipe.ts
+// src/classes/content/swipes/Swipe.ts
 var Swipe = class {
   defaults;
   logger;
@@ -8109,7 +8109,7 @@ __publicField(Swipe, "UPDATE_ERROR", "unable to update swipe");
 /** @hidden */
 __publicField(Swipe, "DELETE_ERROR", "unable to delete swipe");
 
-// src/content/swipes/retrieval.ts
+// src/classes/content/swipes/retrieval.ts
 var retrieval_exports2 = {};
 __export(retrieval_exports2, {
   getByID: () => getByID2,
@@ -8151,7 +8151,7 @@ async function getUserProfileSwipes(options) {
   });
 }
 
-// src/content/swipes/management.ts
+// src/classes/content/swipes/management.ts
 var management_exports2 = {};
 __export(management_exports2, {
   create: () => create2,
@@ -8230,7 +8230,7 @@ async function update2(options) {
   });
 }
 
-// src/content/swipes/interactions.ts
+// src/classes/content/swipes/interactions.ts
 var interactions_exports2 = {};
 __export(interactions_exports2, {
   like: () => like2,
@@ -8358,7 +8358,7 @@ async function unsave2(options) {
   });
 }
 
-// src/content/swipes/moderation.ts
+// src/classes/content/swipes/moderation.ts
 var moderation_exports2 = {};
 __export(moderation_exports2, {
   pin: () => pin2,
@@ -8427,7 +8427,7 @@ async function unpin2(options) {
   });
 }
 
-// src/content/swipes/index.ts
+// src/classes/content/swipes/index.ts
 Object.assign(Swipe.prototype, retrieval_exports2);
 Object.assign(Swipe.prototype, management_exports2);
 Object.assign(Swipe.prototype, interactions_exports2);
@@ -8437,7 +8437,7 @@ Object.defineProperty(Swipe.prototype, "delete", {
 });
 var swipes_default = Swipe;
 
-// src/user/User.ts
+// src/classes/user/User.ts
 var User = class {
   defaults;
   logger;
@@ -8460,7 +8460,7 @@ __publicField(User, "AWARDS_ERROR", "unable to fetch awards");
 /** @hidden */
 __publicField(User, "ANALYTICS_ERROR", "unable to fetch user analytics");
 
-// src/user/retrieval.ts
+// src/classes/user/retrieval.ts
 var retrieval_exports3 = {};
 __export(retrieval_exports3, {
   find: () => find,
@@ -8557,7 +8557,7 @@ async function getAnalytics(options) {
   }
 }
 
-// src/user/management.ts
+// src/classes/user/management.ts
 var management_exports3 = {};
 __export(management_exports3, {
   syncSuins: () => syncSuins,
@@ -8596,10 +8596,19 @@ async function syncSuins() {
   }
 }
 
-// src/user/index.ts
+// src/classes/user/index.ts
 Object.assign(User.prototype, retrieval_exports3);
 Object.assign(User.prototype, management_exports3);
 var user_default = User;
+
+// src/types/user.types.ts
+var user_types_exports = {};
+
+// src/types/swipe.types.ts
+var swipe_types_exports = {};
+
+// src/types/post.types.ts
+var post_types_exports = {};
 
 // src/index.ts
 var BeaverClient = class {
@@ -8672,7 +8681,10 @@ var BeaverClient = class {
   }
 };
 export {
-  BeaverClient
+  BeaverClient,
+  post_types_exports as PostTypes,
+  swipe_types_exports as SwipeTypes,
+  user_types_exports as UserTypes
 };
 /*! Bundled license information:
 
@@ -8682,3 +8694,4 @@ export {
 @noble/hashes/esm/utils.js:
   (*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) *)
 */
+//# sourceMappingURL=index.js.map

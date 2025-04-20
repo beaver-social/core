@@ -1,10 +1,10 @@
 import User from "./User";
-import { tryCatch } from "../utils/tryCatch";
+import { tryCatch } from "../../utils/tryCatch";
 import {
   UpdateUserResponse,
   UserUpdateOptions,
   SyncSuinsResponse,
-} from "./types";
+} from "../../types/user.types";
 
 /**
  * Updates the current user details.

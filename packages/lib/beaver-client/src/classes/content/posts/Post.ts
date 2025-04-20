@@ -1,5 +1,5 @@
 import Logger from "../../misc/logger";
-import { Defaults } from "../../types/types";
+import { Defaults } from "../../../types/client.types";
 
 export default class Post {
   /** @hidden */

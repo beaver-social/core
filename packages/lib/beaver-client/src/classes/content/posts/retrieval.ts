@@ -4,7 +4,7 @@ import {
   GetPostFeedResponse,
   GetPostInteractionsResponse,
   GetPostAwardsResponse,
-} from "../../types/post.types";
+} from "../../../types/post.types";
 
 /**
  * Retrieves a post based on its id.

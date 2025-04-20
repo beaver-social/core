@@ -1,10 +1,10 @@
 import Swipe from "./Swipe";
-import { tryCatch } from "../../utils/tryCatch";
+import { tryCatch } from "../../../utils/tryCatch";
 import {
   ReportSwipeResponse,
   PinSwipeResponse,
   UnpinSwipeResponse,
-} from "../../types/swipe.types";
+} from "../../../types/swipe.types";
 
 /**
  * Reports a swipe.

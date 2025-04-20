@@ -1,5 +1,5 @@
 import Post from "./Post";
-import { tryCatch } from "../../utils/tryCatch";
+import { tryCatch } from "../../../utils/tryCatch";
 import {
   LikePostResponse,
   UnlikePostResponse,
@@ -7,7 +7,7 @@ import {
   UnrepostResponse,
   SavePostResponse,
   UnsavePostResponse,
-} from "../../types/post.types";
+} from "../../../types/post.types";
 
 /**
  * Likes a post.

@@ -1,5 +1,5 @@
 import { Transaction } from "@mysten/sui/transactions";
-import { Defaults } from "../../types/types";
+import { Defaults } from "../../types/client.types";
 import Logger from "../misc/logger";
 
 export default class Identity {

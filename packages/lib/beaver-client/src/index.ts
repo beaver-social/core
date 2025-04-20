@@ -1,9 +1,9 @@
 import Logger from "./classes/misc/logger";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
-import { BeaverClientConfig, Surface } from "./types/types";
+import { BeaverClientConfig, Surface } from "./types/client.types";
 import type { API } from "server";
 import { hc } from "hono/client";
-import { Defaults } from "./types/types";
+import { Defaults } from "./types/client.types";
 import { S3Client } from "@aws-sdk/client-s3";
 import { tryCatch } from "./utils/tryCatch";
 import { Contracts } from "contracts";
@@ -95,3 +95,6 @@ export class BeaverClient {
     return new User(this.defaults, this.logger);
   }
 }
+
+// Export types
+export * from "./types";
