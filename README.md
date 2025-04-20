@@ -1,4 +1,1 @@
-meow meow
-neko neko
-purupurupururin
-zero2
+Decentralized Social Media Network Layer on Sui
