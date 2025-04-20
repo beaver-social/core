@@ -13,8 +13,13 @@ const app = new Hono()
     cors({
       origin: (origin, ctx) => {
         const selfUrl = new URL(ctx.req.url);
+        const allowedOrigins = ["http://localhost:3000"];
         const selfOrigin = selfUrl.origin;
-        if (!origin || origin === selfOrigin) {
+        if (
+          !origin ||
+          origin === selfOrigin ||
+          allowedOrigins.includes(origin)
+        ) {
           return origin;
         }
         return "";
@@ -51,18 +56,22 @@ const app = new Hono()
     });
   })
   .get("/contracts", async (ctx) => {
-    return ctx.json({
+    const data = {
       testnet: {
+        packages: {
+          beaverSocial: {
+            id: "0x",
+          },
+        },
         objects: {
           adminsRecord: "0x",
           clock: "0x",
           registry: "0x",
         },
-        packages: {
-          beaverSocial: { id: "0x" },
-        },
       },
-    });
+    };
+
+    return ctx.json(data);
   });
 
 export default app;

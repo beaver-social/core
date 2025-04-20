@@ -1,6 +1,6 @@
 {
   "name": "@beaver/react",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "React SDK for integrating with Beaver Social",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -14,8 +14,9 @@
     "directory": "packages/lib/beaver-react"
   },
   "scripts": {
-    "build": "tsup src/index.tsx --format cjs,esm -dts",
-    "dev": "bun run build -- --watch",
+    "build": "tsup src/index.tsx --format cjs,esm --dts",
+    "dev": "bun run build --watch",
+    "example": "bun --bun vite example --port 3000 --open",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
@@ -32,7 +33,8 @@
     "react-dom": "^18.2.0",
     "tsconfig": "workspace:*",
     "tsup": "^6.7.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vite": "^6.3.2"
   },
   "dependencies": {
     "@beaver/client": "workspace:*"

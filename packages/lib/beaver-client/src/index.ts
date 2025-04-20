@@ -36,9 +36,9 @@ export class BeaverClient {
     const contracts = new Contracts({
       packageId: "0x2::beaver_social",
       objects: {
-        registry: { id: "0x2::beaver_social::Registry" },
-        clock: { id: "0x2::beaver_social::Clock" },
         adminsRecord: { id: "0x2::beaver_social::AdminsRecord" },
+        clock: { id: "0x2::beaver_social::Clock" },
+        registry: { id: "0x2::beaver_social::Registry" },
       },
     });
 
@@ -80,6 +80,7 @@ export class BeaverClient {
 
   // @marsian check this.
   public destroy() {
+    // @marsian check this.
     this.ready = false;
     this.logger.info("Client Destroyed");
   }

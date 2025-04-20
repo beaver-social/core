@@ -27,6 +27,6 @@ export interface BeaverProviderProps {
 export interface BeaverContextValue {
   client: BeaverClient | null;
   isInitialized: boolean;
-  isInitializing: boolean;
+  isLoading: boolean;
   error: Error | null;
 }
