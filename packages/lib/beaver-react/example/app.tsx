@@ -1,7 +1,6 @@
-import { BeaverProvider } from "../src/context/beaver";
+import { BeaverProvider, useBeaverClient, usePost } from "@beaver/react";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
-import { BeaverClientConfig } from "../src/types";
-import { useBeaverClient, usePost } from "../src/hooks";
+import { BeaverClientConfig } from "@beaver/react";
 
 export type Surface = {
     sign: Ed25519Keypair["sign"];

@@ -1,6 +1,13 @@
 # Beaver React SDK
 
-A React SDK for integrating with the Beaver Social platform.
+A React SDK for integrating with the Beaver Social platform. This SDK is a complete wrapper around the `@beaver/client` package and provides all of its functionality in a React-friendly way.
+
+## Features
+
+- Complete wrapping of `@beaver/client` - All types, functions, and modules are re-exported
+- React Context Provider for easy integration
+- React Hooks for accessing all client functionality
+- TypeScript support with full type definitions
 
 ## Installation
 
@@ -40,15 +47,25 @@ function App() {
 
 ### useBeaverClient
 
-Access the raw Beaver client and its state:
+The primary hook that provides access to the entire Beaver client and its state:
 
 ```tsx
 import { useBeaverClient } from "@beaver/react";
 
 function MyComponent() {
-  const { client, isInitialized, isInitializing, error } = useBeaverClient();
+  const {
+    client, // Full access to the raw client
+    isInitialized,
+    isLoading,
+    error,
+    // Direct access to client modules:
+    identity, // Same as client.identity
+    post, // Same as client.post
+    swipe, // Same as client.swipe
+    user, // Same as client.user
+  } = useBeaverClient();
 
-  if (isInitializing) {
+  if (isLoading) {
     return <div>Loading Beaver client...</div>;
   }
 
@@ -60,7 +77,7 @@ function MyComponent() {
     return <div>Beaver client not initialized</div>;
   }
 
-  // Now you can use the client
+  // Now you can use any client module directly
   return <div>Beaver client is ready!</div>;
 }
 ```

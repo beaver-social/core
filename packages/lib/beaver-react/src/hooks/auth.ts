@@ -2,21 +2,17 @@ import { useBeaverClient } from "./client";
 
 /**
  * Hook to access the identity module of the Beaver client
+ * @returns The identity module and client state
  */
 export const useIdentity = () => {
-  const { client, isInitialized, error } = useBeaverClient();
-
-  if (!isInitialized) {
-    return {
-      identity: null,
-      isInitialized,
-      error: error || new Error("BeaverClient is not initialized"),
-    };
-  }
+  const { identity, isInitialized, error } = useBeaverClient();
 
   return {
-    identity: client?.identity || null,
+    identity,
     isInitialized,
-    error,
+    error:
+      !isInitialized && !error
+        ? new Error("BeaverClient is not initialized")
+        : error,
   };
 };
