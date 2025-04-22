@@ -81,3 +81,9 @@ web_modules/
 
 # Editor directories and files
 *.db
+
+# Bun cache
+.bun
+
+# Dist directory
+dist/

@@ -40,9 +40,11 @@ export default new Hono()
         return ctx.err("Post not found", 404);
       }
 
-      return ctx.ok(
-        result.data[0],
-        "Post interactions fetched successfully",
+      return ctx.json(
+        {
+          data: result.data[0],
+          message: "Post interactions fetched successfully",
+        },
         200
       );
     }

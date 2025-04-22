@@ -14,7 +14,4 @@ export default new Hono()
     const result = await tryCatch(
       db.select().from(users).where(eq(users.id, user.id))
     );
-
-    if (result.error) {
-    }
   });

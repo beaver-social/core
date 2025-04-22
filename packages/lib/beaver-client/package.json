@@ -14,9 +14,10 @@
     "directory": "packages/lib/client"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
-    "dev": "bun run build -- --watch",
-    "docs": "typedoc --out docs"
+    "build": "tsup src/index.ts --format cjs,esm --dts --sourcemap",
+    "dev": "bun run build --watch",
+    "docs": "typedoc --out docs",
+    "clean": "rm -rf dist"
   },
   "devDependencies": {
     "tsconfig": "*",

@@ -1,19 +1,17 @@
-import Logger from "./logger";
+import Logger from "./classes/misc/logger";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
-import { BeaverClientConfig, Surface } from "./types";
+import { BeaverClientConfig, Surface } from "./types/client.types";
 import type { API } from "server";
 import { hc } from "hono/client";
-import { Defaults } from "./types";
+import { Defaults } from "./types/client.types";
 import { S3Client } from "@aws-sdk/client-s3";
 import { tryCatch } from "./utils/tryCatch";
-import { Identity } from "./identity";
 import { Contracts } from "contracts";
+import { Identity } from "./classes/auth";
+import Post from "./classes/content/posts";
+import Swipe from "./classes/content/swipes";
+import User from "./classes/user";
 
-// import { User } from "./user";
-
-/**
- * Main client for interacting with the Beaver Social Layer.
- */
 export class BeaverClient {
   config: BeaverClientConfig;
   defaults: Defaults;
@@ -29,12 +27,22 @@ export class BeaverClient {
     );
     const s3Client = new S3Client();
 
+    // @marsian is this okay?
+    const contracts = new Contracts({
+      packageId: "0x2::beaver_social",
+      objects: {
+        adminsRecord: { id: "0x2::beaver_social::AdminsRecord" },
+        clock: { id: "0x2::beaver_social::Clock" },
+        registry: { id: "0x2::beaver_social::Registry" },
+      },
+    });
+
     this.defaults = {
       apiClient,
       suiClient,
       s3Client,
       surface,
-      contracts: null,
+      contracts,
     };
 
     this.config = config;
@@ -65,7 +73,28 @@ export class BeaverClient {
     this.logger.info("Client Initialised", this.defaults.contracts);
   }
 
+  // @marsian check this.
+  public destroy() {
+    this.ready = false;
+    this.logger.info("Client Destroyed");
+  }
+
   get identity() {
     return new Identity(this.defaults, this.logger);
   }
+
+  get post() {
+    return new Post(this.defaults, this.logger);
+  }
+
+  get swipe() {
+    return new Swipe(this.defaults, this.logger);
+  }
+
+  get user() {
+    return new User(this.defaults, this.logger);
+  }
 }
+
+// Export types
+export * from "./types";

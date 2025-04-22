@@ -1,0 +1,44 @@
+{
+  "name": "@beaver/react",
+  "version": "0.1.0",
+  "description": "React SDK for integrating with Beaver Social - Complete wrapper for @beaver/client",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "license": "MIT",
+  "private": false,
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/beaver-social",
+    "directory": "packages/lib/beaver-react"
+  },
+  "scripts": {
+    "build": "tsup src/index.tsx --format cjs,esm --dts",
+    "build:all": "cd ../beaver-client && bun run build && cd ../beaver-react && bun run build",
+    "dev": "bun run build --watch",
+    "example": "bun --bun vite example --port 3000 --open --config example/vite.config.ts",
+    "lint": "eslint \"src/**/*.ts*\"",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.4.1",
+    "eslint": "^8.42.0",
+    "eslint-config-react-app": "^7.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tsconfig": "workspace:*",
+    "tsup": "^6.7.0",
+    "typescript": "^5.2.2",
+    "vite": "^6.3.2"
+  },
+  "dependencies": {
+    "@beaver/client": "workspace:*"
+  }
+}
