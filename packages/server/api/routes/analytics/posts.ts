@@ -6,6 +6,7 @@ import db from "../../schema/db";
 import { tryCatch } from "../../lib/tryCatch";
 import { eq } from "drizzle-orm";
 import { posts } from "../../schema/content/posts";
+import { respond } from "../../../utils/respond";
 
 export default new Hono()
   // Get interactions count for a post
@@ -30,14 +31,15 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(
+        return respond.err(
+          ctx,
           result.error?.message || "Failed to get post interactions",
           400
         );
       }
 
       if (!result.data || result.data.length === 0) {
-        return ctx.err("Post not found", 404);
+        return respond.err(ctx, "Post not found", 404);
       }
 
       return ctx.json(

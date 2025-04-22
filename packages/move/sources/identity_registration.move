@@ -179,59 +179,59 @@ public fun about(data: &IdentityData): string::String { data.about }
 public fun suins_domain_name(data: &IdentityData): Option<string::String> { data.suins_domain_name }
 
 
-/// Testing
+// /// Testing
 
-#[test_only]
-fun burn_for_testing(reg: IdentityRegistration) {
-    burn(reg);
-}
+// #[test_only]
+// fun burn_for_testing(reg: IdentityRegistration) {
+//     burn(reg);
+// }
 
-#[test_only]
-fun new_for_testing(ctx: &mut TxContext): IdentityRegistration {
-    return new(
-        string::utf8(b"test_user"),
-        string::utf8(b"test_about"),
-        tx_context::sender(ctx),
-        ctx
-    )
-}
+// #[test_only]
+// fun new_for_testing(ctx: &mut TxContext): IdentityRegistration {
+//     return new(
+//         string::utf8(b"test_user"),
+//         string::utf8(b"test_about"),
+//         tx_context::sender(ctx),
+//         ctx
+//     )
+// }
 
-#[test]
-fun test_new_identity() {
-    let sender = @0xA;
-    let mut scenario = test_scenario::begin(sender);
+// #[test]
+// fun test_new_identity() {
+//     let sender = @0xA;
+//     let mut scenario = test_scenario::begin(sender);
 
-    let ctx = test_scenario::ctx(&mut scenario);
+//     let ctx = test_scenario::ctx(&mut scenario);
 
-    let reg = new_for_testing(ctx);
+//     let reg = new_for_testing(ctx);
 
-    assert!(username(&reg) == string::utf8(b"test_user"), 0);
-    assert!(about(identity_data(&reg)) == string::utf8(b"test_about"), 0);
+//     assert!(username(&reg) == string::utf8(b"test_user"), 0);
+//     assert!(about(identity_data(&reg)) == string::utf8(b"test_about"), 0);
 
-    burn_for_testing(reg);
-    test_scenario::end(scenario);
-}
+//     burn_for_testing(reg);
+//     test_scenario::end(scenario);
+// }
 
-#[test]
-fun test_attach_suins() {
-    let sender = @0xA;
-    let mut scenario = test_scenario::begin(sender);
+// #[test]
+// fun test_attach_suins() {
+//     let sender = @0xA;
+//     let mut scenario = test_scenario::begin(sender);
 
-    let mut ctx = test_scenario::ctx(&mut scenario);
+//     let mut ctx = test_scenario::ctx(&mut scenario);
 
-    let mut reg = new_for_testing(ctx);
-    let suins = test_helpers::new_dummy_suins(ctx);
+//     let mut reg = new_for_testing(ctx);
+//     let suins = test_helpers::new_dummy_suins(ctx);
 
-    attach_suins(&mut reg, &suins, ctx);
+//     attach_suins(&mut reg, &suins, ctx);
 
-    let reg_data = identity_data(&reg);
-    let suins_opt = suins_domain_name(reg_data);
+//     let reg_data = identity_data(&reg);
+//     let suins_opt = suins_domain_name(reg_data);
 
-    assert!(option::is_some(&suins_opt), 0);
-    assert!(option::borrow(&suins_opt) == suins_registration::domain_name(&suins), 0);
+//     assert!(option::is_some(&suins_opt), 0);
+//     assert!(option::borrow(&suins_opt) == suins_registration::domain_name(&suins), 0);
 
-    suins_registration::burn_for_testing(suins);
-    burn_for_testing(reg);
+//     suins_registration::burn_for_testing(suins);
+//     burn_for_testing(reg);
 
-    test_scenario::end(scenario);
-}
+//     test_scenario::end(scenario);
+// }

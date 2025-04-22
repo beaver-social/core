@@ -41,7 +41,7 @@ export default new Hono()
           db.select().from(users).where(eq(users.identity, value)).limit(1)
         );
 
-        if (result.error) return ctx.err("User not found", 404);
+        if (result.error) return respond.err(ctx, "User not found", 404);
 
         return ctx.json(
           { data: { id: result.data[0].id }, message: "User id fetched" },
@@ -52,7 +52,7 @@ export default new Hono()
           db.select().from(users).where(eq(users.username, value)).limit(1)
         );
 
-        if (result.error) return ctx.err("User not found", 404);
+        if (result.error) return respond.err(ctx, "User not found", 404);
 
         return ctx.json(
           { data: { id: result.data[0].id }, message: "User id fetched" },
@@ -67,7 +67,7 @@ export default new Hono()
             .limit(1)
         );
 
-        if (result.error) return ctx.err("User not found", 404);
+        if (result.error) return respond.err(ctx, "User not found", 404);
 
         return ctx.json(
           { data: { id: result.data[0].id }, message: "User id fetched" },
@@ -78,14 +78,14 @@ export default new Hono()
           db.select().from(users).where(eq(users.address, value)).limit(1)
         );
 
-        if (result.error) return ctx.err("User not found", 404);
+        if (result.error) return respond.err(ctx, "User not found", 404);
 
         return ctx.json(
           { data: { id: result.data[0].id }, message: "User id fetched" },
           200
         );
       } else {
-        return ctx.err("Invalid search criteria", 400);
+        return respond.err(ctx, "Invalid search criteria", 400);
       }
     }
   )
@@ -105,7 +105,7 @@ export default new Hono()
         db.select().from(users).where(eq(users.id, userId)).limit(1)
       );
 
-      if (user.error) return ctx.err("User not found", 404);
+      if (user.error) return respond.err(ctx, "User not found", 404);
 
       return ctx.json(
         {
@@ -149,7 +149,11 @@ export default new Hono()
         actions.updateUser({ userId, body }, signature)
       );
       if (result.error)
-        return ctx.err(result.error?.message || "Failed to update user", 400);
+        return respond.err(
+          ctx,
+          result.error?.message || "Failed to update user",
+          400
+        );
 
       return ctx.json(
         { data: result.data, message: "User updated successfully" },
@@ -192,7 +196,8 @@ export default new Hono()
         );
 
         if (result.error)
-          return ctx.err(
+          return respond.err(
+            ctx,
             result.error?.message || "Failed to get user's interactions",
             400
           );
@@ -216,7 +221,8 @@ export default new Hono()
         );
 
         if (result.error)
-          return ctx.err(
+          return respond.err(
+            ctx,
             result.error?.message || "Failed to get user's interactions",
             400
           );
@@ -240,7 +246,8 @@ export default new Hono()
         );
 
         if (result.error)
-          return ctx.err(
+          return respond.err(
+            ctx,
             result.error?.message || "Failed to get user's interactions",
             400
           );
@@ -264,7 +271,8 @@ export default new Hono()
         );
 
         if (result.error)
-          return ctx.err(
+          return respond.err(
+            ctx,
             result.error?.message || "Failed to get user's interactions",
             400
           );
@@ -288,7 +296,8 @@ export default new Hono()
         );
 
         if (result.error)
-          return ctx.err(
+          return respond.err(
+            ctx,
             result.error?.message || "Failed to get user's interactions",
             400
           );
@@ -312,7 +321,8 @@ export default new Hono()
         );
 
         if (result.error)
-          return ctx.err(
+          return respond.err(
+            ctx,
             result.error?.message || "Failed to get user's interactions",
             400
           );
@@ -325,7 +335,7 @@ export default new Hono()
           200
         );
       } else {
-        return ctx.err("Invalid interaction type", 400);
+        return respond.err(ctx, "Invalid interaction type", 400);
       }
     }
   )
@@ -344,7 +354,8 @@ export default new Hono()
     );
 
     if (result.error)
-      return ctx.err(
+      return respond.err(
+        ctx,
         result.error?.message || "Failed to get suggested users",
         400
       );
@@ -360,7 +371,11 @@ export default new Hono()
     const result = await tryCatch(actions.syncSuins({ userId }));
 
     if (result.error)
-      return ctx.err(result.error?.message || "Failed to sync suins", 400);
+      return respond.err(
+        ctx,
+        result.error?.message || "Failed to sync suins",
+        400
+      );
 
     return ctx.json(
       { data: result.data, message: "Suins synced successfully" },
@@ -395,7 +410,8 @@ export default new Hono()
         );
 
         if (result.error)
-          return ctx.err(
+          return respond.err(
+            ctx,
             result.error?.message || "Failed to get user awards",
             400
           );
@@ -416,7 +432,8 @@ export default new Hono()
         );
 
         if (result.error)
-          return ctx.err(
+          return respond.err(
+            ctx,
             result.error?.message || "Failed to get user awards",
             400
           );
@@ -426,7 +443,7 @@ export default new Hono()
           200
         );
       } else {
-        return ctx.err("Invalid award type", 400);
+        return respond.err(ctx, "Invalid award type", 400);
       }
     }
   );

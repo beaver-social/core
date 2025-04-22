@@ -43,17 +43,18 @@ export async function create(
     throw new Error(`${Post.CREATE_ERROR}: ${signatureResult.error}`);
   }
 
-  return apiClient.content.posts.create.$post({
-    json: {
-      content,
-      media: media || [],
-      parentId,
-      flags,
-    },
-    query: {
-      signature: signatureResult.data.signature,
-    },
-  });
+  return apiClient.content.posts;
+  //  create.$post({
+  //   json: {
+  //     content,
+  //     media: media || [],
+  //     parentId,
+  //     flags,
+  //   },
+  //   query: {
+  //     signature: signatureResult.data.signature,
+  //   },
+  // });
 }
 
 /**

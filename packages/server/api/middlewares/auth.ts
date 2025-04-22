@@ -22,7 +22,7 @@ export const authenticated = createMiddleware<{
   };
 }>(async (ctx, next) => {
   const token = ctx.req.header("Authorization")?.replace("Bearer ", "");
-  if (!token) return ctx.err("Missing Auth Token", 401);
+  if (!token) return respond.err(ctx, "Missing Auth Token", 401);
 
   const cacheKey = generateHash(token);
 

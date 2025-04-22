@@ -18,6 +18,7 @@ import * as helpers from "./helpers";
 import * as actions from "./post.actions";
 import { getPaginationParams } from "../../lib/utils";
 import { postAwards } from "../../schema/misc/awards";
+import { respond } from "../../../utils/respond";
 
 export default new Hono()
   /**
@@ -49,7 +50,8 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(
+        return respond.err(
+          ctx,
           result.error?.message || "Failed to get posts feed",
           400
         );
@@ -78,14 +80,15 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(
+        return respond.err(
+          ctx,
           result.error?.message || "Failed to get post details",
           400
         );
       }
 
       if (!result.data || result.data.length === 0) {
-        return ctx.err("Post not found", 404);
+        return respond.err(ctx, "Post not found", 404);
       }
 
       return ctx.json(
@@ -112,7 +115,11 @@ export default new Hono()
         );
 
         if (result.error) {
-          return ctx.err(result.error?.message || "Failed to get likes", 400);
+          return respond.err(
+            ctx,
+            result.error?.message || "Failed to get likes",
+            400
+          );
         }
 
         return ctx.json(
@@ -125,7 +132,11 @@ export default new Hono()
         );
 
         if (result.error) {
-          return ctx.err(result.error?.message || "Failed to get replies", 400);
+          return respond.err(
+            ctx,
+            result.error?.message || "Failed to get replies",
+            400
+          );
         }
 
         return ctx.json(
@@ -143,7 +154,11 @@ export default new Hono()
         );
 
         if (result.error) {
-          return ctx.err(result.error?.message || "Failed to get reposts", 400);
+          return respond.err(
+            ctx,
+            result.error?.message || "Failed to get reposts",
+            400
+          );
         }
 
         return ctx.json(
@@ -180,7 +195,8 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(
+        return respond.err(
+          ctx,
           result.error?.message || "Failed to get post awards",
           400
         );
@@ -235,7 +251,8 @@ export default new Hono()
         );
 
         if (followingPosts.error) {
-          return ctx.err(
+          return respond.err(
+            ctx,
             followingPosts.error?.message || "Failed to get posts feed",
             400
           );
@@ -262,7 +279,8 @@ export default new Hono()
         );
 
         if (result.error) {
-          return ctx.err(
+          return respond.err(
+            ctx,
             result.error?.message || "Failed to get posts feed",
             400
           );
@@ -309,7 +327,11 @@ export default new Hono()
         );
 
         if (result.error) {
-          return ctx.err(result.error?.message || "Failed to get posts", 400);
+          return respond.err(
+            ctx,
+            result.error?.message || "Failed to get posts",
+            400
+          );
         }
 
         return ctx.json(
@@ -330,7 +352,11 @@ export default new Hono()
         );
 
         if (result.error) {
-          return ctx.err(result.error?.message || "Failed to get posts", 400);
+          return respond.err(
+            ctx,
+            result.error?.message || "Failed to get posts",
+            400
+          );
         }
 
         return ctx.json(
@@ -350,7 +376,11 @@ export default new Hono()
         );
 
         if (result.error) {
-          return ctx.err(result.error?.message || "Failed to get posts", 400);
+          return respond.err(
+            ctx,
+            result.error?.message || "Failed to get posts",
+            400
+          );
         }
 
         return ctx.json(
@@ -369,7 +399,11 @@ export default new Hono()
         );
 
         if (result.error) {
-          return ctx.err(result.error?.message || "Failed to get posts", 400);
+          return respond.err(
+            ctx,
+            result.error?.message || "Failed to get posts",
+            400
+          );
         }
 
         return ctx.json(
@@ -387,7 +421,11 @@ export default new Hono()
         );
 
         if (result.error) {
-          return ctx.err(result.error?.message || "Failed to get posts", 400);
+          return respond.err(
+            ctx,
+            result.error?.message || "Failed to get posts",
+            400
+          );
         }
 
         return ctx.json(
@@ -426,7 +464,7 @@ export default new Hono()
       // Pre-validate content before sending to action
       const { valid, message } = helpers.validatePostContent(content);
       if (!valid) {
-        return ctx.err(message ?? "Invalid post content", 400);
+        return respond.err(ctx, message ?? "Invalid post content", 400);
       }
 
       const result = await tryCatch(
@@ -437,7 +475,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error?.message || "Failed to create post", 400);
+        return respond.err(
+          ctx,
+          result.error?.message || "Failed to create post",
+          400
+        );
       }
 
       return ctx.json({ data: {}, message: "Post Created Successfully" }, 201);
@@ -462,7 +504,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error?.message || "Failed to delete post", 400);
+        return respond.err(
+          ctx,
+          result.error?.message || "Failed to delete post",
+          400
+        );
       }
 
       return ctx.json({ data: {}, message: "Post Deleted Successfully" }, 201);
@@ -493,7 +539,11 @@ export default new Hono()
       // Pre-validate content before sending to action
       const validation = helpers.validatePostContent(content);
       if (!validation.valid) {
-        return ctx.err(validation.message ?? "Invalid post content", 400);
+        return respond.err(
+          ctx,
+          validation.message ?? "Invalid post content",
+          400
+        );
       }
 
       const result = await tryCatch(
@@ -501,7 +551,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error?.message || "Failed to update post", 400);
+        return respond.err(
+          ctx,
+          result.error?.message || "Failed to update post",
+          400
+        );
       }
 
       return ctx.json({ data: {}, message: "Post updated successfully" }, 200);
@@ -527,7 +581,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error?.message || "Failed to like post", 400);
+        return respond.err(
+          ctx,
+          result.error?.message || "Failed to like post",
+          400
+        );
       }
 
       return ctx.json({ data: {}, message: "Post liked successfully" }, 200);
@@ -552,7 +610,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error?.message || "Failed to unlike post", 400);
+        return respond.err(
+          ctx,
+          result.error?.message || "Failed to unlike post",
+          400
+        );
       }
 
       return ctx.json({ data: {}, message: "Post unliked successfully" }, 200);
@@ -584,7 +646,11 @@ export default new Hono()
       if (content) {
         const validation = helpers.validatePostContent(content);
         if (!validation.valid) {
-          return ctx.err(validation.message ?? "Invalid post content", 400);
+          return respond.err(
+            ctx,
+            validation.message ?? "Invalid post content",
+            400
+          );
         }
       }
 
@@ -596,7 +662,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error?.message || "Failed to repost", 400);
+        return respond.err(
+          ctx,
+          result.error?.message || "Failed to repost",
+          400
+        );
       }
 
       return ctx.json({ data: {}, message: "Post reposted successfully" }, 200);
@@ -630,7 +700,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error?.message || "Failed to unrepost", 400);
+        return respond.err(
+          ctx,
+          result.error?.message || "Failed to unrepost",
+          400
+        );
       }
 
       return ctx.json(
@@ -665,7 +739,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error?.message || "Failed to save post", 400);
+        return respond.err(
+          ctx,
+          result.error?.message || "Failed to save post",
+          400
+        );
       }
 
       return ctx.json({ data: {}, message: "Post saved successfully" }, 200);
@@ -697,7 +775,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error?.message || "Failed to unsave post", 400);
+        return respond.err(
+          ctx,
+          result.error?.message || "Failed to unsave post",
+          400
+        );
       }
 
       return ctx.json({ data: {}, message: "Post unsaved successfully" }, 200);
@@ -729,7 +811,7 @@ export default new Hono()
 
       // Validate reason
       if (!reason || reason.trim().length === 0) {
-        return ctx.err("A reason for reporting is required", 400);
+        return respond.err(ctx, "A reason for reporting is required", 400);
       }
 
       const result = await tryCatch(
@@ -737,7 +819,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error?.message || "Failed to report post", 400);
+        return respond.err(
+          ctx,
+          result.error?.message || "Failed to report post",
+          400
+        );
       }
 
       return ctx.json({ data: {}, message: "Post reported successfully" }, 200);
@@ -769,7 +855,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error?.message || "Failed to pin post", 400);
+        return respond.err(
+          ctx,
+          result.error?.message || "Failed to pin post",
+          400
+        );
       }
 
       return ctx.json({ data: {}, message: "Post pinned successfully" }, 200);
@@ -801,7 +891,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error?.message || "Failed to unpin post", 400);
+        return respond.err(
+          ctx,
+          result.error?.message || "Failed to unpin post",
+          400
+        );
       }
 
       return ctx.json({ data: {}, message: "Post unpinned successfully" }, 200);

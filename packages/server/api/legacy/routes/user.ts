@@ -8,6 +8,7 @@ import { posts } from "../../lib/db/schema/post";
 import { z } from "zod";
 import { zNumberString, zSuiAddress } from "../../lib/zod/helpers";
 import * as actions from "../../lib/db/actions/index";
+import { respond } from "../../../utils/respond";
 import { tryCatch } from "../../lib/tryCatch";
 
 export default new Hono()
@@ -50,13 +51,14 @@ export default new Hono()
       );
 
       if (resp.error) {
-        return ctx.err(resp.error?.message || "Failed to create identity", 400);
+        return respond.err(
+          ctx,
+          resp.error?.message || "Failed to create identity",
+          400
+        );
       }
 
-      return ctx.json(
-        { data: {}, message: "Identity Created Successfully" },
-        201
-      );
+      return respond.ok(ctx, {}, "Identity Created Successfully", 201);
     }
   )
 

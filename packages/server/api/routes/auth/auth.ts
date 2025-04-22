@@ -8,6 +8,7 @@ import { generateNonce } from "./helpers";
 import { authenticated } from "../../middlewares/auth";
 import db from "../../schema/db";
 import { challenges } from "../../schema/misc";
+import { respond } from "../../../utils/respond";
 
 export default new Hono()
   // register identity
@@ -52,7 +53,11 @@ export default new Hono()
       );
 
       if (resp.error) {
-        return ctx.err(resp.error?.message || "Failed to create identity", 400);
+        return respond.err(
+          ctx,
+          resp.error?.message || "Failed to create identity",
+          400
+        );
       }
 
       return ctx.json(
@@ -84,7 +89,8 @@ export default new Hono()
       );
 
       if (resp.error) {
-        return ctx.err(
+        return respond.err(
+          ctx,
           resp.error?.message || "Failed to generate challenge",
           400
         );

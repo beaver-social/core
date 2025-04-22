@@ -43,10 +43,10 @@ const app = new Hono()
   })
 
   // routes
-  .route("auth", authIndex)
+  // .route("auth", authIndex)
   .route("content", contentIndex)
-  .route("misc", miscIndex)
-  .route("user", userIndex)
+  // .route("misc", miscIndex)
+  // .route("user", userIndex)
 
   // handlers
   .get("/stats", async (ctx) => {

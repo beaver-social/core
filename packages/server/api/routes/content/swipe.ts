@@ -18,6 +18,7 @@ import { users } from "../../schema/user/users";
 import * as helpers from "./helpers";
 import * as actions from "./swipe.action";
 import { getPaginationParams } from "../../lib/utils";
+import { respond } from "../../../utils/respond";
 
 export default new Hono()
   /**
@@ -49,7 +50,8 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(
+        return respond.err(
+          ctx,
           result.error?.message || "Failed to get swipes feed",
           400
         );
@@ -77,11 +79,15 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error.message || "Failed to fetch swipe", 400);
+        return respond.err(
+          ctx,
+          result.error.message || "Failed to fetch swipe",
+          400
+        );
       }
 
       if (result.data.length === 0) {
-        return ctx.err("Swipe not found", 404);
+        return respond.err(ctx, "Swipe not found", 404);
       }
 
       return ctx.json(
@@ -114,7 +120,7 @@ export default new Hono()
       );
 
       if (swipeExists.error || swipeExists.data.length === 0) {
-        return ctx.err("Swipe not found", 404);
+        return respond.err(ctx, "Swipe not found", 404);
       }
 
       // Get the content type ID for swipes (assuming it's 1 based on createSwipe implementation)
@@ -192,7 +198,11 @@ export default new Hono()
       }
 
       if (result.error) {
-        return ctx.err(result.error.message || `Failed to fetch ${type}`, 400);
+        return respond.err(
+          ctx,
+          result.error.message || `Failed to fetch ${type}`,
+          400
+        );
       }
 
       return ctx.json(
@@ -244,7 +254,8 @@ export default new Hono()
         );
 
         if (followingPosts.error) {
-          return ctx.err(
+          return respond.err(
+            ctx,
             followingPosts.error?.message || "Failed to get posts feed",
             400
           );
@@ -270,7 +281,8 @@ export default new Hono()
         );
 
         if (result.error) {
-          return ctx.err(
+          return respond.err(
+            ctx,
             result.error.message || "Failed to get swipes feed",
             400
           );
@@ -310,7 +322,8 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(
+        return respond.err(
+          ctx,
           result.error.message || "Failed to get user's swipes",
           400
         );
@@ -370,7 +383,11 @@ export default new Hono()
       );
 
       if (resp.error) {
-        return ctx.err(resp.error.message || "Failed to create swipe", 400);
+        return respond.err(
+          ctx,
+          resp.error.message || "Failed to create swipe",
+          400
+        );
       }
 
       return ctx.json(
@@ -404,7 +421,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error.message || "Failed to delete swipe", 400);
+        return respond.err(
+          ctx,
+          result.error.message || "Failed to delete swipe",
+          400
+        );
       }
 
       return ctx.json(
@@ -464,7 +485,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error.message || "Failed to update swipe", 400);
+        return respond.err(
+          ctx,
+          result.error.message || "Failed to update swipe",
+          400
+        );
       }
 
       return ctx.json(
@@ -493,7 +518,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error.message || "Failed to like swipe", 400);
+        return respond.err(
+          ctx,
+          result.error.message || "Failed to like swipe",
+          400
+        );
       }
 
       return ctx.json({ data: null, message: "Swipe liked successfully" }, 200);
@@ -519,7 +548,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error.message || "Failed to unlike swipe", 400);
+        return respond.err(
+          ctx,
+          result.error.message || "Failed to unlike swipe",
+          400
+        );
       }
 
       return ctx.json(
@@ -555,7 +588,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error.message || "Failed to repost swipe", 400);
+        return respond.err(
+          ctx,
+          result.error.message || "Failed to repost swipe",
+          400
+        );
       }
 
       return ctx.json(
@@ -584,7 +621,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error.message || "Failed to unrepost swipe", 400);
+        return respond.err(
+          ctx,
+          result.error.message || "Failed to unrepost swipe",
+          400
+        );
       }
 
       return ctx.json(
@@ -613,7 +654,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error.message || "Failed to save swipe", 400);
+        return respond.err(
+          ctx,
+          result.error.message || "Failed to save swipe",
+          400
+        );
       }
 
       return ctx.json({ data: null, message: "Swipe saved successfully" }, 200);
@@ -639,7 +684,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error.message || "Failed to unsave swipe", 400);
+        return respond.err(
+          ctx,
+          result.error.message || "Failed to unsave swipe",
+          400
+        );
       }
 
       return ctx.json(
@@ -685,7 +734,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error.message || "Failed to report swipe", 400);
+        return respond.err(
+          ctx,
+          result.error.message || "Failed to report swipe",
+          400
+        );
       }
 
       return ctx.json(
@@ -714,7 +767,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error.message || "Failed to pin swipe", 400);
+        return respond.err(
+          ctx,
+          result.error.message || "Failed to pin swipe",
+          400
+        );
       }
 
       return ctx.json(
@@ -743,7 +800,11 @@ export default new Hono()
       );
 
       if (result.error) {
-        return ctx.err(result.error.message || "Failed to unpin swipe", 400);
+        return respond.err(
+          ctx,
+          result.error.message || "Failed to unpin swipe",
+          400
+        );
       }
 
       return ctx.json(
