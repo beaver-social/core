@@ -9,6 +9,7 @@ export const BeaverContext = createContext<BeaverContextValue>({
     error: null,
 });
 
+
 export const BeaverProvider: React.FC<BeaverProviderProps> = ({
     children,
     surface,

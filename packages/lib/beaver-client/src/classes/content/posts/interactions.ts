@@ -111,7 +111,11 @@ export async function repost(
   const { postId, content } = options;
 
   // Create payload string to sign
-  const payload = JSON.stringify({ postId, content });
+  const payload = JSON.stringify({
+    postId: postId,
+    content: content,
+    type: "v1.repost.post",
+  });
 
   // Convert string to Uint8Array
   const messageBytes = new TextEncoder().encode(payload);

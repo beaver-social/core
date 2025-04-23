@@ -17,7 +17,7 @@ import { getFullnodeUrl } from "@mysten/sui/client";
 import { Network } from "../types";
 
 export function deriveActionNameFromFn(fn: Function) {
-  return "user." + camelToDotCase(fn.name);
+  return "v1.user." + camelToDotCase(fn.name);
 }
 
 type Transaction = Parameters<Parameters<typeof db.transaction>["0"]>["0"];

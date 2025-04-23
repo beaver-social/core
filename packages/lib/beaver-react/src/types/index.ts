@@ -3,7 +3,7 @@ import { BeaverClient, Surface, BeaverClientConfig } from "@beaver/client";
 import { ReactNode } from "react";
 
 // Re-export all types from the client
-export * from "@beaver/client";
+// export * from "@beaver/client";
 
 // React-specific types
 export interface BeaverProviderProps {
