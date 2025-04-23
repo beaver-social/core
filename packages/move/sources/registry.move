@@ -31,7 +31,7 @@ const EAboutTooLong: u64 = 105;
 const EIdentityAlreadyMinted: u64 = 106;
 
 
-public struct Registry has key, store {
+public struct Registry has key {
     id: UID,
     minters: table::Table<address, bool>,
     owners: table::Table<string::String, address>,

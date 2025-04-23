@@ -11,6 +11,7 @@ use sui::{
 use beaver_social::{
     registry
 };
+use beaver_social::posts;
 
 
 /// Error messages.
@@ -101,6 +102,15 @@ public entry fun mint_for(
     transfer::public_transfer(registration, receiver);
 }
 
+public entry fun set_posts_validator(
+    registry: &mut posts::PostsRegistry,
+    new_validator: vector<u8>,
+    admin_cap: &AdminCap,
+    record: &mut AdminsRecord,
+){
+    validate_admin(admin_cap, record);
+    posts::set_validator(registry, new_validator);
+}
 
 public entry fun revoke(
     cap: &mut AdminCap,

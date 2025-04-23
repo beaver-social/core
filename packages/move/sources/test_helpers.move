@@ -1,4 +1,4 @@
-#[allow(unused_use)]
+#[test_only]
 module beaver_social::test_helpers;
 
 use std::{
