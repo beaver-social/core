@@ -29,24 +29,23 @@ const app = new Hono()
       allowHeaders: ["Content-Type", "Authorization"],
     })
   )
-  .use("*", async (ctx, next) => {
-    ctx.text = () => {
-      throw new Error("c.text() is disabled — use c.ok() or c.err() instead");
-    };
+  // .use("*", async (ctx, next) => {
+  //   ctx.text = () => {
+  //     throw new Error("c.text() is disabled — use c.ok() or c.err() instead");
+  //   };
 
-    // will be used in the future
-    // ctx.json = () => {
-    //   throw new Error("c.json() is disabled — use c.ok() or c.err() instead");
-    // };
+  //   ctx.json = () => {
+  //     throw new Error("c.json() is disabled — use c.ok() or c.err() instead");
+  //   };
 
-    await next();
-  })
+  //   await next();
+  // })
 
   // routes
-  // .route("auth", authIndex)
+  .route("auth", authIndex)
   .route("content", contentIndex)
-  // .route("misc", miscIndex)
-  // .route("user", userIndex)
+  .route("misc", miscIndex)
+  .route("user", userIndex)
 
   // handlers
   .get("/stats", async (ctx) => {

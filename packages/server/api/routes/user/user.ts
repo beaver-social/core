@@ -20,6 +20,7 @@ import {
   topicFollows,
 } from "../../schema/interactions";
 import { postAwards } from "../../schema/misc/awards";
+import { respond } from "../../../utils/respond";
 
 export default new Hono()
 
