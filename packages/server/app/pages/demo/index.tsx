@@ -1,4 +1,4 @@
-import { ConnectButton, useCurrentAccount, useCurrentWallet, useSignPersonalMessage, useSignTransaction } from "@mysten/dapp-kit";
+import { ConnectButton, useCurrentAccount, useCurrentWallet } from "@mysten/dapp-kit";
 import { BeaverProvider } from "@beaver/react";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { getFullnodeUrl } from "@mysten/sui/client";

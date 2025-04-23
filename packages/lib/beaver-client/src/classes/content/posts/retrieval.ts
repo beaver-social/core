@@ -1,10 +1,4 @@
 import Post from "./Post";
-import {
-  GetPostResponse,
-  GetPostFeedResponse,
-  GetPostInteractionsResponse,
-  GetPostAwardsResponse,
-} from "../../../types/post.types";
 
 /**
  * Retrieves a post based on its id.
@@ -14,7 +8,7 @@ export async function getByID(this: Post, options: { id: number }) {
   const { apiClient } = this.defaults;
   const { id } = options;
 
-  return apiClient.content.posts[":id"].$get({ param: { id: id } });
+  return apiClient.content.posts[":id"].$get({ param: { id: id.toString() } });
 }
 
 /**
@@ -28,7 +22,9 @@ export async function getFeed(
   const { apiClient } = this.defaults;
   const { page, limit } = options;
 
-  return apiClient.content.posts.$get({ query: { page, limit } });
+  return apiClient.content.posts.$get({
+    query: { page: page.toString(), limit: limit.toString() },
+  });
 }
 
 /**
@@ -46,7 +42,7 @@ export async function getInteractionsByType(
   const { id, type } = options;
 
   return apiClient.content.posts[":id"].interaction.$get({
-    param: { id },
+    param: { id: id.toString() },
     query: { type },
   });
 }
@@ -67,7 +63,7 @@ export async function getUserFeed(
   const { page, limit, type } = options;
 
   return apiClient.content.posts.user.feed.$get({
-    query: { page, limit, type },
+    query: { page: page.toString(), limit: limit.toString(), type },
   });
 }
 
@@ -92,7 +88,7 @@ export async function getUserProfilePosts(
   const { page, limit, type } = options;
 
   return apiClient.content.posts.user.profile.$get({
-    query: { page, limit, type },
+    query: { page: page.toString(), limit: limit.toString(), type },
   });
 }
 
@@ -112,7 +108,7 @@ export async function getAwards(
   const { id, page, limit } = options;
 
   return apiClient.content.posts[":id"].awards.$get({
-    param: { id },
-    query: { page, limit },
+    param: { id: id.toString() },
+    query: { page: page.toString(), limit: limit.toString() },
   });
 }

@@ -1,10 +1,31 @@
-import { useSignPersonalMessage } from "@mysten/dapp-kit";
+import { useSignPersonalMessage, useSignTransaction } from "@mysten/dapp-kit";
 import { IntentScope, SignatureWithBytes } from "@mysten/sui/cryptography";
+import { Transaction } from "@mysten/sui/transactions";
 import { useState } from "react";
 
 export async function sign(
   data: Uint8Array
-): Promise<Uint8Array<ArrayBufferLike>> {}
+): Promise<Uint8Array<ArrayBufferLike>> {
+  const { mutate: walletSign } = useSignTransaction();
+  const [signature, setSignature] = useState<string | null>(null);
+
+  const tx = new Transaction();
+
+  walletSign(
+    {
+      transaction: tx,
+    },
+    {
+      onSuccess: (result) => setSignature(result.signature),
+    }
+  );
+
+  if (!signature) {
+    throw new Error("Signature not found");
+  }
+
+  return signature;
+}
 
 export async function signPersonalMessage(messageBytes: Uint8Array): Promise<{
   bytes: string;

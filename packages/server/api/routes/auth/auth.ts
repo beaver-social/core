@@ -67,7 +67,6 @@ export default new Hono()
     }
   )
 
-  .use(authenticated)
   .get(
     "/challenge",
     zValidator(
@@ -76,6 +75,7 @@ export default new Hono()
         route: z.string(),
       })
     ),
+    authenticated,
     async (ctx) => {
       const nonce = generateNonce();
       const userId = ctx.get("user").id;

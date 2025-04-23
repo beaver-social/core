@@ -81,8 +81,8 @@ export async function delete_(this: Post, options: { id: number }) {
     throw new Error(`${Post.DELETE_ERROR}: ${signatureResult.error}`);
   }
 
-  return apiClient.content.posts.delete[":id"].$post({
-    param: { id },
+  return apiClient.content.posts[":id"].$delete({
+    param: { id: id.toString() },
     query: {
       signature: signatureResult.data.signature,
     },
@@ -120,8 +120,8 @@ export async function update(
     throw new Error(`${Post.UPDATE_ERROR}: ${signatureResult.error}`);
   }
 
-  return apiClient.content.posts.update[":id"].$post({
-    param: { id },
+  return apiClient.content.posts[":id"].$patch({
+    param: { id: id.toString() },
     json: {
       content,
       media,

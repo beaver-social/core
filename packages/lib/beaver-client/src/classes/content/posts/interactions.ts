@@ -7,7 +7,10 @@ import { tryCatch } from "../../../utils/tryCatch";
  */
 export async function like(
   this: Post,
-  options: { id: number; reaction?: string }
+  options: {
+    id: number;
+    reaction?: "like" | "haha" | "wow" | "sad" | "angry";
+  }
 ) {
   const { apiClient, surface } = this.defaults;
   const { id, reaction } = options;
@@ -29,11 +32,11 @@ export async function like(
   }
 
   const apiResponse = await tryCatch(
-    apiClient.content.posts.like[":id"].$post({
-      param: { id },
+    apiClient.content.posts[":id"].like.$post({
+      param: { id: id.toString() },
       query: {
         signature: signatureResult.data.signature,
-        reaction,
+        reaction: reaction || "like",
       },
     })
   );
@@ -43,14 +46,16 @@ export async function like(
     throw new Error(`Unable to like post: ${apiResponse.error}`);
   }
 
-  const parsedResponse = await tryCatch(apiResponse.data.json());
+  if (apiResponse.data) {
+    const parsedResponse = await tryCatch(apiResponse.data.json());
 
-  if (parsedResponse.error) {
-    this.logger.error(`Unable to like post: ${parsedResponse.error}`);
-    throw new Error(`Unable to like post: ${parsedResponse.error}`);
+    if (parsedResponse.error) {
+      this.logger.error(`Unable to like post: ${parsedResponse.error}`);
+      throw new Error(`Unable to like post: ${parsedResponse.error}`);
+    }
+
+    return parsedResponse.data;
   }
-
-  return parsedResponse.data;
 }
 
 /**

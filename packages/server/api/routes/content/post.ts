@@ -588,7 +588,7 @@ export default new Hono()
         );
       }
 
-      return ctx.json({ data: {}, message: "Post liked successfully" }, 200);
+      return respond.ok(ctx, {}, "Post liked successfully", 200);
     }
   )
   // Unlike a post
