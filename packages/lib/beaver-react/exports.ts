@@ -1,4 +1,5 @@
-import * as SDK from "./src";
+import { BeaverProvider, useIdentity, usePost, useSwipe, useUser } from "./src";
+import type { BeaverProviderProps } from "./src";
 
-const exports = { ...SDK };
-export default { ...exports };
+export { BeaverProvider, useIdentity, usePost, useSwipe, useUser };
+export type { BeaverProviderProps };

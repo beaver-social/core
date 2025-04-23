@@ -8,6 +8,9 @@
   "license": "MIT",
   "private": false,
   "type": "module",
+  "exports": {
+    ".": "./exports.ts"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/beaver-social",
@@ -16,9 +19,8 @@
   "scripts": {
     "build": "tsup src/index.tsx --format cjs,esm --dts",
     "build:all": "cd ../beaver-client && bun run build && cd ../beaver-react && bun run build",
-    "dev": "bun run build --watch",
     "lint": "eslint \"src/**/*.ts*\"",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "clean": "rm -rf .turbo && rm -rf dist"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",
