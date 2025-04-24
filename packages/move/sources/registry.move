@@ -15,11 +15,9 @@ use beaver_social::{
 };
 use suins::suins_registration;
 
-
 /// Constants
 const MIN_USERNAME_LENGTH: u64 = 3;
 const MAX_USERNAME_LENGTH: u64 = 32;
-
 
 /// Error messages.
 const EMissingSuins: u64 = 100;
@@ -30,12 +28,12 @@ const EUsernameTooLong: u64 = 104;
 const EAboutTooLong: u64 = 105;
 const EIdentityAlreadyMinted: u64 = 106;
 
-
 public struct Registry has key {
     id: UID,
     minters: table::Table<address, bool>,
     owners: table::Table<string::String, address>,
     owner_changes: table::Table<string::String, table::Table<u64, address>>,
+    usernames: table::Table<address, string::String>,
 }
 
 fun init(ctx: &mut TxContext) {
@@ -44,11 +42,11 @@ fun init(ctx: &mut TxContext) {
         minters: table::new<address, bool>(ctx),
         owners: table::new<string::String, address>(ctx),
         owner_changes: table::new<string::String, table::Table<u64, address>>(ctx),
+        usernames: table::new<address, string::String>(ctx),
     };
 
     transfer::share_object(registry);
 }
-
 
 /// Protected Methods
 
@@ -78,6 +76,7 @@ public(package) fun mint_(
     );
 
     table::add(&mut registry.owners, username, owner);
+    table::add(&mut registry.usernames, owner, username);
 
     let mut owner_changes = table::new<u64, address>(ctx);
     table::add(&mut owner_changes, clock.timestamp_ms(), owner);
@@ -85,7 +84,6 @@ public(package) fun mint_(
 
     return registration
 }
-
 
 /// Public Methods
 
@@ -107,8 +105,12 @@ public entry fun switch_owner(
     registration::set_owner(identity, sender);
 
     let username = registration::username(identity);
+    table::remove(&mut registry.owners, username);
+    table::remove(&mut registry.usernames, sender);
+    
     table::add(&mut registry.owners, username, sender);
-
+    table::add(&mut registry.usernames, sender, username);
+    
     let owner_changes = table::borrow_mut(&mut registry.owner_changes, username);
     let now = clock.timestamp_ms();
     table::add(owner_changes, now, sender);
@@ -126,4 +128,11 @@ public entry fun mint(
     let registration = mint_(registry, sender, username, about, clock, ctx);
 
     transfer::public_transfer(registration, sender);
+}
+
+
+/// Getters
+
+public fun username(registry: &Registry, owner: address): string::String {
+    registry.usernames[owner]
 }

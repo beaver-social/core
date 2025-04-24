@@ -211,6 +211,97 @@ class Contracts {
       },
     };
   }
+
+  get post() {
+    return {
+      /**
+       * Creates a new post in the posts registry.
+       * @param tx - The Transaction object to add the move call to.
+       * @param args - The arguments for creating a post.
+       * @param args.postsRegistry - The PostsRegistry object.
+       * @param args.identityRegistration - The IdentityRegistration object of the author.
+       * @param args.username - The username of the author.
+       * @param args.postId - The unique ID for the post.
+       * @param args.content - The content of the post.
+       * @param args.attested - The attestation vector (typically a signature).
+       * @param args.beaverPosts - The MY_BEAVER_POSTS collection for the user.
+       */
+      push: (
+        tx: Transaction,
+        args: {
+          postsRegistry: MoveKey;
+          identityRegistration: MoveKey;
+          username: string;
+          postId: number;
+          content: string;
+          attested: Uint8Array;
+          collection: MoveKey;
+        }
+      ) => {
+        const postsRegistry = tx.object(args.postsRegistry.id);
+        const identity = tx.object(args.identityRegistration.id);
+        const collection = tx.object(args.collection.id);
+        const clock = tx.object(this.config.objects.clock.id);
+
+        tx.moveCall({
+          target: `${this.config.packageId}::posts::push`,
+          arguments: [
+            postsRegistry,
+            identity,
+            tx.pure(bcs.String.serialize(args.username)),
+            tx.pure.u64(args.postId),
+            tx.pure(bcs.String.serialize(args.content)),
+            tx.pure(args.attested),
+            collection,
+            clock,
+          ],
+        });
+      },
+    };
+  }
+
+  get awards() {
+    return {
+      /**
+       * Gifts an award to a recipient for a specific post.
+       * @param tx - The Transaction object to add the move call to.
+       * @param args - The arguments for gifting an award.
+       * @param args.awardsData - The AwardsData shared object.
+       * @param args.recipient - The address of the recipient.
+       * @param args.awardType - The type of award (0=Gold, 1=Silver, 2=Bronze).
+       * @param args.payment - The SUI coin object for payment.
+       * @param args.postId - The ID of the post being awarded.
+       */
+      gift: (
+        tx: Transaction,
+        args: {
+          awardsData: MoveKey;
+          recipient: string;
+          awardType: number;
+          payment: MoveKey;
+          postId: number;
+        }
+      ) => {
+        const awardsData = tx.object(args.awardsData.id);
+        const registry = tx.object(this.config.objects.registry.id);
+        const payment = tx.object(args.payment.id);
+        const clock = tx.object(this.config.objects.clock.id);
+
+        tx.moveCall({
+          target: `${this.config.packageId}::awards::gift`,
+          arguments: [
+            awardsData,
+            registry,
+            tx.pure(bcs.Address.serialize(formatAddress(args.recipient))),
+            tx.pure.u64(args.awardType),
+            payment,
+            tx.pure.u64(args.postId),
+            clock,
+          ],
+        });
+      },
+    };
+  }
 }
 
 export default Contracts;
