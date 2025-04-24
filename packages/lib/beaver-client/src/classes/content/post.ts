@@ -1,7 +1,7 @@
-import Logger from "../misc/logger";
-import { Defaults } from "../../types/client.types";
 import { tryCatch } from "../../utils/tryCatch";
 import { safeParseResponse } from "../../utils/apiClient";
+import { Defaults } from "../../types";
+import { Logger } from "../misc";
 
 export default class Post {
   /** @hidden */

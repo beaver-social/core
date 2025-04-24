@@ -2,13 +2,13 @@ import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
 import type { API } from "server";
 import { hc } from "hono/client";
 import { S3Client } from "@aws-sdk/client-s3";
-import { tryCatch } from "./utils/tryCatch";
 import { Contracts } from "contracts";
 import { Identity } from "./classes/auth";
 import { Logger } from "./classes/misc";
 import { Post, Swipe } from "./classes/content";
 import { BeaverClientConfig, Defaults, Surface } from "./types";
 import { User } from "./classes/user";
+import { safeParseResponse } from "./utils/apiClient";
 
 export class BeaverClient {
   config: BeaverClientConfig;
@@ -48,22 +48,18 @@ export class BeaverClient {
   }
 
   public async initialize() {
-    const contractsResponse = await tryCatch(
+    const contractsResponse = await safeParseResponse(
       this.defaults.apiClient.contracts.$get()
     );
-    if (contractsResponse.error)
-      return this.logger.error("Unable to fetch contract details from server");
-
-    const contracts = await tryCatch(contractsResponse.data.json());
-    if (contracts.error)
-      return this.logger.error("Invalid contracts retreived from server");
 
     this.defaults.contracts = new Contracts({
-      packageId: contracts.data.testnet.packages.beaverSocial.id,
+      packageId: contractsResponse.data.testnet.packages.beaverSocial.id,
       objects: {
-        adminsRecord: { id: contracts.data.testnet.objects.adminsRecord },
-        clock: { id: contracts.data.testnet.objects.clock },
-        registry: { id: contracts.data.testnet.objects.registry },
+        adminsRecord: {
+          id: contractsResponse.data.testnet.objects.adminsRecord,
+        },
+        clock: { id: contractsResponse.data.testnet.objects.clock },
+        registry: { id: contractsResponse.data.testnet.objects.registry },
       },
     });
 
@@ -71,12 +67,6 @@ export class BeaverClient {
     this.logger.info("Client Initialized", this.defaults.contracts);
 
     return this;
-  }
-
-  // @marsian check this.
-  public destroy() {
-    this.ready = false;
-    this.logger.info("Client Destroyed");
   }
 
   get identity() {

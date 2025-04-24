@@ -4,6 +4,8 @@ import authIndex from "./routes/auth";
 import contentIndex from "./routes/content";
 import miscIndex from "./routes/misc";
 import userIndex from "./routes/user";
+import analyticsIndex from "./routes/analytics";
+import { respond } from "../utils/respond";
 
 let servedSessions = 0;
 
@@ -29,23 +31,12 @@ const app = new Hono()
       allowHeaders: ["Content-Type", "Authorization"],
     })
   )
-  // .use("*", async (ctx, next) => {
-  //   ctx.text = () => {
-  //     throw new Error("c.text() is disabled — use c.ok() or c.err() instead");
-  //   };
 
-  //   ctx.json = () => {
-  //     throw new Error("c.json() is disabled — use c.ok() or c.err() instead");
-  //   };
-
-  //   await next();
-  // })
-
-  // routes
-  .route("auth", authIndex)
+  // .route("auth", authIndex)
   .route("content", contentIndex)
-  .route("misc", miscIndex)
-  .route("user", userIndex)
+  // .route("misc", miscIndex)
+  // .route("user", userIndex)
+  // .route("analytics", analyticsIndex)
 
   // handlers
   .get("/stats", async (ctx) => {
@@ -70,7 +61,7 @@ const app = new Hono()
       },
     };
 
-    return ctx.json(data);
+    return respond.ok(ctx, data, "Contracts fetched successfully", 200);
   });
 
 export default app;

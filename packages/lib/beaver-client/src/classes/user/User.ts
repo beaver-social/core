@@ -1,4 +1,4 @@
-import Logger from "../misc/logger";
+import { Logger } from "../misc";
 import { tryCatch } from "../../utils/tryCatch";
 import { safeParseResponse } from "../../utils/apiClient";
 import { Defaults } from "../../types";
@@ -113,15 +113,6 @@ export default class User {
     address?: string;
   }) {
     const { apiClient } = this.defaults;
-
-    if (
-      !options.identity &&
-      !options.username &&
-      !options.suinsDomainName &&
-      !options.address
-    ) {
-      throw new Error("No search criteria provided");
-    }
 
     return safeParseResponse(
       apiClient.user.find.$get({ query: { ...options } })

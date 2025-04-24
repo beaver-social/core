@@ -1,7 +1,7 @@
-import Logger from "../misc/logger";
-import { Defaults } from "../../types/client.types";
+import { Logger } from "../misc";
 import { tryCatch } from "../../utils/tryCatch";
 import { safeParseResponse } from "../../utils/apiClient";
+import { Defaults } from "../../types";
 
 export default class Swipe {
   /** @hidden */
