@@ -57,8 +57,12 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
-        { data: result.data, message: "Swipes feed fetched successfully" },
+      return respond.ok(
+        ctx,
+        {
+          data: result.data,
+        },
+        "Swipes feed fetched successfully",
         200
       );
     }
@@ -90,8 +94,10 @@ export default new Hono()
         return respond.err(ctx, "Swipe not found", 404);
       }
 
-      return ctx.json(
-        { data: result.data[0], message: "Swipe fetched successfully" },
+      return respond.ok(
+        ctx,
+        { data: result.data[0] },
+        "Swipe fetched successfully",
         200
       );
     }
@@ -205,8 +211,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
-        { data: result.data, message: `${type} fetched successfully` },
+      return respond.ok(
+        ctx,
+        { data: result.data },
+        `${type} fetched successfully`,
         200
       );
     }
@@ -261,11 +269,13 @@ export default new Hono()
           );
         }
 
-        return ctx.json(
+        return respond.ok(
+          ctx,
           {
             data: followingPosts.data,
             message: "Posts feed fetched successfully",
           },
+          "Posts feed fetched successfully",
           200
         );
       } else if (type === "for_you") {
@@ -288,8 +298,10 @@ export default new Hono()
           );
         }
 
-        return ctx.json(
+        return respond.ok(
+          ctx,
           { data: result.data, message: "Posts feed fetched successfully" },
+          "Posts feed fetched successfully",
           200
         );
       }
@@ -329,8 +341,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
+      return respond.ok(
+        ctx,
         { data: result.data, message: "User's swipes fetched successfully" },
+        "User's swipes fetched successfully",
         200
       );
     }
@@ -390,13 +404,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
-        {
-          data: {
-            swipeId: resp.data,
-          },
-          message: "Post Created Successfully",
-        },
+      return respond.ok(
+        ctx,
+        { data: { swipeId: resp.data }, message: "Post Created Successfully" },
+        "Post Created Successfully",
         201
       );
     }
@@ -428,8 +439,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
+      return respond.ok(
+        ctx,
         { data: null, message: "Swipe deleted successfully" },
+        "Swipe deleted successfully",
         200
       );
     }
@@ -492,8 +505,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
+      return respond.ok(
+        ctx,
         { data: null, message: "Swipe updated successfully" },
+        "Swipe updated successfully",
         200
       );
     }
@@ -525,7 +540,12 @@ export default new Hono()
         );
       }
 
-      return ctx.json({ data: null, message: "Swipe liked successfully" }, 200);
+      return respond.ok(
+        ctx,
+        { data: null, message: "Swipe liked successfully" },
+        "Swipe liked successfully",
+        200
+      );
     }
   )
   // unlike swipe by ID
@@ -555,8 +575,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
+      return respond.ok(
+        ctx,
         { data: null, message: "Swipe unliked successfully" },
+        "Swipe unliked successfully",
         200
       );
     }
@@ -595,8 +617,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
+      return respond.ok(
+        ctx,
         { data: null, message: "Swipe reposted successfully" },
+        "Swipe reposted successfully",
         200
       );
     }
@@ -628,8 +652,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
+      return respond.ok(
+        ctx,
         { data: null, message: "Swipe unreposted successfully" },
+        "Swipe unreposted successfully",
         200
       );
     }
@@ -661,7 +687,12 @@ export default new Hono()
         );
       }
 
-      return ctx.json({ data: null, message: "Swipe saved successfully" }, 200);
+      return respond.ok(
+        ctx,
+        { data: null, message: "Swipe saved successfully" },
+        "Swipe saved successfully",
+        200
+      );
     }
   )
   // unsave swipe by ID
@@ -691,8 +722,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
+      return respond.ok(
+        ctx,
         { data: null, message: "Swipe unsaved successfully" },
+        "Swipe unsaved successfully",
         200
       );
     }
@@ -741,8 +774,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
+      return respond.ok(
+        ctx,
         { data: null, message: "Report submitted successfully" },
+        "Report submitted successfully",
         200
       );
     }
@@ -774,8 +809,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
+      return respond.ok(
+        ctx,
         { data: null, message: "Swipe pinned successfully" },
+        "Swipe pinned successfully",
         200
       );
     }
@@ -807,8 +844,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
+      return respond.ok(
+        ctx,
         { data: null, message: "Swipe unpinned successfully" },
+        "Swipe unpinned successfully",
         200
       );
     }

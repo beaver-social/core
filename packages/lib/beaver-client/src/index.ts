@@ -8,7 +8,7 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { tryCatch } from "./utils/tryCatch";
 import { Contracts } from "contracts";
 import { Identity } from "./classes/auth";
-import Post from "./classes/content/posts";
+import Post from "./classes/content/post";
 import Swipe from "./classes/content/swipes";
 import User from "./classes/user";
 
@@ -70,7 +70,9 @@ export class BeaverClient {
     });
 
     this.ready = true;
-    this.logger.info("Client Initialised", this.defaults.contracts);
+    this.logger.info("Client Initialized", this.defaults.contracts);
+
+    return this;
   }
 
   // @marsian check this.

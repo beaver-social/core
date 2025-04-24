@@ -1,10 +1,11 @@
 import { getFullnodeUrl } from "@mysten/sui/client";
-import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { SuiClient } from "@mysten/sui/client";
 import type { API } from "server";
 import { Contracts } from "contracts";
 import { hc } from "hono/client";
 import type { S3Client } from "@aws-sdk/client-s3";
+import { SignatureWithBytes } from "@mysten/sui/cryptography";
+import { Transaction } from "@mysten/sui/transactions";
 
 export type BeaverClientConfig = {
   debug?: boolean;
@@ -26,8 +27,6 @@ export type Defaults = {
 };
 
 export type Surface = {
-  sign: Ed25519Keypair["sign"];
-  signPersonalMessage: Ed25519Keypair["signPersonalMessage"];
-  signTransaction: Ed25519Keypair["signTransaction"];
-  signWithIntent: Ed25519Keypair["signWithIntent"];
+  signPersonalMessage: (message: string) => Promise<SignatureWithBytes>;
+  signTransaction: (tx: Transaction) => Promise<SignatureWithBytes>;
 };

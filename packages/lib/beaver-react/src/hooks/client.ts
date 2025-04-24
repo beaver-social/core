@@ -5,19 +5,14 @@ import { BeaverContext } from "../context/beaver";
  * Hook to access the Beaver client and its state
  * @returns The BeaverClient instance and its state
  */
-export const useBeaverClient = () => {
-  const context = useContext(BeaverContext);
+export function useBeaverClient() {
+  const { client } = useContext(BeaverContext);
 
-  if (!context) {
-    throw new Error("useBeaverClient must be used within a BeaverProvider");
+  if (!client) {
+    throw new Error(
+      "Not yet  initialized or Provider not present please try again"
+    );
   }
 
-  return {
-    ...context,
-    // Provide direct references to all client modules for easier access
-    identity: context.client?.identity,
-    post: context.client?.post,
-    swipe: context.client?.swipe,
-    user: context.client?.user,
-  };
-};
+  return client;
+}

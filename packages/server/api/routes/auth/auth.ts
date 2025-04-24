@@ -60,8 +60,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
-        { data: {}, message: "Identity Created Successfully" },
+      return respond.ok(
+        ctx,
+        { data: {} },
+        "Identity Created Successfully",
         201
       );
     }
@@ -96,8 +98,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
-        { data: { nonce }, message: "Challenge Generated Successfully" },
+      return respond.ok(
+        ctx,
+        { data: { nonce } },
+        "Challenge Generated Successfully",
         200
       );
     }

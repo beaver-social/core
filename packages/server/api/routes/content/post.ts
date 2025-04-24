@@ -57,8 +57,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
-        { data: result.data, message: "Posts feed fetched successfully" },
+      return respond.ok(
+        ctx,
+        { posts: result.data },
+        "Posts feed fetched successfully",
         200
       );
     }
@@ -91,8 +93,10 @@ export default new Hono()
         return respond.err(ctx, "Post not found", 404);
       }
 
-      return ctx.json(
-        { data: result.data[0], message: "Post details fetched successfully" },
+      return respond.ok(
+        ctx,
+        result.data[0],
+        "Post details fetched successfully",
         200
       );
     }
@@ -122,8 +126,10 @@ export default new Hono()
           );
         }
 
-        return ctx.json(
-          { data: result.data, message: "Likes fetched successfully" },
+        return respond.ok(
+          ctx,
+          { likes: result.data },
+          "Likes fetched successfully",
           200
         );
       } else if (type === "replies") {
@@ -139,8 +145,10 @@ export default new Hono()
           );
         }
 
-        return ctx.json(
-          { data: result.data, message: "Replies fetched successfully" },
+        return respond.ok(
+          ctx,
+          { replies: result.data },
+          "Replies fetched successfully",
           200
         );
       } else if (type === "reposts") {
@@ -161,8 +169,10 @@ export default new Hono()
           );
         }
 
-        return ctx.json(
-          { data: result.data, message: "Reposts fetched successfully" },
+        return respond.ok(
+          ctx,
+          { reposts: result.data },
+          "Reposts fetched successfully",
           200
         );
       }
@@ -202,8 +212,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
-        { data: result.data, message: "Post awards fetched successfully" },
+      return respond.ok(
+        ctx,
+        { awards: result.data },
+        "Post awards fetched successfully",
         200
       );
     }
@@ -258,11 +270,10 @@ export default new Hono()
           );
         }
 
-        return ctx.json(
-          {
-            data: followingPosts.data,
-            message: "Posts feed fetched successfully",
-          },
+        return respond.ok(
+          ctx,
+          { posts: followingPosts.data },
+          "Posts feed fetched successfully",
           200
         );
       } else if (type === "for_you") {
@@ -286,8 +297,10 @@ export default new Hono()
           );
         }
 
-        return ctx.json(
-          { data: result.data, message: "Posts feed fetched successfully" },
+        return respond.ok(
+          ctx,
+          { posts: result.data },
+          "Posts feed fetched successfully",
           200
         );
       }
@@ -334,8 +347,10 @@ export default new Hono()
           );
         }
 
-        return ctx.json(
-          { data: result.data, message: "Posts fetched successfully" },
+        return respond.ok(
+          ctx,
+          { data: result.data },
+          "Posts fetched successfully",
           200
         );
       } else if (type === "your-replies") {
@@ -359,8 +374,10 @@ export default new Hono()
           );
         }
 
-        return ctx.json(
-          { data: result.data, message: "Posts fetched successfully" },
+        return respond.ok(
+          ctx,
+          { data: result.data },
+          "Posts fetched successfully",
           200
         );
       } else if (type === "your-media") {
@@ -383,8 +400,10 @@ export default new Hono()
           );
         }
 
-        return ctx.json(
-          { data: result.data, message: "Posts fetched successfully" },
+        return respond.ok(
+          ctx,
+          { data: result.data },
+          "Posts fetched successfully",
           200
         );
       } else if (type === "your-saved") {
@@ -406,8 +425,10 @@ export default new Hono()
           );
         }
 
-        return ctx.json(
-          { data: result.data, message: "Posts fetched successfully" },
+        return respond.ok(
+          ctx,
+          { data: result.data },
+          "Posts fetched successfully",
           200
         );
       } else if (type === "your-pinned") {
@@ -428,8 +449,10 @@ export default new Hono()
           );
         }
 
-        return ctx.json(
-          { data: result.data, message: "Posts fetched successfully" },
+        return respond.ok(
+          ctx,
+          { data: result.data },
+          "Posts fetched successfully",
           200
         );
       }
@@ -437,7 +460,7 @@ export default new Hono()
   )
   // Create a new post (pass parentId to reply to a post)
   .post(
-    "/create",
+    "/",
     zValidator(
       "json",
       z.object({
@@ -482,7 +505,7 @@ export default new Hono()
         );
       }
 
-      return ctx.json({ data: {}, message: "Post Created Successfully" }, 201);
+      return respond.ok(ctx, {}, "Post Created Successfully", 201);
     }
   )
   // Delete a post
@@ -511,7 +534,7 @@ export default new Hono()
         );
       }
 
-      return ctx.json({ data: {}, message: "Post Deleted Successfully" }, 201);
+      return respond.ok(ctx, {}, "Post Deleted Successfully", 201);
     }
   )
   // Update a post
@@ -558,7 +581,7 @@ export default new Hono()
         );
       }
 
-      return ctx.json({ data: {}, message: "Post updated successfully" }, 200);
+      return respond.ok(ctx, {}, "Post updated successfully", 200);
     }
   )
   // Like a post (optionally with an emoji)
@@ -617,7 +640,7 @@ export default new Hono()
         );
       }
 
-      return ctx.json({ data: {}, message: "Post unliked successfully" }, 200);
+      return respond.ok(ctx, {}, "Post unliked successfully", 200);
     }
   )
   // Repost a post
@@ -669,20 +692,13 @@ export default new Hono()
         );
       }
 
-      return ctx.json({ data: {}, message: "Post reposted successfully" }, 200);
+      return respond.ok(ctx, {}, "Post reposted successfully", 200);
     }
   )
   // Unrepost a post
   .post(
     "/:id/unrepost",
     zValidator("param", z.object({ id: zNumberString })),
-    zValidator(
-      "json",
-      z.object({
-        postId: z.number(),
-        repostId: z.number(),
-      })
-    ),
     zValidator(
       "query",
       z.object({
@@ -691,12 +707,11 @@ export default new Hono()
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
-      const { repostId } = ctx.req.valid("json");
       const { signature } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
 
       const result = await tryCatch(
-        actions.unrepostPost({ postId, repostId, userId }, signature)
+        actions.unrepostPost({ postId, userId }, signature)
       );
 
       if (result.error) {
@@ -707,22 +722,13 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
-        { data: {}, message: "Post unreposted successfully" },
-        200
-      );
+      return respond.ok(ctx, {}, "Post unreposted successfully", 200);
     }
   )
   // Save a post
   .post(
     "/:id/save",
     zValidator("param", z.object({ id: zNumberString })),
-    zValidator(
-      "json",
-      z.object({
-        postId: z.number(),
-      })
-    ),
     zValidator(
       "query",
       z.object({
@@ -746,19 +752,13 @@ export default new Hono()
         );
       }
 
-      return ctx.json({ data: {}, message: "Post saved successfully" }, 200);
+      return respond.ok(ctx, {}, "Post saved successfully", 200);
     }
   )
   // Remove post from saved posts
   .post(
     "/:id/unsave",
     zValidator("param", z.object({ id: zNumberString })),
-    zValidator(
-      "json",
-      z.object({
-        postId: z.number(),
-      })
-    ),
     zValidator(
       "query",
       z.object({
@@ -782,7 +782,7 @@ export default new Hono()
         );
       }
 
-      return ctx.json({ data: {}, message: "Post unsaved successfully" }, 200);
+      return respond.ok(ctx, {}, "Post unsaved successfully", 200);
     }
   )
   // Report a post
@@ -792,7 +792,6 @@ export default new Hono()
     zValidator(
       "json",
       z.object({
-        postId: z.number(),
         reason: z.string(),
         details: z.string().optional(),
       })
@@ -826,19 +825,13 @@ export default new Hono()
         );
       }
 
-      return ctx.json({ data: {}, message: "Post reported successfully" }, 200);
+      return respond.ok(ctx, {}, "Post reported successfully", 200);
     }
   )
   // Pin post to profile
   .post(
     "/:id/pin",
     zValidator("param", z.object({ id: zNumberString })),
-    zValidator(
-      "json",
-      z.object({
-        postId: z.number(),
-      })
-    ),
     zValidator(
       "query",
       z.object({
@@ -862,19 +855,13 @@ export default new Hono()
         );
       }
 
-      return ctx.json({ data: {}, message: "Post pinned successfully" }, 200);
+      return respond.ok(ctx, {}, "Post pinned successfully", 200);
     }
   )
   // Unpin post from profile
   .post(
     "/:id/unpin",
     zValidator("param", z.object({ id: zNumberString })),
-    zValidator(
-      "json",
-      z.object({
-        postId: z.number(),
-      })
-    ),
     zValidator(
       "query",
       z.object({
@@ -898,6 +885,6 @@ export default new Hono()
         );
       }
 
-      return ctx.json({ data: {}, message: "Post unpinned successfully" }, 200);
+      return respond.ok(ctx, {}, "Post unpinned successfully", 200);
     }
   );
