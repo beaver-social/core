@@ -1,2 +1,4 @@
 import Identity from "./Identity";
-export { Identity };
+import ZkService from "./ZkService";
+
+export { Identity, ZkService };

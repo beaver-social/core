@@ -39,30 +39,32 @@ export default new Hono()
 
       if (type === "identity") {
         const result = await tryCatch(
-          db.select().from(users).where(eq(users.identity, value)).limit(1)
+          db
+            .select({ id: users.id })
+            .from(users)
+            .where(eq(users.identity, value))
+            .limit(1)
         );
 
         if (result.error) return respond.err(ctx, "User not found", 404);
 
-        return ctx.json(
-          { data: { id: result.data[0].id }, message: "User id fetched" },
-          200
-        );
+        return respond.ok(ctx, result.data[0], "User id fetched", 200);
       } else if (type === "username") {
         const result = await tryCatch(
-          db.select().from(users).where(eq(users.username, value)).limit(1)
+          db
+            .select({ id: users.id })
+            .from(users)
+            .where(eq(users.username, value))
+            .limit(1)
         );
 
         if (result.error) return respond.err(ctx, "User not found", 404);
 
-        return ctx.json(
-          { data: { id: result.data[0].id }, message: "User id fetched" },
-          200
-        );
+        return respond.ok(ctx, result.data[0], "User id fetched", 200);
       } else if (type === "suinsDomainName") {
         const result = await tryCatch(
           db
-            .select()
+            .select({ id: users.id })
             .from(users)
             .where(eq(users.suinsDomainName, value))
             .limit(1)
@@ -70,21 +72,19 @@ export default new Hono()
 
         if (result.error) return respond.err(ctx, "User not found", 404);
 
-        return ctx.json(
-          { data: { id: result.data[0].id }, message: "User id fetched" },
-          200
-        );
+        return respond.ok(ctx, result.data[0], "User id fetched", 200);
       } else if (type === "address") {
         const result = await tryCatch(
-          db.select().from(users).where(eq(users.address, value)).limit(1)
+          db
+            .select({ id: users.id })
+            .from(users)
+            .where(eq(users.address, value))
+            .limit(1)
         );
 
         if (result.error) return respond.err(ctx, "User not found", 404);
 
-        return ctx.json(
-          { data: { id: result.data[0].id }, message: "User id fetched" },
-          200
-        );
+        return respond.ok(ctx, result.data[0], "User id fetched", 200);
       } else {
         return respond.err(ctx, "Invalid search criteria", 400);
       }
@@ -108,11 +108,10 @@ export default new Hono()
 
       if (user.error) return respond.err(ctx, "User not found", 404);
 
-      return ctx.json(
-        {
-          data: { user: user.data[0] },
-          message: "User details fetched from ID successfully",
-        },
+      return respond.ok(
+        ctx,
+        user.data[0],
+        "User details fetched from ID successfully",
         200
       );
     }
@@ -123,11 +122,10 @@ export default new Hono()
   // get current user details
   .get("/", async (ctx) => {
     const user = ctx.get("user");
-    return ctx.json(
-      {
-        user,
-        message: "Current user details fetched successfully",
-      },
+    return respond.ok(
+      ctx,
+      user,
+      "Current user details fetched successfully",
       200
     );
   })
@@ -156,20 +154,22 @@ export default new Hono()
           400
         );
 
-      return ctx.json(
-        { data: result.data, message: "User updated successfully" },
-        200
-      );
+      return respond.ok(ctx, {}, "User updated successfully", 200);
     }
   )
   // get user's interactions (likes, saves, reposts, comments, follows, topic follows)
   .get(
-    "/interactions",
+    "/interactions/:type",
     zValidator(
       "query",
       z.object({
         page: zNumberString,
         limit: zNumberString,
+      })
+    ),
+    zValidator(
+      "param",
+      z.object({
         type: z.enum([
           "likes",
           "saves",
@@ -182,7 +182,8 @@ export default new Hono()
     ),
     async (ctx) => {
       const userId = ctx.get("user").id;
-      const { page, limit, type } = ctx.req.valid("query");
+      const { type } = ctx.req.valid("param");
+      const { page, limit } = ctx.req.valid("query");
       const { offset } = getPaginationParams(page, limit);
 
       if (type === "likes") {
@@ -203,11 +204,10 @@ export default new Hono()
             400
           );
 
-        return ctx.json(
-          {
-            data: result.data,
-            message: "User's interactions fetched successfully",
-          },
+        return respond.ok(
+          ctx,
+          { likes: result.data },
+          "User's interactions fetched successfully",
           200
         );
       } else if (type === "saves") {
@@ -228,11 +228,10 @@ export default new Hono()
             400
           );
 
-        return ctx.json(
-          {
-            data: result.data,
-            message: "User's interactions fetched successfully",
-          },
+        return respond.ok(
+          ctx,
+          { saves: result.data },
+          "User's interactions fetched successfully",
           200
         );
       } else if (type === "reposts") {
@@ -253,11 +252,10 @@ export default new Hono()
             400
           );
 
-        return ctx.json(
-          {
-            data: result.data,
-            message: "User's interactions fetched successfully",
-          },
+        return respond.ok(
+          ctx,
+          { reposts: result.data },
+          "User's interactions fetched successfully",
           200
         );
       } else if (type === "comments") {
@@ -278,11 +276,10 @@ export default new Hono()
             400
           );
 
-        return ctx.json(
-          {
-            data: result.data,
-            message: "User's interactions fetched successfully",
-          },
+        return respond.ok(
+          ctx,
+          { comments: result.data },
+          "User's interactions fetched successfully",
           200
         );
       } else if (type === "follows") {
@@ -303,11 +300,10 @@ export default new Hono()
             400
           );
 
-        return ctx.json(
-          {
-            data: result.data,
-            message: "User's interactions fetched successfully",
-          },
+        return respond.ok(
+          ctx,
+          { follows: result.data },
+          "User's interactions fetched successfully",
           200
         );
       } else if (type === "topicFollows") {
@@ -328,11 +324,10 @@ export default new Hono()
             400
           );
 
-        return ctx.json(
-          {
-            data: result.data,
-            message: "User's interactions fetched successfully",
-          },
+        return respond.ok(
+          ctx,
+          { topicFollows: result.data },
+          "User's interactions fetched successfully",
           200
         );
       } else {
@@ -341,31 +336,46 @@ export default new Hono()
     }
   )
   // get suggested users to follow
-  .get("/suggestions", async (ctx) => {
-    const userId = ctx.get("user").id;
+  .get(
+    "/suggestions",
+    zValidator(
+      "query",
+      z.object({
+        limit: zNumberString,
+        page: zNumberString,
+      })
+    ),
+    async (ctx) => {
+      const userId = ctx.get("user").id;
+      const { limit, page } = ctx.req.valid("query");
+      const { offset } = getPaginationParams(page, limit);
 
-    // get 5 random users excluding the current user
-    const result = await tryCatch(
-      db
-        .select()
-        .from(users)
-        .where(not(eq(users.id, userId)))
-        .orderBy(sql`RANDOM()`)
-        .limit(5)
-    );
-
-    if (result.error)
-      return respond.err(
-        ctx,
-        result.error?.message || "Failed to get suggested users",
-        400
+      // get 5 random users excluding the current user
+      const result = await tryCatch(
+        db
+          .select()
+          .from(users)
+          .where(not(eq(users.id, userId)))
+          .orderBy(sql`RANDOM()`)
+          .limit(limit)
+          .offset(offset)
       );
 
-    return ctx.json(
-      { data: result.data, message: "Suggested users fetched successfully" },
-      200
-    );
-  })
+      if (result.error)
+        return respond.err(
+          ctx,
+          result.error?.message || "Failed to get suggested users",
+          400
+        );
+
+      return respond.ok(
+        ctx,
+        { suggestions: result.data },
+        "Suggested users fetched successfully",
+        200
+      );
+    }
+  )
   // suins sync
   .get("/suins/sync", async (ctx) => {
     const userId = ctx.get("user").id;
@@ -378,10 +388,7 @@ export default new Hono()
         400
       );
 
-    return ctx.json(
-      { data: result.data, message: "Suins synced successfully" },
-      200
-    );
+    return respond.ok(ctx, result.data, "Suins synced successfully", 200);
   })
   // user owned awards
   .get(
@@ -417,8 +424,10 @@ export default new Hono()
             400
           );
 
-        return ctx.json(
-          { data: result.data, message: "User awards fetched successfully" },
+        return respond.ok(
+          ctx,
+          { awards: result.data },
+          "User awards fetched successfully",
           200
         );
       } else if (type === "given") {
@@ -439,8 +448,10 @@ export default new Hono()
             400
           );
 
-        return ctx.json(
-          { data: result.data, message: "User awards fetched successfully" },
+        return respond.ok(
+          ctx,
+          { awards: result.data },
+          "User awards fetched successfully",
           200
         );
       } else {

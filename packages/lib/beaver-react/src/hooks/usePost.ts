@@ -1,14 +1,16 @@
-import { useBeaverClient } from "./client";
+import { useBeaverClient } from ".";
+import { useMutation } from "@tanstack/react-query";
 
 /**
  * Hook to access the post module of the Beaver client
  */
-export const usePost = () => {
+export default function usePost() {
   const client = useBeaverClient();
-
-  return useMutation({
+  const result = useMutation({
     mutationFn: async (options: Parameters<typeof client.post.getByID>[0]) => {
       return client.post.getByID(options);
     },
   });
-};
+
+  return result;
+}

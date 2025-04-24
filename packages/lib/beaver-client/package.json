@@ -30,6 +30,7 @@
     "@aws-sdk/client-s3": "^3.779.0",
     "@hono/client": "^0.0.3",
     "server": "workspace:*",
+    "jwt-decode": "^4.0.0",
     "contracts": "workspace:*"
   }
 }

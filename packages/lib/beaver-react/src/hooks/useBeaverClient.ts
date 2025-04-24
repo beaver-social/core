@@ -5,7 +5,7 @@ import { BeaverContext } from "../context/beaver";
  * Hook to access the Beaver client and its state
  * @returns The BeaverClient instance and its state
  */
-export function useBeaverClient() {
+export default function useBeaverClient() {
   const { client } = useContext(BeaverContext);
 
   if (!client) {

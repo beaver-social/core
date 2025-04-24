@@ -85,7 +85,6 @@ export default class User {
    */
   public async getCurrentUser() {
     const { apiClient } = this.defaults;
-
     return safeParseResponse(apiClient.user.$get());
   }
 
@@ -107,10 +106,8 @@ export default class User {
    * @returns A promise that resolves to the user ID.
    */
   public async find(options: {
-    identity?: string;
-    username?: string;
-    suinsDomainName?: string;
-    address?: string;
+    type: "identity" | "username" | "suinsDomainName" | "address";
+    value: string;
   }) {
     const { apiClient } = this.defaults;
 
@@ -124,28 +121,26 @@ export default class User {
    * @param options The page, limit, and interaction type
    * @returns A promise that resolves to the interactions data.
    */
-  public async getInteractions(options: {
-    page?: number;
-    limit?: number;
-    type:
+  public async getInteractions<
+    T extends
       | "likes"
       | "saves"
       | "reposts"
       | "comments"
       | "follows"
-      | "topicFollows";
-  }) {
+      | "topicFollows"
+  >(options: { page?: number; limit?: number; type: T }) {
     const { apiClient } = this.defaults;
     const { page, limit, type } = options;
 
     return safeParseResponse(
-      apiClient.user.interactions.$get({
+      apiClient.user.interactions[":type"].$get({
+        param: { type },
         query: {
           page: page ? page.toString() : "1",
           limit: limit ? limit.toString() : "10",
-          type,
         },
-      })
+      }) as Promise<any>
     );
   }
 
@@ -153,10 +148,18 @@ export default class User {
    * Get suggested users to follow
    * @returns A promise that resolves to suggested users.
    */
-  public async getSuggestions() {
+  public async getSuggestions(options: { page?: number; limit?: number }) {
     const { apiClient } = this.defaults;
+    const { page, limit } = options;
 
-    return safeParseResponse(apiClient.user.suggestions.$get());
+    return safeParseResponse(
+      apiClient.user.suggestions.$get({
+        query: {
+          page: page ? page.toString() : "1",
+          limit: limit ? limit.toString() : "10",
+        },
+      })
+    );
   }
 
   /**
@@ -180,20 +183,6 @@ export default class User {
           type,
         },
       })
-    );
-  }
-
-  /**
-   * Get user analytics
-   * @param options The user ID to get analytics for
-   * @returns A promise that resolves to the user analytics data.
-   */
-  public async getAnalytics(options: { userId: number }) {
-    const { apiClient } = this.defaults;
-    const { userId } = options;
-
-    return safeParseResponse(
-      apiClient.user[":id"].analytics.$get({ param: { id: userId } })
     );
   }
 }

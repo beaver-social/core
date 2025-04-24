@@ -3,7 +3,7 @@ import type { API } from "server";
 import { hc } from "hono/client";
 import { S3Client } from "@aws-sdk/client-s3";
 import { Contracts } from "contracts";
-import { Identity } from "./classes/auth";
+import { Identity, ZkService } from "./classes/auth";
 import { Logger } from "./classes/misc";
 import { Post, Swipe } from "./classes/content";
 import { BeaverClientConfig, Defaults, Surface } from "./types";
@@ -83,6 +83,10 @@ export class BeaverClient {
 
   get user() {
     return new User(this.defaults, this.logger);
+  }
+
+  get zk() {
+    return new ZkService(this.defaults, this.logger);
   }
 }
 
