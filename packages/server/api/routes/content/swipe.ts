@@ -24,6 +24,7 @@ export default new Hono()
   /**
    *PUBLIC ROUTES
    **/
+  .use(authenticated)
   // get swipes feed
   .get(
     "/",
@@ -219,11 +220,6 @@ export default new Hono()
       );
     }
   )
-
-  /**
-   *ROUTES FOR SIGNED IN USERS
-   **/
-  .use(authenticated)
   // get user's personal swipes feed
   .get(
     "/user/feed",
