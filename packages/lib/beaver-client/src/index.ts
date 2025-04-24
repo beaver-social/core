@@ -6,7 +6,7 @@ import { Contracts } from "contracts";
 import { Identity, ZkService } from "./classes/auth";
 import { Logger } from "./classes/misc";
 import { Post, Swipe } from "./classes/content";
-import { BeaverClientConfig, Defaults, Surface } from "./types";
+import { BeaverClientConfig, Defaults, Surface } from "./types/client";
 import { User } from "./classes/user";
 import { safeParseResponse } from "./utils/apiClient";
 
@@ -91,4 +91,5 @@ export class BeaverClient {
 }
 
 // Export types
-export * from "./types";
+export * from "./types/client";
+export * from "./types/zk";

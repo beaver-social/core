@@ -4,43 +4,22 @@ import { toast } from "sonner";
 import { useZkAuthStore } from "@/shared/stores/zustand";
 import Icon from "@/shared/components/Icon";
 import zkLoginService from "@/shared/lib/zkLoginService";
+import { useAuth } from "@beaver/react";
 
 type Props = {}
 
 export default function GoogleOAuth({ }: Props) {
-    const zkAuthStore = useZkAuthStore();
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { zkLoginCallback } = useAuth();
 
     useEffect(() => {
         const handleOAuthRedirect = async () => {
             if (window.location.hash.includes('id_token')) {
                 setIsLoading(true);
                 try {
-                    // Get ephemeral keypair from session storage
-                    const storedKeyPair = sessionStorage.getItem('zkLoginEphemeralKeyPair');
-
-                    if (!storedKeyPair) {
-                        throw new Error("No ephemeral keypair found in session. Please try again.");
-                    }
-
-                    const ephemeralKeyPair = JSON.parse(storedKeyPair);
-
-                    // Complete the zkLogin flow
-                    const zkLoginData = await zkLoginService.completeZkLoginFlow(ephemeralKeyPair, window.location.href);
-                    setIsLoading(false);
-
-                    zkAuthStore.setZkLoginData({
-                        jwt: zkLoginData.jwt,
-                        decodedJwt: zkLoginData.decodedJwt,
-                        userAddress: zkLoginData.userAddress,
-                        userSalt: zkLoginData.userSalt.toString(),
-                        ephemeralKeyPair: ephemeralKeyPair,
-                        partialZkLoginSignature: zkLoginData.partialZkLoginSignature,
+                    await zkLoginCallback({
+                        redirectPath: "/"
                     });
-
-                    // clear session storage
-                    sessionStorage.removeItem('zkLoginEphemeralKeyPair');
-                    window.location.href = '/';
                 } catch (error: any) {
                     toast.error(`Login failed: ${error.message}`);
                 }

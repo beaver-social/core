@@ -1,5 +1,4 @@
 import { ConnectButton, useCurrentWallet } from "@mysten/dapp-kit";
-import { BeaverProvider } from "@beaver/react";
 
 export default function Demo() {
     const { currentWallet, connectionStatus } = useCurrentWallet();

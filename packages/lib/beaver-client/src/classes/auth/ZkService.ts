@@ -11,7 +11,13 @@ import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { Transaction } from "@mysten/sui/transactions";
 import * as jwtDecode from "jwt-decode";
 import { Logger } from "../misc";
-import { Defaults } from "../../types";
+import { Defaults } from "../../types/client";
+import {
+  EphemeralKeyPair,
+  JwtPayload,
+  StoredZkLoginData,
+  ZkLoginData,
+} from "../../types/zk";
 
 type PartialZkLoginSignature = Omit<
   Parameters<typeof getZkLoginSignature>["0"]["inputs"],

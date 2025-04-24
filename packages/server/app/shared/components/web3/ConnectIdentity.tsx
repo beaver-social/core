@@ -8,8 +8,8 @@ import { toast } from "sonner";
 import { formatAddress } from "@mysten/sui/utils";
 import Icon from "../Icon";
 import { useZkAuthStore } from "@/shared/stores/zustand";
-import zkLoginService from "@/shared/lib/zkLoginService";
 import { Image } from "../Image";
+import { useAuth } from "@beaver/react";
 
 type Props = {
     open?: boolean;
@@ -23,13 +23,14 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
     const currentAccount = useCurrentAccount();
     const { mutate: disconnectWallet } = useDisconnectWallet();
     const zkAuthStore = useZkAuthStore();
+    const { zkLogin } = useAuth();
 
     const handleOpenChange = (newOpen: boolean) => {
         setIsOpen(newOpen);
         onOpenChange?.(newOpen);
     };
 
-    const handleDisconnect = () => {
+    const handleDisconnect = async () => {
         // Clear zkLogin data
         sessionStorage.removeItem('zkLoginData');
         sessionStorage.removeItem('zkLoginEphemeralKeyPair');
@@ -44,18 +45,7 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
 
     async function handleGoogleLogin() {
         try {
-            // Generate ephemeral keypair
-            const ephemeralKeyPair = await zkLoginService.generateEphemeralKeyPair();
-
-            // Store only the necessary data in session storage
-            sessionStorage.setItem(
-                "zkLoginEphemeralKeyPair",
-                JSON.stringify(ephemeralKeyPair)
-            );
-
-            // Generate OAuth URL and redirect
-            const oauthUrl = zkLoginService.generateGoogleOAuthUrl(ephemeralKeyPair);
-            window.location.href = oauthUrl;
+            await zkLogin();
         } catch (error: any) {
             toast.error(`Error initiating login: ${error.message}`);
         }

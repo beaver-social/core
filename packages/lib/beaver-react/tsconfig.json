@@ -1,5 +1,5 @@
 {
-  "include": ["."],
+  "include": [".", "../../server/app/shared/context/theme-provider.tsx"],
   "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
     "lib": ["ESNext", "DOM"],

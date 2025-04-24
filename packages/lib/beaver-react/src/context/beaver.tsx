@@ -22,7 +22,6 @@ export type BeaverConfig = {
 
 export function BeaverProvider(props: BeaverConfig) {
     const { children, config } = props;
-
     const [client, setClient] = useState<BeaverClient | null>(null);
 
     function init() {

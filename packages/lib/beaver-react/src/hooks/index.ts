@@ -1,4 +1,3 @@
-import useBeaverClient from "./useBeaverClient";
-import useUser from "./useUser";
+import useAuth from "./useAuth";
 
-export { useBeaverClient, useUser };
+export { useAuth };

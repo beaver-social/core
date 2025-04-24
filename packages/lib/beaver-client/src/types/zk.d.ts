@@ -43,12 +43,9 @@ interface partialZkLoginSignature {
   addressSeed: string;
 }
 
-// Stored zkLogin data in local storage
-interface StoredZkLoginData {
-  ephemeralKeyPair: EphemeralKeyPair;
-  userAddress: string;
-  jwt: string;
-  decodedJwt: JwtPayload;
-  partialZkLoginSignature: partialZkLoginSignature;
-  userSalt: string;
-}
+export type {
+  EphemeralKeyPair,
+  JwtPayload,
+  partialZkLoginSignature,
+  ZkLoginData,
+};
