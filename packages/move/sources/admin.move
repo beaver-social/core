@@ -15,8 +15,8 @@ use beaver_social::posts;
 
 
 /// Error messages.
-const EInvalidAdmin: u64 = 11;
-const ECanNotRemovePastAdmin: u64 = 11;
+const EInvalidAdmin: u64 = 113;
+const ECanNotRemovePastAdmin: u64 = 112;
 
 public struct AdminsRecord has key, store {
     id: UID,
