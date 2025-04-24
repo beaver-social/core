@@ -259,6 +259,49 @@ class Contracts {
       },
     };
   }
+
+  get awards() {
+    return {
+      /**
+       * Gifts an award to a recipient for a specific post.
+       * @param tx - The Transaction object to add the move call to.
+       * @param args - The arguments for gifting an award.
+       * @param args.awardsData - The AwardsData shared object.
+       * @param args.recipient - The address of the recipient.
+       * @param args.awardType - The type of award (0=Gold, 1=Silver, 2=Bronze).
+       * @param args.payment - The SUI coin object for payment.
+       * @param args.postId - The ID of the post being awarded.
+       */
+      gift: (
+        tx: Transaction,
+        args: {
+          awardsData: MoveKey;
+          recipient: string;
+          awardType: number;
+          payment: MoveKey;
+          postId: number;
+        }
+      ) => {
+        const awardsData = tx.object(args.awardsData.id);
+        const registry = tx.object(this.config.objects.registry.id);
+        const payment = tx.object(args.payment.id);
+        const clock = tx.object(this.config.objects.clock.id);
+
+        tx.moveCall({
+          target: `${this.config.packageId}::awards::gift`,
+          arguments: [
+            awardsData,
+            registry,
+            tx.pure(bcs.Address.serialize(formatAddress(args.recipient))),
+            tx.pure.u64(args.awardType),
+            payment,
+            tx.pure.u64(args.postId),
+            clock,
+          ],
+        });
+      },
+    };
+  }
 }
 
 export default Contracts;
