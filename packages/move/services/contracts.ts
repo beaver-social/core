@@ -211,6 +211,54 @@ class Contracts {
       },
     };
   }
+
+  get post() {
+    return {
+      /**
+       * Creates a new post in the posts registry.
+       * @param tx - The Transaction object to add the move call to.
+       * @param args - The arguments for creating a post.
+       * @param args.postsRegistry - The PostsRegistry object.
+       * @param args.identityRegistration - The IdentityRegistration object of the author.
+       * @param args.username - The username of the author.
+       * @param args.postId - The unique ID for the post.
+       * @param args.content - The content of the post.
+       * @param args.attested - The attestation vector (typically a signature).
+       * @param args.beaverPosts - The MY_BEAVER_POSTS collection for the user.
+       */
+      push: (
+        tx: Transaction,
+        args: {
+          postsRegistry: MoveKey;
+          identityRegistration: MoveKey;
+          username: string;
+          postId: number;
+          content: string;
+          attested: Uint8Array;
+          collection: MoveKey;
+        }
+      ) => {
+        const postsRegistry = tx.object(args.postsRegistry.id);
+        const identity = tx.object(args.identityRegistration.id);
+        const collection = tx.object(args.collection.id);
+        const clock = tx.object(this.config.objects.clock.id);
+
+        tx.moveCall({
+          target: `${this.config.packageId}::posts::push`,
+          arguments: [
+            postsRegistry,
+            identity,
+            tx.pure(bcs.String.serialize(args.username)),
+            tx.pure.u64(args.postId),
+            tx.pure(bcs.String.serialize(args.content)),
+            tx.pure(args.attested),
+            collection,
+            clock,
+          ],
+        });
+      },
+    };
+  }
 }
 
 export default Contracts;
