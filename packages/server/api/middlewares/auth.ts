@@ -10,7 +10,7 @@ import { eq } from "drizzle-orm";
 import { zJwtPayload } from "../lib/zod/helpers";
 import { users } from "../schema/user/users";
 import { generateHash } from "../lib/utils";
-import { verifyChallenge as verifyChallengeHelper } from "../routes/auth/helpers";
+import { respond } from "../../utils/respond";
 const cache = new LRUCache<string, DB["user"]>({
   max: 1000,
   ttlAutopurge: true,

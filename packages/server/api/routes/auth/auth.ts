@@ -60,14 +60,15 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
-        { data: {}, message: "Identity Created Successfully" },
+      return respond.ok(
+        ctx,
+        { data: {} },
+        "Identity Created Successfully",
         201
       );
     }
   )
 
-  .use(authenticated)
   .get(
     "/challenge",
     zValidator(
@@ -76,6 +77,7 @@ export default new Hono()
         route: z.string(),
       })
     ),
+    authenticated,
     async (ctx) => {
       const nonce = generateNonce();
       const userId = ctx.get("user").id;
@@ -96,8 +98,10 @@ export default new Hono()
         );
       }
 
-      return ctx.json(
-        { data: { nonce }, message: "Challenge Generated Successfully" },
+      return respond.ok(
+        ctx,
+        { data: { nonce } },
+        "Challenge Generated Successfully",
         200
       );
     }

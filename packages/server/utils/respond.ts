@@ -1,11 +1,11 @@
 import { Context } from "hono";
-import { ResponseHeader } from "hono/utils/headers";
-import {
+import type { ResponseHeader } from "hono/utils/headers";
+import type {
   ClientErrorStatusCode,
   ServerErrorStatusCode,
 } from "hono/utils/http-status";
-import { BaseMime } from "hono/utils/mime";
-import { JSONObject } from "hono/utils/types";
+import type { BaseMime } from "hono/utils/mime";
+import type { JSONObject } from "hono/utils/types";
 
 export const respond = {
   ok: function <

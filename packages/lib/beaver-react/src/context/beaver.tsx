@@ -1,69 +1,50 @@
-import React, { createContext, useEffect, useState, useCallback } from 'react';
-import { BeaverContextValue, BeaverProviderProps } from '../types';
-import { BeaverClient } from '@beaver/client';
+import { createContext, useEffect, useState } from 'react';
+import { BeaverClient, BeaverClientConfig } from "@beaver/client";
+import { surface } from "../lib/surface";
 
-export const BeaverContext = createContext<BeaverContextValue>({
+type BeaverContext = {
+    ready: false;
+    client: null;
+} | {
+    ready: true;
+    client: BeaverClient;
+}
+
+export const BeaverContext = createContext<BeaverContext>({
     client: null,
-    isInitialized: false,
-    isLoading: false,
-    error: null,
+    ready: false
 });
 
+export type BeaverConfig = {
+    children: React.ReactNode;
+    config: BeaverClientConfig;
+}
 
-export const BeaverProvider: React.FC<BeaverProviderProps> = ({
-    children,
-    surface,
-    config
-}) => {
+export function BeaverProvider(props: BeaverConfig) {
+    const { children, config } = props;
+
     const [client, setClient] = useState<BeaverClient | null>(null);
-    const [isInitialized, setIsInitialized] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<Error | null>(null);
 
-    const initialize = useCallback(async () => {
-        try {
-            setIsLoading(true);
-            setError(null);
+    function init() {
+        const beaverClient = new BeaverClient(surface, config);
+        beaverClient.initialize();
+        setClient(beaverClient);
+    }
 
-            const beaverClient = new BeaverClient(surface, config);
-            await beaverClient.initialize();
-            setClient(beaverClient);
-            setIsInitialized(true);
-            setIsLoading(false);
-            return beaverClient;
-        } catch (err) {
-            const errorObj = err instanceof Error ? err : new Error('Failed to initialize Beaver Client');
-            setError(errorObj);
-            setIsLoading(false);
-            throw errorObj;
-        }
-    }, [surface, config]);
-
-    const destroy = useCallback(() => {
-        if (client) {
-            client.destroy();
-            setClient(null);
-            setIsInitialized(false);
-        }
-    }, [client]);
+    const value: BeaverContext = !!client?.ready ? {
+        client: client,
+        ready: true
+    } : {
+        client: null,
+        ready: false
+    }
 
     useEffect(() => {
-        initialize();
-
-        return () => {
-            destroy();
-        };
-    }, [initialize, destroy]);
-
-    const contextValue: BeaverContextValue = {
-        client,
-        isInitialized,
-        isLoading,
-        error,
-    };
+        init();
+    }, [config]);
 
     return (
-        <BeaverContext.Provider value={contextValue}>
+        <BeaverContext.Provider value={value}>
             {children}
         </BeaverContext.Provider>
     );

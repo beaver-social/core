@@ -11,6 +11,7 @@ import { PageErrorBoundary } from "./shared/lib/errorHandling";
 import Shorts from "./pages/shorts";
 import Settings from "./pages/settings";
 import SearchResults from "./pages/explore/SearchResults";
+import Demo from "./pages/demo";
 
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary = (Component: React.ComponentType<any>) => (props: any) => (
@@ -33,6 +34,7 @@ export default function () {
         <Route path="/shorts" element={withPageErrorBoundary(Shorts)({})} />
         <Route path="/settings" element={withPageErrorBoundary(Settings)({})} />
         <Route path="/explore/search" element={withPageErrorBoundary(SearchResults)({})} />
+        <Route path="/demo" element={withPageErrorBoundary(Demo)({})} />
         <Route path="*" element={withPageErrorBoundary(Error404)({})} />
       </Routes>
     </BrowserRouter>

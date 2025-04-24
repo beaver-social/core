@@ -24,8 +24,8 @@ export default class Identity {
       about,
     });
 
+    const signature = await surface.signTransaction(tx);
     const transactionBytes = await tx.build();
-    const signature = await surface.signTransaction(transactionBytes);
 
     return suiClient.executeTransactionBlock({
       transactionBlock: transactionBytes,
@@ -44,8 +44,8 @@ export default class Identity {
       about,
     });
 
+    const signature = await surface.signTransaction(tx);
     const transactionBytes = await tx.build();
-    const signature = await surface.signTransaction(transactionBytes);
 
     return suiClient.executeTransactionBlock({
       transactionBlock: transactionBytes,

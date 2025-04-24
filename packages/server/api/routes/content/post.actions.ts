@@ -1,4 +1,4 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, sql, isNotNull } from "drizzle-orm";
 import { z } from "zod";
 import { zMedia, zReactionType } from "../../lib/zod/helpers";
 import { createAction } from "../../lib/actions/factory";
@@ -574,17 +574,16 @@ export const repostPost = createAction<{
 // Deletes a repost if the user has permission
 export const unrepostPost = createAction<{
   postId: number;
-  repostId: number;
-}>()(async (tx, { postId, repostId, userId }) => {
+}>()(async (tx, { postId, userId }) => {
   // Check if repost exists and user is the author
   const [repost] = await tx
     .select({ authorId: contentSchema.posts.authorId })
     .from(contentSchema.posts)
     .where(
       and(
-        eq(contentSchema.posts.id, repostId),
+        eq(contentSchema.posts.id, postId),
         eq(contentSchema.posts.authorId, userId),
-        eq(contentSchema.posts.parentId, postId)
+        isNotNull(contentSchema.posts.parentId)
       )
     )
     .limit(1);
@@ -602,7 +601,7 @@ export const unrepostPost = createAction<{
   await tx
     .update(contentSchema.posts)
     .set({ deletedAt: Date.now() })
-    .where(eq(contentSchema.posts.id, repostId));
+    .where(eq(contentSchema.posts.id, postId));
 
   // Update repost count on original post
   await tx
@@ -612,7 +611,7 @@ export const unrepostPost = createAction<{
     })
     .where(eq(contentSchema.posts.id, postId));
 
-  return { success: true, repostId };
+  return { success: true };
 });
 
 // Saves a post for the user if it hasn't been saved already

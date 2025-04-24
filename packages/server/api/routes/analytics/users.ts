@@ -7,8 +7,7 @@ import { users } from "../../schema/user/users";
 
 export default new Hono()
   // Get interactions count for a swipe
-  .use(authenticated)
-  .get("/profile", async (ctx) => {
+  .get("/profile", authenticated, async (ctx) => {
     const user = ctx.get("user");
 
     const result = await tryCatch(
