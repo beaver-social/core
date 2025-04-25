@@ -21,7 +21,7 @@ export class BeaverClient {
     const rpcUrl = getFullnodeUrl(config.network || "mainnet");
     const suiClient = new SuiClient({ url: rpcUrl });
     const apiClient = hc<typeof API>(
-      config.apiBaseUrl || "https://api.beaversocial.com/api"
+      config.apiBaseUrl || "https://api.beaversocial.com/api/v1"
     );
     const s3Client = new S3Client();
 
@@ -47,7 +47,7 @@ export class BeaverClient {
     this.logger = logger;
   }
 
-  public async initialize() {
+  public async initialize(callback?: () => void) {
     const contractsResponse = await safeParseResponse(
       this.defaults.apiClient.contracts.$get()
     );
@@ -64,8 +64,8 @@ export class BeaverClient {
     });
 
     this.ready = true;
-    this.logger.info("Client Initialized", this.defaults.contracts);
 
+    !!callback && callback();
     return this;
   }
 

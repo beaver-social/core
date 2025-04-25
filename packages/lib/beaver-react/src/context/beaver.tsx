@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useEffect, useRef, useState } from 'react';
 import { BeaverClient, BeaverClientConfig } from "@beaver/client";
 import { surface } from "../lib/surface";
 
@@ -23,28 +23,35 @@ export type BeaverConfig = {
 export function BeaverProvider(props: BeaverConfig) {
     const { children, config } = props;
     const [client, setClient] = useState<BeaverClient | null>(null);
+    const [ready, setReady] = useState<boolean>(false);
+
+    const flag = useRef(false)
 
     function init() {
         const beaverClient = new BeaverClient(surface, config);
-        beaverClient.initialize();
+        beaverClient.initialize(() => setReady(true));
         setClient(beaverClient);
     }
 
     const value: BeaverContext = !!client?.ready ? {
         client: client,
-        ready: true
+        ready: ready as true
     } : {
         client: null,
-        ready: false
+        ready: ready as false
     }
 
     useEffect(() => {
-        init();
+        if (!flag.current) {
+            flag.current = true
+            init();
+        }
     }, [config]);
+
 
     return (
         <BeaverContext.Provider value={value}>
-            {children}
+            {ready && children}
         </BeaverContext.Provider>
     );
 };

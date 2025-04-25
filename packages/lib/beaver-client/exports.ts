@@ -4,7 +4,6 @@ import type {
   EphemeralKeyPair,
   JwtPayload,
   partialZkLoginSignature,
-  StoredZkLoginData,
   ZkLoginData,
 } from "./src/types/zk";
 
@@ -15,6 +14,5 @@ export {
   EphemeralKeyPair,
   JwtPayload,
   partialZkLoginSignature,
-  StoredZkLoginData,
   ZkLoginData,
 };

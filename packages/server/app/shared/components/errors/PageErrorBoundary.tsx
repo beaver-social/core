@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import ErrorBoundary from './ErrorBoundary';
 import { Button } from '@/shared/components/ui/button';
 import ThemeSwitch from "../ThemeSwitch";
+import Icon from "../Icon";
 
 interface PageErrorBoundaryProps {
     children: React.ReactNode;
@@ -30,10 +31,10 @@ const DefaultErrorFallback = () => {
                         </svg>
                     </div>
 
-                    <h2 className="text-2xl font-bold text-foreground mb-2 animate-in fade-in slide-in-from-bottom-2 duration-300 delay-100">Oops! Something went wrong</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-2 animate-in fade-in slide-in-from-bottom-2 duration-300 delay-100">Something went wrong</h2>
 
                     <p className="text-muted-foreground mb-6 animate-in fade-in slide-in-from-bottom-2 duration-300 delay-150">
-                        We're sorry, but there was an error loading this page.
+                        There was an error loading this page.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-3 justify-center animate-in fade-in slide-in-from-bottom-2 duration-300 delay-200">
@@ -57,11 +58,8 @@ const DefaultErrorFallback = () => {
                             onClick={() => navigate('/')}
                             variant="outline"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                            </svg>
-                            Go to Home
+                            <Icon name="House" />
+                            Go Back
                         </Button>
                     </div>
                 </div>
