@@ -4,6 +4,7 @@ module beaver_social::registry;
 
 use std::{
     string,
+    ascii
 };
 use sui::{
     table,
@@ -15,9 +16,11 @@ use beaver_social::{
 };
 use suins::suins_registration;
 
+
 /// Constants
 const MIN_USERNAME_LENGTH: u64 = 3;
 const MAX_USERNAME_LENGTH: u64 = 32;
+
 
 /// Error messages.
 const EMissingSuins: u64 = 100;
@@ -48,6 +51,7 @@ fun init(ctx: &mut TxContext) {
     transfer::share_object(registry);
 }
 
+
 /// Protected Methods
 
 public(package) fun mint_(
@@ -58,6 +62,10 @@ public(package) fun mint_(
     clock: &clock::Clock,
     ctx: &mut TxContext
 ): IdentityRegistration {
+    // Convert the username to lowercase before processing.
+    let ascii_username = string::to_ascii(username);
+    let username = string::from_ascii(ascii::to_lowercase(&ascii_username));
+
     let username_length = string::length(&username);
     let about_length = string::length(&about);
 
@@ -84,6 +92,7 @@ public(package) fun mint_(
 
     return registration
 }
+
 
 /// Public Methods
 

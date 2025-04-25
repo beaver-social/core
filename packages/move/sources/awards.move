@@ -14,8 +14,10 @@ use sui::{
 };
 use beaver_social::registry as identity_registry;
 
+
 /// Constants
 const BASE_URL: vector<u8> = b"http://xksgo8ggkwsgooc84o0ok0c8.176.57.188.144.sslip.io";
+
 
 /// Error messages.
 const EInsufficientPayment: u64 = 1001;

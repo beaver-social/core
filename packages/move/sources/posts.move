@@ -91,7 +91,7 @@ public entry fun push(
     assert!(string::length(&content) <= MAX_POST_CONTENT_LENGTH, EInvalidPostLength);
 
     let identity_data = identity_registration::identity_data(identity);
-    let author_address = owner(identity_data);
+    let author_address = &owner(identity_data);
     assert!(author_address == tx_context::sender(ctx), EInvalidAuthor);
     
     let identity_username = username(identity);
