@@ -127,7 +127,7 @@ export default function SearchResults() {
     return (
         <Layout
             main={
-                <div className="border mb-10 mx-auto rounded-2xl">
+                <div className="md:border md:rounded-2xl">
                     {/* Search Header */}
                     <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b p-4 rounded-t-2xl">
                         <div className="flex items-center gap-4 mb-5">

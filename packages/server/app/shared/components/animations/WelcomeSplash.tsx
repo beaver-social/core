@@ -2,7 +2,7 @@ import { useTheme } from "@/shared/context/theme-provider";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 
-export default function LoginSuccessAnimation({ onComplete }: { onComplete: () => void }) {
+export default function WelcomeSplash({ onComplete }: { onComplete: () => void }) {
     const { theme } = useTheme();
 
     useEffect(() => {

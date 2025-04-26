@@ -8,7 +8,7 @@ import { useZkAuthStore } from "@/shared/stores/zustand";
 import { Image } from "../Image";
 import { useAuth } from "@beaver/react";
 import { useCurrentAccount } from "@mysten/dapp-kit";
-import LoginSuccessAnimation from "../animations/LoginSuccess";
+import WelcomeSplash from "../animations/WelcomeSplash";
 
 type Props = {
     open?: boolean;
@@ -54,7 +54,7 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
     };
 
     if (showWelcomeSplash) {
-        return <LoginSuccessAnimation onComplete={() => {
+        return <WelcomeSplash onComplete={() => {
             setShowWelcomeSplash(false);
             setShowDisconnectButton(true);
         }} />;
