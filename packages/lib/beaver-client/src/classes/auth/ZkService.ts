@@ -15,8 +15,8 @@ import { Defaults } from "../../types/client";
 import {
   EphemeralKeyPair,
   JwtPayload,
-  StoredZkLoginData,
   ZkLoginData,
+  StoredZkLoginData,
 } from "../../types/zk";
 
 type PartialZkLoginSignature = Omit<
@@ -202,7 +202,7 @@ export default class ZkService {
   async completeZkLoginFlow(
     ephemeralKeyPair: EphemeralKeyPair,
     redirectUrl: string
-  ): Promise<ZkLoginData> {
+  ): Promise<{ data: ZkLoginData | null; error: Error | null }> {
     // Deserialize the ephemeral key pair
     const { jwt, decodedJwt } = this.extractAndDecodeJwt(redirectUrl);
 
@@ -218,14 +218,24 @@ export default class ZkService {
       userSalt
     );
 
+    if (partialZkLoginSignature.error) {
+      return {
+        data: null,
+        error: partialZkLoginSignature.error,
+      };
+    }
+
     // Return all the zkLogin data
     return {
-      ephemeralKeyPair,
-      jwt,
-      decodedJwt,
-      userSalt,
-      userAddress,
-      partialZkLoginSignature,
+      data: {
+        ephemeralKeyPair,
+        jwt,
+        decodedJwt,
+        userSalt,
+        userAddress,
+        partialZkLoginSignature,
+      },
+      error: null,
     };
   }
 

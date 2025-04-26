@@ -1,5 +1,6 @@
 import Icon from "@/shared/components/Icon";
 import { Image } from "@/shared/components/Image";
+import Reactions from "@/shared/components/Reactions";
 
 // Sample replies data
 const repliesData = [
@@ -102,24 +103,7 @@ export default function Replies() {
 
                             <p className="mt-2">{reply.content}</p>
 
-                            <div className="flex justify-between mt-3 text-grey-500 max-w-md">
-                                <div className="flex items-center gap-1 hover:text-primary">
-                                    <Icon name="MessageCircle" weight="light" />
-                                    <span className="text-xs">{reply.comments}</span>
-                                </div>
-                                <div className="flex items-center gap-1 hover:text-green-500">
-                                    <Icon name="Repeat" weight="light" />
-                                    <span className="text-xs">{reply.reposts}</span>
-                                </div>
-                                <div className="flex items-center gap-1 hover:text-red-500">
-                                    <Icon name="Heart" weight="light" />
-                                    <span className="text-xs">{reply.likes}</span>
-                                </div>
-                                <div className="flex items-center gap-1 hover:text-primary">
-                                    <Icon name="Share" weight="light" />
-                                    <span className="text-xs">{reply.shares}</span>
-                                </div>
-                            </div>
+                            <Reactions postId={reply.id} />
                         </div>
                     </div>
                 </div>

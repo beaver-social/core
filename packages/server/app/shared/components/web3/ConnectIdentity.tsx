@@ -16,7 +16,6 @@ type Props = {
     trigger?: React.ReactNode;
 }
 
-
 export default function ConnectIdentity({ open, onOpenChange }: Props) {
     const [isOpen, setIsOpen] = useState(open || false);
     const [showWelcomeSplash, setShowWelcomeSplash] = useState(false);

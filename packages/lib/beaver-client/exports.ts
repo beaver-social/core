@@ -1,18 +1,19 @@
 import { BeaverClient } from "./src";
 import type { BeaverClientConfig, Surface } from "./src";
-import type {
+import {
   EphemeralKeyPair,
   JwtPayload,
   partialZkLoginSignature,
   ZkLoginData,
+  StoredZkLoginData,
 } from "./src/types/zk";
 
-export {
-  BeaverClient,
-  BeaverClientConfig,
-  Surface,
+export { BeaverClient, BeaverClientConfig, Surface };
+
+export type {
   EphemeralKeyPair,
   JwtPayload,
   partialZkLoginSignature,
   ZkLoginData,
+  StoredZkLoginData,
 };

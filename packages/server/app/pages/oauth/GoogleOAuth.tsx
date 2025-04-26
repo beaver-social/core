@@ -1,9 +1,6 @@
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
 import { useEffect, useState } from 'react'
 import { toast } from "sonner";
-import { useZkAuthStore } from "@/shared/stores/zustand";
-import Icon from "@/shared/components/Icon";
-import zkLoginService from "@/shared/lib/zkLoginService";
 import { useAuth } from "@beaver/react";
 
 type Props = {}
@@ -16,13 +13,9 @@ export default function GoogleOAuth({ }: Props) {
         const handleOAuthRedirect = async () => {
             if (window.location.hash.includes('id_token')) {
                 setIsLoading(true);
-                try {
-                    await zkLoginCallback({
-                        redirectPath: "/"
-                    });
-                } catch (error: any) {
-                    toast.error(`Login failed: ${error.message}`);
-                }
+                await zkLoginCallback({
+                    redirectPath: "/"
+                });
             }
         };
 

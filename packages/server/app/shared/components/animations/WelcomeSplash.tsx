@@ -46,15 +46,15 @@ export default function WelcomeSplash({ onComplete }: { onComplete: () => void }
                         />
                         <motion.path
                             d="M65 40L80 65L60 80L40 65L55 40H65Z"
-                            fill={theme === 'dark' ? '#7C3AED' : '#8B5CF6'}
+                            fill={theme === 'dark' ? '#4ca5f9' : '#4ca5f9'}
                             initial={{ pathLength: 0, opacity: 0 }}
                             animate={{
                                 pathLength: 1,
                                 opacity: 1,
                                 fill: [
-                                    theme === 'dark' ? '#7C3AED' : '#8B5CF6',
-                                    theme === 'dark' ? '#9333EA' : '#A78BFA',
-                                    theme === 'dark' ? '#7C3AED' : '#8B5CF6'
+                                    theme === 'dark' ? '#4ca5f9' : '#4ca5f9',
+                                    theme === 'dark' ? '#3f85d3' : '#b9daff',
+                                    theme === 'dark' ? '#4ca5f9' : '#4ca5f9'
                                 ]
                             }}
                             transition={{
@@ -86,7 +86,7 @@ export default function WelcomeSplash({ onComplete }: { onComplete: () => void }
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <motion.path
                                 d="M20 6L9 17L4 12"
-                                stroke={theme === 'dark' ? '#10B981' : '#059669'}
+                                stroke={theme === 'dark' ? '#4ca5f9' : '#4ca5f9'}
                                 strokeWidth="3"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -99,7 +99,7 @@ export default function WelcomeSplash({ onComplete }: { onComplete: () => void }
                 </motion.div>
 
                 <motion.h2
-                    className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-indigo-500"
+                    className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-primary-600"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3, duration: 0.5 }}

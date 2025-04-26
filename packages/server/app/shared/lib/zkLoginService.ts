@@ -216,6 +216,10 @@ class zkLoginService {
       userSalt
     );
 
+    if (partialZkLoginSignature.error) {
+      throw new Error(partialZkLoginSignature.error);
+    }
+
     // Return all the zkLogin data
     return {
       ephemeralKeyPair,

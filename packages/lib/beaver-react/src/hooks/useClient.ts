@@ -9,9 +9,7 @@ export default function useBeaverClient() {
   const { client } = useContext(BeaverContext);
 
   if (!client) {
-    throw new Error(
-      "Not yet  initialized or Provider not present please try again"
-    );
+    throw new Error("Not yet initialized / Provider not found.");
   }
 
   return client;

@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Transaction } from "@mysten/sui/transactions";
 import zkLoginService from "@/shared/lib/zkLoginService";
 import { Image } from "@/shared/components/Image";
+import Reactions from "@/shared/components/Reactions";
 
 type FeedPostProps = {
   id: string;
@@ -30,70 +31,11 @@ function FeedPost({
   content,
   images,
   aspectRatio,
-  likes,
-  comments,
-  reposts,
-  shares,
   avatarUrl,
 }: FeedPostProps) {
   const navigate = useNavigate();
   const zkAuthStore = useZkAuthStore();
 
-  async function handleLike(e: React.MouseEvent<HTMLButtonElement>) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    console.log("Liking post queued");
-
-    try {
-      if (!zkAuthStore.zkLoginData) {
-        throw new Error("No zkLogin data found");
-      }
-
-      const tx = new Transaction();
-
-      const result = await zkLoginService.executeTransactionWithZkLogin(
-        zkAuthStore.zkLoginData,
-        tx
-      );
-
-      if (result.success) {
-        console.log({ result });
-        toast.success("Transaction executed successfully");
-      } else {
-        console.log({ result });
-        throw new Error(result.error);
-      }
-    } catch (error: any) {
-      console.log({ error });
-      toast.error(`Error liking post: ${error.message}`);
-    }
-  }
-
-  async function handleComment(e: React.MouseEvent<HTMLButtonElement>) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    console.log("Commenting on post queued");
-
-    try {
-      if (!zkAuthStore.zkLoginData) {
-        throw new Error("No zkLogin data found");
-      }
-
-      const message = "Commenting on post";
-
-      const result = await zkLoginService.zkSignPersonalMessage(
-        zkAuthStore.zkLoginData,
-        message
-      );
-
-      console.log({ result });
-    } catch (error: any) {
-      console.log({ error });
-      toast.error(`Error commenting on post: ${error.message}`);
-    }
-  }
 
   return (
     <div
@@ -149,49 +91,7 @@ function FeedPost({
             )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-6 mt-4 w-[32rem] justify-between">
-            <button
-              className="flex items-center gap-2 text-hover group"
-              onClick={handleLike}
-            >
-              <Icon
-                name="Heart"
-                className="w-5 h-5 group-hover:text-rose-500"
-              />
-              <span className="text-sm">{likes}</span>
-            </button>
-            <button
-              className="flex items-center gap-2 text-hover group"
-              onClick={handleComment}
-            >
-              <Icon
-                name="BotMessageSquare"
-                className="w-5 h-5 group-hover:text-emerald-500"
-              />
-              <span className="text-sm">{comments}</span>
-            </button>
-            <button
-              className="flex items-center gap-2 text-hover group"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Icon
-                name="Repeat"
-                className="w-5 h-5 group-hover:text-sky-500"
-              />
-              <span className="text-sm">{reposts}</span>
-            </button>
-            <button
-              className="flex items-center gap-2 text-hover group"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Icon
-                name="Share2"
-                className="w-5 h-5 group-hover:text-amber-500"
-              />
-              <span className="text-sm">{shares}</span>
-            </button>
-          </div>
+          <Reactions postId={id} />
         </div>
       </article>
     </div>

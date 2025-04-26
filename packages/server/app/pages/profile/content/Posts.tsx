@@ -1,5 +1,6 @@
 import Icon from "@/shared/components/Icon";
 import { Image } from "@/shared/components/Image";
+import Reactions from "@/shared/components/Reactions";
 
 // Sample post data for demonstration
 const samplePosts = [
@@ -98,24 +99,7 @@ export default function PostData() {
                                 </div>
                             )}
 
-                            <div className="flex justify-between mt-3 text-grey-500 max-w-md">
-                                <div className="flex items-center gap-1 hover:text-primary">
-                                    <Icon name="MessageCircle" weight="light" />
-                                    <span className="text-xs">{post.comments}</span>
-                                </div>
-                                <div className="flex items-center gap-1 hover:text-green-500">
-                                    <Icon name="Repeat" weight="light" />
-                                    <span className="text-xs">{post.reposts}</span>
-                                </div>
-                                <div className="flex items-center gap-1 hover:text-red-500">
-                                    <Icon name="Heart" weight="light" />
-                                    <span className="text-xs">{post.likes}</span>
-                                </div>
-                                <div className="flex items-center gap-1 hover:text-primary">
-                                    <Icon name="Share" weight="light" />
-                                    <span className="text-xs">{post.shares}</span>
-                                </div>
-                            </div>
+                            <Reactions postId={post.id} />
                         </div>
                     </div>
                 </div>

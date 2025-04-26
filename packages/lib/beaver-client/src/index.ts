@@ -9,6 +9,7 @@ import { Post, Swipe } from "./classes/content";
 import { BeaverClientConfig, Defaults, Surface } from "./types/client";
 import { User } from "./classes/user";
 import { safeParseResponse } from "./utils/apiClient";
+import Auth from "./classes/auth/Auth";
 
 export class BeaverClient {
   config: BeaverClientConfig;
@@ -83,6 +84,10 @@ export class BeaverClient {
 
   get user() {
     return new User(this.defaults, this.logger);
+  }
+
+  get auth() {
+    return new Auth(this.defaults, this.logger);
   }
 
   get zk() {
