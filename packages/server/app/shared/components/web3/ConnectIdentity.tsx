@@ -2,14 +2,13 @@ import { useState, useEffect } from "react";
 import { Button } from "../ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "../ui/dialog"
 import { WalletButton } from "./Wallet"
-import { useTheme } from "@/shared/context/theme-provider";
-import { useCurrentAccount, useDisconnectWallet } from "@mysten/dapp-kit";
 import { toast } from "sonner";
-import { formatAddress } from "@mysten/sui/utils";
 import Icon from "../Icon";
 import { useZkAuthStore } from "@/shared/stores/zustand";
 import { Image } from "../Image";
 import { useAuth } from "@beaver/react";
+import { useCurrentAccount } from "@mysten/dapp-kit";
+import LoginSuccessAnimation from "../animations/LoginSuccess";
 
 type Props = {
     open?: boolean;
@@ -17,46 +16,58 @@ type Props = {
     trigger?: React.ReactNode;
 }
 
-export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) {
+
+export default function ConnectIdentity({ open, onOpenChange }: Props) {
     const [isOpen, setIsOpen] = useState(open || false);
-    const { theme } = useTheme();
-    const currentAccount = useCurrentAccount();
-    const { mutate: disconnectWallet } = useDisconnectWallet();
+    const [showWelcomeSplash, setShowWelcomeSplash] = useState(false);
+    const [showDisconnectButton, setShowDisconnectButton] = useState(false);
+    const [isLoadingGoogleOAuthScreen, setIsLoadingGoogleOAuthScreen] = useState(false);
     const zkAuthStore = useZkAuthStore();
-    const { zkLogin } = useAuth();
+    const { zkLogin, logout } = useAuth();
+    const currentAccount = useCurrentAccount();
+
+    useEffect(() => {
+        if (zkAuthStore.zkLoginData?.userAddress || currentAccount?.address) {
+            setShowDisconnectButton(true);
+        }
+    }, [zkAuthStore.zkLoginData?.userAddress, currentAccount?.address]);
+
+    useEffect(() => {
+        if (currentAccount?.address && !showWelcomeSplash && !showDisconnectButton) {
+            setShowWelcomeSplash(true);
+            handleOpenChange(false);
+        }
+    }, [currentAccount?.address, showWelcomeSplash, showDisconnectButton]);
 
     const handleOpenChange = (newOpen: boolean) => {
         setIsOpen(newOpen);
         onOpenChange?.(newOpen);
     };
 
-    const handleDisconnect = async () => {
-        // Clear zkLogin data
-        sessionStorage.removeItem('zkLoginData');
-        sessionStorage.removeItem('zkLoginEphemeralKeyPair');
-
-        toast.success("Identity disconnected");
-
-        // Disconnect wallet if connected
-        if (currentAccount) {
-            disconnectWallet();
+    const handleDisconnect = async (type: "wallet" | "social") => {
+        try {
+            await logout(type);
+            setShowDisconnectButton(false);
+        } catch (error) {
+            toast.error(`Error disconnecting identity: ${error}`);
         }
     };
 
-    async function handleGoogleLogin() {
-        try {
-            await zkLogin();
-        } catch (error: any) {
-            toast.error(`Error initiating login: ${error.message}`);
-        }
+    if (showWelcomeSplash) {
+        return <LoginSuccessAnimation onComplete={() => {
+            setShowWelcomeSplash(false);
+            setShowDisconnectButton(true);
+        }} />;
     }
 
-    if (zkAuthStore.zkLoginData?.userAddress) {
+    if (showDisconnectButton) {
         return (
             <div>
-                <Button variant="neon">
-                    <Icon name="Wallet" className="size-4" />
-                    <p>{formatAddress(zkAuthStore.zkLoginData.userAddress)}</p>
+                <Button variant="neon" onClick={() => handleDisconnect(
+                    zkAuthStore.zkLoginData?.userAddress ? "social" : "wallet"
+                )}>
+                    <Icon name="LogOut" className="size-4" />
+                    <p>Disconnect</p>
                 </Button>
             </div>
         )
@@ -66,7 +77,8 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
                 <Button variant="neon">
-                    Connect Identity
+                    <Icon name="LogIn" className="size-4" />
+                    <p>Connect Identity</p>
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
@@ -80,24 +92,20 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
                     {/* Social Login Section */}
                     <div className="space-y-2">
                         <h3 className="text-sm font-medium text-muted-foreground">Continue with</h3>
-                        <div className="grid grid-cols-2 gap-2">
-                            <Button
-                                variant="outline"
-                                className="w-full"
-                                onClick={handleGoogleLogin}
-                            >
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={async () => {
+                                setIsLoadingGoogleOAuthScreen(true);
+                                await zkLogin();
+                            }}
+                        >
+                            {isLoadingGoogleOAuthScreen ? (
+                                <Icon name="LoaderCircle" className="size-4 animate-spin" />
+                            ) : (
                                 <Image src="/icons/google_icon.png" alt="Google" className="size-6" />
-                            </Button>
-                            <Button variant="outline" className="w-full">
-                                {
-                                    theme === "dark" ? (
-                                        <Image src="/icons/x_icon_dark.png" alt="X" className="size-7 p-1" />
-                                    ) : (
-                                        <Image src="/icons/x_icon_light.png" alt="X" className="size-7 p-1" />
-                                    )
-                                }
-                            </Button>
-                        </div>
+                            )}
+                        </Button>
                     </div>
 
                     {/* Divider */}
@@ -116,8 +124,10 @@ export default function ConnectIdentity({ open, onOpenChange, trigger }: Props) 
                     <div className="space-y-2">
                         <h3 className="text-sm font-medium text-muted-foreground">Connect Wallet</h3>
                         <div className="space-y-2 w-full">
-                            <WalletButton />
-                            {/* <NetworkSelector /> */}
+                            <WalletButton onConnected={() => {
+                                handleOpenChange(false);
+                                setShowWelcomeSplash(true);
+                            }} />
                         </div>
                     </div>
                 </div>

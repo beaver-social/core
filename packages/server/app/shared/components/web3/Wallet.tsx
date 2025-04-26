@@ -1,61 +1,23 @@
 import { Button } from "@/shared/components/ui/button"
-import { ConnectModal, useCurrentAccount, useDisconnectWallet, useSuiClientContext } from '@mysten/dapp-kit';
+import { ConnectModal, useCurrentAccount } from '@mysten/dapp-kit';
 import Icon from "../Icon";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/shared/components/ui/select"
-import { useState } from "react";
-import { formatAddress } from "@mysten/sui/utils";
-import { toast } from "sonner";
+import { useState, useEffect } from "react";
 
 type Props = {}
 
-export function NetworkSelector() {
-    const ctx = useSuiClientContext();
-
-    return (
-        <>
-            <Select>
-                <SelectTrigger className="">
-                    <SelectValue placeholder="Select a network" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>All Networks</SelectLabel>
-                        {Object.keys(ctx.networks).map((network) => (
-                            <SelectItem key={network} value={network}>
-                                {network}
-                            </SelectItem>
-                        ))}
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-        </>
-    )
-}
-
-export function WalletButton() {
-    const currentAccount = useCurrentAccount();
-    const { mutate: disconnectWallet } = useDisconnectWallet();
+export function WalletButton({ onConnected }: { onConnected?: () => void }) {
     const [open, setOpen] = useState(false);
+    const currentAccount = useCurrentAccount();
+    const [previousConnectionState, setPreviousConnectionState] = useState(!!currentAccount?.address);
 
-    if (currentAccount?.address) {
-        return (
-            <Button variant="outline" className="w-full" onClick={() => {
-                disconnectWallet();
-                toast.success("Wallet disconnected");
-            }}>
-                <Icon name="LogOut" />
-                {formatAddress(currentAccount?.address)}
-            </Button>
-        )
-    }
+    // Monitor for successful wallet connections
+    useEffect(() => {
+        if (!previousConnectionState && currentAccount?.address) {
+            // Connection just happened
+            onConnected?.();
+        }
+        setPreviousConnectionState(!!currentAccount?.address);
+    }, [currentAccount?.address, previousConnectionState, onConnected]);
 
     return (
         <ConnectModal

@@ -10,14 +10,18 @@ interface IAuthHook {
   zkLogin: () => Promise<void>;
   zkLoginCallback: (options: { redirectPath: string }) => Promise<void>;
   walletLogin: (variables: any, options: any) => Promise<void>;
-  logout: (variables: any, options: any) => Promise<void>;
+  logout: (
+    type: "wallet" | "social",
+    variables?: any,
+    options?: any
+  ) => Promise<void>;
 }
 
 export default function useAuth(): IAuthHook {
   const client = useBeaverClient();
   const zkAuthStore = useZkAuthStore();
   const { mutate: connectWallet } = useConnectWallet();
-  const { mutate: disconnectWallet } = useDisconnectWallet();
+  const { mutateAsync: disconnectWallet } = useDisconnectWallet();
   const currentAccount = useCurrentAccount();
 
   async function zkLogin() {
@@ -73,22 +77,21 @@ export default function useAuth(): IAuthHook {
   }
 
   async function logout(
-    variables: Parameters<typeof disconnectWallet>[0],
-    options: Parameters<typeof disconnectWallet>[1]
+    type: "wallet" | "social",
+    variables?: Parameters<typeof disconnectWallet>[0],
+    options?: Parameters<typeof disconnectWallet>[1]
   ) {
-    // Remove zkLoginData from session storage
-    if (sessionStorage.getItem("zkLoginData")) {
-      sessionStorage.removeItem("zkLoginData");
-    }
-
-    // Remove zkLoginEphemeralKeyPair from session storage
-    if (sessionStorage.getItem("zkLoginEphemeralKeyPair")) {
-      sessionStorage.removeItem("zkLoginEphemeralKeyPair");
-    }
-
     // Disconnect wallet
-    if (currentAccount) {
+    if (type === "wallet" && currentAccount?.address) {
       disconnectWallet(variables, options);
+      window.location.reload();
+    } else if (type === "social") {
+      if (localStorage.getItem("zk-auth-store")) {
+        localStorage.removeItem("zk-auth-store");
+      }
+      window.location.reload();
+    } else {
+      throw new Error("Invalid logout type");
     }
   }
 
