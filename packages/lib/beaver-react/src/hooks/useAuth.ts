@@ -8,11 +8,12 @@ import { tryCatch } from "../lib/tryCatch";
 import { useZkAuthStore } from "../store/zk";
 import { StoredZkLoginData } from "@beaver/client";
 import { useState } from "react";
-import { User } from "../types/user";
+import type { User } from "@beaver/client";
 
 interface IAuthHook {
   user: User | null;
   zkLoginData: StoredZkLoginData | null;
+  getUser: () => Promise<any>;
   zkLogin: () => Promise<any>;
   zkLoginCallback: (options: { redirectPath: string }) => Promise<any>;
   walletLogin: (variables: any, options?: any) => Promise<any>;
@@ -36,6 +37,17 @@ export default function useAuth(): IAuthHook {
   const { mutateAsync: disconnectWallet } = useDisconnectWallet();
   const currentAccount = useCurrentAccount();
   const [user, setUser] = useState<User | null>(null);
+  const [jwt, setJwt] = useState<string | null>(null);
+
+  async function getUser() {
+    const result = await tryCatch(client.user.getCurrentUser());
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    setUser(result.data as any);
+  }
 
   async function zkLogin() {
     // Generate ephemeral keypair
@@ -91,8 +103,8 @@ export default function useAuth(): IAuthHook {
       const zkLoginData = result.data;
 
       zkAuthStore.setZkLoginData({
+        userId: zkLoginData.userId,
         jwt: zkLoginData.jwt,
-        decodedJwt: zkLoginData.decodedJwt,
         userAddress: zkLoginData.userAddress,
         userSalt: zkLoginData.userSalt.toString(),
         ephemeralKeyPair: ephemeralKeyPair,
@@ -164,6 +176,7 @@ export default function useAuth(): IAuthHook {
   return {
     user,
     zkLoginData: zkAuthStore.zkLoginData,
+    getUser,
     zkLogin,
     zkLoginCallback,
     walletLogin,

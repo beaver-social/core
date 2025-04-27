@@ -1,3 +1,5 @@
+import { User } from "./schema";
+
 // zkLoginService - JwtPayload
 interface JwtPayload {
   iss?: string;
@@ -19,6 +21,7 @@ interface EphemeralKeyPair {
 
 // zkLoginService -zkLoginData
 interface ZkLoginData {
+  userId: number | null;
   ephemeralKeyPair: EphemeralKeyPair;
   jwt: string;
   decodedJwt: JwtPayload;
@@ -44,10 +47,10 @@ interface partialZkLoginSignature {
 }
 
 interface StoredZkLoginData {
+  userId: number | null;
   ephemeralKeyPair: EphemeralKeyPair;
   userAddress: string;
   jwt: string;
-  decodedJwt: JwtPayload;
   partialZkLoginSignature: partialZkLoginSignature;
   userSalt: string;
 }

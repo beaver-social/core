@@ -18,6 +18,8 @@ import {
   ZkLoginData,
   StoredZkLoginData,
 } from "../../types/zk";
+import { tryCatch } from "../../utils/tryCatch";
+import { safeParseResponse } from "../../utils/apiClient";
 
 type PartialZkLoginSignature = Omit<
   Parameters<typeof getZkLoginSignature>["0"]["inputs"],
@@ -225,9 +227,25 @@ export default class ZkService {
       };
     }
 
+    // if user exists, get user id
+    let userId: number | null = null;
+    const userResp = await safeParseResponse(
+      this.defaults.apiClient.user.find.$get({
+        query: {
+          type: "address",
+          value: userAddress,
+        },
+      })
+    );
+
+    if (userResp.data) {
+      userId = userResp.data.id;
+    }
+
     // Return all the zkLogin data
     return {
       data: {
+        userId,
         ephemeralKeyPair,
         jwt,
         decodedJwt,
@@ -245,9 +263,13 @@ export default class ZkService {
     message: string
   ): Promise<{ zkLoginSignature: string }> {
     const ephemeralKeyPair = zkLoginData.ephemeralKeyPair;
-    const aud = zkLoginData.decodedJwt.aud;
+
+    const jwt = zkLoginData.jwt;
+    const decodedJwt = jwtDecode.jwtDecode(jwt);
+
+    const aud = decodedJwt.aud;
     const audienceString = Array.isArray(aud) ? aud[0] : (aud as string);
-    const subString = zkLoginData.decodedJwt.sub as string;
+    const subString = decodedJwt.sub as string;
 
     const addressSeed = genAddressSeed(
       BigInt(zkLoginData.userSalt),
@@ -299,6 +321,9 @@ export default class ZkService {
   ): Promise<{ zkLoginSignature: string; txBytes: Uint8Array }> {
     const ephemeralKeyPair = zkLoginData.ephemeralKeyPair;
 
+    const jwt = zkLoginData.jwt;
+    const decodedJwt = jwtDecode.jwtDecode(jwt);
+
     // get keypair from secret key
     const keypair = Ed25519Keypair.fromSecretKey(ephemeralKeyPair.secretKey);
 
@@ -308,8 +333,8 @@ export default class ZkService {
     const userSignature = (await keypair.signTransaction(txBytes)).signature;
 
     // Generate ZKLogin signature
-    const aud = zkLoginData.decodedJwt.aud;
-    const subString = zkLoginData.decodedJwt.sub as string;
+    const aud = decodedJwt.aud;
+    const subString = decodedJwt.sub as string;
     const audienceString = Array.isArray(aud) ? aud[0] : (aud as string);
 
     const addressSeed = genAddressSeed(

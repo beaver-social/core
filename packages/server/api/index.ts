@@ -33,10 +33,10 @@ const app = new Hono()
   )
 
   .route("auth", authIndex)
-  .route("content", contentIndex)
-  .route("misc", miscIndex)
+  // .route("content", contentIndex)
+  // .route("misc", miscIndex)
+  // .route("analytics", analyticsIndex)
   .route("user", userIndex)
-  .route("analytics", analyticsIndex)
 
   // handlers
   .get("/stats", async (ctx) => {

@@ -1,7 +1,7 @@
 import { Logger } from "../misc";
 import { tryCatch } from "../../utils/tryCatch";
 import { safeParseResponse } from "../../utils/apiClient";
-import { Defaults } from "../../types";
+import { Defaults } from "../../types/client";
 
 export default class User {
   /** @hidden */

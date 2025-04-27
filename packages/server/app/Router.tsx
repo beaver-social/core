@@ -24,24 +24,19 @@ const withPageErrorBoundary = (Component: React.ComponentType<any>) => (props: a
   </PageErrorBoundary>
 );
 
-// Route protection for checking onboarding status
 function OnboardingProtection({ children }: { children: React.ReactNode }) {
-  // redirect to onboarding if user is logged in but onboarding is not complete
   const { onboardingProgress } = useGlobalUIStore();
   const { user } = useAuth();
   const location = useLocation();
 
-  // If we have a logged in user and there's onboarding progress that's not complete
   if (user && onboardingProgress &&
     (!onboardingProgress.completed.includes(5) ||
       onboardingProgress.completed.length < 5)) {
-    // Don't redirect if we're already at the onboarding page or OAuth page
     if (location.pathname !== "/onboarding" && !location.pathname.includes("/oauth")) {
       return <Navigate to="/onboarding" replace />;
     }
   }
 
-  // Otherwise, render the requested route
   return <>{children}</>;
 }
 

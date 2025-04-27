@@ -98,3 +98,4 @@ export class BeaverClient {
 // Export types
 export * from "./types/client";
 export * from "./types/zk";
+export * from "./types/schema";

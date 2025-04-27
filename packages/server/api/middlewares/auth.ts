@@ -11,6 +11,7 @@ import { zJwtPayload } from "../lib/zod/helpers";
 import { users } from "../schema/user/users";
 import { generateHash } from "../lib/utils";
 import { respond } from "../../utils/respond";
+
 const cache = new LRUCache<string, DB["user"]>({
   max: 1000,
   ttlAutopurge: true,
@@ -40,6 +41,7 @@ export const authenticated = createMiddleware<{
 
   const { sub } = zJwtPayload.parse(decodedJwt.data);
 
+  // this will fetch user for every request, replace with redis cache later.
   let [user] = await db.select().from(users).where(eq(users.id, sub)).limit(1);
   ctx.set("user", user);
 

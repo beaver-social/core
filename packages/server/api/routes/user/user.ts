@@ -83,7 +83,6 @@ export default new Hono()
         );
 
         if (result.error) return respond.err(ctx, "User not found", 404);
-
         return respond.ok(ctx, result.data[0], "User id fetched", 200);
       } else {
         return respond.err(ctx, "Invalid search criteria", 400);

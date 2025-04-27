@@ -5,13 +5,15 @@ import { zSuiAddress } from "../../lib/zod/helpers";
 import { tryCatch } from "../../lib/tryCatch";
 import { createIdentity } from "./auth.action";
 import { generateNonce } from "./helpers";
-import db from "../../schema/db";
 import { challenges } from "../../schema/misc";
 import { respond } from "../../../utils/respond";
 import { eq } from "drizzle-orm";
 import { verifyPersonalMessageSignature } from "@mysten/sui/verify";
-import { jwt, sign } from "hono/jwt";
+import { sign } from "hono/jwt";
 import { users } from "../../schema/user";
+import { JWTalgorithm } from "../../constants";
+import db from "../../schema/db";
+import env from "../../../env";
 
 export default new Hono()
   // register identity
@@ -189,12 +191,8 @@ export default new Hono()
       }
 
       // create jwt for user to signin
-      const jwt = await sign(
-        {
-          userId: user.id,
-        },
-        process.env.JWT_SECRET
-      );
+      const payload = { sub: user.id };
+      const token = await sign(payload, env.JWT_SECRET, JWTalgorithm);
 
       // delete nonce from db
       const resp2 = await tryCatch(
@@ -209,11 +207,43 @@ export default new Hono()
         );
       }
 
-      return respond.ok(
-        ctx,
-        { data: { jwt } },
-        "JWT Created Successfully",
-        200
+      return respond.ok(ctx, { jwt: token }, "JWT Created Successfully", 200);
+    }
+  )
+
+  .post(
+    "/issue-jwt",
+    zValidator("json", z.object({ userAddress: z.string() })),
+    async (ctx) => {
+      const { userAddress } = ctx.req.valid("json");
+
+      const userResp = await tryCatch(
+        db
+          .select({
+            id: users.id,
+          })
+          .from(users)
+          .where(eq(users.address, userAddress))
+          .limit(1)
       );
+
+      if (userResp.error) {
+        return respond.err(
+          ctx,
+          userResp.error?.message || "Failed to fetch user",
+          400
+        );
+      }
+
+      const user = userResp.data[0];
+
+      if (!user) {
+        return respond.err(ctx, "User not found", 400);
+      }
+
+      const payload = { sub: user.id };
+      const token = await sign(payload, env.JWT_SECRET, JWTalgorithm);
+
+      return respond.ok(ctx, { jwt: token }, "JWT Created Successfully", 200);
     }
   );
