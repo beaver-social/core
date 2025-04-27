@@ -1,82 +1,107 @@
 import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
-import type { Keypair } from "@mysten/sui/cryptography";
-import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
-import { Transaction } from "@mysten/sui/transactions";
-import { execSync } from "child_process";
-import fs from "fs";
-import path from "path";
-// packages/server/lib/utils.ts
-import { mnemonicToSeedSync } from "bip39";
+import { z } from "zod";
+import { zNumberString, zSuiRPCObjectResult } from "./services/utils";
 
-export function seedPhraseToHex(mnemonic: string): string {
-  const seedBuffer = mnemonicToSeedSync(mnemonic);
-  return seedBuffer.toString("hex");
-}
-const PACKAGE_PATH = "./path/to/move/package";
-const BUILD_PATH = path.join(PACKAGE_PATH, "build");
-const DEPLOYMENT_FILE = "deployments.json";
+const objectId =
+  "0x8307457995996a3d3ff1796d94302734ad3794016eb1f428fa0c9e4e147ab774";
+const table = "postid_post";
+const key =
+  "0x2f0e29b511b7cce13849d2d48414af95d10487d9e9fbb7548eb7dfbf12aaabef";
 
-async function buildPackage() {
-  console.log("Building Move package...");
-  //   execSync("bun run sui move build", { cwd: PACKAGE_PATH, stdio: "inherit" });
-  console.log("Build complete.");
-}
+// async function readMoveTable() {}
+const client = new SuiClient({
+  url: getFullnodeUrl("testnet"),
+});
 
-async function deployPackage(client: SuiClient, sender: Keypair) {
-  await buildPackage();
+const object = await client.getObject({
+  id: "0x9c195aba1a392c4a6d234f09097b2e4c1cb45f04ede8973f153575147c0d1efa",
+  options: { showContent: true },
+});
 
-  const bytecodePath = path.join(BUILD_PATH, "package.publish.json");
-  if (!fs.existsSync(bytecodePath)) {
-    throw new Error("Build failed: package.publish.json not found");
-  }
-
-  const bytecode = JSON.parse(fs.readFileSync(bytecodePath, "utf-8"));
-  const tx = new Transaction();
-  tx.publish({
-    modules: bytecode.modules,
-    dependencies: bytecode.dependencies,
+async function readMoveTable(args: {
+  object: { id: string };
+  table: string;
+  key: { type: string; value: string };
+}) {
+  const object = await client.getObject({
+    id: args.object.id,
+    options: { showContent: true },
   });
 
-  const result = await client.signAndExecuteTransaction({
-    transaction: tx,
-    signer: sender,
+  const parsedObject = zSuiRPCObjectResult({
+    [args.table]: z.object({
+      fields: z.object({
+        id: z.object({
+          id: z.string(),
+        }),
+      }),
+    }),
+  }).parse(object);
+
+  const dynamicFieldObject = await client.getDynamicFieldObject({
+    parentId: parsedObject[args.table].fields.id.id,
+    name: args.key,
   });
 
-  //   const packageId = result.effects?.created?.find(
-  //     (o) => o.reference.objectId === "package"
-  //   )?.objectId;
-  //   if (!packageId) throw new Error("Deployment failed");
-  //   return packageId;
+  const result = zSuiRPCObjectResult({
+    value: z.unknown().optional(),
+  }).parse(dynamicFieldObject);
 
-  console.log(result);
-
-  return "0xlong_package_id";
+  return result.value;
 }
 
-function saveDeployment(packageId: string) {
-  let deployments: Record<string, string> = {};
-  if (fs.existsSync(DEPLOYMENT_FILE)) {
-    deployments = JSON.parse(fs.readFileSync(DEPLOYMENT_FILE, "utf-8"));
-  }
-  deployments["latest"] = packageId;
-  fs.writeFileSync(DEPLOYMENT_FILE, JSON.stringify(deployments, null, 2));
-}
+// const f = await readMoveTable({
+//   table: "owners",
+//   object: { id: objectId },
+//   key: {
+//     type: "0x1::string::String",
+//     value: "random",
+//   },
+// });
 
-async function main() {
-  const testnet = getFullnodeUrl("testnet");
-  const client = new SuiClient({ url: testnet });
+// const f = await client.getObject({
+//   id: "0x00380af42cb9448362ea94975e9556b15dbb9b5420efa79fc97aef3223f26f26",
+//   options: { showContent: true },
+// });
 
-  const sender = Ed25519Keypair.deriveKeypairFromSeed(
-    seedPhraseToHex(
-      "title rookie script spot device drift panel nice maple verb bundle pull"
-    )
-  );
+// const d = zSuiRPCObjectResult({
+//   username: z.string(),
+//   identity_data: z.object({
+//     fields: z.object({
+//       about: z.string(),
+//       owner: z.string(),
+//       suins_domain_name: z.string().nullable(),
+//     }),
+//   }),
+// }).parse(f);
 
-  console.log(sender.getPublicKey().toSuiAddress());
+// const f = await readMoveTable({
+//   object: { id: objectId },
+//   table: "postid_post",
+//   key: {
+//     type: "u64",
+//     value: "1",
+//   },
+// });
 
-  const packageId = await deployPackage(client, sender);
+// const d = z
+//   .object({
+//     fields: z.object({
+//       post_id: zNumberString(),
+//       author: z.string(),
+//       content: z.string(),
+//       upgraded_at: zNumberString(),
+//     }),
+//   })
+//   .parse(f);
 
-  saveDeployment(packageId);
-}
+const f = await client.getObject({
+  id: "0x8a25c63a9ae03584fe104baf7a72edb41cab5f61a1ccae1eac37b29ecf79f4a3",
+  options: { showContent: true },
+});
 
-main().catch(console.error);
+const d = zSuiRPCObjectResult({
+  posts: z.array(zNumberString()),
+}).parse(f);
+
+console.log(d);
