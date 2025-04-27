@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { Button } from "../ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "../ui/dialog"
 import { WalletButton } from "./Wallet"
 import { toast } from "sonner";
-import Icon from "../Icon";
-import { useZkAuthStore } from "@/shared/stores/zustand";
 import { Image } from "../Image";
 import { useAuth } from "@beaver/react";
 import { useCurrentAccount } from "@mysten/dapp-kit";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "../ui/dialog"
+import Icon from "../Icon";
 import WelcomeSplash from "../animations/WelcomeSplash";
 
 type Props = {
@@ -21,22 +20,21 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
     const [showWelcomeSplash, setShowWelcomeSplash] = useState(false);
     const [showDisconnectButton, setShowDisconnectButton] = useState(false);
     const [isLoadingGoogleOAuthScreen, setIsLoadingGoogleOAuthScreen] = useState(false);
-    const zkAuthStore = useZkAuthStore();
-    const { zkLogin, logout } = useAuth();
     const currentAccount = useCurrentAccount();
+    const { zkLoginData, zkLogin, logout } = useAuth();
+
+    const urlParams = new URLSearchParams(window.location.search);
 
     useEffect(() => {
-        if (zkAuthStore.zkLoginData?.userAddress || currentAccount?.address) {
+        // Check if the user is redirected from the OAuth screen
+        if (urlParams.get("auth_success")) {
+            setShowWelcomeSplash(true);
+        }
+
+        if (zkLoginData?.userAddress || currentAccount?.address) {
             setShowDisconnectButton(true);
         }
-    }, [zkAuthStore.zkLoginData?.userAddress, currentAccount?.address]);
-
-    useEffect(() => {
-        if (currentAccount?.address && !showWelcomeSplash && !showDisconnectButton) {
-            setShowWelcomeSplash(true);
-            handleOpenChange(false);
-        }
-    }, [currentAccount?.address, showWelcomeSplash, showDisconnectButton]);
+    }, [zkLoginData?.userAddress, currentAccount?.address]);
 
     const handleOpenChange = (newOpen: boolean) => {
         setIsOpen(newOpen);
@@ -63,7 +61,7 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
         return (
             <div>
                 <Button variant="neon" onClick={() => handleDisconnect(
-                    zkAuthStore.zkLoginData?.userAddress ? "social" : "wallet"
+                    zkLoginData?.userAddress ? "social" : "wallet"
                 )}>
                     <Icon name="LogOut" className="size-4" />
                     <p>Disconnect</p>

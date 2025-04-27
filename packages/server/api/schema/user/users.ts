@@ -14,6 +14,11 @@ export const users = table(
     username: t.text().notNull().unique(),
     fullName: t.text("full_name").notNull(),
     about: t.text("about"),
+    onboardingStep: t.int("onboarding_step").default(0),
+    onboardingCompleted: t
+      .int("onboarding_completed", { mode: "boolean" })
+      .default(false),
+    website: t.text("website"),
     imageUrl: t.text("image_url"),
     bannerUrl: t.text("banner_url"),
     loginType: t

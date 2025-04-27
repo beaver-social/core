@@ -1,6 +1,5 @@
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
 import { useEffect, useState } from 'react'
-import { toast } from "sonner";
 import { useAuth } from "@beaver/react";
 
 type Props = {}
@@ -14,7 +13,7 @@ export default function GoogleOAuth({ }: Props) {
             if (window.location.hash.includes('id_token')) {
                 setIsLoading(true);
                 await zkLoginCallback({
-                    redirectPath: "/"
+                    redirectPath: "/?auth_success=true&auth_type=google"
                 });
             }
         };

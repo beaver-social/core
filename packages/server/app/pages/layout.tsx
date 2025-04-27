@@ -2,10 +2,6 @@ import SideNav from "@/pages/SideNav";
 import BottomBar from "@/pages/BottomBar";
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
 import { useLocation } from "react-router";
-import ReplyBar from "./messages/message/ReplyBar";
-import AuthDialog from "@/shared/components/web3/ConnectIdentity";
-import { Button } from "@/shared/components/ui/button";
-import Icon from "@/shared/components/Icon";
 import ConnectIdentity from "@/shared/components/web3/ConnectIdentity";
 import GlobalSearch from "@/shared/components/GlobalSearch";
 
@@ -18,7 +14,7 @@ export default function Layout({ main, secondary }: LayoutProps) {
     const { pathname } = useLocation();
 
     return (
-        <div>
+        <div className="">
             {/* GlobalSearch - adds CTRL+K functionality */}
             <GlobalSearch />
 

@@ -8,8 +8,10 @@ import { tryCatch } from "../lib/tryCatch";
 import { useZkAuthStore } from "../store/zk";
 import { StoredZkLoginData } from "@beaver/client";
 import { useState } from "react";
+import { User } from "../types/user";
 
 interface IAuthHook {
+  user: User | null;
   zkLoginData: StoredZkLoginData | null;
   zkLogin: () => Promise<any>;
   zkLoginCallback: (options: { redirectPath: string }) => Promise<any>;
@@ -27,26 +29,6 @@ interface IAuthHook {
   ) => Promise<any>;
 }
 
-interface User {
-  id: number;
-  identity: string;
-  address: string;
-  suinsDomainName: string;
-  username: string;
-  fullName: string;
-  about: string;
-  imageUrl: string;
-  bannerUrl: string;
-  loginType: string;
-  email: string;
-  isVerified: boolean;
-  timezone: number;
-  pinnedPost: number;
-  pinnedShort: number;
-  createdAt: string;
-  deletedAt: string;
-}
-
 export default function useAuth(): IAuthHook {
   const client = useBeaverClient();
   const zkAuthStore = useZkAuthStore();
@@ -54,14 +36,6 @@ export default function useAuth(): IAuthHook {
   const { mutateAsync: disconnectWallet } = useDisconnectWallet();
   const currentAccount = useCurrentAccount();
   const [user, setUser] = useState<User | null>(null);
-
-  // async function getJWT() {
-  //   const result = await tryCatch(client.);
-
-  //   if (result.error) {
-  //     throw result.error;
-  //   }
-  // }
 
   async function zkLogin() {
     // Generate ephemeral keypair
@@ -126,7 +100,6 @@ export default function useAuth(): IAuthHook {
       });
 
       sessionStorage.removeItem("zkLoginEphemeralKeyPair");
-      console.log("Redirecting to", options.redirectPath);
       window.location.href = options.redirectPath;
     } catch (error) {
       return {
@@ -141,25 +114,6 @@ export default function useAuth(): IAuthHook {
     options?: Parameters<typeof connectWallet>[1]
   ) {
     connectWallet(variables, options);
-  }
-
-  async function logout(
-    type: "wallet" | "social",
-    variables?: Parameters<typeof disconnectWallet>[0],
-    options?: Parameters<typeof disconnectWallet>[1]
-  ) {
-    // Disconnect wallet
-    if (type === "wallet" && currentAccount?.address) {
-      disconnectWallet(variables, options);
-      window.location.reload();
-    } else if (type === "social") {
-      if (localStorage.getItem("zk-auth-store")) {
-        localStorage.removeItem("zk-auth-store");
-      }
-      window.location.reload();
-    } else {
-      throw new Error("Invalid logout type");
-    }
   }
 
   async function getChallenge(address: string) {
@@ -188,7 +142,27 @@ export default function useAuth(): IAuthHook {
     return result.data;
   }
 
+  async function logout(
+    type: "wallet" | "social",
+    variables?: Parameters<typeof disconnectWallet>[0],
+    options?: Parameters<typeof disconnectWallet>[1]
+  ) {
+    // Disconnect wallet
+    if (type === "wallet" && currentAccount?.address) {
+      disconnectWallet(variables, options);
+      window.location.reload();
+    } else if (type === "social") {
+      if (localStorage.getItem("zk-auth-store")) {
+        localStorage.removeItem("zk-auth-store");
+      }
+      window.location.reload();
+    } else {
+      throw new Error("Invalid logout type");
+    }
+  }
+
   return {
+    user,
     zkLoginData: zkAuthStore.zkLoginData,
     zkLogin,
     zkLoginCallback,

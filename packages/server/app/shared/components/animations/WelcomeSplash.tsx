@@ -104,7 +104,7 @@ export default function WelcomeSplash({ onComplete }: { onComplete: () => void }
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3, duration: 0.5 }}
                 >
-                    Welcome to Beaver Social!
+                    Welcome Back!
                 </motion.h2>
 
                 <motion.p
@@ -113,7 +113,7 @@ export default function WelcomeSplash({ onComplete }: { onComplete: () => void }
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6, duration: 0.5 }}
                 >
-                    Your identity is now connected. Ready to explore the decentralized social experience.
+                    Your identity is now connected to Beaver Social.
                 </motion.p>
             </motion.div>
         </motion.div>

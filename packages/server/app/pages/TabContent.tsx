@@ -70,4 +70,5 @@ export const tabs: Record<Screen, Tab[]> = {
       content: (<ShortsFeed />),
     },
   ],
+  onboarding: [],
 };
