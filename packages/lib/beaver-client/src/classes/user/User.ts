@@ -85,7 +85,8 @@ export default class User {
    */
   public async getCurrentUser() {
     const { apiClient } = this.defaults;
-    return safeParseResponse(apiClient.user.$get());
+    const result = await safeParseResponse(apiClient.user.$get());
+    return result.data;
   }
 
   /**

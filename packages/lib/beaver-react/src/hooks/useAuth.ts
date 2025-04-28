@@ -7,13 +7,14 @@ import {
 import { tryCatch } from "../lib/tryCatch";
 import { useZkAuthStore } from "../store/zk";
 import { StoredZkLoginData } from "@beaver/client";
+import { useEffect } from "react";
 import { useState } from "react";
-import type { User } from "@beaver/client";
 
 interface IAuthHook {
-  user: User | null;
+  userId: number | null;
+  isConnected: boolean;
+  isLoading: boolean;
   zkLoginData: StoredZkLoginData | null;
-  getUser: () => Promise<any>;
   zkLogin: () => Promise<any>;
   zkLoginCallback: (options: { redirectPath: string }) => Promise<any>;
   walletLogin: (variables: any, options?: any) => Promise<any>;
@@ -28,6 +29,7 @@ interface IAuthHook {
     message: string,
     signature: string
   ) => Promise<any>;
+  checkConnection: () => boolean;
 }
 
 export default function useAuth(): IAuthHook {
@@ -36,17 +38,68 @@ export default function useAuth(): IAuthHook {
   const { mutate: connectWallet } = useConnectWallet();
   const { mutateAsync: disconnectWallet } = useDisconnectWallet();
   const currentAccount = useCurrentAccount();
-  const [user, setUser] = useState<User | null>(null);
-  const [jwt, setJwt] = useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  async function getUser() {
-    const result = await tryCatch(client.user.getCurrentUser());
-
-    if (result.error) {
-      throw result.error;
+  useEffect(() => {
+    async function initialize() {
+      if (checkConnection()) {
+        setIsConnected(true);
+        const data = await fetchConnectedUser();
+        setUserId(data?.id ?? null);
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
+      }
     }
 
-    setUser(result.data as any);
+    initialize();
+  }, [checkConnection]);
+
+  function checkConnection() {
+    // check wallet connection
+    if (currentAccount?.address) {
+      return true;
+    }
+
+    // check zkLoginData
+    if (zkAuthStore.zkLoginData) {
+      return true;
+    }
+
+    return false;
+  }
+
+  async function fetchConnectedUser() {
+    if (checkConnection()) {
+      let address = null;
+
+      if (currentAccount?.address) {
+        address = currentAccount.address;
+      } else if (zkAuthStore.zkLoginData) {
+        address = zkAuthStore.zkLoginData.userAddress;
+      } else {
+        return null;
+      }
+
+      try {
+        const result = await client.user.find({
+          type: "address",
+          value: address,
+        });
+
+        if (!result) {
+          return null;
+        }
+
+        return result.data;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    return null;
   }
 
   async function zkLogin() {
@@ -174,14 +227,16 @@ export default function useAuth(): IAuthHook {
   }
 
   return {
-    user,
+    userId,
+    isConnected,
+    isLoading,
     zkLoginData: zkAuthStore.zkLoginData,
-    getUser,
     zkLogin,
     zkLoginCallback,
     walletLogin,
     logout,
     getChallenge,
     verifyChallenge,
+    checkConnection,
   };
 }

@@ -229,14 +229,12 @@ export default class ZkService {
 
     // if user exists, get user id
     let userId: number | null = null;
-    const userResp = await safeParseResponse(
-      this.defaults.apiClient.user.find.$get({
-        query: {
-          type: "address",
-          value: userAddress,
-        },
-      })
-    );
+    const userResp = await this.defaults.apiClient.user.find.$get({
+      query: {
+        type: "address",
+        value: userAddress,
+      },
+    });
 
     if (userResp.data) {
       userId = userResp.data.id;

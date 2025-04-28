@@ -12,7 +12,8 @@ import { useGlobalUI } from "@/shared/hooks/useGlobalUI";
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
 import { useNavigate } from "react-router";
 import CompleteOnboarding from "./CompleteOnboarding";
-
+import ConnectIdentity from "@/shared/components/web3/ConnectIdentity";
+import { useAuth } from "@beaver/react";
 const TOTAL_STEPS = 5;
 
 export default function Onboarding() {
@@ -22,6 +23,7 @@ export default function Onboarding() {
     const [completedSteps, setCompletedSteps] = useState<number[]>(
         onboardingProgress?.completed || []
     );
+    const { userId, isConnected } = useAuth();
     const navigate = useNavigate();
 
     console.log(onboardingProgress);
@@ -100,6 +102,10 @@ export default function Onboarding() {
         navigate("/");
     }
 
+    if (!isConnected || userId) {
+        navigate("/");
+    }
+
     return (
         <div className="min-h-screen bg-[url(/images/tailwind-gradient-light.png)] dark:bg-[url(/images/tailwind-gradient-dark.jpg)] flex flex-col items-center justify-center p-4 bg-no-repeat bg-cover">
             <Card className="w-full max-w-2xl bg-background/30 glass border rounded-xl overflow-hidden shadow-lg">
@@ -131,7 +137,8 @@ export default function Onboarding() {
                 </div>
             </Card>
 
-            <div className="absolute bottom-4 right-4">
+            <div className="flex gap-2 absolute bottom-4 right-4">
+                <ConnectIdentity />
                 <ThemeSwitch />
             </div>
         </div>
