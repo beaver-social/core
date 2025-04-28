@@ -261,6 +261,16 @@ export default function ConnectSuiNS({ onComplete, handleBack, handleSkip }: Pro
                 </Card>
             </motion.div>
 
+            <motion.button
+                onClick={handleBack}
+                className="text-xs text-muted-foreground mt-2 underline underline-offset-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7, duration: 0.5 }}
+            >
+                Go Back
+            </motion.button>
+
             <motion.div
                 className="text-xs text-muted-foreground mt-2"
                 initial={{ opacity: 0 }}

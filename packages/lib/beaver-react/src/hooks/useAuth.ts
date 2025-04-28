@@ -30,6 +30,11 @@ interface IAuthHook {
     signature: string
   ) => Promise<any>;
   checkConnection: () => boolean;
+  usernameExists: (username: string) => Promise<boolean>;
+  uploadImage: (image: File) => Promise<{
+    url: string | null;
+    error: Error | null;
+  }>;
 }
 
 export default function useAuth(): IAuthHook {
@@ -69,6 +74,36 @@ export default function useAuth(): IAuthHook {
     }
 
     return false;
+  }
+
+  async function uploadImage(image: File) {
+    try {
+      const result = await client.user.uploadImage(image);
+      return {
+        url: result.data,
+        error: null,
+      };
+    } catch (error) {
+      return {
+        url: null,
+        error: error,
+      };
+    }
+  }
+
+  async function usernameExists(username: string) {
+    try {
+      await tryCatch(
+        client.user.find({
+          type: "username",
+          value: username,
+        })
+      );
+
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   async function fetchConnectedUser() {
@@ -238,5 +273,7 @@ export default function useAuth(): IAuthHook {
     getChallenge,
     verifyChallenge,
     checkConnection,
+    usernameExists,
+    uploadImage,
   };
 }

@@ -34,7 +34,7 @@ const app = new Hono()
 
   .route("auth", authIndex)
   // .route("content", contentIndex)
-  // .route("misc", miscIndex)
+  .route("misc", miscIndex)
   // .route("analytics", analyticsIndex)
   .route("user", userIndex)
 

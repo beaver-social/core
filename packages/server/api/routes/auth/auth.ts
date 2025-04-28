@@ -33,19 +33,17 @@ export default new Hono()
     zValidator(
       "query",
       z.object({
-        userId: z.number(),
         signature: z.string(),
       })
     ),
     async (ctx) => {
       const { username, fullName, address, imageUrl, about, loginType } =
         ctx.req.valid("json");
-      const { signature, userId } = ctx.req.valid("query");
+      const { signature } = ctx.req.valid("query");
 
       const resp = await tryCatch(
         createIdentity(
           {
-            userId,
             username,
             about,
             fullName,

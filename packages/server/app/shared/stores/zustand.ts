@@ -36,6 +36,13 @@ interface OnboardingProgress {
   checkpoint?: string;
 }
 
+interface OnboardingData {
+  username: string | null;
+  fullName: string | null;
+  about: string | null;
+  imageUrl: string | null;
+}
+
 interface GlobalUIStore {
   screen: Screen;
   setScreen: (screen: Screen) => void;
@@ -47,6 +54,8 @@ interface GlobalUIStore {
   setSelectedSetting: (setting: string) => void;
   onboardingProgress: OnboardingProgress | null;
   setOnboardingProgress: (progress: OnboardingProgress | null) => void;
+  onboardingData: OnboardingData | null;
+  setOnboardingData: (data: OnboardingData | null) => void;
 }
 
 export const useGlobalUIStore = create<GlobalUIStore>()(
@@ -63,32 +72,9 @@ export const useGlobalUIStore = create<GlobalUIStore>()(
       onboardingProgress: null,
       setOnboardingProgress: (progress) =>
         set({ onboardingProgress: progress }),
+      onboardingData: null,
+      setOnboardingData: (data) => set({ onboardingData: data }),
     }),
     { name: "global-ui-store" }
   )
 );
-
-interface User {
-  id: number;
-  identity: string;
-  address: string;
-  suinsDomainName: string;
-  username: string;
-  fullName: string;
-  about: string;
-  imageUrl: string;
-  bannerUrl: string;
-  loginType: string;
-  email: string;
-  isVerified: boolean;
-  timezone: number;
-  pinnedPost: number;
-  pinnedShort: number;
-  createdAt: string;
-  deletedAt: string;
-}
-
-interface UserStore {
-  user: User | null;
-  setUser: (user: User | null) => void;
-}

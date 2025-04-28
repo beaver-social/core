@@ -117,6 +117,13 @@ export default class User {
     );
   }
 
+  public async uploadImage(image: File) {
+    const { apiClient } = this.defaults;
+    return safeParseResponse(
+      apiClient.misc.upload.image.$post({ form: { file: image } })
+    );
+  }
+
   /**
    * Get user's interactions
    * @param options The page, limit, and interaction type
