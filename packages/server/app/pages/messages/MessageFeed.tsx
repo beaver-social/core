@@ -1,4 +1,4 @@
-import FeedItem from "./FeedItem";
+import FeedItem from "./MessageFeedItem";
 import Icon from "@/shared/components/Icon";
 
 // Sample data - replace with actual data from your backend

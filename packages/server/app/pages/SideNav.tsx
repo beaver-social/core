@@ -29,9 +29,9 @@ export const sidebarItems: sidebarItems[] = [
         to: "/",
     },
     {
-        name: "Shorts",
-        iconName: "Clapperboard",
-        to: "/shorts",
+        name: "Swipes",
+        iconName: "Video",
+        to: "/swipes",
     },
     {
         name: "Alerts",
@@ -40,7 +40,7 @@ export const sidebarItems: sidebarItems[] = [
     },
     {
         name: "Messages",
-        iconName: "MessageSquare",
+        iconName: "Mail",
         to: "/messages",
     },
     {

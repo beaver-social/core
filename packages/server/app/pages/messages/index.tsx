@@ -1,6 +1,6 @@
 import Layout from "@/pages/layout"
 import SecondaryPanel from "../explore/SecondaryPanel"
-import MessagesFeed from "./Feed"
+import MessagesFeed from "./MessageFeed"
 import PageTitle from "@/shared/components/PageTitle"
 import { useGlobalUI } from "@/shared/hooks/useGlobalUI"
 import { useEffect } from "react"

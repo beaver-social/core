@@ -12,11 +12,22 @@ const followingPosts = [
         timestamp: "3h",
         content: "Excited to announce my new NFT collection! 🚀",
         aspectRatio: "square" as const,
-        likes: 34,
-        comments: 9,
-        reposts: 4,
-        shares: 1,
-        avatarUrl: "/images/user.webp"
+        analytics: {
+            likes: 34,
+            comments: 9,
+            reposts: 4,
+            shares: 1,
+        },
+        avatarUrl: "/images/user.webp",
+        topReply: {
+            id: "1",
+            timestamp: "2h",
+            username: "Kartik",
+            handle: "kartik",
+            avatarUrl: "/images/user.webp",
+            content: "lmao he's such a nerd"
+        },
+        location: "New York, NY"
     },
     {
         id: "5",
@@ -26,18 +37,29 @@ const followingPosts = [
         content: "Just finished my latest artwork! 🎨",
         images: ["/images/wallpapers/1.jpeg", "/images/wallpapers/2.jpeg", "/images/wallpapers/3.jpeg", "/images/wallpapers/4.jpeg"],
         aspectRatio: "portrait" as const,
-        likes: 56,
-        comments: 15,
-        reposts: 7,
-        shares: 2,
-        avatarUrl: "/images/user.webp"
+        analytics: {
+            likes: 56,
+            comments: 15,
+            reposts: 7,
+            shares: 2,
+        },
+        avatarUrl: "/images/user.webp",
+        topReply: {
+            id: "1",
+            timestamp: "2h",
+            username: "Kartik",
+            handle: "kartik",
+            avatarUrl: "/images/user.webp",
+            content: "lmao he's such a nerd"
+        },
+        location: "New York, NY"
     },
 ];
 
 export default function Following({ }: Props) {
     return (
         <>
-            <div>
+            <div className="divide-y">
                 {followingPosts.map((post, index) => (
                     <FeedPost key={index} {...post} />
                 ))}

@@ -36,7 +36,7 @@ function Tabs({ className, tabClassName }: TabsProps) {
       </div>
 
       {/* Tab Content */}
-      <div className="mt-4">
+      <div className="mt-6">
         {tabs && tabs.length > 0 && tabs.find((tab) => tab.id === activeTab)?.content ? tabs.find((tab) => tab.id === activeTab)?.content : tabs.find((tab) => tab.id === tabs[0].id)?.content}
       </div>
     </div>

@@ -8,7 +8,7 @@ import Message from "./pages/messages/message";
 import Profile from "./pages/profile";
 import GoogleOAuth from "./pages/oauth/GoogleOAuth";
 import { PageErrorBoundary } from "./shared/lib/errorHandling";
-import Shorts from "./pages/shorts";
+import Swipes from "./pages/swipes";
 import Settings from "./pages/settings";
 import SearchResults from "./pages/explore/SearchResults";
 import Demo from "./pages/demo";
@@ -64,7 +64,7 @@ export default function () {
                 <Route path="/message/:id" element={withPageErrorBoundary(Message)({})} />
                 <Route path="post/:id" element={withPageErrorBoundary(Post)({})} />
                 <Route path="/profile/:id" element={withPageErrorBoundary(Profile)({})} />
-                <Route path="/shorts" element={withPageErrorBoundary(Shorts)({})} />
+                <Route path="/swipes" element={withPageErrorBoundary(Swipes)({})} />
                 <Route path="/settings" element={withPageErrorBoundary(Settings)({})} />
                 <Route path="/explore/search" element={withPageErrorBoundary(SearchResults)({})} />
                 <Route path="/demo" element={withPageErrorBoundary(Demo)({})} />

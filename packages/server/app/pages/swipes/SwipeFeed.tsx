@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import ShortVideo from './ShortVideo';
+import ShortVideo from './SwipeVideo';
 import { sampleShorts, ShortVideoData } from './mockData';
-import { useInView } from './useInView';
+import { useInView } from '../../shared/hooks/useInView';
 import { useGlobalUIStore } from '@/shared/stores/zustand';
 
 export default function ShortsFeed() {

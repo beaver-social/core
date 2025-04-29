@@ -1,6 +1,6 @@
 import Layout from "@/pages/layout"
 import PageTitle from "@/shared/components/PageTitle"
-import MessagesFeed from "../Feed"
+import MessagesFeed from "../MessageFeed"
 import UserDetails from "./UserDetails"
 import ReplyBarContent from "./ReplyBarContent"
 

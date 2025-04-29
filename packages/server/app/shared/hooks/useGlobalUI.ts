@@ -17,8 +17,8 @@ export const useGlobalUI = () => {
         return tabs.messages;
       case "settings":
         return tabs.settings;
-      case "shorts":
-        return tabs.shorts;
+      case "swipes":
+        return tabs.swipes;
       case "onboarding":
         return []; // Onboarding doesn't have tabs
     }
