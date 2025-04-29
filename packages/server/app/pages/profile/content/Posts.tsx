@@ -87,7 +87,7 @@ export default function PostData() {
                                 <span className="text-grey-500">·</span>
                                 <span className="text-grey-500">{post.timestamp}</span>
                             </div>
-                            <p className="mt-1">{post.content}</p>
+                            <p className="mt-1 text-sm">{post.content}</p>
 
                             {post.imageUrl && (
                                 <div className="mt-3 rounded-lg overflow-hidden border">
