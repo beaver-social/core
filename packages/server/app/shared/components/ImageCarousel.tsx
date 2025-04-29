@@ -39,7 +39,7 @@ export default function ImageCarousel({ images, className = '', aspectRatio }: I
 
     return (
         <div className={`relative ${className}`}>
-            <div className={`relative bg-secondary rounded-xl overflow-hidden ${aspectRatio === 'square' ? 'aspect-square' : 'aspect-[3/4]'
+            <div className={`relative bg-secondary overflow-hidden ${aspectRatio === 'square' ? 'aspect-square' : 'aspect-[3/4]'
                 }`}>
                 <Swiper
                     modules={[Navigation, EffectFade, Pagination]}

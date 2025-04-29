@@ -52,8 +52,7 @@ const samplePosts = [
 export default function ForYou({ }: Props) {
     return (
         <>
-            <CreatePost />
-            <div className="divide-y">
+            <div className="">
                 {samplePosts.map((post, index) => (
                     <FeedPost key={index} {...post} />
                 ))}

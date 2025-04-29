@@ -16,6 +16,7 @@ import Onboarding from "./pages/onboarding";
 import { useAuth } from "@beaver/react";
 
 import { useEffect } from "react";
+import Landing from "./pages/landing";
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary = (Component: React.ComponentType<any>) => (props: any) => (
   <PageErrorBoundary>
@@ -51,6 +52,7 @@ export default function () {
     <BrowserRouter>
       <Routes>
         <Route path="/onboarding" element={withPageErrorBoundary(Onboarding)({})} />
+        <Route path="/landing" element={withPageErrorBoundary(Landing)({})} />
         <Route path="/oauth/google" element={withPageErrorBoundary(GoogleOAuth)({})} />
         <Route path="/*" element={
           <LoadingAuth>

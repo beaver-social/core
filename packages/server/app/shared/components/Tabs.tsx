@@ -1,6 +1,7 @@
 import { cn } from "@/shared/lib/utils";
 import { useGlobalUI } from "../hooks/useGlobalUI";
 import { Tab } from "../types/globalUI";
+import { useEffect } from "react";
 
 interface TabsProps {
   className?: string;
@@ -14,7 +15,7 @@ function Tabs({ className, tabClassName }: TabsProps) {
   return (
     <div className={cn("w-full", className)}>
       {/* Tabs Header */}
-      <div className="sticky glass top-0 z-10 bg-background/50 border-b border-t">
+      <div className="sticky glass top-0 z-10 bg-background/50">
         <div className="flex">
           {tabs && tabs.length > 0 && tabs.map((tab) => (
             <button
@@ -22,8 +23,8 @@ function Tabs({ className, tabClassName }: TabsProps) {
               className={cn(
                 "flex-1 py-4 text-center font-semibold",
                 activeTab === tab.id
-                  ? "text-primary border-b border-primary"
-                  : "text-grey-500 hover:text-grey-700",
+                  ? "text-foreground border-b border-foreground"
+                  : "text-foreground/50 hover:text-foreground",
                 tabClassName
               )}
               onClick={() => setActiveTab(tab.id)}

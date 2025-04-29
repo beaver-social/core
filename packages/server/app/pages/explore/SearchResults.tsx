@@ -129,7 +129,7 @@ export default function SearchResults() {
             main={
                 <div className="md:border md:rounded-2xl">
                     {/* Search Header */}
-                    <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b p-4 rounded-t-2xl">
+                    <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm p-4 rounded-t-2xl">
                         <div className="flex items-center gap-4 mb-5">
                             <button
                                 onClick={() => navigate(-1)}
@@ -157,7 +157,7 @@ export default function SearchResults() {
 
                     {/* Search Results */}
                     {filteredPosts.length > 0 ? (
-                        <div className="divide-y">
+                        <div className="mx-6 mt-4">
                             {filteredPosts.map((post) => (
                                 <FeedPost key={post.id} {...post} />
                             ))}
