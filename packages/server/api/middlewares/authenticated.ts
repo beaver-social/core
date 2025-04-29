@@ -1,6 +1,6 @@
 import { createMiddleware } from "hono/factory";
 import { verify } from "hono/jwt";
-import { JWTalgorithm } from "../constants";
+import { JWTalgorithm, JWTPrivateKey } from "../constants";
 import env from "../../env";
 import { tryCatch } from "../lib/tryCatch";
 import { LRUCache } from "lru-cache";
@@ -32,15 +32,15 @@ const authenticated = createMiddleware<{
     return await next();
   }
 
-  const decodedJwt = await tryCatch(
-    verify(token, env.JWT_SECRET, JWTalgorithm)
-  );
+  const decodedJwt = await tryCatch(verify(token, JWTPrivateKey, JWTalgorithm));
 
-  if (decodedJwt.error) return ctx.text("Unable to verify Auth Token", 401);
+  if (decodedJwt.error) {
+    ctx.log(decodedJwt.error);
+    return respond.err(ctx, "Unable to verify Auth Token", 401);
+  }
+  const { sub } = zJwtPayload().parse(decodedJwt.data);
 
-  const { sub } = zJwtPayload.parse(decodedJwt.data);
-
-  // this will fetch user for every request, replace with redis cache later.
+  // no this will not you stupid ai => this will fetch user for every request, replace with redis cache later.
   let [user] = await db
     .select()
     .from(db.schema.users)

@@ -1,13 +1,12 @@
 import { createInsertSchema } from "drizzle-zod";
 import { createAction } from "../../lib/actions/factory";
 import { z } from "zod";
-import schema from "../../lib/db/schema";
 import { tryCatch } from "../../lib/tryCatch";
 import { preprocessPostContent } from "./helpers";
 import db from "../../lib/db";
 import { eq, sql } from "drizzle-orm";
 
-const { posts, post_mentions, post_topics } = schema;
+const { posts } = db.schema;
 
 export const zCreatePostAction = () =>
   createInsertSchema(posts).pick({
@@ -21,7 +20,10 @@ export const zCreatePostAction = () =>
 export const createPost = createAction<
   z.infer<ReturnType<typeof zCreatePostAction>>
 >()(
-  async (tx, { user, content, nsfw, parentId, reposting, subscriberOnly }) => {
+  async function createPost(
+    tx,
+    { user, content, nsfw, parentId, reposting, subscriberOnly }
+  ) {
     if (!!parentId && !!reposting) {
       throw new Error(
         "Cannot repost and reply at the same time you dumbass! Get your act together."

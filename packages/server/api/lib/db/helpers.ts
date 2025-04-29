@@ -40,6 +40,16 @@ export const dbExtensionHelpers = {
     return user;
   },
 
+  async getUserByAddress(address: string) {
+    const [user] = await dbClient
+      .select()
+      .from(schema.users)
+      .where(eq(schema.users.address, address))
+      .limit(1);
+
+    return user;
+  },
+
   async getUserByUsername(username: string) {
     const [user] = await dbClient
       .select()

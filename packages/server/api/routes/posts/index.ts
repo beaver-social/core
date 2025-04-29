@@ -17,7 +17,10 @@ const app = new Hono()
     zValidator(
       "query",
       z.object({
-        page: z.number().default(1),
+        page: z
+          .number()
+          .default(1)
+          .transform((v) => v - 1),
         perPage: z.number().max(32).default(8),
       })
     ),
@@ -64,10 +67,16 @@ const app = new Hono()
       const { media, signature, ...postData } = ctx.req.valid("json");
       const user = ctx.get("user");
 
-      const { post, mentions, topics } = await createPost(
-        { ...postData, userId: user.id },
-        signature
+      const { data: actionResponse, error: actionError } = await tryCatch(
+        createPost({ ...postData, userId: user.id }, signature)
       );
+
+      if (actionError) {
+        ctx.log(actionError);
+        return respond.err(ctx, actionError.message, 400);
+      }
+
+      const { post, mentions, topics } = actionResponse;
 
       for (const mention of mentions) {
         const mentionedUser = await db.getUserByUsername(mention);
@@ -153,6 +162,8 @@ const app = new Hono()
           }
         }
       }
+
+      return respond.ok(ctx, { post }, "Post created successfully", 201);
     }
   );
 

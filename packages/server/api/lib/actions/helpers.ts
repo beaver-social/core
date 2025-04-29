@@ -6,14 +6,22 @@ import { desc, eq } from "drizzle-orm";
 import { camelToDotCase } from "../utils/utils";
 import { createAction } from "./factory";
 import { encode as msgpackEncode, decode as msgpackDecode } from "msgpackr";
-import { SuiGraphQLClient } from "@mysten/sui/graphql";
-import { getFullnodeUrl } from "@mysten/sui/client";
-import { Network } from "../types";
 
 const { actions, users, actionFunctions, actionRequests } = db.schema;
 
 export function deriveActionNameFromFn(fn: Function) {
-  return "v1.user." + camelToDotCase(fn.name);
+  // There would be a better way to ensure same function names, but removing 2 from fn name works
+
+  const fnName = camelToDotCase(fn.name);
+
+  if (!fnName.endsWith("2")) {
+    throw new Error(
+      "Function name must be same as action name. Invalid function name: " +
+        fn.name
+    );
+  }
+
+  return "v1.user." + fnName.slice(0, fnName.length - 2);
 }
 
 type Transaction = Parameters<Parameters<typeof db.transaction>["0"]>["0"];

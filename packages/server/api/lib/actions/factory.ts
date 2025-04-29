@@ -28,6 +28,7 @@ export function createAction<T>() {
 
       // Prepare payload and message
       const payload = JSON.stringify(actionRequest);
+      console.log(payload);
       const [compressedPayload, keys] =
         helpers.compressActionRequest(actionRequest);
       const message = new TextEncoder().encode(payload);

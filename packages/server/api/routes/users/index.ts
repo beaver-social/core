@@ -11,14 +11,20 @@ import { contracts } from "../../lib/sui/contracts";
 import { Transaction } from "@mysten/sui/transactions";
 import { defaultAdminCapId } from "contracts/definitions";
 import { findObjectIdByName } from "contracts/utils";
-import suiClient, { executeTransaction } from "../../lib/sui/client";
+import suiClient, {
+  executeTransaction,
+  serverKeypair,
+} from "../../lib/sui/client";
 import {
+  zJwtPayload,
   zNumberString,
   zSuiAddress,
   zSuiSignature,
 } from "../../lib/zod/helpers";
 import nonceManager from "../../lib/utils/nonce";
 import { verifySignature } from "../../lib/utils/signature";
+import { sign } from "hono/jwt";
+import { JWTalgorithm, JWTexpiration, JWTPrivateKey } from "../../constants";
 
 const { users } = schema;
 
@@ -80,49 +86,79 @@ export default new Hono()
   )
 
   .get(
-    "/:id",
+    "/nonce",
+    zValidator("query", z.object({ address: zSuiAddress() })),
+    async (ctx) => {
+      const { address } = ctx.req.valid("query");
+
+      const nonce = nonceManager.generateNonce(address);
+
+      return respond.ok(ctx, { nonce }, "Nonce generated", 200);
+    }
+  )
+
+  .post(
+    "/login",
     zValidator(
-      "param",
+      "json",
       z.object({
-        id: zNumberString(),
+        address: zSuiAddress(),
+        signature: zSuiSignature(),
       })
     ),
     async (ctx) => {
-      const { id: userId } = ctx.req.valid("param");
-
-      const userResponse = await tryCatch(
-        db.select().from(users).where(eq(users.id, userId)).limit(1)
-      );
+      const { address, signature } = ctx.req.valid("json");
+      const userResponse = await tryCatch(db.getUserByAddress(address));
 
       if (userResponse.error) {
         ctx.log(userResponse.error);
         return respond.err(ctx, "Failed to find user", 500);
       }
-
-      const [user] = userResponse.data;
-
+      const user = userResponse.data;
       if (!user) {
         return respond.err(ctx, "User not found", 404);
       }
+      const nonce = nonceManager.comsumeNonceBytes(address);
+      if (!nonce) {
+        return respond.err(ctx, "Please request a nonce +(GET /nonce)", 400);
+      }
 
-      return respond.ok(
-        ctx,
-        user,
-        "User details fetched from ID successfully",
-        200
+      const { data: valid, error: validationError } = await tryCatch(
+        verifySignature(nonce, signature, {
+          address: user.address,
+          intent: "PersonalMessage",
+          type: user.loginType,
+        })
       );
-    }
-  )
 
-  .post(
-    "/nonce",
-    zValidator("json", z.object({ address: zSuiAddress() })),
-    async (ctx) => {
-      const { address } = ctx.req.valid("json");
+      if (validationError) {
+        ctx.log(validationError);
+        return respond.err(ctx, "Failed to verify signature", 500);
+      }
+      if (!valid) {
+        return respond.err(ctx, "Invalid signature", 400);
+      }
 
-      const nonce = nonceManager.generateNonce(address);
+      const now = Date.now() / 1000;
 
-      return respond.ok(ctx, { nonce }, "Nonce generated", 200);
+      const payload: z.infer<ReturnType<typeof zJwtPayload>> = {
+        app: 0,
+        iss: serverKeypair.getPublicKey().toBase64(),
+        sub: user.id,
+        iat: now,
+        exp: now + JWTexpiration,
+        nbf: now + 1,
+      };
+
+      const { data: token, error } = await tryCatch(
+        sign(payload, JWTPrivateKey, JWTalgorithm)
+      );
+      if (error || !token) {
+        ctx.log(error || "token is undefined");
+        return respond.err(ctx, "Failed to generate token", 500);
+      }
+
+      return respond.ok(ctx, { token }, "Login successful", 200);
     }
   )
 
@@ -150,11 +186,18 @@ export default new Hono()
         return respond.err(ctx, "Please request a nonce +(GET /nonce)", 400);
       }
 
-      const valid = verifySignature(nonce, signature, {
-        address,
-        intent: "PersonalMessage",
-        type: loginType,
-      });
+      const { data: valid, error: verificationError } = await tryCatch(
+        verifySignature(nonce, signature, {
+          address,
+          intent: "PersonalMessage",
+          type: loginType,
+        })
+      );
+
+      if (verificationError) {
+        ctx.log(verificationError);
+        return respond.err(ctx, "Failed to verify signature", 500);
+      }
       if (!valid) {
         return respond.err(ctx, "Invalid signature", 400);
       }
@@ -198,8 +241,6 @@ export default new Hono()
         digest: identityGeneration.data.digest,
         options: { showObjectChanges: true },
       });
-
-      ctx.log("Object changes", objectChanges);
 
       const registration = tryCatchSync(() =>
         findObjectIdByName(objectChanges, "IdentityRegistration")
@@ -250,5 +291,40 @@ export default new Hono()
       const [newUser] = newUserResponse.data;
 
       return respond.ok(ctx, newUser, "User created successfully", 201);
+    }
+  )
+
+  .get(
+    "/:id",
+    zValidator(
+      "param",
+      z.object({
+        id: zNumberString(),
+      })
+    ),
+    async (ctx) => {
+      const { id: userId } = ctx.req.valid("param");
+
+      const userResponse = await tryCatch(
+        db.select().from(users).where(eq(users.id, userId)).limit(1)
+      );
+
+      if (userResponse.error) {
+        ctx.log(userResponse.error);
+        return respond.err(ctx, "Failed to find user", 500);
+      }
+
+      const [user] = userResponse.data;
+
+      if (!user) {
+        return respond.err(ctx, "User not found", 404);
+      }
+
+      return respond.ok(
+        ctx,
+        user,
+        "User details fetched from ID successfully",
+        200
+      );
     }
   );
