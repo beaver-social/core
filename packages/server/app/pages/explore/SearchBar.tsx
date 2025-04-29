@@ -136,7 +136,7 @@ export default function SearchBar({
         let topicStartIndex = filteredProfiles.length;
 
         return (
-            <Command className="rounded-2xl" shouldFilter={false}>
+            <Command className="rounded-2xl glass bg-transparent" shouldFilter={false}>
                 <CommandList>
                     <CommandGroup heading="Search">
                         <CommandItem onSelect={() => handleSelectTopic(searchValue)} className="cursor-default text-muted-foreground">

@@ -32,7 +32,7 @@ export default function ProfileHeader({ data, isCurrentUser = false }: Props) {
                 <Image
                     src={data.coverPhoto}
                     alt="Cover"
-                    className="w-full h-48 object-cover rounded-t-2xl"
+                    className="w-full h-48 object-cover sm:rounded-t-xl"
                 />
 
                 <div className="absolute top-24 left-0 w-full h-full flex items-center justify-center">

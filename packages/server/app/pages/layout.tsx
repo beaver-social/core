@@ -15,14 +15,14 @@ export default function Layout({ main, secondary }: LayoutProps) {
 
     return (
         <div className="">
-            {/* GlobalSearch - adds CTRL+K functionality */}
+            {/* CTRL+K functionality */}
             <GlobalSearch />
 
             {/* Desktop Layout */}
             <div className="hidden sm:block">
                 <SideNav />
 
-                <section className="flex justify-center flex-col px-10 2xl:px-44 sm:ml-[4.5rem] lg:mr-[24rem] items-center bg-background">
+                <section className="flex justify-center flex-col px-10 2xl:px-44 sm:ml-[240px] lg:mr-[24rem] items-center bg-background">
                     <div className="w-full mt-8 rounded-xl">
                         {main}
                     </div>

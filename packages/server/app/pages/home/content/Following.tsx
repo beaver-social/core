@@ -37,8 +37,7 @@ const followingPosts = [
 export default function Following({ }: Props) {
     return (
         <>
-            <CreatePost />
-            <div className="divide-y">
+            <div>
                 {followingPosts.map((post, index) => (
                     <FeedPost key={index} {...post} />
                 ))}

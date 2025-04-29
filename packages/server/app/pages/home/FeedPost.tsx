@@ -1,12 +1,9 @@
-import Icon from "@/shared/components/Icon";
 import { Link, useNavigate } from "react-router";
 import ImageCarousel from "@/shared/components/ImageCarousel";
 import { useZkAuthStore } from "@/shared/stores/zustand";
-import { toast } from "sonner";
-import { Transaction } from "@mysten/sui/transactions";
-import zkLoginService from "@/shared/lib/zkLoginService";
 import { Image } from "@/shared/components/Image";
 import Reactions from "@/shared/components/Reactions";
+import { motion } from "framer-motion";
 
 type FeedPostProps = {
   id: string;
@@ -34,67 +31,82 @@ function FeedPost({
   avatarUrl,
 }: FeedPostProps) {
   const navigate = useNavigate();
-  const zkAuthStore = useZkAuthStore();
-
 
   return (
-    <div
-      onClick={(e) => {
-        e.preventDefault();
-        navigate(`/post/${id}`, { state: { postId: id } });
-      }}
-      className="block cursor-pointer"
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="mb-8"
     >
-      <article className="flex gap-4 p-4 border-b hover:bg-secondary/50 transition-colors">
-        {/* Avatar */}
-        <div className="flex-shrink-0">
-          <Link to={`/profile/${handle}`} onClick={(e) => e.stopPropagation()}>
-            <Image
-              src={avatarUrl}
-              alt={username}
-              className="w-12 h-12 mt-1 rounded-full"
-            />
-          </Link>
-        </div>
-
-        {/* Content */}
-        <div className="flex flex-col overflow-hidden px-4">
-          {/* Header */}
-          <div className="flex items-center gap-2">
-            <Link
-              to={`/profile/${handle}`}
-              className="font-semibold hover:underline"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {username}
+      <motion.article
+        className="flex flex-col rounded-sm overflow-hidden bg-secondary shadow-sm hover:shadow-md transition-all duration-300 dark:border dark:border-border mx-6 sm:mx-0"
+        whileTap={{ scale: 0.99 }}
+        onClick={(e) => {
+          e.preventDefault();
+          navigate(`/post/${id}`, { state: { postId: id } });
+        }}
+      >
+        {/* Header with Avatar */}
+        <div className="flex items-start gap-3 p-4 pb-2">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="flex-shrink-0"
+          >
+            <Link to={`/profile/${handle}`} onClick={(e) => e.stopPropagation()}>
+              <Image
+                src={avatarUrl}
+                alt={username}
+                className="w-10 h-10 rounded-full border-2 border-primary/20"
+              />
             </Link>
-            <span className="text-grey-500">@{handle}</span>
-            <span className="text-grey-500">·</span>
-            <time className="text-grey-500 hover:underline">{timestamp}</time>
-          </div>
+          </motion.div>
 
-          {/* Post Content */}
-          <div className="mt-2 text-md">{content}</div>
-
-          {/* Images if present */}
-          <div className="max-w-[32rem]">
-            {images && images.length > 0 && (
-              <div
-                className="mt-4 cursor-default"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1 flex-wrap">
+              <Link
+                to={`/profile/${handle}`}
+                className="font-semibold hover:text-primary transition-colors"
+                onClick={(e) => e.stopPropagation()}
               >
-                <ImageCarousel images={images} aspectRatio={aspectRatio} />
-              </div>
-            )}
+                {username}
+              </Link>
+              <span className="text-muted-foreground text-sm">@{handle}</span>
+              <span className="text-muted-foreground mx-1">·</span>
+              <time className="text-muted-foreground text-sm hover:underline">{timestamp}</time>
+            </div>
           </div>
-
-          <Reactions postId={id} />
         </div>
-      </article>
-    </div>
+
+        {/* Post Content */}
+        <div className="px-4 pt-1 pb-3">
+          <p className="text-md leading-relaxed">{content}</p>
+        </div>
+
+        {/* Images if present */}
+        {images && images.length > 0 && (
+          <div
+            className="w-full"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            <ImageCarousel images={images} aspectRatio={aspectRatio} />
+          </div>
+        )}
+
+        {/* Post Actions */}
+        <div className="px-4 py-3 border-t border-border bg-secondary">
+          <motion.div
+            initial={{ opacity: 0.8 }}
+            whileHover={{ opacity: 1 }}
+          >
+            <Reactions postId={id} />
+          </motion.div>
+        </div>
+      </motion.article>
+    </motion.div>
   );
 }
 
