@@ -2,9 +2,7 @@ import Icon from "@/shared/components/Icon"
 import { UserDetails } from "."
 import { Image } from "@/shared/components/Image"
 import { Link } from "react-router"
-import { Button } from "@/shared/components/ui/button"
 import GradientButton from "@/shared/components/GradientButton"
-import { truncateSuiAddress, truncateText } from "@/shared/lib/utils"
 
 export default function BasicInfo({ data: userDetails }: { data: UserDetails }) {
     return (
@@ -111,7 +109,7 @@ export default function BasicInfo({ data: userDetails }: { data: UserDetails }) 
             {/* Pinned Post Section */}
             {
                 userDetails.pinnedPost && (
-                    <div className="my-4 text-sm">
+                    <div className="my-4 mb-8 text-sm">
                         <div className="flex items-center justify-between mb-3">
                             <h3 className="text-sm font-medium flex items-center gap-2 text-grey-400">
                                 <Icon name="Pin" className="size-3.5 text-primary" />

@@ -36,7 +36,13 @@ export default function Replies() {
                                     <p className="text-sm line-clamp-2">{reply.parent?.content}</p>
 
                                     {reply.parent?.images && reply.parent?.images.length > 0 && (
-                                        <div className="mt-2">
+                                        <div
+                                            className="w-full rounded-sm overflow-hidden"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                            }}
+                                        >
                                             <ImageCarousel images={reply.parent?.images} aspectRatio={reply.parent?.aspectRatio} />
                                         </div>
                                     )}

@@ -299,3 +299,38 @@
   --font-manrope: "Manrope", sans-serif;
   --font-openSans: "Open Sans", sans-serif;
 }
+
+/* Swiper Carousel Styles */
+.carousel-dot {
+  width: 8px !important;
+  height: 8px !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+  opacity: 1 !important;
+  margin: 0 3px !important;
+  transition: all 0.2s ease;
+}
+
+.carousel-dot-active {
+  background: rgba(255, 255, 255, 0.6) !important;
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.swiper-pagination {
+  position: absolute;
+  bottom: 8px !important;
+  width: auto !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  display: flex !important;
+  z-index: 20 !important;
+}
+
+.carousel-button-prev,
+.carousel-button-next {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

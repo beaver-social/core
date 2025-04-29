@@ -10,9 +10,6 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 
-// Add custom styles
-import './imageCarousel.css';
-
 interface ImageCarouselProps {
     images: string[];
     className?: string;
@@ -38,7 +35,7 @@ export default function ImageCarousel({ images, className = '', aspectRatio }: I
     if (!images.length) return null;
 
     return (
-        <div className={`relative ${className}`}>
+        <div className={`relative max-w-2xl mx-auto ${className}`}>
             <div className={`relative bg-secondary overflow-hidden ${aspectRatio === 'square' ? 'aspect-square' : 'aspect-[3/4]'
                 }`}>
                 <Swiper
