@@ -1,6 +1,7 @@
 import { Transaction } from "@mysten/sui/transactions";
 import { Defaults } from "../../types/client";
 import { Logger } from "../misc";
+import { safeParseResponse } from "../../utils/apiClient";
 
 export default class Identity {
   defaults: Defaults;

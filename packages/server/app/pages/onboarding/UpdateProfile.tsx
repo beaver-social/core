@@ -5,7 +5,8 @@ import { Input } from "@/shared/components/ui/input";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Image } from "@/shared/components/Image";
-
+import { useGlobalUIStore } from "@/shared/stores/zustand";
+import { useAuth } from "@beaver/react";
 type Props = {
     onComplete: () => void;
     handleBack: () => void;
@@ -18,36 +19,39 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
     const [isUploading, setIsUploading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const fileInputRef = useState<HTMLInputElement | null>(null);
+    const { onboardingData, setOnboardingData } = useGlobalUIStore();
+    const { uploadImage } = useAuth();
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    async function handleProfileImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
         if (e.target.files && e.target.files[0]) {
             setIsUploading(true);
 
-            // Just for demo purposes - in a real app you'd upload to your storage
             const file = e.target.files[0];
-            const reader = new FileReader();
+            const result = await uploadImage(file);
 
-            reader.onload = (event) => {
-                if (event.target?.result) {
-                    // Simulate upload delay
-                    setTimeout(() => {
-                        setProfilePicture(event.target!.result as string);
-                        setIsUploading(false);
-                    }, 1000);
-                }
-            };
+            if (result.error) {
+                console.error(result.error);
+            }
 
-            reader.readAsDataURL(file);
+            if (result.url) {
+                setProfilePicture(result.url);
+            }
+
+            setIsUploading(false);
         }
     };
 
     const handleSaveProfile = () => {
         if (!name) return;
-
         setIsSaving(true);
 
-        // Placeholder for SDK logic to save profile details
-        // This would be replaced with actual implementation
+        setOnboardingData({
+            fullName: name,
+            username: onboardingData ? onboardingData.username : null,
+            about: bio,
+            imageUrl: profilePicture
+        });
+
         setTimeout(() => {
             setIsSaving(false);
             onComplete();
@@ -55,6 +59,11 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
     };
 
     const canSubmit = name.trim().length > 0;
+
+    if (!onboardingData || onboardingData.username === null) {
+        handleBack();
+        return;
+    }
 
     return (
         <div className="flex flex-col items-center space-y-8">
@@ -90,7 +99,7 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
                                     type="file"
                                     accept="image/*"
                                     className="hidden"
-                                    onChange={handleImageUpload}
+                                    onChange={handleProfileImageUpload}
                                     ref={(input) => fileInputRef[1](input)}
                                 />
 
@@ -204,6 +213,16 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
                     </CardContent>
                 </Card>
             </motion.div>
+
+            <motion.button
+                onClick={handleBack}
+                className="text-xs text-muted-foreground mt-2 underline underline-offset-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7, duration: 0.5 }}
+            >
+                Go Back
+            </motion.button>
 
             <motion.div
                 className="text-xs text-muted-foreground mt-2 text-center"

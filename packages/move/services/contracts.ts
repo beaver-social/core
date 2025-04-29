@@ -525,4 +525,7 @@ class Contracts {
   }
 }
 
+// const g = new Contracts({} as any);
+// g.write.awards().;
+
 export default Contracts;

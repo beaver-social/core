@@ -12,16 +12,15 @@ import topics from "./topics";
 import moderation from "./moderation";
 import nft from "./nft";
 
-export default new Hono()
-  .route("/", user)
-  .route("/settings", settings)
-  .route("/messages", messages)
-  .route("/alerts", alerts)
-  .route("/monetization", monetization)
-  .route("/profile", profile)
-  .route("/relationships", relationships)
-  .route("/content", content)
-  .route("/analytics", analytics)
-  .route("/topics", topics)
-  .route("/moderation", moderation)
-  .route("/nft", nft);
+export default new Hono().route("/", user);
+// .route("/settings", settings)
+// .route("/messages", messages)
+// .route("/alerts", alerts)
+// .route("/monetization", monetization)
+// .route("/profile", profile)
+// .route("/relationships", relationships)
+// .route("/content", content)
+// .route("/analytics", analytics)
+// .route("/topics", topics)
+// .route("/moderation", moderation)
+// .route("/nft", nft);

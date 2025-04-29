@@ -7,11 +7,13 @@ import {
 import { tryCatch } from "../lib/tryCatch";
 import { useZkAuthStore } from "../store/zk";
 import { StoredZkLoginData } from "@beaver/client";
+import { useEffect } from "react";
 import { useState } from "react";
-import { User } from "../types/user";
 
 interface IAuthHook {
-  user: User | null;
+  userId: number | null;
+  isConnected: boolean;
+  isLoading: boolean;
   zkLoginData: StoredZkLoginData | null;
   zkLogin: () => Promise<any>;
   zkLoginCallback: (options: { redirectPath: string }) => Promise<any>;
@@ -27,6 +29,12 @@ interface IAuthHook {
     message: string,
     signature: string
   ) => Promise<any>;
+  checkConnection: () => boolean;
+  usernameExists: (username: string) => Promise<boolean>;
+  uploadImage: (image: File) => Promise<{
+    url: string | null;
+    error: Error | null;
+  }>;
 }
 
 export default function useAuth(): IAuthHook {
@@ -35,7 +43,99 @@ export default function useAuth(): IAuthHook {
   const { mutate: connectWallet } = useConnectWallet();
   const { mutateAsync: disconnectWallet } = useDisconnectWallet();
   const currentAccount = useCurrentAccount();
-  const [user, setUser] = useState<User | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    async function initialize() {
+      if (checkConnection()) {
+        setIsConnected(true);
+        const data = await fetchConnectedUser();
+        setUserId(data?.id ?? null);
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
+      }
+    }
+
+    initialize();
+  }, [checkConnection]);
+
+  function checkConnection() {
+    // check wallet connection
+    if (currentAccount?.address) {
+      return true;
+    }
+
+    // check zkLoginData
+    if (zkAuthStore.zkLoginData) {
+      return true;
+    }
+
+    return false;
+  }
+
+  async function uploadImage(image: File) {
+    try {
+      const result = await client.user.uploadImage(image);
+      return {
+        url: result.data,
+        error: null,
+      };
+    } catch (error) {
+      return {
+        url: null,
+        error: error,
+      };
+    }
+  }
+
+  async function usernameExists(username: string) {
+    try {
+      await tryCatch(
+        client.user.find({
+          type: "username",
+          value: username,
+        })
+      );
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async function fetchConnectedUser() {
+    if (checkConnection()) {
+      let address = null;
+
+      if (currentAccount?.address) {
+        address = currentAccount.address;
+      } else if (zkAuthStore.zkLoginData) {
+        address = zkAuthStore.zkLoginData.userAddress;
+      } else {
+        return null;
+      }
+
+      try {
+        const result = await client.user.find({
+          type: "address",
+          value: address,
+        });
+
+        if (!result) {
+          return null;
+        }
+
+        return result.data;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    return null;
+  }
 
   async function zkLogin() {
     // Generate ephemeral keypair
@@ -91,8 +191,8 @@ export default function useAuth(): IAuthHook {
       const zkLoginData = result.data;
 
       zkAuthStore.setZkLoginData({
+        userId: zkLoginData.userId,
         jwt: zkLoginData.jwt,
-        decodedJwt: zkLoginData.decodedJwt,
         userAddress: zkLoginData.userAddress,
         userSalt: zkLoginData.userSalt.toString(),
         ephemeralKeyPair: ephemeralKeyPair,
@@ -162,7 +262,9 @@ export default function useAuth(): IAuthHook {
   }
 
   return {
-    user,
+    userId,
+    isConnected,
+    isLoading,
     zkLoginData: zkAuthStore.zkLoginData,
     zkLogin,
     zkLoginCallback,
@@ -170,5 +272,8 @@ export default function useAuth(): IAuthHook {
     logout,
     getChallenge,
     verifyChallenge,
+    checkConnection,
+    usernameExists,
+    uploadImage,
   };
 }

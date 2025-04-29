@@ -7,11 +7,9 @@ import { LRUCache } from "lru-cache";
 import { eq } from "drizzle-orm";
 import { zJwtPayload } from "../lib/zod/helpers";
 import { generateHash } from "../lib/utils/utils";
-import schema, { DB } from "../lib/db/schema";
+import { DB } from "../lib/db/schema";
 import db from "../lib/db";
 import { respond } from "../lib/utils/respond";
-
-const { users } = schema;
 
 const cache = new LRUCache<string, DB["user"]>({
   max: 1000,
@@ -42,7 +40,12 @@ const authenticated = createMiddleware<{
 
   const { sub } = zJwtPayload.parse(decodedJwt.data);
 
-  let [user] = await db.select().from(users).where(eq(users.id, sub)).limit(1);
+  // this will fetch user for every request, replace with redis cache later.
+  let [user] = await db
+    .select()
+    .from(db.schema.users)
+    .where(eq(db.schema.users.id, sub))
+    .limit(1);
   ctx.set("user", user);
 
   await next();

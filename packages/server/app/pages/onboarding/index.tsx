@@ -4,7 +4,6 @@ import ConnectSuiNS from "./ConnectSuiNS";
 import { Progress } from "@/shared/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/shared/components/ui/card";
-import CreateIdentity from "./CreateIdentity";
 import ChooseUsername from "./ChooseUsername";
 import UpdateProfile from "./UpdateProfile";
 import { useGlobalUIStore } from "@/shared/stores/zustand";
@@ -12,7 +11,8 @@ import { useGlobalUI } from "@/shared/hooks/useGlobalUI";
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
 import { useNavigate } from "react-router";
 import CompleteOnboarding from "./CompleteOnboarding";
-
+import ConnectIdentity from "@/shared/components/web3/ConnectIdentity";
+import { useAuth } from "@beaver/react";
 const TOTAL_STEPS = 5;
 
 export default function Onboarding() {
@@ -22,6 +22,7 @@ export default function Onboarding() {
     const [completedSteps, setCompletedSteps] = useState<number[]>(
         onboardingProgress?.completed || []
     );
+    const { userId, isConnected } = useAuth();
     const navigate = useNavigate();
 
     console.log(onboardingProgress);
@@ -44,11 +45,10 @@ export default function Onboarding() {
     const getCheckpointName = (stepNum: number): string => {
         switch (stepNum) {
             case 1: return "introduction";
-            case 2: return "create-identity";
-            case 3: return "choose-username";
-            case 4: return "update-profile";
-            case 5: return "connect-suins";
-            case 6: return "complete";
+            case 2: return "choose-username";
+            case 3: return "update-profile";
+            case 4: return "connect-suins";
+            case 5: return "complete";
             default: return "introduction";
         }
     };
@@ -80,14 +80,12 @@ export default function Onboarding() {
             case 1:
                 return <Introduction onComplete={handleNext} />;
             case 2:
-                return <CreateIdentity onComplete={handleNext} handleBack={handleBack} />;
-            case 3:
                 return <ChooseUsername onComplete={handleNext} handleBack={handleBack} />;
-            case 4:
+            case 3:
                 return <UpdateProfile onComplete={handleNext} handleBack={handleBack} />;
-            case 5:
+            case 4:
                 return <ConnectSuiNS onComplete={handleNext} handleBack={handleBack} handleSkip={handleSkip} />;
-            case 6:
+            case 5:
                 return <CompleteOnboarding onComplete={() => navigate("/")} />;
             default:
                 return <Introduction onComplete={handleNext} />;
@@ -97,6 +95,10 @@ export default function Onboarding() {
     // Only redirect automatically if onboarding was already completed before this session
     // (let the completion screen handle the final navigation)
     if (onboardingProgress?.completed.length === TOTAL_STEPS && step !== 6) {
+        navigate("/");
+    }
+
+    if (!isConnected || userId) {
         navigate("/");
     }
 
@@ -131,7 +133,8 @@ export default function Onboarding() {
                 </div>
             </Card>
 
-            <div className="absolute bottom-4 right-4">
+            <div className="flex gap-2 absolute bottom-4 right-4">
+                <ConnectIdentity />
                 <ThemeSwitch />
             </div>
         </div>

@@ -1,7 +1,7 @@
 import { Logger } from "../misc";
 import { tryCatch } from "../../utils/tryCatch";
 import { safeParseResponse } from "../../utils/apiClient";
-import { Defaults } from "../../types";
+import { Defaults } from "../../types/client";
 
 export default class User {
   /** @hidden */
@@ -85,7 +85,8 @@ export default class User {
    */
   public async getCurrentUser() {
     const { apiClient } = this.defaults;
-    return safeParseResponse(apiClient.user.$get());
+    const result = await safeParseResponse(apiClient.user.$get());
+    return result.data;
   }
 
   /**
@@ -113,6 +114,13 @@ export default class User {
 
     return safeParseResponse(
       apiClient.user.find.$get({ query: { ...options } })
+    );
+  }
+
+  public async uploadImage(image: File) {
+    const { apiClient } = this.defaults;
+    return safeParseResponse(
+      apiClient.misc.upload.image.$post({ form: { file: image } })
     );
   }
 
