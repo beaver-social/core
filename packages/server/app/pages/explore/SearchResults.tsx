@@ -6,77 +6,7 @@ import FeedPost from "@/pages/home/FeedPost";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router";
 import SearchBar from "@/pages/explore/SearchBar";
-
-// Sample post data for demonstration
-const samplePosts = [
-    {
-        id: "1",
-        username: "John Doe",
-        handle: "johndoe",
-        timestamp: "2h",
-        content: "Just launched my new Web3 project! 🚀 Check it out and let me know what you think.",
-        images: ["/images/banner.webp"],
-        aspectRatio: "square" as const,
-        likes: 42,
-        comments: 12,
-        reposts: 5,
-        shares: 3,
-        avatarUrl: "/images/user.webp"
-    },
-    {
-        id: "2",
-        username: "Jane Smith",
-        handle: "janesmith",
-        timestamp: "4h",
-        content: "Working on some exciting new features for our Blockchain platform. Stay tuned! 💻",
-        aspectRatio: "portrait" as const,
-        likes: 28,
-        comments: 8,
-        reposts: 3,
-        shares: 1,
-        avatarUrl: "/images/user.webp"
-    },
-    {
-        id: "3",
-        username: "Mike Johnson",
-        handle: "mikej",
-        timestamp: "6h",
-        content: "Great day at the NFT conference! Learned so much about the future of web development.",
-        images: ["/icons/logo_dark.png"],
-        aspectRatio: "square" as const,
-        likes: 89,
-        comments: 24,
-        reposts: 12,
-        shares: 6,
-        avatarUrl: "/images/user.webp"
-    },
-    {
-        id: "4",
-        username: "Alex Wilson",
-        handle: "alexw",
-        timestamp: "1d",
-        content: "Just published my article on Web3 technologies and their impact on the future of the internet. #Web3 #Blockchain",
-        aspectRatio: "square" as const,
-        likes: 112,
-        comments: 45,
-        reposts: 23,
-        shares: 15,
-        avatarUrl: "/images/user.webp"
-    },
-    {
-        id: "5",
-        username: "Kartik",
-        handle: "ishtails",
-        timestamp: "2d",
-        content: "Excited to announce that we're integrating NFT functionality into our platform. This will allow creators to tokenize their content!",
-        aspectRatio: "square" as const,
-        likes: 78,
-        comments: 34,
-        reposts: 14,
-        shares: 8,
-        avatarUrl: "/images/user.webp"
-    }
-];
+import { samplePosts } from "@/shared/data/posts";
 
 // Sample data for profiles and topics in search
 const sampleProfiles = [
@@ -129,7 +59,7 @@ export default function SearchResults() {
             main={
                 <div className="">
                     {/* Search Header */}
-                    <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm rounded-t-2xl">
+                    <div className="top-0 z-10 backdrop-blur-sm rounded-t-2xl">
                         <div className="flex items-center gap-4 mb-5">
                             <button
                                 onClick={() => navigate(-1)}

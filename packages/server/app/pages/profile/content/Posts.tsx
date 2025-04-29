@@ -1,82 +1,14 @@
 import Icon from "@/shared/components/Icon";
 import { Image } from "@/shared/components/Image";
 import Reactions from "@/shared/components/Reactions";
-
-// Sample post data for demonstration
-const samplePosts = [
-    {
-        id: "1",
-        username: "Kartik",
-        handle: "ishtails",
-        timestamp: "10h",
-        content: "Just deployed a new web3 project! Check it out at https://beaver-social.com",
-        likes: 42,
-        comments: 5,
-        reposts: 8,
-        shares: 3,
-        avatarUrl: "/images/user.webp",
-        aspectRatio: "square" as const,
-    },
-    {
-        id: "2",
-        username: "Kartik",
-        handle: "ishtails",
-        timestamp: "2d",
-        content: "Working on some new features for Beaver Social. Stay tuned!",
-        likes: 21,
-        comments: 3,
-        reposts: 2,
-        shares: 1,
-        avatarUrl: "/images/user.webp",
-        aspectRatio: "square" as const,
-    },
-    {
-        id: "3",
-        username: "Kartik",
-        handle: "ishtails",
-        timestamp: "3d",
-        content: "Exciting news! Just integrated our platform with a decentralized identity solution. This will make verification much easier for all users.",
-        likes: 56,
-        comments: 12,
-        reposts: 15,
-        shares: 8,
-        avatarUrl: "/images/user.webp",
-        aspectRatio: "square" as const,
-    },
-    {
-        id: "4",
-        username: "Kartik",
-        handle: "ishtails",
-        timestamp: "1w",
-        content: "Beautiful sunset from my balcony today. Web3 work can wait sometimes. 🌆",
-        likes: 89,
-        comments: 7,
-        reposts: 4,
-        shares: 2,
-        avatarUrl: "/images/user.webp",
-        imageUrl: "/images/sunset.jpg",
-        aspectRatio: "square" as const,
-    },
-    {
-        id: "5",
-        username: "Kartik",
-        handle: "ishtails",
-        timestamp: "2w",
-        content: "Just finished the UI redesign for our dApp. What do you think?",
-        likes: 124,
-        comments: 23,
-        reposts: 18,
-        shares: 11,
-        avatarUrl: "/images/user.webp",
-        imageUrl: "/images/ui-design.png",
-        aspectRatio: "square" as const,
-    }
-];
+import { samplePosts } from "@/shared/data/posts";
 
 export default function PostData() {
+    const userPosts = samplePosts.filter((post) => post.handle === "ishtails");
+
     return (
         <div className="space-y-1">
-            {samplePosts.map((post) => (
+            {userPosts.map((post) => (
                 <div key={post.id} className="p-4 border-b hover:bg-accent/10 transition cursor-pointer">
                     <div className="flex gap-3">
                         <Image src={post.avatarUrl} alt={post.username} className="size-10 rounded-full" />
@@ -89,17 +21,17 @@ export default function PostData() {
                             </div>
                             <p className="mt-1 text-sm">{post.content}</p>
 
-                            {post.imageUrl && (
+                            {post.avatarUrl && (
                                 <div className="mt-3 rounded-lg overflow-hidden border">
                                     <Image
-                                        src={post.imageUrl}
+                                        src={post.avatarUrl}
                                         alt="Post image"
                                         className="w-full h-auto object-cover"
                                     />
                                 </div>
                             )}
 
-                            <Reactions postId={post.id} />
+                            <Reactions analytics={post.analytics} />
                         </div>
                     </div>
                 </div>

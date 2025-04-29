@@ -20,13 +20,15 @@ export const useGlobalUI = () => {
       case "swipes":
         return tabs.swipes;
       case "onboarding":
-        return []; // Onboarding doesn't have tabs
+        return [];
     }
   };
 
   const setScreenHandler = (screen: Screen) => {
     setScreen(screen);
-    setActiveTab(null);
+    setActiveTab(
+      getTabs().find((tab) => tab.id === getTabs()[0].id)?.id ?? "default"
+    );
   };
 
   return {

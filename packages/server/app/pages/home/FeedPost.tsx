@@ -19,7 +19,7 @@ type FeedPostProps = {
   images?: string[];
   aspectRatio: "square" | "portrait";
   avatarUrl: string;
-  topReply: {
+  topReply?: {
     id: string;
     handle: string;
     content: string;
@@ -140,11 +140,13 @@ function FeedPost({
 
           {/* View / Post Comments */}
           <div className="mt-3">
-            <button onClick={() => {
-              navigate(`/post/${id}/replies/${topReply.id}`, { state: { postId: id } });
-            }} className="text-sm text-muted-foreground">
-              <span className="font-semibold">{topReply.handle}</span> {truncateText(topReply.content, 50)}
-            </button>
+            {topReply && (
+              <button onClick={() => {
+                navigate(`/post/${id}/replies/${topReply.id}`, { state: { postId: id } });
+              }} className="text-sm text-muted-foreground">
+                <span className="font-semibold">{topReply.handle}</span> {truncateText(topReply.content, 50)}
+              </button>
+            )}
             <br />
             <button onClick={() => {
               navigate(`/post/${id}`, { state: { postId: id } });

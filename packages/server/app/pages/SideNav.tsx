@@ -82,7 +82,7 @@ export default function SideNav() {
     }, [location.pathname]);
 
     return (
-        <div className="fixed bg-background glass h-screen border-r flex-col justify-between hidden sm:flex w-[16rem]">
+        <div className="fixed bg-background glass h-screen border-r flex-col justify-between hidden sm:flex w-[14rem]">
             <div className="flex flex-col w-full justify-center-safe h-full px-3">
                 <ul className="flex flex-col w-full gap-3 text-grey-300 text-hover">
                     {sidebarItems.map((item, index) => (

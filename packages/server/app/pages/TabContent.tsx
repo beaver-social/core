@@ -12,7 +12,7 @@ import ShortsFeed from "./swipes/SwipeFeed";
 export const tabs: Record<Screen, Tab[]> = {
   home: [
     {
-      id: "for-you",
+      id: "default",
       label: "For you",
       content: (<ForYou />),
     },
@@ -24,7 +24,7 @@ export const tabs: Record<Screen, Tab[]> = {
   ],
   profile: [
     {
-      id: "posts",
+      id: "default",
       label: "Posts",
       content: (<Posts />),
     },
@@ -46,7 +46,7 @@ export const tabs: Record<Screen, Tab[]> = {
   ],
   alerts: [
     {
-      id: "all",
+      id: "default",
       label: "All",
       content: (<AllAlerts />),
     },
@@ -60,7 +60,7 @@ export const tabs: Record<Screen, Tab[]> = {
   settings: [],
   swipes: [
     {
-      id: "for-you",
+      id: "default",
       label: "For you",
       content: (<ShortsFeed />),
     },
