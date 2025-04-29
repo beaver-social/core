@@ -41,40 +41,6 @@ export async function getUser(userId: number) {
   return user;
 }
 
-export async function verifyUserSignature(
-  message: Uint8Array,
-  signature: string,
-  loginType: "wallet" | "zk",
-  address: string
-) {
-  if (loginType === "wallet") {
-    const { toSuiAddress: getVerifiedAddress } =
-      await verifyPersonalMessageSignature(message, signature, {
-        address,
-      });
-
-    if (address !== getVerifiedAddress()) {
-      throw new Error("Invalid signature");
-    }
-  } else if (loginType === "zk") {
-    const fullnodeUrl = getFullnodeUrl(import.meta.env.SUI_NETWORK as Network);
-
-    const { toSuiAddress: getVerifiedAddress } =
-      await verifyPersonalMessageSignature(message, signature, {
-        address,
-        client: new SuiGraphQLClient({
-          url: fullnodeUrl,
-        }),
-      });
-
-    if (address !== getVerifiedAddress()) {
-      throw new Error("Invalid signature");
-    }
-  } else {
-    throw new Error("Invalid signature type");
-  }
-}
-
 export async function executeActionFunction<T, R>(
   tx: Transaction,
   fn: (tx: Transaction, args: ActionOptions<T>) => Promise<R>,

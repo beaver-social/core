@@ -12,7 +12,13 @@ import { Transaction } from "@mysten/sui/transactions";
 import { defaultAdminCapId } from "contracts/definitions";
 import { findObjectIdByName } from "contracts/utils";
 import suiClient, { executeTransaction } from "../../lib/sui/client";
-import { zNumberString, zSuiAddress } from "../../lib/zod/helpers";
+import {
+  zNumberString,
+  zSuiAddress,
+  zSuiSignature,
+} from "../../lib/zod/helpers";
+import nonceManager from "../../lib/utils/nonce";
+import { verifySignature } from "../../lib/utils/signature";
 
 const { users } = schema;
 
@@ -109,6 +115,18 @@ export default new Hono()
   )
 
   .post(
+    "/nonce",
+    zValidator("json", z.object({ address: zSuiAddress() })),
+    async (ctx) => {
+      const { address } = ctx.req.valid("json");
+
+      const nonce = nonceManager.generateNonce(address);
+
+      return respond.ok(ctx, { nonce }, "Nonce generated", 200);
+    }
+  )
+
+  .post(
     "/",
     zValidator(
       "json",
@@ -120,11 +138,26 @@ export default new Hono()
         bannerUrl: z.string().max(255).optional(),
         about: z.string().max(255).nullable().optional(),
         loginType: z.enum(["zk", "wallet"]),
+        signature: zSuiSignature(),
       })
     ),
     async (ctx) => {
-      const user = ctx.req.valid("json");
-      const { address } = user;
+      const { signature, ...user } = ctx.req.valid("json");
+      const { address, loginType } = user;
+
+      const nonce = nonceManager.comsumeNonceBytes(address);
+      if (!nonce) {
+        return respond.err(ctx, "Please request a nonce +(GET /nonce)", 400);
+      }
+
+      const valid = verifySignature(nonce, signature, {
+        address,
+        intent: "PersonalMessage",
+        type: loginType,
+      });
+      if (!valid) {
+        return respond.err(ctx, "Invalid signature", 400);
+      }
 
       const existingResponse = await tryCatch(
         db

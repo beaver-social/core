@@ -2,6 +2,7 @@ import * as helpers from "./helpers";
 import * as utils from "../utils/utils";
 import type { DB } from "../db/schema";
 import db from "../db";
+import { verifySignature } from "../utils/signature";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>["0"]>["0"];
 type ActionOptions<T> = T & { userId: number };
@@ -31,12 +32,11 @@ export function createAction<T>() {
         helpers.compressActionRequest(actionRequest);
       const message = new TextEncoder().encode(payload);
       const user = await helpers.getUser(options.userId);
-      await helpers.verifyUserSignature(
-        message,
-        signature,
-        user.loginType,
-        user.address
-      );
+      await verifySignature(message, signature, {
+        address: user.address,
+        intent: "PersonalMessage",
+        type: user.loginType,
+      });
 
       const result = await db.transaction(async (tx) => {
         // Run the action function
