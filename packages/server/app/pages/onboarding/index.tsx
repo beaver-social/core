@@ -92,8 +92,6 @@ export default function Onboarding() {
         }
     };
 
-    // Only redirect automatically if onboarding was already completed before this session
-    // (let the completion screen handle the final navigation)
     if (onboardingProgress?.completed.length === TOTAL_STEPS && step !== 6) {
         navigate("/");
     }
