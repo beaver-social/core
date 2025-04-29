@@ -79,11 +79,11 @@ public entry fun elevate(
 public entry fun mint_for(
     cap: &mut AdminCap,
     record: &AdminsRecord,
+    registry: &mut registry::Registry,
+    clock: &clock::Clock,
     username: string::String,
     about: string::String,
-    registry: &mut registry::Registry,
     receiver: address,
-    clock: &clock::Clock,
     ctx: &mut TxContext
 ){
     validate_admin(cap, record);
@@ -98,8 +98,10 @@ public entry fun mint_for(
         clock,
         ctx
     );
+    let collection = posts::mint_collection(&registration, ctx);
 
     transfer::public_transfer(registration, receiver);
+    transfer::public_transfer(collection, receiver);
 }
 
 public entry fun set_posts_validator(

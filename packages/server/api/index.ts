@@ -1,11 +1,12 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import authIndex from "./routes/auth";
-import contentIndex from "./routes/content";
-import miscIndex from "./routes/misc";
-import userIndex from "./routes/user";
-import analyticsIndex from "./routes/analytics";
-import { respond } from "../utils/respond";
+// import authIndex from "./routes/auth";
+// import contentIndex from "./routes/content";
+// import miscIndex from "./routes/misc";
+// import analyticsIndex from "./routes/analytics";
+import router from "./routes";
+import { respond } from "./lib/utils/respond";
+import { onchainDefinitions } from "contracts/definitions";
 
 let servedSessions = 0;
 
@@ -32,13 +33,8 @@ const app = new Hono()
     })
   )
 
-  .route("auth", authIndex)
-  // .route("content", contentIndex)
-  .route("misc", miscIndex)
-  // .route("analytics", analyticsIndex)
-  .route("user", userIndex)
+  .route("/", router)
 
-  // handlers
   .get("/stats", async (ctx) => {
     servedSessions++;
     return ctx.json({
@@ -46,22 +42,12 @@ const app = new Hono()
     });
   })
   .get("/contracts", async (ctx) => {
-    const data = {
-      testnet: {
-        packages: {
-          beaverSocial: {
-            id: "0x",
-          },
-        },
-        objects: {
-          adminsRecord: "0x",
-          clock: "0x",
-          registry: "0x",
-        },
-      },
-    };
+    const data = onchainDefinitions;
 
     return respond.ok(ctx, data, "Contracts fetched successfully", 200);
+  })
+  .get("*", (ctx) => {
+    return respond.err(ctx, "Invalid v1 api route", 404);
   });
 
 export default app;

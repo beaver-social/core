@@ -1,20 +1,16 @@
-import {
-  actionFunctions,
-  actionRequests,
-  actions,
-} from "../../schema/interactions";
 import { verifyPersonalMessageSignature } from "@mysten/sui/verify";
-import { users } from "../../schema/user/users";
-import type { DB } from "../../schema";
-import db from "../../schema/db";
+import type { DB } from "../db/schema";
+import db from "../db";
 import { tryCatch } from "../tryCatch";
 import { desc, eq } from "drizzle-orm";
-import { camelToDotCase } from "../utils";
+import { camelToDotCase } from "../utils/utils";
 import { createAction } from "./factory";
 import { encode as msgpackEncode, decode as msgpackDecode } from "msgpackr";
 import { SuiGraphQLClient } from "@mysten/sui/graphql";
 import { getFullnodeUrl } from "@mysten/sui/client";
 import { Network } from "../types";
+
+const { actions, users, actionFunctions, actionRequests } = db.schema;
 
 export function deriveActionNameFromFn(fn: Function) {
   return "v1.user." + camelToDotCase(fn.name);
@@ -45,44 +41,10 @@ export async function getUser(userId: number) {
   return user;
 }
 
-export async function verifyUserSignature(
-  message: Uint8Array,
-  signature: string,
-  loginType: "wallet" | "zk",
-  address: string
-) {
-  if (loginType === "wallet") {
-    const { toSuiAddress: getVerifiedAddress } =
-      await verifyPersonalMessageSignature(message, signature, {
-        address,
-      });
-
-    if (address !== getVerifiedAddress()) {
-      throw new Error("Invalid signature");
-    }
-  } else if (loginType === "zk") {
-    const fullnodeUrl = getFullnodeUrl(import.meta.env.SUI_NETWORK as Network);
-
-    const { toSuiAddress: getVerifiedAddress } =
-      await verifyPersonalMessageSignature(message, signature, {
-        address,
-        client: new SuiGraphQLClient({
-          url: fullnodeUrl,
-        }),
-      });
-
-    if (address !== getVerifiedAddress()) {
-      throw new Error("Invalid signature");
-    }
-  } else {
-    throw new Error("Invalid signature type");
-  }
-}
-
 export async function executeActionFunction<T, R>(
   tx: Transaction,
   fn: (tx: Transaction, args: ActionOptions<T>) => Promise<R>,
-  options: ActionOptions<T> & { _user: DB["user"] },
+  options: ActionOptions<T> & { user: DB["user"] },
   actionType: string
 ): Promise<R> {
   const result = await tryCatch(fn(tx, options));
@@ -151,8 +113,8 @@ export async function storeActionRecord(
       hash,
       previous,
       type,
-      loginType: loginType,
-      signature: signature,
+      signature,
+      // loginType: loginType,
     })
     .returning();
 

@@ -1,5 +1,5 @@
 const envKeys = [
-  "SERVER_PRIVATE_KEY",
+  "SERVER_PASSPHRASE",
   // DB
   "DB_FILE_NAME",
   // R2

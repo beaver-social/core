@@ -1,7 +1,6 @@
 import { bcs } from "@mysten/sui/bcs";
 import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
-import { formatAddress } from "@mysten/sui/utils";
 import { z } from "zod";
 import { zNumberString, zSuiRPCObjectResult } from "./utils";
 
@@ -141,7 +140,7 @@ class Contracts {
             table: "usernames",
             key: {
               type: "address",
-              value: formatAddress(args.address),
+              value: args.address,
             },
           });
 
@@ -255,7 +254,7 @@ class Contracts {
             arguments: [
               adminCap,
               adminsRecord,
-              tx.pure(bcs.Address.serialize(formatAddress(args.receiver))),
+              tx.pure(bcs.Address.serialize(args.receiver)),
             ],
           });
         },
@@ -289,11 +288,11 @@ class Contracts {
             arguments: [
               adminCap,
               adminsRecord,
-              tx.pure(bcs.String.serialize(args.username)),
-              tx.pure(bcs.String.serialize(args.about)),
               registry,
-              tx.pure(bcs.Address.serialize(formatAddress(args.receiver))),
               clock,
+              bcs.String.serialize(args.username),
+              bcs.String.serialize(args.about),
+              bcs.Address.serialize(args.receiver),
             ],
           });
         },
@@ -318,9 +317,7 @@ class Contracts {
             arguments: [
               adminCap,
               adminsRecord,
-              tx.pure(
-                bcs.Address.serialize(formatAddress(args.adminCapIdToRevoke))
-              ),
+              tx.pure(bcs.Address.serialize(args.adminCapIdToRevoke)),
             ],
           });
         },
@@ -436,7 +433,7 @@ class Contracts {
             arguments: [
               awardsData,
               registry,
-              tx.pure(bcs.Address.serialize(formatAddress(args.recipient))),
+              tx.pure(bcs.Address.serialize(args.recipient)),
               tx.pure.u64(args.awardType),
               payment,
               tx.pure.u64(args.postId),
@@ -491,7 +488,7 @@ class Contracts {
 
         getAwardsByRecipient: async (args: { address: string }) => {
           const response = await this.client.getOwnedObjects({
-            owner: formatAddress(args.address),
+            owner: args.address,
             filter: {
               StructType: `${this.config.packageId}::awards::Award`,
             },

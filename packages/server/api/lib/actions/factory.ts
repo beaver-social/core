@@ -1,17 +1,15 @@
 import * as helpers from "./helpers";
-import * as utils from "../utils";
-import type { DB } from "../../schema";
-import db from "../../schema/db";
+import * as utils from "../utils/utils";
+import type { DB } from "../db/schema";
+import db from "../db";
+import { verifySignature } from "../utils/signature";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>["0"]>["0"];
 type ActionOptions<T> = T & { userId: number };
 
 export function createAction<T>() {
   return function <R>(
-    fn: (
-      tx: Transaction,
-      args: ActionOptions<T> & { _user: DB["user"] }
-    ) => Promise<R>,
+    fn: (tx: Transaction, args: T & { user: DB["user"] }) => Promise<R>,
     callback?: (
       tx: Transaction,
       result: R,
@@ -34,22 +32,20 @@ export function createAction<T>() {
         helpers.compressActionRequest(actionRequest);
       const message = new TextEncoder().encode(payload);
       const user = await helpers.getUser(options.userId);
-      await helpers.verifyUserSignature(
-        message,
-        signature,
-        user.loginType,
-        user.address
-      );
+      await verifySignature(message, signature, {
+        address: user.address,
+        intent: "PersonalMessage",
+        type: user.loginType,
+      });
 
-      // Execute transaction
-      await db.transaction(async (tx) => {
+      const result = await db.transaction(async (tx) => {
         // Run the action function
         const result = await helpers.executeActionFunction(
           tx,
           fn,
           {
             ...options,
-            _user: user,
+            user: user,
           },
           actionType
         );
@@ -77,7 +73,11 @@ export function createAction<T>() {
         if (callback) {
           await callback(tx, result, action);
         }
+
+        return result;
       });
+
+      return result;
     };
   };
 }
