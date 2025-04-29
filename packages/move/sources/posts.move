@@ -73,13 +73,26 @@ public(package) fun set_validator(
     registry.validator = new_validator;
 }
 
+public(package) fun mint_collection(
+    identity: &IdentityRegistration,
+    ctx: &mut TxContext,
+) : MY_BEAVER_POSTS {
+    let username = username(identity);
+    let collection = MY_BEAVER_POSTS {
+        id: object::new(ctx),
+        username: username,
+        posts: vector::empty<u64>(),
+    };
+
+    collection
+}
+
 
 /// Public Methods
 
 public entry fun push(
     registry: &mut PostsRegistry,
     identity: &IdentityRegistration,
-    author_username: string::String,
     post_id: u64,
     content: string::String,
     attested: vector<u8>,
@@ -94,8 +107,7 @@ public entry fun push(
     let author_address = &owner(identity_data);
     assert!(author_address == tx_context::sender(ctx), EInvalidAuthor);
     
-    let identity_username = username(identity);
-    assert!(identity_username == author_username, EInvalidAuthor);
+    let author_username = username(identity);
 
     // Impleent the signature verification logic here. once we have the signature
     // let msg = x"00";  // We have to derive this from the input parameters

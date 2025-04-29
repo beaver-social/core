@@ -14,6 +14,7 @@ use beaver_social::{
     identity_registration as registration,
     identity_registration::{ IdentityRegistration, IdentityData }
 };
+use beaver_social::posts::mint_collection;
 use suins::suins_registration;
 
 
@@ -135,8 +136,10 @@ public entry fun mint(
     let sender = tx_context::sender(ctx);
 
     let registration = mint_(registry, sender, username, about, clock, ctx);
+    let collection = mint_collection(&registration, ctx);
 
     transfer::public_transfer(registration, sender);
+    transfer::public_transfer(collection, sender);
 }
 
 
@@ -144,4 +147,8 @@ public entry fun mint(
 
 public fun username(registry: &Registry, owner: address): string::String {
     registry.usernames[owner]
+}
+
+public fun resolve_username(registry: &Registry, username: string::String): address {
+    registry.owners[username]
 }

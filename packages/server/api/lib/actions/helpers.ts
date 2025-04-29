@@ -1,20 +1,16 @@
-import {
-  actionFunctions,
-  actionRequests,
-  actions,
-} from "../../schema/interactions";
 import { verifyPersonalMessageSignature } from "@mysten/sui/verify";
-import { users } from "../../schema/user/users";
-import type { DB } from "../../schema";
-import db from "../../schema/db";
+import type { DB } from "../db/schema";
+import db from "../db";
 import { tryCatch } from "../tryCatch";
 import { desc, eq } from "drizzle-orm";
-import { camelToDotCase } from "../utils";
+import { camelToDotCase } from "../utils/utils";
 import { createAction } from "./factory";
 import { encode as msgpackEncode, decode as msgpackDecode } from "msgpackr";
 import { SuiGraphQLClient } from "@mysten/sui/graphql";
 import { getFullnodeUrl } from "@mysten/sui/client";
 import { Network } from "../types";
+
+const { actions, users, actionFunctions, actionRequests } = db.schema;
 
 export function deriveActionNameFromFn(fn: Function) {
   return "v1.user." + camelToDotCase(fn.name);
@@ -82,7 +78,7 @@ export async function verifyUserSignature(
 export async function executeActionFunction<T, R>(
   tx: Transaction,
   fn: (tx: Transaction, args: ActionOptions<T>) => Promise<R>,
-  options: ActionOptions<T> & { _user: DB["user"] },
+  options: ActionOptions<T> & { user: DB["user"] },
   actionType: string
 ): Promise<R> {
   const result = await tryCatch(fn(tx, options));
@@ -151,8 +147,8 @@ export async function storeActionRecord(
       hash,
       previous,
       type,
-      loginType: loginType,
-      signature: signature,
+      signature,
+      // loginType: loginType,
     })
     .returning();
 

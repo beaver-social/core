@@ -1,4 +1,4 @@
-import { Contracts } from "contracts"
-import { onchainDefinitions } from "./constants"
+import { Contracts } from "contracts";
+import { onchainDefinitions } from "contracts/definitions";
 
-export const contracts = new Contracts({ packageId: onchainDefinitions.testnet.packageId, objects: onchainDefinitions.testnet.objects })
+export const contracts = new Contracts(onchainDefinitions);
