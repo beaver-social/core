@@ -12,7 +12,7 @@ export default function BasicInfo({ data: userDetails }: { data: UserDetails }) 
                 <div className="flex items-center justify-center gap-2">
                     <h1 className="text-xl font-bold">{userDetails.name}</h1>
                     {userDetails.verified && (
-                        <Icon name="CircleCheckBig" className="text-secondary-foreground" />
+                        <Icon name="SquareCheckBig" className="text-secondary-foreground" />
                     )}
                 </div>
                 <div className="flex items-center justify-center gap-2">
@@ -129,7 +129,7 @@ export default function BasicInfo({ data: userDetails }: { data: UserDetails }) 
                                         <div className="flex items-center gap-1.5">
                                             <span className="font-semibold">{userDetails.name}</span>
                                             {userDetails.verified && (
-                                                <Icon name="CircleCheckBig" className="text-primary size-4" />
+                                                <Icon name="SquareCheckBig" className="text-primary size-4" />
                                             )}
                                         </div>
                                         <div className="flex items-center gap-1.5 text-xs text-grey-500">

@@ -21,6 +21,8 @@ export const useGlobalUI = () => {
         return tabs.swipes;
       case "onboarding":
         return [];
+      case "create":
+        return tabs.create;
     }
   };
 

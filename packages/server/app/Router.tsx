@@ -13,6 +13,7 @@ import Settings from "./pages/settings";
 import SearchResults from "./pages/explore/SearchResults";
 import Demo from "./pages/demo";
 import Onboarding from "./pages/onboarding";
+import Create from "./pages/create";
 import { useAuth } from "@beaver/react";
 
 import { useEffect } from "react";
@@ -66,6 +67,7 @@ export default function () {
                 <Route path="/profile/:id" element={withPageErrorBoundary(Profile)({})} />
                 <Route path="/swipes" element={withPageErrorBoundary(Swipes)({})} />
                 <Route path="/settings" element={withPageErrorBoundary(Settings)({})} />
+                <Route path="/create" element={withPageErrorBoundary(Create)({})} />
                 <Route path="/explore/search" element={withPageErrorBoundary(SearchResults)({})} />
                 <Route path="/demo" element={withPageErrorBoundary(Demo)({})} />
                 <Route path="*" element={withPageErrorBoundary(Error404)({})} />
