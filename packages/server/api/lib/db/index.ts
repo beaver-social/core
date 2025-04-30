@@ -1,6 +1,7 @@
 import schema from "./schema";
-import { dbExtensionHelpers } from "./helpers";
 import dbClient from "./client";
+import { eq } from "drizzle-orm";
+import { dbExtensionHelpers } from "./extension";
 
 const db = {
   ...dbClient,

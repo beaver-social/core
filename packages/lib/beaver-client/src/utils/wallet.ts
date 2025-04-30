@@ -8,6 +8,7 @@ import {
   getWallets,
   isWalletWithRequiredFeatureSet,
 } from "@mysten/wallet-standard";
+import { z } from "zod";
 
 export function getRegisteredWallets<
   AdditionalFeatures extends Wallet["features"]
@@ -42,5 +43,12 @@ export function getRegisteredWallets<
 }
 
 export function getWalletUniqueIdentifier(wallet?: Wallet) {
-  return wallet?.id ?? wallet?.name;
+  const id = wallet?.id ?? wallet?.name;
+  if (!id) {
+    throw new Error("Wallet does not have a unique identifier.");
+  }
+
+  return id;
 }
+
+export const zBeaverConnectionMethods = () => z.enum(["wallet", "x", "google"]);

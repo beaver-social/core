@@ -8,29 +8,74 @@ const beaver = new BeaverClient({
 beaver.initialize();
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
-  <div>
-    <button id="wallets" type="button">Show All Wallets</button>
-    <button id="connect" type="button">Connect</button>
-    <button id="disconnect" type="button">DisConnect</button>
+  <div id="container">
   </div>
 `;
 
-const walletsButton = document.querySelector<HTMLButtonElement>("#wallets")!;
-walletsButton.addEventListener("click", async () => {
+render();
+function render() {
+  const container = document.querySelector<HTMLDivElement>("#container")!;
+  container.innerHTML = "";
+
+  function gap() {
+    container.appendChild(document.createElement("br"));
+  }
+
+  beaver.connector.onConnected = () => render();
+  beaver.connector.onDisconnected = () => render();
+
+  const address = beaver.connector.address;
   const wallets = beaver.connector.getWallets();
-  console.log("Available wallets:", wallets);
-});
 
-const connectButton = document.querySelector<HTMLButtonElement>("#connect")!;
-connectButton.addEventListener("click", async () => {
-  const connection = await beaver.connector.connect("wallet", 0);
+  if (address) {
+    const addressButton = document.createElement("button");
+    addressButton.innerText = `Connected: ${address}`;
+    addressButton.onclick = async () => {
+      await beaver.connector.disconnect();
+    };
+    container.appendChild(addressButton);
+  } else {
+    for (let i = 0; i < wallets.length; i++) {
+      const wallet = wallets[i];
 
-  console.log("Connected to wallet:", connection);
-});
+      const walletButton = document.createElement("button");
+      walletButton.innerText = wallet.name;
+      walletButton.onclick = async () => {
+        await beaver.connector.connect("wallet", i);
+      };
+      container.appendChild(walletButton);
+    }
+  }
 
-const disconnectButton =
-  document.querySelector<HTMLButtonElement>("#disconnect")!;
-disconnectButton.addEventListener("click", async () => {
-  const disconnect = await beaver.connector.disconnect();
-  console.log("Disconnected from wallet:", disconnect);
-});
+  if (!address) return;
+  gap();
+
+  const newUserButton = document.createElement("button");
+  newUserButton.innerText = "Register";
+  newUserButton.onclick = async () => {
+    const response = await beaver.user.register({
+      username: "thisiswillclient",
+      fullName: "Will Client",
+      about: "This is a test bio",
+    });
+    console.log(response);
+  };
+  container.appendChild(newUserButton);
+
+  gap();
+
+  const postInput = document.createElement("input");
+  postInput.placeholder = "Post content";
+  container.appendChild(postInput);
+
+  const postButton = document.createElement("button");
+  postButton.innerText = "Post";
+  postButton.onclick = async () => {
+    const response = await beaver.posts.upload({
+      content: postInput.value,
+      media: [],
+    });
+    console.log(response);
+  };
+  container.appendChild(postButton);
+}

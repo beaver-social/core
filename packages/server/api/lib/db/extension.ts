@@ -1,21 +1,8 @@
-import { drizzle } from "drizzle-orm/bun-sqlite";
-import { Database } from "bun:sqlite";
-import env from "../../../env";
-import schema from "./schema";
 import { eq } from "drizzle-orm";
+import schema from "./schema";
+import dbClient from "./client";
 
-const sqlite = new Database(env.DB_FILE_NAME || "beaver.db");
-sqlite.exec("PRAGMA foreign_keys = ON");
-
-const dbClient = drizzle({
-  client: sqlite,
-  schema: schema,
-  casing: "snake_case",
-});
-
-export default dbClient;
-
-const dbExtensionHelpers = {
+export const dbExtensionHelpers = {
   async getUserById(id: number) {
     const [user] = await dbClient
       .select()

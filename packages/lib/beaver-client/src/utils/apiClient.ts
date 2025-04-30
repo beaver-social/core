@@ -1,23 +1,46 @@
 import { ClientResponse } from "hono/client";
 import { tryCatch } from "./tryCatch";
-type ErrorResponse = { error: string };
+import { z } from "zod";
 
-export async function safeParseResponse<
-  T extends Record<string, unknown>,
-  U extends number,
-  F extends string
->(raw: Promise<ClientResponse<T | ErrorResponse, U, F>>): Promise<T> {
-  const rawData = await tryCatch(raw);
-  if (rawData.error) {
-    const errorMessage = "Failed to contact beaver server";
-    throw new Error(errorMessage);
+type ErrorResponse = { success: false; error: string };
+type SuccessResponse<T> = { success: true; data: T; message: string };
+
+export async function safeParseResponse<T>(
+  raw: Promise<ClientResponse<T | ErrorResponse>>
+): Promise<T> {
+  let response: ClientResponse<T | ErrorResponse>;
+
+  const awaited = await tryCatch(raw);
+
+  if (awaited.error) {
+    throw new Error("Failed to fetch response: " + awaited.error);
+  } else {
+    response = awaited.data;
   }
-  const res = await tryCatch(rawData.data.json());
 
-  if (res.error) {
-    const errorMessage = res.error.message || "Invalid response from server";
-    throw new Error(errorMessage);
+  let body;
+
+  const parsed = await tryCatch(response.json());
+
+  if (parsed.error) {
+    throw new Error("Failed to parse response: " + parsed.error);
+  } else {
+    body = awaited.data;
   }
 
-  return res.data as T;
+  const resp = z
+    .object({
+      success: z.boolean(),
+      error: z.string().optional(),
+      data: z.any().optional(),
+      message: z.string(),
+    })
+    .parse(body);
+
+  if (resp.success) {
+    return (resp as SuccessResponse<T>).data;
+  } else {
+    const error = (resp as ErrorResponse).error || "Unknown error";
+    throw new Error(error);
+  }
 }

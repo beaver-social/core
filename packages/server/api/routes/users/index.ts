@@ -5,7 +5,6 @@ import authenticated from "../../middlewares/authenticated";
 import { respond } from "../../lib/utils/respond";
 import { tryCatch, tryCatchSync } from "../../lib/tryCatch";
 import db from "../../lib/db";
-import schema from "../../lib/db/schema";
 import { eq, or } from "drizzle-orm";
 import { contracts } from "../../lib/sui/contracts";
 import { Transaction } from "@mysten/sui/transactions";
@@ -26,8 +25,9 @@ import { verifySignature } from "../../lib/utils/signature";
 import { sign } from "hono/jwt";
 import { JWTalgorithm, JWTexpiration, JWTPrivateKey } from "../../constants";
 import { stringify } from "../../../utils";
+import { getPreviousActionHash } from "../../lib/actions/helpers";
 
-const { users } = schema;
+const { users } = db.schema;
 
 export default new Hono()
 
@@ -295,6 +295,22 @@ export default new Hono()
     }
   )
 
+  .get("/actions/pointer", authenticated, async (ctx) => {
+    const user = ctx.get("user");
+    const { data: pointer, error: actionHashError } = await tryCatch(
+      getPreviousActionHash(user.id)
+    );
+    if (actionHashError) {
+      ctx.log(actionHashError);
+      return respond.err(ctx, "Failed to get pointer", 500);
+    }
+    if (!pointer) {
+      return respond.err(ctx, "Pointer not found", 404);
+    }
+
+    return respond.ok(ctx, { pointer }, "Pointer fetched successfully", 200);
+  })
+
   .get(
     "/:id",
     zValidator(
@@ -321,11 +337,6 @@ export default new Hono()
         return respond.err(ctx, "User not found", 404);
       }
 
-      return respond.ok(
-        ctx,
-        user,
-        "User details fetched from ID successfully",
-        200
-      );
+      return respond.ok(ctx, user, "User details from ID", 200);
     }
   );

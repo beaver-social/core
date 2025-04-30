@@ -3,10 +3,11 @@ import type { API } from "server";
 import { hc } from "hono/client";
 import { Contracts } from "contracts";
 import { BeaverClientConfig, Defaults } from "./types/client";
-import { safeParseResponse } from "./utils/apiClient";
 
 import Logger from "./bindings/Logger";
 import Connector from "./bindings/Connector";
+import User from "./bindings/User";
+import Posts from "./bindings/Posts";
 
 export class BeaverClient {
   config: BeaverClientConfig;
@@ -15,6 +16,8 @@ export class BeaverClient {
   logger: Logger;
 
   connector: Connector;
+  user: User;
+  posts: Posts;
 
   constructor(config: BeaverClientConfig) {
     const logger = new Logger("Beaver Social SDK", Boolean(config.debug));
@@ -27,24 +30,28 @@ export class BeaverClient {
     const contracts = {} as any;
 
     this.defaults = {
+      logger,
       apiClient,
       suiClient,
-      surface: {} as any,
       contracts,
+      connection: null,
+      surface: null,
     };
 
     this.config = config;
-    this.logger = logger;
+    this.logger = this.defaults.logger;
 
-    this.connector = new Connector(this.defaults, this.logger);
+    this.connector = new Connector(this.defaults);
+    this.user = new User(this.defaults);
+    this.posts = new Posts(this.defaults);
   }
 
   public async initialize(callback?: () => void) {
-    const contractsResponse = await safeParseResponse(
-      this.defaults.apiClient.contracts.$get()
-    );
+    const contractsResponse = await this.defaults.apiClient.contracts.$get();
 
-    this.defaults.contracts = new Contracts(contractsResponse.data);
+    const contracts = await contractsResponse.json();
+
+    this.defaults.contracts = new Contracts(contracts.data);
 
     this.ready = true;
 
