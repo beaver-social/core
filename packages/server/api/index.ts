@@ -16,7 +16,10 @@ const app = new Hono()
     cors({
       origin: (origin, ctx) => {
         const selfUrl = new URL(ctx.req.url);
-        const allowedOrigins = ["http://localhost:3000"];
+        const allowedOrigins = [
+          "http://localhost:5173",
+          "https://localhost:3000",
+        ];
         const selfOrigin = selfUrl.origin;
         if (
           !origin ||

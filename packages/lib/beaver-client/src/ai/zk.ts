@@ -1,4 +1,4 @@
-import { User } from "./schema";
+import { User } from "../types/schema";
 
 // zkLoginService - JwtPayload
 interface JwtPayload {

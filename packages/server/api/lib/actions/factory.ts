@@ -3,6 +3,7 @@ import * as utils from "../utils/utils";
 import type { DB } from "../db/schema";
 import db from "../db";
 import { verifySignature } from "../utils/signature";
+import { stringify } from "../../../utils";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>["0"]>["0"];
 type ActionOptions<T> = T & { userId: number };
@@ -27,7 +28,7 @@ export function createAction<T>() {
       };
 
       // Prepare payload and message
-      const payload = JSON.stringify(actionRequest);
+      const payload = stringify(actionRequest);
       console.log(payload);
       const [compressedPayload, keys] =
         helpers.compressActionRequest(actionRequest);

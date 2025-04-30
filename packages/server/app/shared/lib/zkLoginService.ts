@@ -23,6 +23,7 @@ import {
   verifyTransactionSignature,
 } from "@mysten/sui/verify";
 import { SuiGraphQLClient } from "@mysten/sui/graphql";
+import { stringify } from "../../../utils";
 
 type PartialZkLoginSignature = Omit<
   Parameters<typeof getZkLoginSignature>["0"]["inputs"],
@@ -180,7 +181,7 @@ class zkLoginService {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_ENOKI_API_KEY}`,
         },
-        body: JSON.stringify(zkpRequestPayload),
+        body: stringify(zkpRequestPayload),
       });
 
       const proofResponse = await response.json();

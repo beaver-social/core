@@ -17,7 +17,7 @@ import {
   JwtPayload,
   ZkLoginData,
   StoredZkLoginData,
-} from "../../types/zk";
+} from "../zk";
 import { tryCatch } from "../../utils/tryCatch";
 import { safeParseResponse } from "../../utils/apiClient";
 

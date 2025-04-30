@@ -1,4 +1,3 @@
-import { verifyPersonalMessageSignature } from "@mysten/sui/verify";
 import type { DB } from "../db/schema";
 import db from "../db";
 import { tryCatch } from "../tryCatch";
@@ -6,6 +5,7 @@ import { desc, eq } from "drizzle-orm";
 import { camelToDotCase } from "../utils/utils";
 import { createAction } from "./factory";
 import { encode as msgpackEncode, decode as msgpackDecode } from "msgpackr";
+import { stringify } from "../../../utils";
 
 const { actions, users, actionFunctions, actionRequests } = db.schema;
 
@@ -85,7 +85,7 @@ export async function storeFunctionDefinition(
     .insert(actionFunctions)
     .values({
       hash: fnHash,
-      params: JSON.stringify(keys),
+      params: stringify(keys),
     })
     .returning();
 

@@ -25,6 +25,7 @@ import nonceManager from "../../lib/utils/nonce";
 import { verifySignature } from "../../lib/utils/signature";
 import { sign } from "hono/jwt";
 import { JWTalgorithm, JWTexpiration, JWTPrivateKey } from "../../constants";
+import { stringify } from "../../../utils";
 
 const { users } = schema;
 
@@ -283,7 +284,7 @@ export default new Hono()
         ctx.log(newUserResponse.error);
         return respond.err(
           ctx,
-          "Failed to create user : " + JSON.stringify(newUserResponse.error),
+          "Failed to create user : " + stringify(newUserResponse.error),
           400
         );
       }
