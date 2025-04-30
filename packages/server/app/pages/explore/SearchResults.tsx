@@ -87,7 +87,7 @@ export default function SearchResults() {
 
                     {/* Search Results */}
                     {filteredPosts.length > 0 ? (
-                        <div className="mt-8">
+                        <div className="mt-8 divide-y">
                             {filteredPosts.map((post) => (
                                 <FeedPost key={post.id} {...post} />
                             ))}

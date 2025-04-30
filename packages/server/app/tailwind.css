@@ -2,8 +2,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&: is(.dark *));
 
 :root {
   /* shadcn */
@@ -84,7 +83,7 @@
   /* shadcn */
   --background: #101010;
   --foreground: #fafafa;
-  --primary: #737373;
+  --primary: #c4c4c4;
   --primary-foreground: #171717;
   --secondary: #151515;
   --secondary-foreground: #fafafa;
@@ -333,4 +332,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

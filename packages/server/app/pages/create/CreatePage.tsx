@@ -9,7 +9,6 @@ import { Progress } from "@/shared/components/ui/progress";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/components/ui/select";
-import { ToggleGroup, ToggleGroupItem } from "@/shared/components/ui/toggle-group";
 import { Label } from "@/shared/components/ui/label";
 import ImageCropDialog from "@/shared/components/ImageCropDialog";
 import imageCompression from 'browser-image-compression';
@@ -433,11 +432,11 @@ export default function CreatePage() {
                                 {mediaFiles.length === 0 ? (
                                     <div className="text-center space-y-4">
                                         <div className="bg-primary/10 rounded-full p-4 inline-block">
-                                            <Icon name="Video" className="size-6 text-primary" />
+                                            <Icon name="Clapperboard" className="size-6 text-primary" />
                                         </div>
-                                        <h3 className="text-lg font-semibold">Upload a video</h3>
+                                        <h3 className="text-lg font-semibold">Upload Swipes</h3>
                                         <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                                            Short videos should be less than 60 seconds and in portrait mode for best viewing experience
+                                            Swipes are the best way to reach new audience. Upload in portrait mode for best viewing experience
                                         </p>
                                         <Button
                                             type="button"
@@ -461,7 +460,7 @@ export default function CreatePage() {
 
                                         <div className="space-y-4 mt-6">
                                             <Label htmlFor="caption">Caption</Label>
-                                            <div className="relative">
+                                            <div className="relative mt-2">
                                                 <Textarea
                                                     id="caption"
                                                     placeholder="Add a caption to your short"

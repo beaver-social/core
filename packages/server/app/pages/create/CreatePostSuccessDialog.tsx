@@ -62,19 +62,7 @@ export default function CreatePostSuccessDialog({
                                 exit={{ opacity: 0 }}
                                 className="flex flex-col items-center justify-center py-6"
                             >
-                                <motion.div
-                                    animate={{
-                                        rotate: 360,
-                                        transition: {
-                                            duration: 1.5,
-                                            ease: "linear",
-                                            repeat: Infinity
-                                        }
-                                    }}
-                                    className="text-primary"
-                                >
-                                    <Icon name="Loader" className="size-12" />
-                                </motion.div>
+                                <Icon name="LoaderCircle" className="size-12 animate-spin" />
                                 <motion.p
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0, transition: { delay: 0.3 } }}
@@ -102,7 +90,7 @@ export default function CreatePostSuccessDialog({
                                     }}
                                     className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center text-green-600 dark:text-green-400 mb-4"
                                 >
-                                    <Icon name="CheckCircle" className="size-10" />
+                                    <Icon name="CircleCheck" className="size-10" />
                                 </motion.div>
 
                                 <motion.h2

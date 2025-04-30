@@ -74,7 +74,6 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
                 <Button variant="neon">
-                    <Icon name="LogIn" className="size-4" />
                     <p>Connect Identity</p>
                 </Button>
             </DialogTrigger>

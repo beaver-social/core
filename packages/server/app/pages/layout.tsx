@@ -22,17 +22,17 @@ export default function Layout({ main, secondary }: LayoutProps) {
             <div className="hidden sm:block">
                 <SideNav />
 
-                <section className="flex justify-center flex-col px-10 ml-[14rem] lg:mr-[24rem] items-center bg-background">
-                    <div className="w-full mt-8 rounded-xl max-w-xl">
+                <section className="flex justify-center flex-col px-10 ml-[14rem] xl:mr-[28rem] lg:mr-[24rem] items-center bg-background">
+                    <div className="w-full max-w-xl mt-8 rounded-xl">
                         {main}
                     </div>
                 </section>
 
-                <section className="hidden w-[24rem] lg:block fixed right-0 top-0 h-screen overflow-y-auto border-l p-4 bg-background">
+                <section className="hidden w-[24rem] xl:w-[28rem] lg:block fixed right-0 top-0 h-screen overflow-y-auto border-l p-4 bg-background hide-scrollbar">
                     {secondary}
                 </section>
 
-                <div className="fixed z-50 flex gap-4 bottom-0 right-0 p-5">
+                <div className="fixed bottom-0 right-0 z-50 flex gap-4 p-5">
                     <ConnectIdentity />
                     <ThemeSwitch />
                 </div>

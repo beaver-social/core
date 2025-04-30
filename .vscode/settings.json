@@ -6,7 +6,7 @@
   ],
   "[move]": {
     "files.autoSave": "onFocusChange"
-  }
+  },
   // Uncomment the next line if you want to use this theme
-  // "workbench.colorTheme": "Tokyo Night Dark"
+  "workbench.colorTheme": "One Dark Pro Night Flat"
 }

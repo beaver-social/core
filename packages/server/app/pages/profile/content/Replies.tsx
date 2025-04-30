@@ -28,28 +28,15 @@ export default function Replies() {
                                 </div>
 
                                 {/* Parent Post */}
-                                <div className="mt-2 p-3 border rounded-md bg-accent/5">
+                                <div className="my-4 p-3 border rounded-md bg-accent/5">
                                     <div className="flex items-center gap-1 mb-1">
                                         <span className="font-medium">{reply.parent?.username}</span>
                                         <span className="text-grey-500 text-sm">@{reply.parent?.handle}</span>
                                     </div>
                                     <p className="text-sm line-clamp-2">{reply.parent?.content}</p>
-
-                                    {reply.parent?.images && reply.parent?.images.length > 0 && (
-                                        <div
-                                            className="w-full rounded-sm overflow-hidden"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                            }}
-                                        >
-                                            <ImageCarousel images={reply.parent?.images} aspectRatio={reply.parent?.aspectRatio} />
-                                        </div>
-                                    )}
-
                                 </div>
 
-                                <p className="mt-2">{reply.content}</p>
+                                <p className="my-2">{reply.content}</p>
 
                                 <Reactions analytics={reply.analytics} />
                             </div>
