@@ -1,12 +1,12 @@
-import { createInsertSchema } from "drizzle-zod";
+import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import { createAction } from "../../lib/actions/factory";
 import { z } from "zod";
 import { tryCatch } from "../../lib/tryCatch";
 import { preprocessPostContent } from "./helpers";
 import db from "../../lib/db";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
-const { posts } = db.schema;
+const { posts, likes } = db.schema;
 
 export const zCreatePostAction = () =>
   createInsertSchema(posts).pick({
@@ -122,3 +122,68 @@ export const createPost = createAction<
     }
   }
 );
+
+export const zLikePostAction = () =>
+  createInsertSchema(likes).pick({
+    postId: true,
+  });
+
+export const likePost = createAction<
+  z.infer<ReturnType<typeof zLikePostAction>>
+>()(async function likePost(tx, { user, postId }) {
+  const [post] = await tx
+    .select()
+    .from(posts)
+    .where(eq(posts.id, postId))
+    .limit(1);
+
+  if (!post) {
+    throw new Error("Post not found");
+  }
+
+  if (post.deletedAt) {
+    throw new Error("Cannot like a deleted post");
+  }
+
+  await tx.insert(likes).values({
+    userId: user.id,
+    postId: postId,
+  });
+
+  await tx
+    .update(posts)
+    .set({ likesCount: sql`${posts.likesCount} + 1` })
+    .where(eq(posts.id, postId));
+});
+
+export const zUnlikePostAction = () =>
+  createInsertSchema(likes).pick({
+    postId: true,
+  });
+
+export const unlikePost = createAction<
+  z.infer<ReturnType<typeof zUnlikePostAction>>
+>()(async function unlikePost(tx, { user, postId }) {
+  const [post] = await tx
+    .select()
+    .from(posts)
+    .where(eq(posts.id, postId))
+    .limit(1);
+
+  if (!post) {
+    throw new Error("Post not found");
+  }
+
+  if (post.deletedAt) {
+    throw new Error("Cannot unlike a deleted post");
+  }
+
+  await tx
+    .delete(likes)
+    .where(and(eq(likes.userId, user.id), eq(likes.postId, postId)));
+
+  await tx
+    .update(posts)
+    .set({ likesCount: sql`${posts.likesCount} - 1` })
+    .where(eq(posts.id, postId));
+});
