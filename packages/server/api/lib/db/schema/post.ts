@@ -55,6 +55,7 @@ export const topics = t.sqliteTable("topics", {
   id: t.int().primaryKey({ autoIncrement: true }),
   tag: t.text().notNull(),
 });
+
 export const post_topics = t.sqliteTable(
   "post_topics",
   {
