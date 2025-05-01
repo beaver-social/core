@@ -27,6 +27,9 @@ export const zNumberString = () =>
     })
     .transform((value) => Number(value));
 
+export const zBooleanString = () =>
+  z.enum(["true", "false"]).transform((value) => value === "true");
+
 export const zSuiAddress = () =>
   z
     .string()
