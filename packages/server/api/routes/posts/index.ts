@@ -21,6 +21,7 @@ import { zNumberString, zSuiSignature } from "../../lib/zod/helpers";
 import { preprocessImageMedia } from "./helpers";
 import s3 from "../../lib/s3/client";
 import { eq } from "drizzle-orm";
+import auth from "../../ai/routes/auth";
 
 const { posts, post_media, post_topics, post_mentions, likes, users } =
   db.schema;
@@ -32,11 +33,12 @@ const app = new Hono()
     zValidator(
       "query",
       z.object({
-        page: z
-          .number()
-          .default(1)
+        page: zNumberString()
+          .default("1")
           .transform((v) => v - 1),
-        perPage: z.number().max(32).default(8),
+        perPage: zNumberString()
+          .transform((v) => Math.min(v, 32))
+          .default("8"),
       })
     ),
     async (ctx) => {
@@ -59,7 +61,7 @@ const app = new Hono()
 
       return respond.ok(
         ctx,
-        { posts: postsData, hasMore: !!postsData.length },
+        { posts: postsData, hasMore: !(postsData.length < perPage) },
         "Posts fetched successfully",
         200
       );
@@ -344,6 +346,100 @@ const app = new Hono()
       }
 
       return respond.ok(ctx, {}, "Post unbookmarked successfully", 201);
+    }
+  )
+
+  .get(
+    "/:id/likes",
+    authenticated,
+    zValidator("param", z.object({ id: zNumberString() })),
+    zValidator(
+      "query",
+      z.object({
+        page: zNumberString()
+          .default("1")
+          .transform((v) => v - 1),
+        perPage: zNumberString()
+          .transform((v) => Math.min(v, 32))
+          .default("8"),
+      })
+    ),
+    async (ctx) => {
+      const { id } = ctx.req.valid("param");
+      const { page, perPage } = ctx.req.valid("query");
+
+      const likesResponse = await tryCatch(
+        db
+          .select()
+          .from(likes)
+          .where(eq(likes.postId, id))
+          .limit(perPage)
+          .offset(page * perPage)
+      );
+
+      if (likesResponse.error) {
+        ctx.log(likesResponse.error);
+        return respond.err(ctx, "Failed to get likes from db", 500);
+      }
+
+      const likesData = likesResponse.data;
+
+      return respond.ok(
+        ctx,
+        {
+          likes: likesData,
+          hasMore: !(likesData.length < perPage),
+        },
+        "Likes fetched successfully",
+        200
+      );
+    }
+  )
+
+  .get(
+    "/:id/replies",
+    authenticated,
+    zValidator("param", z.object({ id: zNumberString() })),
+    zValidator(
+      "query",
+      z.object({
+        page: zNumberString()
+          .default("1")
+          .transform((v) => v - 1),
+        perPage: zNumberString()
+          .transform((v) => Math.min(v, 32))
+          .default("8"),
+      })
+    ),
+    async (ctx) => {
+      const { id } = ctx.req.valid("param");
+      const { page, perPage } = ctx.req.valid("query");
+
+      const repliesResponse = await tryCatch(
+        db
+          .select()
+          .from(posts)
+          .where(eq(posts.parentId, id))
+          .limit(perPage)
+          .offset(page * perPage)
+      );
+
+      if (repliesResponse.error) {
+        ctx.log(repliesResponse.error);
+        return respond.err(ctx, "Failed to get replies from db", 500);
+      }
+
+      const repliesData = repliesResponse.data;
+
+      return respond.ok(
+        ctx,
+        {
+          replies: repliesData,
+          hasMore: !(repliesData.length < perPage),
+        },
+        "Replies fetched successfully",
+        200
+      );
     }
   );
 
