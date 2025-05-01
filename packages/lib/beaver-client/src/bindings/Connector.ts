@@ -108,6 +108,7 @@ export default class Connector {
       this.store.persistent.delete(STORAGE_KEY);
       this.logger.info("Disconnected and cleared stored connection.");
 
+      this.store.authToken = null;
       this.onDisconnected();
     } else {
       this.logger.warn("No active connection to disconnect from.");
