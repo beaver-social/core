@@ -20,11 +20,6 @@ export const users = t.sqliteTable(
     bannerUrl: t.text(),
     website: t.text(),
     timezone: t.int(),
-    loginType: t
-      .text({
-        enum: ["wallet", "zk"],
-      })
-      .notNull(),
 
     ...timestamps,
   },

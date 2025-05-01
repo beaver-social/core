@@ -84,6 +84,7 @@ public(package) fun mint_(
         ctx
     );
 
+    table::add(&mut registry.minters, owner, true);
     table::add(&mut registry.owners, username, owner);
     table::add(&mut registry.usernames, owner, username);
 

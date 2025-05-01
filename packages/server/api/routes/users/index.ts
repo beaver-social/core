@@ -1,7 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
-import authenticated from "../../middlewares/authenticated";
+import authenticated, { getUserFromCtx } from "../../middlewares/authenticated";
 import { respond } from "../../lib/utils/respond";
 import { tryCatch, tryCatchSync } from "../../lib/tryCatch";
 import db from "../../lib/db";
@@ -88,13 +88,44 @@ export default new Hono()
 
   .get(
     "/nonce",
-    zValidator("query", z.object({ address: zSuiAddress() })),
+    zValidator(
+      "query",
+      z.object({ address: zSuiAddress().optional() }).optional()
+    ),
     async (ctx) => {
-      const { address } = ctx.req.valid("query");
+      const { address } = ctx.req.valid("query") || {};
+      const { data: user, error } = await tryCatch(getUserFromCtx(ctx));
 
-      const nonce = nonceManager.generateNonce(address);
+      if (error) {
+        ctx.log(error);
+        return respond.err(ctx, "Failed to get user", 500);
+      }
 
-      return respond.ok(ctx, { nonce }, "Nonce generated", 200);
+      if (user) {
+        const { data: pointer, error: actionHashError } = await tryCatch(
+          getPreviousActionHash(user.id)
+        );
+        if (actionHashError) {
+          ctx.log(actionHashError);
+          return respond.err(ctx, "Failed to get pointer", 500);
+        }
+        if (!pointer) {
+          return respond.err(ctx, "Pointer not found", 404);
+        }
+
+        return respond.ok(
+          ctx,
+          { nonce: pointer },
+          "Action Pointer fetched successfully",
+          200
+        );
+      }
+      if (address) {
+        const nonce = nonceManager.generateNonce(address);
+        return respond.ok(ctx, { nonce }, "Nonce generated", 200);
+      }
+
+      return respond.err(ctx, "Address is required", 400);
     }
   )
 
@@ -128,7 +159,6 @@ export default new Hono()
         verifySignature(nonce, signature, {
           address: user.address,
           intent: "PersonalMessage",
-          type: user.loginType,
         })
       );
 
@@ -174,13 +204,12 @@ export default new Hono()
         imageUrl: z.string().max(255).optional(),
         bannerUrl: z.string().max(255).optional(),
         about: z.string().max(255).nullable().optional(),
-        loginType: z.enum(["zk", "wallet"]),
         signature: zSuiSignature(),
       })
     ),
     async (ctx) => {
       const { signature, ...user } = ctx.req.valid("json");
-      const { address, loginType } = user;
+      const { address } = user;
 
       const nonce = nonceManager.comsumeNonceBytes(address);
       if (!nonce) {
@@ -191,7 +220,6 @@ export default new Hono()
         verifySignature(nonce, signature, {
           address,
           intent: "PersonalMessage",
-          type: loginType,
         })
       );
 
@@ -229,7 +257,7 @@ export default new Hono()
         username: user.username,
         receiver: address,
       });
-      tx.setGasBudget(100000000);
+      tx.setGasBudgetIfNotSet(100_000_000);
 
       const identityGeneration = await tryCatch(executeTransaction(tx));
 
@@ -294,22 +322,6 @@ export default new Hono()
       return respond.ok(ctx, newUser, "User created successfully", 201);
     }
   )
-
-  .get("/actions/pointer", authenticated, async (ctx) => {
-    const user = ctx.get("user");
-    const { data: pointer, error: actionHashError } = await tryCatch(
-      getPreviousActionHash(user.id)
-    );
-    if (actionHashError) {
-      ctx.log(actionHashError);
-      return respond.err(ctx, "Failed to get pointer", 500);
-    }
-    if (!pointer) {
-      return respond.err(ctx, "Pointer not found", 404);
-    }
-
-    return respond.ok(ctx, { pointer }, "Pointer fetched successfully", 200);
-  })
 
   .get(
     "/:id",

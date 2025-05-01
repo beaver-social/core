@@ -8,11 +8,13 @@ import Logger from "./bindings/Logger";
 import Connector from "./bindings/Connector";
 import User from "./bindings/User";
 import Posts from "./bindings/Posts";
+import { BeaverStore } from "./store";
 
 export class BeaverClient {
   config: BeaverClientConfig;
   defaults: Defaults;
   ready: boolean = false;
+  onReady = () => {};
   logger: Logger;
 
   connector: Connector;
@@ -23,19 +25,25 @@ export class BeaverClient {
     const logger = new Logger("Beaver Social SDK", Boolean(config.debug));
     const rpcUrl = getFullnodeUrl(config.network || "mainnet");
     const suiClient = new SuiClient({ url: rpcUrl });
-    const apiClient = hc<typeof API>(
-      config.apiBaseUrl || "https://api.beaversocial.com/api/v1"
-    );
+    const apiUrl = config.apiBaseUrl || "https://api.beaversocial.com/api/v1";
+    const apiClient = hc<typeof API>(apiUrl);
 
     const contracts = {} as any;
+    const store = new BeaverStore({ apiClient });
+    store.onLogin = (authToken) => {
+      this.defaults.apiClient = hc<typeof API>(apiUrl, {
+        headers: () => ({
+          Authorization: authToken ? `Bearer ${authToken}` : "null",
+        }),
+      });
+    };
 
     this.defaults = {
       logger,
       apiClient,
       suiClient,
       contracts,
-      connection: null,
-      surface: null,
+      store,
     };
 
     this.config = config;
@@ -44,18 +52,40 @@ export class BeaverClient {
     this.connector = new Connector(this.defaults);
     this.user = new User(this.defaults);
     this.posts = new Posts(this.defaults);
+
+    this.initialize();
   }
 
-  public async initialize(callback?: () => void) {
-    const contractsResponse = await this.defaults.apiClient.contracts.$get();
+  public async initialize() {
+    try {
+      const contractsResponse = await this.defaults.apiClient.contracts.$get();
 
-    const contracts = await contractsResponse.json();
+      const contracts = await contractsResponse.json();
 
-    this.defaults.contracts = new Contracts(contracts.data);
+      this.defaults.contracts = new Contracts(contracts.data);
+    } catch {
+      this.logger
+        .error(`Unable to connect to server. Please check your network connection or the API URL.
+        Provided URL : ${this.defaults.apiClient["*"].$url()}`);
+      return this;
+    }
+
+    if (this.config.zkLoginWallets?.enabled) {
+      await this.connector.enableZkLoginWallets({
+        windowFeatures: this.config.zkLoginWallets.windowFeatures,
+      });
+    }
+
+    await this.connector.tryRestoreConnection();
+
+    const localJwt = this.defaults.store.persistent.get("beaver-jwt");
+    if (localJwt) {
+      this.defaults.store.authToken = localJwt;
+    }
 
     this.ready = true;
+    this.onReady();
 
-    !!callback && callback();
     return this;
   }
 }

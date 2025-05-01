@@ -1,20 +1,19 @@
 import {
   getWallets,
   WalletWithRequiredFeatures,
-  WalletAccount,
 } from "@mysten/wallet-standard";
-import { Connection, Defaults } from "../types/client";
+import { Defaults } from "../types/client";
 import Logger from "./Logger";
-import {
-  getWalletUniqueIdentifier,
-  zBeaverConnectionMethods,
-} from "../utils/wallet"; // You may need to adapt this
+import { getWalletUniqueIdentifier } from "../utils/wallet";
 import { z } from "zod";
-import { BeaverConnectionMethods, BeaverProvidedWallet } from "../types/wallet";
+import { BeaverProvidedWallet, Connection } from "../types/wallet";
+import { registerEnokiWallets } from "@mysten/enoki";
+import { BeaverStore } from "../store";
+import { normalizeSuiAddress } from "@mysten/sui/utils";
+import stringify from "fast-json-stable-stringify";
 
 const zStoredConnection = () =>
   z.object({
-    method: zBeaverConnectionMethods(),
     walletName: z.string(),
     address: z.string(),
   });
@@ -25,6 +24,7 @@ const STORAGE_KEY = "beaver-wallet-connection";
 export default class Connector {
   private defaults: Defaults;
   private logger: Logger;
+  private store: BeaverStore;
 
   onConnected: (connection: Connection) => void = () => {};
   onDisconnected: () => void = () => {};
@@ -32,18 +32,23 @@ export default class Connector {
   constructor(defaults: Defaults) {
     this.defaults = defaults;
     this.logger = defaults.logger;
-    this.connection = defaults.connection;
+    this.store = defaults.store;
 
     this.logger.info("Connector interface instantiated");
-
-    this.tryRestoreConnection();
   }
 
-  get connection() {
-    return this.defaults.connection;
-  }
-  set connection(conn: Connection | null) {
-    this.defaults.connection = conn;
+  async enableZkLoginWallets(
+    options?: Pick<Parameters<typeof registerEnokiWallets>[0], "windowFeatures">
+  ) {
+    const serverStats = await this.defaults.apiClient.stats.$get();
+    const stats = await serverStats.json();
+
+    return registerEnokiWallets({
+      client: this.defaults.suiClient,
+      network: "testnet",
+      ...stats.enokiConfig,
+      ...options,
+    });
   }
 
   getWallets() {
@@ -52,68 +57,55 @@ export default class Connector {
   }
 
   get isConnected() {
-    return this.connection != null;
+    return this.store.isConnected();
   }
 
   get address() {
-    if (this.connection) {
-      return this.connection.account.address;
-    } else {
-      this.logger.warn("No active connection to retrieve address from.");
+    const { address } = this.store;
+    if (!address) {
       return null;
     }
+    return normalizeSuiAddress(address);
   }
 
-  async connect<T extends BeaverConnectionMethods>(
-    method: T,
-    ...args: T extends "wallet" ? [number] : []
-  ) {
-    if (this.connection != null) {
+  async connect(walletIndex: number) {
+    if (this.isConnected) {
       this.logger.warn("Already connected to a wallet. Disconnect first.");
       return;
     }
 
-    if (method === "wallet") {
-      const [walletIndex] = args;
-      const selectedWallet = getWallets().get()[walletIndex || 0];
+    const selectedWallet = getWallets().get()[walletIndex];
 
-      const wallet = selectedWallet as BeaverProvidedWallet;
+    const wallet = selectedWallet as BeaverProvidedWallet;
 
-      const response = await wallet.features["standard:connect"].connect();
+    const response = await wallet.features["standard:connect"].connect();
 
-      if (!response || !response.accounts || response.accounts.length === 0) {
-        throw new Error("Failed to connect to wallet.");
-      }
-
-      const account = response.accounts[0];
-
-      this.connection = {
-        method: "wallet",
-        wallet,
-        account,
-        disconnect: wallet.features["standard:disconnect"].disconnect,
-      };
-
-      this.saveConnection({
-        method: "wallet",
-        walletName: getWalletUniqueIdentifier(wallet),
-        address: account.address,
-      });
-
-      await this.tryRestoreConnection();
-
-      return response;
+    if (!response || !response.accounts || response.accounts.length === 0) {
+      throw new Error("Failed to connect to wallet.");
     }
+
+    const account = response.accounts[0];
+
+    this.store.wallet = wallet;
+
+    this.saveConnection({
+      walletName: getWalletUniqueIdentifier(wallet),
+      address: account.address,
+    });
+
+    await this.tryRestoreConnection();
+
+    return response;
   }
 
   async disconnect() {
-    if (this.connection) {
-      const { disconnect } = this.connection;
-      await disconnect();
+    if (this.store.isConnected()) {
+      const { wallet } = this.store.connection;
 
-      this.connection = null;
+      wallet.features["standard:disconnect"].disconnect();
+      this.store.wallet = null;
 
-      localStorage.removeItem(STORAGE_KEY);
+      this.store.persistent.delete(STORAGE_KEY);
       this.logger.info("Disconnected and cleared stored connection.");
 
       this.onDisconnected();
@@ -123,11 +115,11 @@ export default class Connector {
   }
 
   private saveConnection(data: StoredConnection) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    this.store.persistent.set(STORAGE_KEY, stringify(data));
   }
 
-  private async tryRestoreConnection() {
-    const raw = localStorage.getItem(STORAGE_KEY);
+  async tryRestoreConnection() {
+    const raw = this.store.persistent.get(STORAGE_KEY);
     if (!raw) return;
 
     try {
@@ -155,43 +147,16 @@ export default class Connector {
         return;
       }
 
-      this.connection = {
-        method: parsed.method,
-        wallet,
-        account,
-        disconnect: wallet.features["standard:disconnect"].disconnect,
-      };
+      this.store.wallet = wallet;
 
       this.logger.info(`Restored connection with ${parsed.walletName}`);
-      this.onConnected(this.connection);
 
-      this.defaults.surface = {
-        type: parsed.method === "wallet" ? "wallet" : "zk",
-
-        signPersonalMessage: async (message) => {
-          const messageBytes = new TextEncoder().encode(message);
-          const response = await wallet.features[
-            "sui:signPersonalMessage"
-          ].signPersonalMessage({
-            account,
-            message: messageBytes,
-          });
-
-          return response;
-        },
-
-        signTransaction: (tx) => {
-          const response = wallet.features[
-            "sui:signTransaction"
-          ].signTransaction({
-            account,
-            transaction: tx,
-            chain: "sui:testnet",
-          });
-
-          return response;
-        },
-      };
+      if (this.store.isConnected()) {
+        this.onConnected(this.store.connection);
+      } else {
+        this.disconnect();
+        this.logger.warn("Failed to restore connection.");
+      }
     } catch (err) {
       this.logger.error("Failed to restore wallet connection:", err);
       this.disconnect();

@@ -37,7 +37,6 @@ export function createAction<T>() {
       await verifySignature(message, signature, {
         address: user.address,
         intent: "PersonalMessage",
-        type: user.loginType,
       });
 
       const result = await db.transaction(async (tx) => {
@@ -67,8 +66,7 @@ export function createAction<T>() {
           hash,
           prevHash,
           actionType,
-          signature,
-          user.loginType
+          signature
         );
 
         // Execute optional callback

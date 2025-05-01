@@ -6,16 +6,12 @@ type ErrorResponse = { success: false; error: string };
 type SuccessResponse<T> = { success: true; data: T; message: string };
 
 export async function safeParseResponse<T>(
-  raw: Promise<ClientResponse<T | ErrorResponse>>
-): Promise<T> {
-  let response: ClientResponse<T | ErrorResponse>;
+  raw: Promise<ClientResponse<SuccessResponse<T> | ErrorResponse>>
+) {
+  const { error: awaitedError, data: response } = await tryCatch(raw);
 
-  const awaited = await tryCatch(raw);
-
-  if (awaited.error) {
-    throw new Error("Failed to fetch response: " + awaited.error);
-  } else {
-    response = awaited.data;
+  if (awaitedError) {
+    throw new Error("Failed to fetch response: " + awaitedError);
   }
 
   let body;
@@ -25,7 +21,7 @@ export async function safeParseResponse<T>(
   if (parsed.error) {
     throw new Error("Failed to parse response: " + parsed.error);
   } else {
-    body = awaited.data;
+    body = parsed.data;
   }
 
   const resp = z

@@ -1,7 +1,6 @@
 import { ApiClient, Defaults } from "../types/client";
-import { ApiParams } from "../types/utils";
+import { ApiParams } from "../types/api";
 import { safeParseResponse } from "../utils/apiClient";
-import { ensureConnection } from "../utils/connection";
 import Logger from "./Logger";
 
 export default class User {
@@ -21,35 +20,55 @@ export default class User {
       "username" | "fullName" | "about" | "imageUrl" | "bannerUrl"
     >
   ) {
-    const { surface, connection } = ensureConnection(this.defaults);
-    const address = connection.account.address;
+    const { features, address } = this.defaults.store;
+    if (!features || !address) {
+      throw new Error("Connect wallet before registering.");
+    }
 
-    const {
-      data: { nonce },
-    } = await safeParseResponse(
+    const { nonce } = await safeParseResponse(
       this.defaults.apiClient.users.nonce.$get({
         query: { address },
       })
     );
 
-    const { signature } = await surface.signPersonalMessage(nonce);
+    const { signature } = await features.signPersonalMessage(nonce);
 
-    const raw = await this.defaults.apiClient.users.$post({
-      json: {
-        ...options,
-        address: connection.account.address,
-        loginType: surface.type,
-        signature,
-      },
-    });
-    const response = await raw.json();
-
-    if (!response.success) {
-      throw new Error(response.error);
-    }
-
-    const { data: user } = response;
+    const user = await safeParseResponse(
+      this.defaults.apiClient.users.$post({
+        json: {
+          ...options,
+          address: address,
+          signature,
+        },
+      })
+    );
 
     return user;
+  }
+
+  async login() {
+    const { address, features } = this.defaults.store;
+    if (!features || !address) {
+      throw new Error("Connect wallet before logging in.");
+    }
+
+    const { nonce } = await safeParseResponse(
+      this.defaults.apiClient.users.nonce.$get({
+        query: { address },
+      })
+    );
+
+    const { signature } = await features.signPersonalMessage(nonce);
+
+    const { token } = await safeParseResponse(
+      this.defaults.apiClient.users.login.$post({
+        json: {
+          address,
+          signature,
+        },
+      })
+    );
+
+    this.defaults.store.authToken = token;
   }
 }

@@ -4,15 +4,17 @@ import { BeaverClient } from "../../exports.ts";
 const beaver = new BeaverClient({
   apiBaseUrl: "http://localhost:9090/api/v1",
   debug: true,
+  zkLoginWallets: {
+    enabled: true,
+  },
 });
-beaver.initialize();
+beaver.onReady = render;
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
   <div id="container">
   </div>
 `;
 
-render();
 function render() {
   const container = document.querySelector<HTMLDivElement>("#container")!;
   container.innerHTML = "";
@@ -25,7 +27,7 @@ function render() {
   beaver.connector.onDisconnected = () => render();
 
   const address = beaver.connector.address;
-  const wallets = beaver.connector.getWallets();
+  const wallets = beaver.connector.getWallets(); //.concat([enoki.wallets.google]);
 
   if (address) {
     const addressButton = document.createElement("button");
@@ -41,7 +43,7 @@ function render() {
       const walletButton = document.createElement("button");
       walletButton.innerText = wallet.name;
       walletButton.onclick = async () => {
-        await beaver.connector.connect("wallet", i);
+        await beaver.connector.connect(i);
       };
       container.appendChild(walletButton);
     }
@@ -54,9 +56,9 @@ function render() {
   newUserButton.innerText = "Register";
   newUserButton.onclick = async () => {
     const response = await beaver.user.register({
-      username: "thisiswillclient",
-      fullName: "Will Client",
-      about: "This is a test bio",
+      username: "zkaccount",
+      fullName: "Will LFG",
+      about: "This is a bio",
     });
     console.log(response);
   };
