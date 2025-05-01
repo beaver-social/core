@@ -6,7 +6,7 @@ import { preprocessPostContent } from "./helpers";
 import db from "../../lib/db";
 import { and, eq, sql } from "drizzle-orm";
 
-const { posts, likes } = db.schema;
+const { posts, likes, bookmarks } = db.schema;
 
 export const zCreatePostAction = () =>
   createInsertSchema(posts).pick({
@@ -186,4 +186,59 @@ export const unlikePost = createAction<
     .update(posts)
     .set({ likesCount: sql`${posts.likesCount} - 1` })
     .where(eq(posts.id, postId));
+});
+
+export const zBookmarkPostAction = () =>
+  createInsertSchema(bookmarks).pick({
+    postId: true,
+  });
+
+export const bookmarkPost = createAction<
+  z.infer<ReturnType<typeof zBookmarkPostAction>>
+>()(async function bookmarkPost(tx, { user, postId }) {
+  const [post] = await tx
+    .select()
+    .from(posts)
+    .where(eq(posts.id, postId))
+    .limit(1);
+
+  if (!post) {
+    throw new Error("Post not found");
+  }
+
+  if (post.deletedAt) {
+    throw new Error("Cannot bookmark a deleted post");
+  }
+
+  await tx.insert(bookmarks).values({
+    userId: user.id,
+    postId: postId,
+  });
+});
+
+export const zUnbookmarkPostAction = () =>
+  createInsertSchema(bookmarks).pick({
+    postId: true,
+  });
+
+export const unbookmarkPost = createAction<
+  z.infer<ReturnType<typeof zUnbookmarkPostAction>>
+>()(async function unbookmarkPost(tx, { user, postId }) {
+  const [post] = await tx
+    .select()
+    .from(posts)
+    .where(eq(posts.id, postId))
+    .limit(1);
+
+  if (!post) {
+    throw new Error("Post not found");
+  }
+
+  if (post.deletedAt) {
+    throw new Error("Cannot unbookmark a deleted post");
+  }
+
+  await tx
+    .delete(bookmarks)
+    .where(and(eq(bookmarks.userId, user.id), eq(bookmarks.postId, postId)));
 });

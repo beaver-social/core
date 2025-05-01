@@ -6,11 +6,15 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import authenticated from "../../middlewares/authenticated";
 import {
+  bookmarkPost,
   createPost,
   likePost,
+  unbookmarkPost,
   unlikePost,
+  zBookmarkPostAction,
   zCreatePostAction,
   zLikePostAction,
+  zUnbookmarkPostAction,
   zUnlikePostAction,
 } from "./actions";
 import { zNumberString, zSuiSignature } from "../../lib/zod/helpers";
@@ -318,6 +322,64 @@ const app = new Hono()
       }
 
       return respond.ok(ctx, {}, "Post unliked successfully", 201);
+    }
+  )
+
+  .post(
+    "/bookmark",
+    authenticated,
+    zValidator(
+      "json",
+      zBookmarkPostAction().merge(
+        z.object({
+          signature: zSuiSignature(),
+        })
+      )
+    ),
+    async (ctx) => {
+      const { postId, signature } = ctx.req.valid("json");
+
+      const user = ctx.get("user");
+
+      const { error: actionError } = await tryCatch(
+        bookmarkPost({ postId: postId, userId: user.id }, signature)
+      );
+
+      if (actionError) {
+        ctx.log(actionError);
+        return respond.err(ctx, actionError.message, 400);
+      }
+
+      return respond.ok(ctx, {}, "Post bookmarked successfully", 201);
+    }
+  )
+
+  .post(
+    "/unbookmark",
+    authenticated,
+    zValidator(
+      "json",
+      zUnbookmarkPostAction().merge(
+        z.object({
+          signature: zSuiSignature(),
+        })
+      )
+    ),
+    async (ctx) => {
+      const { postId, signature } = ctx.req.valid("json");
+
+      const user = ctx.get("user");
+
+      const { error: actionError } = await tryCatch(
+        unbookmarkPost({ postId: postId, userId: user.id }, signature)
+      );
+
+      if (actionError) {
+        ctx.log(actionError);
+        return respond.err(ctx, actionError.message, 400);
+      }
+
+      return respond.ok(ctx, {}, "Post unbookmarked successfully", 201);
     }
   );
 
