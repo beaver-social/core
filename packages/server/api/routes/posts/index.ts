@@ -21,7 +21,9 @@ import { zNumberString, zSuiSignature } from "../../lib/zod/helpers";
 import { preprocessImageMedia } from "./helpers";
 import s3 from "../../lib/s3/client";
 import { eq } from "drizzle-orm";
-import post from "../../ai/routes/content/post";
+
+const { posts, post_media, post_topics, post_mentions, likes, users } =
+  db.schema;
 
 const app = new Hono()
 
@@ -43,7 +45,7 @@ const app = new Hono()
       const postsResposne = await tryCatch(
         db
           .select()
-          .from(db.schema.posts)
+          .from(posts)
           .limit(perPage)
           .offset(page * perPage)
       );
@@ -97,7 +99,7 @@ const app = new Hono()
         if (!mentionedUser) continue;
 
         const { error } = await tryCatch(
-          db.insert(db.schema.post_mentions).values({
+          db.insert(post_mentions).values({
             userId: mentionedUser.id,
             postId: post.id,
           })
@@ -111,7 +113,7 @@ const app = new Hono()
 
       for (const topic of topics) {
         const { error } = await tryCatch(
-          db.insert(db.schema.post_topics).values({
+          db.insert(post_topics).values({
             postId: post.id,
             topicId: await db.ensureTopicId(topic),
           })
@@ -140,7 +142,7 @@ const app = new Hono()
           }
 
           const { error } = await tryCatch(
-            db.insert(db.schema.post_media).values({
+            db.insert(post_media).values({
               postId: post.id,
               url: imageUrl.data,
               blurhash,
@@ -163,7 +165,7 @@ const app = new Hono()
           }
 
           const { error } = await tryCatch(
-            db.insert(db.schema.post_media).values({
+            db.insert(post_media).values({
               postId: post.id,
               url: videoUrl.data,
             })
@@ -194,8 +196,11 @@ const app = new Hono()
       const postResponse = await tryCatch(
         db
           .select()
-          .from(db.schema.posts)
-          .where(eq(db.schema.posts.id, id))
+          .from(posts)
+          .where(eq(posts.id, id))
+          .leftJoin(post_media, eq(posts.id, post_media.id))
+          .leftJoin(post_mentions, eq(posts.id, post_mentions.id))
+          .leftJoin(post_topics, eq(posts.id, post_topics.id))
           .limit(1)
       );
 
@@ -204,62 +209,19 @@ const app = new Hono()
         return respond.err(ctx, "Failed to get post from db", 500);
       }
 
-      const post = postResponse.data[0];
+      const [post] = postResponse.data;
 
       if (!post) {
         return respond.err(ctx, "Post not found", 404);
       }
 
-      const mediaResponse = await tryCatch(
-        db
-          .select()
-          .from(db.schema.post_media)
-          .where(eq(db.schema.post_media.postId, id))
-      );
-
-      const mentionsResponse = await tryCatch(
-        db.query.post_mentions.findMany({
-          where: eq(db.schema.post_mentions.postId, id),
-          with: {
-            user: {
-              columns: {
-                id: true,
-                username: true,
-                suiAddress: true,
-                displayName: true,
-                avatar: true,
-              },
-            },
-          },
-        })
-      );
-
-      const topicsResponse = await tryCatch(
-        db.query.post_topics.findMany({
-          where: eq(db.schema.post_topics.postId, id),
-          with: {
-            topic: true,
-          },
-        })
-      );
-
-      const media = mediaResponse.error ? [] : mediaResponse.data;
-      const topics = topicsResponse.error
-        ? []
-        : topicsResponse.data.map((t) => t.topic);
-      const mentions = mentionsResponse.error
-        ? []
-        : mentionsResponse.data.map((m) => m.user);
-
       return respond.ok(
         ctx,
         {
-          post: {
-            ...post,
-            media,
-            mentions,
-            topics,
-          },
+          ...post.posts,
+          media: post.post_media,
+          mentions: post.post_mentions,
+          topics: post.post_topics,
         },
         "Post fetched successfully",
         200
