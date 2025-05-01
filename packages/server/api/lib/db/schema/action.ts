@@ -17,7 +17,7 @@ export const actions = table(
     signature: t.text().notNull().unique(),
     ...timestamps,
   },
-  (table) => [t.uniqueIndex("user_idx").on(table.userId)]
+  (table) => [t.index("user_idx").on(table.userId)]
 );
 
 export const actionRequests = table("action_requests", {

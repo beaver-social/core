@@ -21,7 +21,7 @@ export function deriveActionNameFromFn(fn: Function) {
     );
   }
 
-  return "v1.user." + fnName.slice(0, fnName.length - 2);
+  return "v1.user." + fnName.slice(0, fnName.length - 1);
 }
 
 type Transaction = Parameters<Parameters<typeof db.transaction>["0"]>["0"];

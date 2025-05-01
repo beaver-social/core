@@ -15,4 +15,4 @@ const { data } = bech32Decode(secret);
 const privateKeyBytes = convertBits(data, 5, 8, false);
 export const JWTPrivateKey = privateKeyBytes.toBase64();
 
-export const MAX_POST_CONTENT_LENGTH = 512; // 10MB
+export const MAX_POST_CONTENT_LENGTH = 512;
