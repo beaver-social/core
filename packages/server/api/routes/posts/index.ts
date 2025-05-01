@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { tryCatch } from "../../lib/tryCatch";
+import { tryCatch, tryCatchSync } from "../../lib/tryCatch";
 import db from "../../lib/db";
 import { respond } from "../../lib/utils/respond";
 import { zValidator } from "@hono/zod-validator";
@@ -194,14 +194,18 @@ const app = new Hono()
       const { id } = ctx.req.valid("param");
 
       const postResponse = await tryCatch(
+        db.select().from(posts).where(eq(posts.id, id)).limit(1)
+      );
+
+      const mentions = await tryCatch(
         db
-          .select()
-          .from(posts)
-          .where(eq(posts.id, id))
-          .leftJoin(post_media, eq(posts.id, post_media.id))
-          .leftJoin(post_mentions, eq(posts.id, post_mentions.id))
-          .leftJoin(post_topics, eq(posts.id, post_topics.id))
-          .limit(1)
+          .select({
+            userId: users.id,
+            username: users.username,
+          })
+          .from(users)
+          .innerJoin(post_mentions, eq(users.id, post_mentions.userId))
+          .where(eq(post_mentions.postId, id))
       );
 
       if (postResponse.error) {
@@ -218,10 +222,8 @@ const app = new Hono()
       return respond.ok(
         ctx,
         {
-          ...post.posts,
-          media: post.post_media,
-          mentions: post.post_mentions,
-          topics: post.post_topics,
+          ...post,
+          mentions,
         },
         "Post fetched successfully",
         200
@@ -258,8 +260,8 @@ const app = new Hono()
     }
   )
 
-  .post(
-    "/unlike",
+  .delete(
+    "/like",
     authenticated,
     zValidator(
       "json",
@@ -316,8 +318,8 @@ const app = new Hono()
     }
   )
 
-  .post(
-    "/unbookmark",
+  .delete(
+    "/bookmark",
     authenticated,
     zValidator(
       "json",
