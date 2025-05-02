@@ -20,7 +20,7 @@ export default function FeedItem({
         <div onClick={
             (e) => {
                 e.preventDefault();
-                navigate(`/message/${handle}-ishtails`, { state: { postId: id } });
+                navigate(`/messages/${handle}-ishtails`, { state: { postId: id } });
             }
         } className="block cursor-pointer">
             <article className="flex gap-4 p-4 border-b hover:bg-secondary/50 transition-colors">

@@ -210,7 +210,7 @@ export default function CreatePage() {
     }, [content, mediaFiles, location]);
 
     return (
-        <div className="max-w-2xl border mx-auto mt-4 mb-10 p-4 md:p-6 rounded-lg bg-background shadow-md">
+        <div className="max-w-2xl sm:border mx-auto mt-4 mb-10 p-8 md:p-6 rounded-lg bg-background shadow-md">
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -244,10 +244,10 @@ export default function CreatePage() {
                                 <Image
                                     src="/images/user.webp"
                                     alt="User avatar"
-                                    className="w-12 h-12 rounded-full flex-shrink-0"
+                                    className="hidden sm:block w-12 h-12 rounded-full flex-shrink-0"
                                 />
 
-                                <div className="flex-1 space-y-4">
+                                <div className="flex flex-col w-full space-y-4">
                                     <div className="relative">
                                         <Textarea
                                             placeholder="What's on your mind?"
@@ -308,7 +308,7 @@ export default function CreatePage() {
                                     </AnimatePresence>
 
                                     <div className="flex justify-between items-center">
-                                        <div className="flex gap-2">
+                                        <div className="flex gap-1">
                                             <TooltipProvider>
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>

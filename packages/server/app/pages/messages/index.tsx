@@ -14,8 +14,6 @@ export default function Messages() {
     return (
         <Layout main={
             <div>
-                <PageTitle title="messages" />
-
                 <div className="w-full">
                     <MessagesFeed />
                 </div>

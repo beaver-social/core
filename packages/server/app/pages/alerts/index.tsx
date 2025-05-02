@@ -14,8 +14,6 @@ export default function Notifications() {
     return (
         <Layout main={
             <div>
-                <PageTitle title="alerts" />
-
                 <div className="w-full flex-1 border mx-auto">
                     <Tabs />
                 </div>

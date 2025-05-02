@@ -8,8 +8,6 @@ export default function Message() {
     return (
         <Layout main={
             <div>
-                <PageTitle title="message" />
-
                 <div className="w-full border">
                     <UserDetails />
 

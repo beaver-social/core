@@ -19,7 +19,7 @@ const buttonVariants = cva(
                     "bg-secondary text-secondary-foreground hover:bg-secondary/80", ghost: "hover:bg-accent hover:text-accent-foreground",
                 link: "text-primary underline-offset-4 hover:underline",
                 neon: "relative group border text-foreground text-center rounded-full bg-background/90 hover:bg-background/80 border-blue-500/20",
-                interactive: "group relative w-32 overflow-hidden rounded-full border bg-background p-2 text-center font-semibold",
+                interactive: "relative w-32 overflow-hidden rounded-full border bg-background p-2 text-center font-semibold hover:bg-grey-900 text-foreground",
             },
             size: {
                 default: "h-10 px-4 py-2",
@@ -46,10 +46,26 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ({ className, variant, size, asChild = false, neon = true, text = "Button", ...props }, ref) => {
         const Comp = asChild ? Slot : "button"
+        const [isClicked, setIsClicked] = React.useState(false);
+
+        const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+            if (variant === "interactive") {
+                setIsClicked(true);
+                // Reset after animation completes
+                setTimeout(() => setIsClicked(false), 1500);
+            }
+
+            // Call the original onClick if it exists
+            if (props.onClick) {
+                props.onClick(e);
+            }
+        };
+
         return (
             <Comp
                 className={cn(buttonVariants({ variant, size, className }), "transition-all")}
                 ref={ref}
+                onClick={handleClick}
                 {...props}
             >
                 {variant === "neon" && (
@@ -58,17 +74,25 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                         {props.children}
                         <span className={cn("absolute group-hover:opacity-30 transition-all duration-500 ease-in-out inset-x-0 h-px -bottom-px bg-gradient-to-r w-3/4 mx-auto from-transparent dark:via-blue-500 via-blue-600 to-transparent hidden", neon && "block")} />
                     </>
-                )}
-                {variant === "interactive" && (
+                )}                {variant === "interactive" && (
                     <>
-                        <span className="inline-block translate-x-1 transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0">
+                        <span className={cn(
+                            "inline-block translate-x-1 transition-all duration-300",
+                            isClicked && "translate-x-12 opacity-0"
+                        )}>
                             {props.children}
                         </span>
-                        <div className="absolute top-0 z-10 flex h-full w-full translate-x-12 items-center justify-center gap-2 text-primary-foreground opacity-0 transition-all duration-300 group-hover:-translate-x-1 group-hover:opacity-100">
+                        <div className={cn(
+                            "absolute top-0 z-10 flex h-full w-full translate-x-12 items-center justify-center gap-2 text-primary-foreground opacity-0 transition-all duration-300",
+                            isClicked && "-translate-x-1 opacity-100"
+                        )}>
                             <span>{props.children}</span>
                             <ArrowRight />
                         </div>
-                        <div className="absolute left-[20%] top-[40%] h-2 w-2 scale-[1] rounded-lg bg-primary transition-all duration-300 group-hover:left-[0%] group-hover:top-[0%] group-hover:h-full group-hover:w-full group-hover:scale-[1.8] group-hover:bg-primary"></div>
+                        <div className={cn(
+                            "absolute left-[20%] top-[40%] h-2 w-2 scale-[1] rounded-lg bg-primary transition-all duration-300",
+                            isClicked && "left-[0%] top-[0%] h-full w-full scale-[1.8] bg-primary"
+                        )}></div>
                     </>
                 )}
                 {variant !== "neon" && variant !== "interactive" && props.children}
