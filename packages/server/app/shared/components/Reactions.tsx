@@ -1,5 +1,5 @@
 import Icon from "@/shared/components/Icon";
-import { useAuth } from "@beaver/react";
+// import { useAuth } from "@beaver/react";
 import { motion } from "framer-motion";
 
 type Props = {

@@ -3,7 +3,7 @@ import { Button } from "../ui/button"
 import { WalletButton } from "./Wallet"
 import { toast } from "sonner";
 import { Image } from "../Image";
-import { useAuth } from "@beaver/react";
+// import { useAuth } from "@beaver/react";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "../ui/dialog"
 import Icon from "../Icon";
@@ -21,34 +21,34 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
     const [showDisconnectButton, setShowDisconnectButton] = useState(false);
     const [isLoadingGoogleOAuthScreen, setIsLoadingGoogleOAuthScreen] = useState(false);
     const currentAccount = useCurrentAccount();
-    const { zkLoginData, zkLogin, logout } = useAuth();
+    // const { zkLoginData, zkLogin, logout } = useAuth();
 
     const urlParams = new URLSearchParams(window.location.search);
 
-    useEffect(() => {
-        // Check if the user is redirected from the OAuth screen
-        if (urlParams.get("auth_success")) {
-            setShowWelcomeSplash(true);
-        }
+    // useEffect(() => {
+    //     // Check if the user is redirected from the OAuth screen
+    //     if (urlParams.get("auth_success")) {
+    //         setShowWelcomeSplash(true);
+    //     }
 
-        if (zkLoginData?.userAddress || currentAccount?.address) {
-            setShowDisconnectButton(true);
-        }
-    }, [zkLoginData?.userAddress, currentAccount?.address]);
+    //     if (zkLoginData?.userAddress || currentAccount?.address) {
+    //         setShowDisconnectButton(true);
+    //     }
+    // }, [zkLoginData?.userAddress, currentAccount?.address]);
 
     const handleOpenChange = (newOpen: boolean) => {
         setIsOpen(newOpen);
         onOpenChange?.(newOpen);
     };
 
-    const handleDisconnect = async (type: "wallet" | "social") => {
-        try {
-            await logout(type);
-            setShowDisconnectButton(false);
-        } catch (error) {
-            toast.error(`Error disconnecting identity: ${error}`);
-        }
-    };
+    // const handleDisconnect = async (type: "wallet" | "social") => {
+    //     try {
+    //         await logout(type);
+    //         setShowDisconnectButton(false);
+    //     } catch (error) {
+    //         toast.error(`Error disconnecting identity: ${error}`);
+    //     }
+    // };
 
     if (showWelcomeSplash) {
         return <WelcomeSplash onComplete={() => {
@@ -57,18 +57,18 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
         }} />;
     }
 
-    if (showDisconnectButton) {
-        return (
-            <div>
-                <Button variant="neon" onClick={() => handleDisconnect(
-                    zkLoginData?.userAddress ? "social" : "wallet"
-                )}>
-                    <Icon name="LogOut" className="size-4" />
-                    <p>Disconnect</p>
-                </Button>
-            </div>
-        )
-    }
+    // if (showDisconnectButton) {
+    //     return (
+    //         <div>
+    //             <Button variant="neon" onClick={() => handleDisconnect(
+    //                 zkLoginData?.userAddress ? "social" : "wallet"
+    //             )}>
+    //                 <Icon name="LogOut" className="size-4" />
+    //                 <p>Disconnect</p>
+    //             </Button>
+    //         </div>
+    //     )
+    // }
 
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -93,7 +93,7 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
                             className="w-full"
                             onClick={async () => {
                                 setIsLoadingGoogleOAuthScreen(true);
-                                await zkLogin();
+                                // await zkLogin();
                             }}
                         >
                             {isLoadingGoogleOAuthScreen ? (

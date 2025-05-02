@@ -6,7 +6,7 @@ import { Textarea } from "@/shared/components/ui/textarea";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Image } from "@/shared/components/Image";
 import { useGlobalUIStore } from "@/shared/stores/zustand";
-import { useAuth } from "@beaver/react";
+// import { useAuth } from "@beaver/react";
 type Props = {
     onComplete: () => void;
     handleBack: () => void;
@@ -20,26 +20,26 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
     const [isSaving, setIsSaving] = useState(false);
     const fileInputRef = useState<HTMLInputElement | null>(null);
     const { onboardingData, setOnboardingData } = useGlobalUIStore();
-    const { uploadImage } = useAuth();
+    // const { uploadImage } = useAuth();
 
-    async function handleProfileImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-        if (e.target.files && e.target.files[0]) {
-            setIsUploading(true);
+    // async function handleProfileImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    //     if (e.target.files && e.target.files[0]) {
+    //         setIsUploading(true);
 
-            const file = e.target.files[0];
-            const result = await uploadImage(file);
+    //         const file = e.target.files[0];
+    //         const result = await uploadImage(file);
 
-            if (result.error) {
-                console.error(result.error);
-            }
+    //         if (result.error) {
+    //             console.error(result.error);
+    //         }
 
-            if (result.url) {
-                setProfilePicture(result.url);
-            }
+    //         if (result.url) {
+    //             setProfilePicture(result.url);
+    //         }
 
-            setIsUploading(false);
-        }
-    };
+    //         setIsUploading(false);
+    //     }
+    // };
 
     const handleSaveProfile = () => {
         if (!name) return;
@@ -99,7 +99,7 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
                                     type="file"
                                     accept="image/*"
                                     className="hidden"
-                                    onChange={handleProfileImageUpload}
+                                    // onChange={handleProfileImageUpload}
                                     ref={(input) => fileInputRef[1](input)}
                                 />
 

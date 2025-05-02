@@ -14,7 +14,7 @@ import SearchResults from "./pages/explore/SearchResults";
 import Demo from "./pages/demo";
 import Onboarding from "./pages/onboarding";
 import Create from "./pages/create";
-import { useAuth } from "@beaver/react";
+// import { useAuth } from "@beaver/react";
 
 import { useEffect } from "react";
 import Landing from "./pages/landing";
@@ -26,24 +26,24 @@ const withPageErrorBoundary = (Component: React.ComponentType<any>) => (props: a
 );
 
 function OnboardingProtection({ children }: { children: React.ReactNode }) {
-  const { userId, isConnected } = useAuth();
-  const navigate = useNavigate();
+  // const { userId, isConnected } = useAuth();
+  // const navigate = useNavigate();
 
-  useEffect(() => {
-    if (isConnected && !userId) {
-      navigate("/onboarding");
-    }
-  }, [userId, isConnected]);
+  // useEffect(() => {
+  //   if (isConnected && !userId) {
+  //     navigate("/onboarding");
+  //   }
+  // }, [userId, isConnected]);
 
   return children;
 }
 
 function LoadingAuth({ children }: { children: React.ReactNode }) {
-  const { isLoading } = useAuth();
+  // const { isLoading } = useAuth();
 
-  if (isLoading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
-  }
+  // if (isLoading) {
+  //   return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  // }
 
   return children;
 }
