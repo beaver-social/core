@@ -1,6 +1,6 @@
 import Layout from "@/pages/layout"
 import PageTitle from "@/shared/components/PageTitle"
-import MessagesFeed from "../Feed"
+import MessagesFeed from "../MessageFeed"
 import UserDetails from "./UserDetails"
 import ReplyBarContent from "./ReplyBarContent"
 
@@ -8,8 +8,6 @@ export default function Message() {
     return (
         <Layout main={
             <div>
-                <PageTitle title="message" />
-
                 <div className="w-full border">
                     <UserDetails />
 

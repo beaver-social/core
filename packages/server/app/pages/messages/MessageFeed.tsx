@@ -1,4 +1,4 @@
-import FeedItem from "./FeedItem";
+import FeedItem from "./MessageFeedItem";
 import Icon from "@/shared/components/Icon";
 
 // Sample data - replace with actual data from your backend
@@ -43,7 +43,7 @@ const sampleMessages = [
 
 export default function MessagesFeed() {
     return (
-        <div className="flex-1 border mx-auto">
+        <div className="flex-1 mx-auto">
             {/* search bar */}
             <div className="relative p-4 border-b">
                 <Icon name="Search" className="absolute left-7 top-1/2 transform -translate-y-1/2 text-muted-foreground" />

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import ShortVideo from './ShortVideo';
+import ShortVideo from './SwipeVideo';
 import { sampleShorts, ShortVideoData } from './mockData';
-import { useInView } from './useInView';
+import { useInView } from '../../shared/hooks/useInView';
 import { useGlobalUIStore } from '@/shared/stores/zustand';
 
 export default function ShortsFeed() {
@@ -207,7 +207,7 @@ export default function ShortsFeed() {
                     className="h-20 flex items-center justify-center"
                 >
                     {loading && (
-                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                        <Icon name="loader" className="animate-spin size-8 text-primary" />
                     )}
                 </div>
             )}

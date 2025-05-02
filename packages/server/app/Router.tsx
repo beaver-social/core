@@ -8,14 +8,16 @@ import Message from "./pages/messages/message";
 import Profile from "./pages/profile";
 import GoogleOAuth from "./pages/oauth/GoogleOAuth";
 import { PageErrorBoundary } from "./shared/lib/errorHandling";
-import Shorts from "./pages/shorts";
+import Swipes from "./pages/swipes";
 import Settings from "./pages/settings";
 import SearchResults from "./pages/explore/SearchResults";
 import Demo from "./pages/demo";
 import Onboarding from "./pages/onboarding";
+import Create from "./pages/create";
 import { useAuth } from "@beaver/react";
 
 import { useEffect } from "react";
+import Landing from "./pages/landing";
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary = (Component: React.ComponentType<any>) => (props: any) => (
   <PageErrorBoundary>
@@ -51,6 +53,7 @@ export default function () {
     <BrowserRouter>
       <Routes>
         <Route path="/onboarding" element={withPageErrorBoundary(Onboarding)({})} />
+        <Route path="/landing" element={withPageErrorBoundary(Landing)({})} />
         <Route path="/oauth/google" element={withPageErrorBoundary(GoogleOAuth)({})} />
         <Route path="/*" element={
           <LoadingAuth>
@@ -59,11 +62,12 @@ export default function () {
                 <Route path="/" element={withPageErrorBoundary(Home)({})} />
                 <Route path="/alerts" element={withPageErrorBoundary(Notifications)({})} />
                 <Route path="/messages" element={withPageErrorBoundary(Messages)({})} />
-                <Route path="/message/:id" element={withPageErrorBoundary(Message)({})} />
+                <Route path="/messages/:id" element={withPageErrorBoundary(Message)({})} />
                 <Route path="post/:id" element={withPageErrorBoundary(Post)({})} />
                 <Route path="/profile/:id" element={withPageErrorBoundary(Profile)({})} />
-                <Route path="/shorts" element={withPageErrorBoundary(Shorts)({})} />
+                <Route path="/swipes" element={withPageErrorBoundary(Swipes)({})} />
                 <Route path="/settings" element={withPageErrorBoundary(Settings)({})} />
+                <Route path="/create" element={withPageErrorBoundary(Create)({})} />
                 <Route path="/explore/search" element={withPageErrorBoundary(SearchResults)({})} />
                 <Route path="/demo" element={withPageErrorBoundary(Demo)({})} />
                 <Route path="*" element={withPageErrorBoundary(Error404)({})} />
