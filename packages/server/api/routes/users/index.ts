@@ -94,12 +94,7 @@ export default new Hono()
     ),
     async (ctx) => {
       const { address } = ctx.req.valid("query") || {};
-      const { data: user, error } = await tryCatch(getUserFromCtx(ctx));
-
-      if (error) {
-        ctx.log(error);
-        return respond.err(ctx, "Failed to get user", 500);
-      }
+      const { data: user } = await tryCatch(getUserFromCtx(ctx));
 
       if (user) {
         const { data: pointer, error: actionHashError } = await tryCatch(

@@ -1,8 +1,8 @@
 import { UserInfo } from "./types/api";
-import { ApiClient, Defaults, Surface } from "./types/client";
 import { BeaverProvidedWallet, Connection } from "./types/wallet";
 import { Transaction } from "@mysten/sui/transactions";
 import { safeParseResponse } from "./utils/apiClient";
+import ApiClient from "./bindings/ApiClient";
 
 export class BeaverStore {
   persistent: {
@@ -16,16 +16,22 @@ export class BeaverStore {
   };
 
   user: UserInfo | null = null;
-  actionPointer: string;
+  private _actionPointer: string = "GENESIS";
   private _connection: Connection | null = null;
 
   apiClient: ApiClient;
-  onLogin = (authToken: string | null) => {};
-  onLogout = () => {};
 
   constructor(options: { apiClient: ApiClient }) {
     this.apiClient = options.apiClient;
-    this.actionPointer = "GENESIS";
+  }
+
+  get actionPointer() {
+    const pointer = this._actionPointer;
+    if (!pointer) {
+      this.syncUserAndActionPointer();
+      return "GENESIS";
+    }
+    return pointer;
   }
 
   get connection() {
@@ -60,30 +66,13 @@ export class BeaverStore {
     };
   }
 
-  set authToken(token: string | null) {
-    if (!token) {
-      this.persistent.delete("beaver-jwt");
-      this.user = null;
-      this.onLogout();
-    } else {
-      if (!this.isConnected()) this.authToken = null;
-
-      this.persistent.set("beaver-jwt", token);
-
-      this.apiClient.users.$get().then((raw) => {
-        (async () => {
-          const response = await raw.json();
-          if (!response.success) {
-            this.authToken = null;
-            return;
-          }
-
-          this.user = response.data;
-          await this.syncActionPointer();
-          this.onLogin(this.authToken);
-        })();
-      });
+  async setJwt(jwt: string | null) {
+    this.apiClient.setJwt(jwt);
+    if (!jwt) {
+      return this.persistent.delete("beaver-jwt");
     }
+
+    await this.syncUserAndActionPointer();
   }
 
   get features() {
@@ -121,13 +110,20 @@ export class BeaverStore {
     };
   }
 
-  async syncActionPointer() {
+  async syncUserAndActionPointer() {
+    if (!this.apiClient.jwtExists) return;
+
+    const user = await safeParseResponse(this.apiClient.rpc.users.$get());
+
+    if (!user) return this.setJwt(null);
+    this.user = user;
+
     if (!this.isAuthenticated()) return;
     const { nonce } = await safeParseResponse(
-      this.apiClient.users.nonce.$get()
+      this.apiClient.rpc.users.nonce.$get()
     );
 
-    this.actionPointer = nonce;
+    this._actionPointer = nonce;
   }
 }
 

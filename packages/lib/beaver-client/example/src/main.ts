@@ -8,8 +8,13 @@ const beaver = new BeaverClient({
     enabled: true,
   },
 });
-beaver.onReady = render;
 
+beaver.on("beaver:ready", render);
+beaver.on("user:login", render);
+beaver.on("connection:change", ({ connection }) => {
+  console.log("Connection changed", connection);
+  render();
+});
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
   <div id="container">
   </div>
@@ -23,10 +28,8 @@ function render() {
     container.appendChild(document.createElement("br"));
   }
 
-  beaver.connector.onConnected = () => render();
-  beaver.connector.onDisconnected = () => render();
-
   const address = beaver.connector.address;
+  const user = beaver.auth.user;
   const wallets = beaver.connector.getWallets(); //.concat([enoki.wallets.google]);
 
   if (address) {
@@ -52,17 +55,27 @@ function render() {
   if (!address) return;
   gap();
 
-  const newUserButton = document.createElement("button");
-  newUserButton.innerText = "Register";
-  newUserButton.onclick = async () => {
-    const response = await beaver.user.register({
-      username: "zkaccount",
-      fullName: "Will LFG",
-      about: "This is a bio",
-    });
-    console.log(response);
-  };
-  container.appendChild(newUserButton);
+  if (!user) {
+    const newUserButton = document.createElement("button");
+    newUserButton.innerText = "Register";
+    newUserButton.onclick = async () => {
+      await beaver.user.register({
+        username: "zanzibar",
+        fullName: "fully island",
+        about: "kya karna hai iska",
+      });
+    };
+    container.appendChild(newUserButton);
+
+    const loginButton = document.createElement("button");
+    loginButton.innerText = "Login";
+    loginButton.onclick = async () => {
+      await beaver.user.login();
+    };
+    container.appendChild(loginButton);
+  }
+
+  if (!user) return;
 
   gap();
 

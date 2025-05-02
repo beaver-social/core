@@ -3,12 +3,12 @@ import { SuiClient } from "@mysten/sui/client";
 import type { API } from "server";
 import { Contracts } from "contracts";
 import { hc } from "hono/client";
-import { WalletAccount } from "@mysten/wallet-standard";
 import Logger from "../bindings/Logger";
 import { BeaverStore } from "../store";
-import { BeaverProvidedWallet } from "./wallet";
 import { Transaction } from "@mysten/sui/transactions";
 import { SignatureWithBytes } from "@mysten/sui/cryptography";
+import ApiClient from "../bindings/ApiClient";
+import EventNotifier from "../bindings/EventHandler";
 
 export type BeaverClientConfig = {
   debug?: boolean;
@@ -20,7 +20,7 @@ export type BeaverClientConfig = {
   };
 };
 
-export type ApiClient = ReturnType<typeof hc<typeof API>>;
+export type Api = ReturnType<typeof hc<typeof API>>;
 
 export type Defaults = {
   logger: Logger;
@@ -28,11 +28,7 @@ export type Defaults = {
   suiClient: SuiClient;
   contracts: Contracts;
   store: BeaverStore;
-};
-
-export type Connection = {
-  wallet: BeaverProvidedWallet;
-  account: WalletAccount;
+  events: EventNotifier;
 };
 
 export type Surface = {

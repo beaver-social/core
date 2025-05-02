@@ -1,4 +1,4 @@
-import { ApiClient, Defaults } from "../types/client";
+import { Api, Defaults } from "../types/client";
 import { ApiParams } from "../types/api";
 import { stringify } from "../utils/utils";
 import Logger from "./Logger";
@@ -16,7 +16,7 @@ export default class Posts {
   }
 
   async upload(
-    options: Omit<ApiParams<ApiClient["posts"]["$post"]>["json"], "signature">
+    options: Omit<ApiParams<Api["posts"]["$post"]>["json"], "signature">
   ) {
     const { features, user, actionPointer } = this.defaults.store;
     if (!features || !user) {
@@ -34,7 +34,7 @@ export default class Posts {
     );
 
     const { post } = await safeParseResponse(
-      this.defaults.apiClient.posts.$post({
+      this.defaults.apiClient.rpc.posts.$post({
         json: {
           ...options,
           signature,

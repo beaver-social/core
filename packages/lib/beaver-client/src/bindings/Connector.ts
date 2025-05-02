@@ -26,9 +26,6 @@ export default class Connector {
   private logger: Logger;
   private store: BeaverStore;
 
-  onConnected: (connection: Connection) => void = () => {};
-  onDisconnected: () => void = () => {};
-
   constructor(defaults: Defaults) {
     this.defaults = defaults;
     this.logger = defaults.logger;
@@ -40,7 +37,7 @@ export default class Connector {
   async enableZkLoginWallets(
     options?: Pick<Parameters<typeof registerEnokiWallets>[0], "windowFeatures">
   ) {
-    const serverStats = await this.defaults.apiClient.stats.$get();
+    const serverStats = await this.defaults.apiClient.rpc.stats.$get();
     const stats = await serverStats.json();
 
     return registerEnokiWallets({
@@ -108,8 +105,8 @@ export default class Connector {
       this.store.persistent.delete(STORAGE_KEY);
       this.logger.info("Disconnected and cleared stored connection.");
 
-      this.store.authToken = null;
-      this.onDisconnected();
+      this.store.setJwt(null);
+      this.defaults.events.emit("connection:disconnect", {});
     } else {
       this.logger.warn("No active connection to disconnect from.");
     }
@@ -153,7 +150,9 @@ export default class Connector {
       this.logger.info(`Restored connection with ${parsed.walletName}`);
 
       if (this.store.isConnected()) {
-        this.onConnected(this.store.connection);
+        this.defaults.events.emit("connection:change", {
+          connection: this.store.connection,
+        });
       } else {
         this.disconnect();
         this.logger.warn("Failed to restore connection.");

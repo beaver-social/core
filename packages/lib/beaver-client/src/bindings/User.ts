@@ -1,7 +1,8 @@
-import { ApiClient, Defaults } from "../types/client";
+import { Api, Defaults } from "../types/client";
 import { ApiParams } from "../types/api";
 import { safeParseResponse } from "../utils/apiClient";
 import Logger from "./Logger";
+import { sleep } from "../utils/utils";
 
 export default class User {
   private defaults: Defaults;
@@ -16,7 +17,7 @@ export default class User {
 
   async register(
     options: Pick<
-      ApiParams<ApiClient["users"]["$post"]>["json"],
+      ApiParams<Api["users"]["$post"]>["json"],
       "username" | "fullName" | "about" | "imageUrl" | "bannerUrl"
     >
   ) {
@@ -26,7 +27,7 @@ export default class User {
     }
 
     const { nonce } = await safeParseResponse(
-      this.defaults.apiClient.users.nonce.$get({
+      this.defaults.apiClient.rpc.users.nonce.$get({
         query: { address },
       })
     );
@@ -34,7 +35,7 @@ export default class User {
     const { signature } = await features.signPersonalMessage(nonce);
 
     const user = await safeParseResponse(
-      this.defaults.apiClient.users.$post({
+      this.defaults.apiClient.rpc.users.$post({
         json: {
           ...options,
           address: address,
@@ -47,13 +48,14 @@ export default class User {
   }
 
   async login() {
-    const { address, features } = this.defaults.store;
+    const store = this.defaults.store;
+    const { address, features } = store;
     if (!features || !address) {
       throw new Error("Connect wallet before logging in.");
     }
 
     const { nonce } = await safeParseResponse(
-      this.defaults.apiClient.users.nonce.$get({
+      this.defaults.apiClient.rpc.users.nonce.$get({
         query: { address },
       })
     );
@@ -61,7 +63,7 @@ export default class User {
     const { signature } = await features.signPersonalMessage(nonce);
 
     const { token } = await safeParseResponse(
-      this.defaults.apiClient.users.login.$post({
+      this.defaults.apiClient.rpc.users.login.$post({
         json: {
           address,
           signature,
@@ -69,6 +71,22 @@ export default class User {
       })
     );
 
-    this.defaults.store.authToken = token;
+    await sleep(1500); // Wait for the jwt token to be valid
+    await store.setJwt(token);
+
+    const user = store.user;
+
+    if (!user) {
+      this.logout();
+      console.log("BEAVER FATAL : Unable to fetch user data. Logging out.");
+    }
+
+    this.defaults.events.emit("user:login", { user });
+  }
+
+  async logout() {
+    await this.defaults.store.setJwt(null);
+    this.defaults.store.persistent.delete("beaver-jwt");
+    this.defaults.events.emit("user:logout", {});
   }
 }

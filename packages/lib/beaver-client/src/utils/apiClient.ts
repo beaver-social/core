@@ -29,7 +29,7 @@ export async function safeParseResponse<T>(
       success: z.boolean(),
       error: z.string().optional(),
       data: z.any().optional(),
-      message: z.string(),
+      message: z.string().optional(),
     })
     .parse(body);
 

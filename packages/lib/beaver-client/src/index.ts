@@ -9,13 +9,14 @@ import Connector from "./bindings/Connector";
 import User from "./bindings/User";
 import Posts from "./bindings/Posts";
 import { BeaverStore } from "./store";
+import ApiClient from "./bindings/ApiClient";
+import EventNotifier from "./bindings/EventHandler";
 
 export class BeaverClient {
-  config: BeaverClientConfig;
-  defaults: Defaults;
+  private config: BeaverClientConfig;
+  private defaults: Defaults;
   ready: boolean = false;
-  onReady = () => {};
-  logger: Logger;
+  private logger: Logger;
 
   connector: Connector;
   user: User;
@@ -25,18 +26,13 @@ export class BeaverClient {
     const logger = new Logger("Beaver Social SDK", Boolean(config.debug));
     const rpcUrl = getFullnodeUrl(config.network || "mainnet");
     const suiClient = new SuiClient({ url: rpcUrl });
-    const apiUrl = config.apiBaseUrl || "https://api.beaversocial.com/api/v1";
-    const apiClient = hc<typeof API>(apiUrl);
+    const apiClient = new ApiClient(logger);
+    apiClient.baseUrl = config.apiBaseUrl || "https://beaver.xyz/api/v1";
+
+    const events = new EventNotifier();
 
     const contracts = {} as any;
     const store = new BeaverStore({ apiClient });
-    store.onLogin = (authToken) => {
-      this.defaults.apiClient = hc<typeof API>(apiUrl, {
-        headers: () => ({
-          Authorization: authToken ? `Bearer ${authToken}` : "null",
-        }),
-      });
-    };
 
     this.defaults = {
       logger,
@@ -44,6 +40,7 @@ export class BeaverClient {
       suiClient,
       contracts,
       store,
+      events,
     };
 
     this.config = config;
@@ -56,18 +53,28 @@ export class BeaverClient {
     this.initialize();
   }
 
+  get on() {
+    return this.defaults.events.on.bind(this.defaults.events);
+  }
+
+  get auth() {
+    return {
+      user: this.defaults.store.user,
+      isAuthenticated: this.defaults.store.isAuthenticated,
+    };
+  }
+
   public async initialize() {
     try {
-      const contractsResponse = await this.defaults.apiClient.contracts.$get();
+      const contractsResponse =
+        await this.defaults.apiClient.rpc.contracts.$get();
 
       const contracts = await contractsResponse.json();
 
       this.defaults.contracts = new Contracts(contracts.data);
     } catch {
-      this.logger
-        .error(`Unable to connect to server. Please check your network connection or the API URL.
-        Provided URL : ${this.defaults.apiClient["*"].$url()}`);
-      return this;
+      throw new Error(`Unable to connect to server. Please check your network connection or the API URL.
+        Provided URL : ${this.defaults.apiClient.rpc["*"].$url()}`);
     }
 
     if (this.config.zkLoginWallets?.enabled) {
@@ -80,11 +87,11 @@ export class BeaverClient {
 
     const localJwt = this.defaults.store.persistent.get("beaver-jwt");
     if (localJwt) {
-      this.defaults.store.authToken = localJwt;
+      this.defaults.apiClient.setJwt(localJwt);
     }
 
     this.ready = true;
-    this.onReady();
+    this.defaults.events.emit("beaver:ready", {});
 
     return this;
   }
