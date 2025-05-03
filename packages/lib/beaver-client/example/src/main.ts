@@ -60,7 +60,7 @@ function render() {
     newUserButton.innerText = "Register";
     newUserButton.onclick = async () => {
       await beaver.user.register({
-        username: "zanzibar",
+        username: "riyariyariya",
         fullName: "fully island",
         about: "kya karna hai iska",
       });
