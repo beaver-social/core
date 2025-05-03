@@ -84,7 +84,7 @@ const app = new Hono()
       const { media, signature, ...postData } = ctx.req.valid("json");
       const user = ctx.get("user");
 
-      if (postData.content.length! > 0 && !postData.reposting) {
+      if (!(postData.content.length > 0) && !postData.reposting) {
         return respond.err(ctx, "Content is required", 400);
       }
 

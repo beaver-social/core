@@ -68,11 +68,18 @@ export class BeaverStore {
 
   async setJwt(jwt: string | null) {
     this.apiClient.setJwt(jwt);
-    if (!jwt) {
-      return this.persistent.delete("beaver-jwt");
+
+    if (jwt) {
+      this.persistent.set("beaver-jwt", jwt);
+    } else {
+      this.persistent.delete("beaver-jwt");
     }
 
-    await this.syncUserAndActionPointer();
+    const valid = await this.syncUserAndActionPointer();
+    if (!valid) {
+      this.user = null;
+    }
+    return valid;
   }
 
   get features() {
@@ -111,19 +118,25 @@ export class BeaverStore {
   }
 
   async syncUserAndActionPointer() {
-    if (!this.apiClient.jwtExists) return;
+    if (!this.apiClient.jwtExists) return false;
 
     const user = await safeParseResponse(this.apiClient.rpc.users.$get());
 
-    if (!user) return this.setJwt(null);
+    console.log("user", user);
+
+    if (!user) {
+      this.setJwt(null);
+      return false;
+    }
     this.user = user;
 
-    if (!this.isAuthenticated()) return;
+    if (!this.isAuthenticated()) return false;
     const { nonce } = await safeParseResponse(
       this.apiClient.rpc.users.nonce.$get()
     );
 
     this._actionPointer = nonce;
+    return true;
   }
 }
 

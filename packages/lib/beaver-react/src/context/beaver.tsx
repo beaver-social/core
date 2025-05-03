@@ -1,57 +1,48 @@
-import { createContext, useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { BeaverClient, BeaverClientConfig } from "@beaver/client";
-import { surface } from "../lib/surface";
 
 type BeaverContext = {
-    ready: false;
-    client: null;
-} | {
-    ready: true;
-    client: BeaverClient;
-}
+  client: BeaverClient;
+};
 
-export const BeaverContext = createContext<BeaverContext>({
-    client: null,
-    ready: false
+const BeaverContext = createContext<BeaverContext>({
+  client: {} as any,
 });
 
-export type BeaverConfig = {
-    children: React.ReactNode;
-    config: BeaverClientConfig;
-}
+type BeaverConfig = {
+  children: React.ReactNode;
+  config: BeaverClientConfig;
+};
 
 export function BeaverProvider(props: BeaverConfig) {
-    const { children, config } = props;
-    const [client, setClient] = useState<BeaverClient | null>(null);
-    const [ready, setReady] = useState<boolean>(false);
+  const { children, config } = props;
+  const [client, setClient] = useState<BeaverClient>({} as any);
+  const [ready, setReady] = useState<boolean>(false);
 
-    const flag = useRef(false)
+  const flag = useRef(false);
 
-    function init() {
-        const beaverClient = new BeaverClient(surface, config);
-        beaverClient.initialize(() => setReady(true));
-        setClient(beaverClient);
+  function init() {
+    const beaver = new BeaverClient(config);
+    beaver.on("beaver:ready", () => setReady(true));
+    setClient(beaver);
+  }
+
+  const value: BeaverContext = { client };
+
+  useEffect(() => {
+    if (!flag.current) {
+      flag.current = true;
+      init();
     }
+  }, [config]);
 
-    const value: BeaverContext = !!client?.ready ? {
-        client: client,
-        ready: ready as true
-    } : {
-        client: null,
-        ready: ready as false
-    }
+  return (
+    <BeaverContext.Provider value={value}>
+      {ready && children}
+    </BeaverContext.Provider>
+  );
+}
 
-    useEffect(() => {
-        if (!flag.current) {
-            flag.current = true
-            init();
-        }
-    }, [config]);
-
-
-    return (
-        <BeaverContext.Provider value={value}>
-            {ready && children}
-        </BeaverContext.Provider>
-    );
-};
+export function useBeaverContext() {
+  return useContext(BeaverContext);
+}

@@ -24,6 +24,7 @@ export default class Posts {
     }
 
     const { media, ...data } = options;
+
     const { signature } = await features.signPersonalMessage(
       stringify({
         ...data,
@@ -42,6 +43,7 @@ export default class Posts {
       })
     );
 
+    this.defaults.store.syncUserAndActionPointer();
     return post;
   }
 }
