@@ -111,8 +111,7 @@ export async function storeActionRecord(
   hash: string,
   previous: string,
   type: string,
-  signature: string,
-  loginType: "wallet" | "zk"
+  signature: string
 ) {
   const [action] = await tx
     .insert(actions)
@@ -122,7 +121,6 @@ export async function storeActionRecord(
       previous,
       type,
       signature,
-      // loginType: loginType,
     })
     .returning();
 

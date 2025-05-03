@@ -50,5 +50,3 @@ export function getWalletUniqueIdentifier(wallet?: Wallet) {
 
   return id;
 }
-
-export const zBeaverConnectionMethods = () => z.enum(["wallet", "x", "google"]);

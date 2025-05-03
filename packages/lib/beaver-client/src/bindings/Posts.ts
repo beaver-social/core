@@ -1,9 +1,8 @@
-import { ApiClient, Defaults } from "../types/client";
-import { ApiParams } from "../types/utils";
-import { safeParseResponse } from "../utils/apiClient";
-import { ensureConnection } from "../utils/connection";
+import { Api, Defaults } from "../types/client";
+import { ApiParams } from "../types/api";
 import { stringify } from "../utils/utils";
 import Logger from "./Logger";
+import { safeParseResponse } from "../utils/apiClient";
 
 export default class Posts {
   private defaults: Defaults;
@@ -17,44 +16,32 @@ export default class Posts {
   }
 
   async upload(
-    options: Omit<ApiParams<ApiClient["posts"]["$post"]>["json"], "signature">
+    options: Omit<ApiParams<Api["posts"]["$post"]>["json"], "signature">
   ) {
-    const { surface, connection } = ensureConnection(this.defaults);
-    const address = connection.account.address;
-
-    const {
-      data: { pointer },
-    } = await safeParseResponse(
-      this.defaults.apiClient.users.actions.pointer.$get()
-    );
-    const {
-      data: { id },
-    } = await safeParseResponse(this.defaults.apiClient.users.$get());
+    const { features, user, actionPointer } = this.defaults.store;
+    if (!features || !user) {
+      throw new Error("Login before posting.");
+    }
 
     const { media, ...data } = options;
-    const { signature } = await surface.signPersonalMessage(
+    const { signature } = await features.signPersonalMessage(
       stringify({
         ...data,
-        userId: id,
+        userId: user.id,
         type: "v1.user.create.post",
-        previous: pointer,
+        previous: actionPointer,
       })
     );
 
-    const raw = await this.defaults.apiClient.posts.$post({
-      json: {
-        ...options,
-        signature,
-      },
-    });
-    const response = await raw.json();
+    const { post } = await safeParseResponse(
+      this.defaults.apiClient.rpc.posts.$post({
+        json: {
+          ...options,
+          signature,
+        },
+      })
+    );
 
-    if (!response.success) {
-      throw new Error(response.error);
-    }
-
-    const { data: user } = response;
-
-    return user;
+    return post;
   }
 }

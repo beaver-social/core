@@ -4,13 +4,8 @@ import {
   SuiSignPersonalMessageFeature,
   StandardDisconnectFeature,
   WalletWithFeatures,
+  WalletAccount,
 } from "@mysten/wallet-standard";
-import { z } from "zod";
-import { zBeaverConnectionMethods } from "../utils/wallet";
-
-export type BeaverConnectionMethods = z.infer<
-  ReturnType<typeof zBeaverConnectionMethods>
->;
 
 export type BeaverProvidedWallet = WalletWithRequiredFeatures &
   WalletWithFeatures<
@@ -18,3 +13,8 @@ export type BeaverProvidedWallet = WalletWithRequiredFeatures &
       SuiSignTransactionFeature &
       SuiSignPersonalMessageFeature
   >;
+
+export type Connection = {
+  wallet: BeaverProvidedWallet;
+  account: WalletAccount;
+};

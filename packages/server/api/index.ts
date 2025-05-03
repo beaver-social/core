@@ -1,9 +1,5 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-// import authIndex from "./routes/auth";
-// import contentIndex from "./routes/content";
-// import miscIndex from "./routes/misc";
-// import analyticsIndex from "./routes/analytics";
 import router from "./routes";
 import { respond } from "./lib/utils/respond";
 import { onchainDefinitions } from "contracts/definitions";
@@ -42,6 +38,16 @@ const app = new Hono()
     servedSessions++;
     return ctx.json({
       servedSessions,
+      uptime: process.uptime(),
+      enokiConfig: {
+        apiKey: "enoki_public_8c3957b3817b45f4ee9cfacaa994bf77",
+        providers: {
+          google: {
+            clientId:
+              "697934856801-at79vesgvkq9pn28j44o128n1b9td7aa.apps.googleusercontent.com",
+          },
+        },
+      },
     });
   })
   .get("/contracts", async (ctx) => {

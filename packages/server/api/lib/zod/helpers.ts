@@ -73,7 +73,6 @@ export const zJwtPayload = () =>
     iat: z.number(),
   });
 
-export const zSignType = z.enum(["wallet", "zk"]);
 export const zReactionType = z.enum(["like", "haha", "wow", "sad", "angry"]);
 
 export const zUserUpdate = z

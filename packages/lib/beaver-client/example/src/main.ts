@@ -4,15 +4,22 @@ import { BeaverClient } from "../../exports.ts";
 const beaver = new BeaverClient({
   apiBaseUrl: "http://localhost:9090/api/v1",
   debug: true,
+  zkLoginWallets: {
+    enabled: true,
+  },
 });
-beaver.initialize();
 
+beaver.on("beaver:ready", render);
+beaver.on("user:login", render);
+beaver.on("connection:change", ({ connection }) => {
+  console.log("Connection changed", connection);
+  render();
+});
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
   <div id="container">
   </div>
 `;
 
-render();
 function render() {
   const container = document.querySelector<HTMLDivElement>("#container")!;
   container.innerHTML = "";
@@ -21,11 +28,9 @@ function render() {
     container.appendChild(document.createElement("br"));
   }
 
-  beaver.connector.onConnected = () => render();
-  beaver.connector.onDisconnected = () => render();
-
   const address = beaver.connector.address;
-  const wallets = beaver.connector.getWallets();
+  const user = beaver.auth.user;
+  const wallets = beaver.connector.getWallets(); //.concat([enoki.wallets.google]);
 
   if (address) {
     const addressButton = document.createElement("button");
@@ -41,7 +46,7 @@ function render() {
       const walletButton = document.createElement("button");
       walletButton.innerText = wallet.name;
       walletButton.onclick = async () => {
-        await beaver.connector.connect("wallet", i);
+        await beaver.connector.connect(i);
       };
       container.appendChild(walletButton);
     }
@@ -50,17 +55,27 @@ function render() {
   if (!address) return;
   gap();
 
-  const newUserButton = document.createElement("button");
-  newUserButton.innerText = "Register";
-  newUserButton.onclick = async () => {
-    const response = await beaver.user.register({
-      username: "thisiswillclient",
-      fullName: "Will Client",
-      about: "This is a test bio",
-    });
-    console.log(response);
-  };
-  container.appendChild(newUserButton);
+  if (!user) {
+    const newUserButton = document.createElement("button");
+    newUserButton.innerText = "Register";
+    newUserButton.onclick = async () => {
+      await beaver.user.register({
+        username: "zanzibar",
+        fullName: "fully island",
+        about: "kya karna hai iska",
+      });
+    };
+    container.appendChild(newUserButton);
+
+    const loginButton = document.createElement("button");
+    loginButton.innerText = "Login";
+    loginButton.onclick = async () => {
+      await beaver.user.login();
+    };
+    container.appendChild(loginButton);
+  }
+
+  if (!user) return;
 
   gap();
 
