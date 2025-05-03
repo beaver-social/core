@@ -345,16 +345,14 @@ class Contracts {
         push: (
           tx: Transaction,
           args: {
-            postsRegistry: MoveKey;
             identityRegistration: MoveKey;
-            username: string;
             postId: number;
             content: string;
             attested: Uint8Array;
             collection: MoveKey;
           }
         ) => {
-          const postsRegistry = tx.object(args.postsRegistry.id);
+          const postsRegistry = tx.object(this.config.objects.postsRegistry.id);
           const identity = tx.object(args.identityRegistration.id);
           const collection = tx.object(args.collection.id);
           const clock = tx.object(this.config.objects.clock.id);
@@ -364,7 +362,6 @@ class Contracts {
             arguments: [
               postsRegistry,
               identity,
-              tx.pure(bcs.String.serialize(args.username)),
               tx.pure.u64(args.postId),
               tx.pure(bcs.String.serialize(args.content)),
               tx.pure(args.attested),
