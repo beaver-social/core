@@ -26,7 +26,7 @@ import { sign } from "hono/jwt";
 import { JWTalgorithm, JWTexpiration, JWTPrivateKey } from "../../constants";
 import { stringify } from "../../../utils";
 import { getPreviousActionHash } from "../../lib/actions/helpers";
-import { followUser } from "./actions";
+import { followUser, unfollowUser } from "./actions";
 
 const { users } = db.schema;
 
@@ -246,6 +246,25 @@ export default new Hono()
         return respond.err(ctx, "username already taken", 409);
       }
 
+      const { data: onchainIdentity } = await tryCatch(
+        contracts.registry.read.getByOwner({ address: user.address })
+      );
+      const { data: collectionNft } = await tryCatch(
+        contracts.posts.read.getCollectionByOwner({ address: user.address })
+      );
+
+      if (onchainIdentity && collectionNft) {
+        await db.insert(users).values({
+          identity: onchainIdentity.objectId,
+          collectionNft: collectionNft.objectId,
+          username: onchainIdentity.username,
+          fullName: user.fullName,
+          address: address,
+        });
+
+        return respond.err(ctx, "User already exists", 409);
+      }
+
       const tx = new Transaction();
       contracts.admin.write.mint_for(tx, {
         adminCap: { id: defaultAdminCapId },
@@ -378,7 +397,11 @@ export default new Hono()
       );
 
       if (followError) {
-        return respond.err(ctx, "Failed to follow user", 500);
+        return respond.err(
+          ctx,
+          "Failed to follow user : " + followError.message,
+          500
+        );
       }
 
       return respond.ok(ctx, {}, "Followed user successfully", 200);
@@ -410,11 +433,15 @@ export default new Hono()
       }
 
       const { error: unfollowError } = await tryCatch(
-        followUser({ followingId, userId: user.id }, signature)
+        unfollowUser({ followingId, userId: user.id }, signature)
       );
 
       if (unfollowError) {
-        return respond.err(ctx, "Failed to unfollow user", 500);
+        return respond.err(
+          ctx,
+          "Failed to unfollow user : " + unfollowError,
+          500
+        );
       }
 
       return respond.ok(ctx, {}, "Unfollowed user successfully", 200);
