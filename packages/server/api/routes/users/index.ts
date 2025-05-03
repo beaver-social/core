@@ -171,9 +171,9 @@ export default new Hono()
         app: 0,
         iss: serverKeypair.getPublicKey().toBase64(),
         sub: user.id,
-        iat: now,
+        iat: now - 2,
         exp: now + JWTexpiration,
-        nbf: now + 1,
+        nbf: now - 1, //+ 1,
       };
 
       const { data: token, error } = await tryCatch(

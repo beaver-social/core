@@ -11,6 +11,8 @@ import { registerEnokiWallets } from "@mysten/enoki";
 import { BeaverStore } from "../store";
 import { normalizeSuiAddress } from "@mysten/sui/utils";
 import stringify from "fast-json-stable-stringify";
+import { safeParseResponse } from "../utils/apiClient";
+import { tryCatch } from "../utils/tryCatch";
 
 const zStoredConnection = () =>
   z.object({
@@ -150,8 +152,19 @@ export default class Connector {
       this.logger.info(`Restored connection with ${parsed.walletName}`);
 
       if (this.store.isConnected()) {
+        const userInfo = await tryCatch(
+          safeParseResponse(
+            this.defaults.apiClient.rpc.users.find.$get({
+              query: {
+                type: "address",
+                value: this.store.connection.account.address,
+              },
+            })
+          )
+        );
         this.defaults.events.emit("connection:change", {
           connection: this.store.connection,
+          hasIdentity: !!userInfo.data?.id,
         });
       } else {
         this.disconnect();

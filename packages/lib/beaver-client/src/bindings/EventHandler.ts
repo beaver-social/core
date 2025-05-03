@@ -52,6 +52,7 @@ type EventKey = keyof EventEmissions;
 type EventEmissions = {
   "connection:change": {
     connection: Connection;
+    hasIdentity: boolean;
   };
 
   "user:login": {
