@@ -26,6 +26,7 @@ import { sign } from "hono/jwt";
 import { JWTalgorithm, JWTexpiration, JWTPrivateKey } from "../../constants";
 import { stringify } from "../../../utils";
 import { getPreviousActionHash } from "../../lib/actions/helpers";
+import { followUser } from "./actions";
 
 const { users } = db.schema;
 
@@ -345,5 +346,77 @@ export default new Hono()
       }
 
       return respond.ok(ctx, user, "User details from ID", 200);
+    }
+  )
+
+  .post(
+    "/:id/follow",
+    authenticated,
+    zValidator(
+      "param",
+      z.object({
+        id: zNumberString(),
+      })
+    ),
+    zValidator(
+      "json",
+      z.object({
+        signature: zSuiSignature(),
+      })
+    ),
+    async (ctx) => {
+      const { id: followingId } = ctx.req.valid("param");
+      const { signature } = ctx.req.valid("json");
+      const user = ctx.get("user");
+
+      if (!user) {
+        return respond.err(ctx, "User not found", 404);
+      }
+
+      const { error: followError } = await tryCatch(
+        followUser({ followingId, userId: user.id }, signature)
+      );
+
+      if (followError) {
+        return respond.err(ctx, "Failed to follow user", 500);
+      }
+
+      return respond.ok(ctx, {}, "Followed user successfully", 200);
+    }
+  )
+
+  .delete(
+    "/:id/follow",
+    authenticated,
+    zValidator(
+      "param",
+      z.object({
+        id: zNumberString(),
+      })
+    ),
+    zValidator(
+      "json",
+      z.object({
+        signature: zSuiSignature(),
+      })
+    ),
+    async (ctx) => {
+      const { id: followingId } = ctx.req.valid("param");
+      const { signature } = ctx.req.valid("json");
+      const user = ctx.get("user");
+
+      if (!user) {
+        return respond.err(ctx, "User not found", 404);
+      }
+
+      const { error: unfollowError } = await tryCatch(
+        followUser({ followingId, userId: user.id }, signature)
+      );
+
+      if (unfollowError) {
+        return respond.err(ctx, "Failed to unfollow user", 500);
+      }
+
+      return respond.ok(ctx, {}, "Unfollowed user successfully", 200);
     }
   );
