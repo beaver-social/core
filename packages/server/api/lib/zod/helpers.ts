@@ -73,32 +73,19 @@ export const zJwtPayload = () =>
     iat: z.number(),
   });
 
-export const zReactionType = z.enum(["like", "haha", "wow", "sad", "angry"]);
+export const zPaginatedRequest = (options?: {
+  maxPerPage?: number;
+  defaultPerPage?: number;
+}) => {
+  const maxPerPage = options?.maxPerPage ?? 32;
+  const defaultPerPage = options?.defaultPerPage ?? 16;
 
-export const zUserUpdate = z
-  .object({
-    username: z.string().optional(),
-    fullName: z.string().optional(),
-    about: z.string().optional(),
-    imageUrl: z.string().optional(),
-    bannerUrl: z.string().optional(),
-    timezone: z.number().optional(),
-    isVerified: z.boolean().optional(),
-    pinnedPost: z.number().optional(),
-    pinnedShort: z.number().optional(),
-    email: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      return Object.keys(data).length > 0;
-    },
-    {
-      message: "At least one field is required",
-    }
-  )
-  .transform((data) => {
-    const processedData = Object.fromEntries(
-      Object.entries(data).filter(([_, value]) => value !== undefined)
-    );
-    return processedData;
+  return z.object({
+    page: zNumberString()
+      .default("1")
+      .transform((v) => v - 1),
+    perPage: zNumberString()
+      .default(defaultPerPage.toString())
+      .transform((v) => Math.min(v, maxPerPage)),
   });
+};

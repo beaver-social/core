@@ -413,16 +413,15 @@ class Contracts {
         gift: (
           tx: Transaction,
           args: {
-            awardsData: MoveKey;
             recipient: string;
             awardType: number;
-            payment: MoveKey;
+            // payment: MoveKey;
             postId: number;
           }
         ) => {
-          const awardsData = tx.object(args.awardsData.id);
+          const awardsData = tx.object(this.config.objects.awardsData.id);
           const registry = tx.object(this.config.objects.registry.id);
-          const payment = tx.object(args.payment.id);
+          const payment = tx.gas; //object(args.payment.id);
           const clock = tx.object(this.config.objects.clock.id);
 
           tx.moveCall({

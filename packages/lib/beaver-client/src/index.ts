@@ -53,6 +53,10 @@ export class BeaverClient {
     this.initialize();
   }
 
+  get contracts() {
+    return this.defaults.contracts;
+  }
+
   get on() {
     return this.defaults.events.on.bind(this.defaults.events);
   }
