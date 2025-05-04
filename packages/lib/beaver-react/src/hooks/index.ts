@@ -1,27 +1,37 @@
-import { useState } from "react";
 import { useBeaverContext } from "../context/beaver";
-import { BeaverUser } from "@beaver/client";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-export default function useBeaver() {
+export function useBeaver() {
   const { client } = useBeaverContext();
-  const [user, setUser] = useState<BeaverUser>();
 
-  client.on("user:login", (user) => {
-    setUser(user);
-  });
-  client.on("user:logout", () => {
-    setUser(null);
-  });
-
-  const authenticated = !!user;
+  const register = useRegister();
 
   return {
     client,
-    user,
-    authenticated,
+    register,
     login: client.user.login,
     logout: client.user.logout,
     connect: client.connector.connect,
     disconnect: client.connector.disconnect,
   };
+}
+
+export function useRegister() {
+  const { client } = useBeaverContext();
+  return useMutation({
+    mutationKey: ["register"],
+    mutationFn: async (data: Parameters<typeof client.user.register>[0]) => {
+      return await client.user.register(data);
+    },
+  });
+}
+
+export function useUploadPost() {
+  const { client } = useBeaverContext();
+  return useMutation({
+    mutationKey: ["uploadPost"],
+    mutationFn: async (data: Parameters<typeof client.posts.upload>[0]) => {
+      return await client.posts.upload(data);
+    },
+  });
 }

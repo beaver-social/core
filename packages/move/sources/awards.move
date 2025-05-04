@@ -3,12 +3,13 @@
 module beaver_social::awards;
 
 use std::{
-    string,
+    string
 };
 use sui::{
     display,
     package,
     clock,
+    table,
     coin,
     sui::SUI,
 };
@@ -27,6 +28,7 @@ public struct AwardsData has key, store {
     id: UID,
     award_names: vector<string::String>,
     award_costs: vector<u64>,
+    post_awards: table::Table<u64, vector<ID>>,
 }
 
 public struct Award has key, store {
@@ -58,6 +60,7 @@ fun init(otw: AWARDS, ctx: &mut TxContext) {
         id: object::new(ctx),
         award_names: award_names,
         award_costs: award_costs,
+        post_awards: table::new(ctx)
     };
 
     let mut url = string::utf8(BASE_URL);
@@ -117,8 +120,11 @@ public entry fun gift(
     // Validate award type
     assert!(award_type < vector::length(&awards_data.award_names), EInvalidAwardType);
 
+    let award_id = object::new(ctx);
+    let award_id_inner = object::uid_to_inner(&award_id);
+
     let award = Award {
-        id: object::new(ctx),
+        id: award_id,
         username: identity_registry::username(registry, sender),
         name: awards_data.award_names[award_type],
         created_at: clock.timestamp_ms(),
@@ -127,9 +133,20 @@ public entry fun gift(
         post_id: post_id
     };
 
+    if (!table::contains(&awards_data.post_awards, post_id)) {
+        table::add(&mut awards_data.post_awards, post_id, vector::empty<ID>());
+    };
+    let post_award_ids = table::borrow_mut(&mut awards_data.post_awards, post_id);
+    vector::push_back(post_award_ids, award_id_inner);
+
     // Validate payment amount
     assert!(coin::value(&payment) >= awards_data.award_costs[award_type], EInsufficientPayment);
 
     transfer::public_transfer(payment, sender);
     transfer::transfer(award, recipient);
 }
+
+
+/// Getters
+
+

@@ -1,15 +1,15 @@
 import Icon from "../shared/components/Icon";
 import type { icons } from "lucide-react";
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "../shared/components/ui/tooltip";
 import { Link, useLocation } from "react-router";
 import { Image } from "@/shared/components/Image";
-import { motion, Transition, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
 type sidebarItems = {
     name: string;
-    to: string;
+    to?: string;
     iconName: keyof typeof icons;
+    onClick?: () => void;
 };
 
 export const sidebarItems: sidebarItems[] = [
@@ -24,20 +24,30 @@ export const sidebarItems: sidebarItems[] = [
         to: "/explore/search",
     },
     {
-        name: "Shorts",
+        name: "Create",
+        iconName: "SquarePlus",
+        to: "/create",
+    },
+    {
+        name: "Swipes",
         iconName: "Clapperboard",
-        to: "/shorts",
+        to: "/swipes",
     },
     {
         name: "Alerts",
-        iconName: "Heart",
+        iconName: "Bell",
         to: "/alerts",
     },
     {
         name: "Messages",
-        iconName: "MessageSquare",
+        iconName: "Mail",
         to: "/messages",
     },
+    {
+        name: "Settings",
+        iconName: "Settings",
+        to: "/settings",
+    }
 ]
 
 export default function SideNav() {
@@ -63,7 +73,7 @@ export default function SideNav() {
         const index = sidebarItems.findIndex(item => {
             return item.to === "/"
                 ? currentPath === "/"
-                : currentPath.startsWith(item.to);
+                : currentPath.startsWith(item.to || "/");
         });
 
         if (index !== -1) {
@@ -72,23 +82,9 @@ export default function SideNav() {
     }, [location.pathname]);
 
     return (
-        <div className="fixed bg-background glass h-screen border-r flex-col items-center justify-between hidden sm:flex">
-            <div className="flex flex-col w-[4.5rem] items-center ">
-                <Link to="/">
-                    <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                    >
-                        <Image src={
-                            "/images/page2.png"
-                        } alt="logo" className="p-5 object-contain w-[5.5rem]" />
-                    </motion.div>
-                </Link>
-            </div>
-
-            <div className="flex items-center justify-center w-full h-full">
-                <ul className="flex flex-col items-center justify-center gap-6 text-grey-300 text-hover">
+        <div className="fixed bg-background glass h-screen border-r flex-col justify-between hidden sm:flex w-[14rem]">
+            <div className="flex flex-col w-full justify-center-safe h-full px-3">
+                <ul className="flex flex-col w-full gap-3 text-grey-300 text-hover">
                     {sidebarItems.map((item, index) => (
                         <motion.li
                             key={index}
@@ -97,117 +93,101 @@ export default function SideNav() {
                             animate={{
                                 y: hoveredItem === index ? -1 : 0
                             }}
+                            className="w-full"
                         >
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Link className="btn-icon relative" to={item.to}>
-                                            <AnimatePresence>
-                                                {activeIndex === index && (
-                                                    <motion.div
-                                                        className="absolute inset-0 bg-primary/5 rounded-md"
-                                                        initial={{ scale: 0, opacity: 0 }}
-                                                        animate={{
-                                                            scale: 1,
-                                                            opacity: 1
-                                                        }}
-                                                        exit={{ scale: 0, opacity: 0 }}
-                                                        transition={{ duration: 0.2 }}
-                                                    />
-                                                )}
-                                            </AnimatePresence>
-                                            <Icon name={item.iconName} className={activeIndex === index ? "text-primary" : ""} />
-                                            <AnimatePresence>
-                                                {activeIndex === index && (
-                                                    <motion.div
-                                                        className="absolute -right-0.5 top-0 bottom-0 w-1 h-full bg-primary rounded-l-sm"
-                                                        initial={{ height: 0, opacity: 0 }}
-                                                        animate={{ height: "100%", opacity: 1 }}
-                                                        exit={{ height: 0, opacity: 0 }}
-                                                        layoutId="activeIndicator"
-                                                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                                                    />
-                                                )}
-                                            </AnimatePresence>
-                                        </Link>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        {item.name}
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
+                            {item.to ? (
+                                <Link
+                                    className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${activeIndex === index ? 'bg-primary/5' : 'hover:bg-muted'}`}
+                                    to={item.to}
+                                >
+                                    <Icon name={item.iconName} className={activeIndex === index ? "text-primary" : ""} />
+                                    <span className={activeIndex === index ? "text-primary font-medium" : ""}>{item.name}</span>
+                                    <AnimatePresence>
+                                        {activeIndex === index && (
+                                            <motion.div
+                                                className="absolute left-0 top-0 bottom-0 w-1 h-full bg-primary rounded-r-sm"
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: "100%", opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                layoutId="activeIndicator"
+                                                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                                            />
+                                        )}
+                                    </AnimatePresence>
+                                </Link>) : (
+                                <button
+                                    className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${activeIndex === index ? 'bg-primary/5' : 'hover:bg-muted'}`}
+                                    onClick={item.onClick}
+                                >
+                                    <Icon name={item.iconName} className={activeIndex === index ? "text-primary" : ""} />
+                                    <span className={activeIndex === index ? "text-primary font-medium" : ""}>{item.name}</span>
+                                    <AnimatePresence>
+                                        {activeIndex === index && (
+                                            <motion.div
+                                                className="absolute left-0 top-0 bottom-0 w-1 h-full bg-primary rounded-r-sm"
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: "100%", opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                layoutId="activeIndicator"
+                                                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                                            />
+                                        )}
+                                    </AnimatePresence>
+                                </button>
+                            )}
                         </motion.li>
                     ))}
 
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Link to="/profile/ishtails">
-                                    <motion.li
-                                        whileHover={{ scale: 1.1 }}
-                                        whileTap={{ scale: 1 }}
-                                    >
-                                        <motion.div
-                                            className="relative rounded-full"
-                                            animate={isProfilePage ? {
-                                                boxShadow: ["0 0 0px rgba(76, 165, 249, 0)", "0 0 12px rgba(76, 165, 249, 0.7)", "0 0 0px rgba(76, 165, 249, 0)"],
-                                            } : {}}
-                                            transition={isProfilePage ? {
-                                                duration: 4,
-                                                repeat: Infinity,
-                                                repeatType: "mirror"
-                                            } : {}}
-                                        >
-                                            {isProfilePage && (
-                                                <motion.div
-                                                    className="absolute inset-0 rounded-full border-2 border-primary"
-                                                    animate={{
-                                                        borderColor: ["rgba(76, 165, 249, 0.4)", "rgba(76, 165, 249, 1)", "rgba(76, 165, 249, 0.4)"],
-                                                        rotate: [0, 360],
-                                                    }}
-                                                    transition={{
-                                                        duration: 3,
-                                                        repeat: Infinity,
-                                                        ease: "linear"
-                                                    }}
-                                                />
-                                            )}
-                                            <Image src={
-                                                "/images/user.webp"
-                                            } alt="user" className={`w-[2rem] border rounded-full ${isProfilePage ? 'border-primary' : ''}`} />
-                                        </motion.div>
-                                    </motion.li>
-                                </Link>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                Profile
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+
                 </ul>
             </div>
 
-            <div className="flex flex-col gap-4 items-center justify-center w-full py-4 mb-2">
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Link to="/settings">
-                                <motion.div
-                                    whileHover={{
-                                        rotate: 30,
-                                        scale: 1.1,
-                                        transition: { duration: 0.2 }
-                                    }}
-                                >
-                                    <Icon name="Settings" className={location.pathname.startsWith("/settings") ? "text-primary" : "text-hover"} />
-                                </motion.div>
-                            </Link>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            Settings
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+            <div className="my-4 mx-3">
+                <Link
+                    to="/profile/ishtails"
+                    className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors mt-3 ${isProfilePage ? 'bg-primary/5' : 'hover:bg-muted'}`}
+                >
+                    <motion.div
+                        className="relative rounded-full"
+                        animate={isProfilePage ? {
+                            boxShadow: ["0 0 0px rgba(76, 165, 249, 0)", "0 0 12px rgba(76, 165, 249, 0.7)", "0 0 0px rgba(76, 165, 249, 0)"],
+                        } : {}}
+                        transition={isProfilePage ? {
+                            duration: 4,
+                            repeat: Infinity,
+                            repeatType: "mirror"
+                        } : {}}
+                    >
+                        {isProfilePage && (
+                            <motion.div
+                                className="absolute inset-0 rounded-full border-2 border-primary"
+                                animate={{
+                                    borderColor: ["rgba(76, 165, 249, 0.4)", "rgba(76, 165, 249, 1)", "rgba(76, 165, 249, 0.4)"],
+                                    rotate: [0, 360],
+                                }}
+                                transition={{
+                                    duration: 3,
+                                    repeat: Infinity,
+                                    ease: "linear"
+                                }}
+                            />
+                        )}
+                        <Image src={
+                            "/images/user.webp"
+                        } alt="user" className={`w-[2rem] border rounded-full ${isProfilePage ? 'border-primary' : ''}`} />
+                    </motion.div>
+                    <span className={isProfilePage ? "text-primary font-medium" : ""}>Profile</span>
+                    {isProfilePage && (
+                        <motion.div
+                            className="absolute left-0 top-0 bottom-0 w-1 h-full bg-primary rounded-r-sm"
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "100%", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            layoutId="profileIndicator"
+                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        />
+                    )}
+                </Link>
             </div>
         </div>
     )

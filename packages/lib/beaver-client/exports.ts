@@ -1,3 +1,3 @@
 export { BeaverClient } from "./src";
-export { BeaverClientConfig } from "./src/types/client";
-export { UserInfo as BeaverUser } from "./src/types/api";
+export type { BeaverClientConfig } from "./src/types/client";
+export type { UserInfo as BeaverUser } from "./src/types/api";

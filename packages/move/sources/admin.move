@@ -12,6 +12,7 @@ use beaver_social::{
     registry
 };
 use beaver_social::posts;
+use beaver_social::awards;
 
 
 /// Error messages.
@@ -129,4 +130,29 @@ public entry fun revoke(
     cap.accessed = cap.accessed + 1;
 
     vector::remove(&mut record.admin_caps, index);
+}
+
+public entry fun create_award(
+    cap: &mut AdminCap,
+    record: &mut AdminsRecord,
+    awards_data: &mut awards::AwardsData,
+    name: string::String,
+    cost: u64
+){
+    validate_admin(cap, record);
+
+    vector::push_back(&mut awards_data.award_names, name);
+    vector::push_back(&mut awards_data.award_costs, cost);
+}
+
+public entry fun discontinue_award(
+    cap: &mut AdminCap,
+    record: &mut AdminsRecord,
+    awards_data: &mut awards::AwardsData,
+    index: u64,
+){
+    validate_admin(cap, record);
+
+    vector::remove(&mut awards_data.award_names, index);
+    vector::remove(&mut awards_data.award_costs, index);
 }

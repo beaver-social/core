@@ -338,6 +338,41 @@ export default new Hono()
     }
   )
 
+  .patch(
+    "/",
+    authenticated,
+    zValidator(
+      "json",
+      z.object({
+        fullName: z.string().min(3).max(50).optional(),
+        imageUrl: z.string().max(255).optional(),
+        bannerUrl: z.string().max(255).optional(),
+        about: z.string().max(255).nullable().optional(),
+      })
+    ),
+    async (ctx) => {
+      const user = ctx.get("user");
+      const data = ctx.req.valid("json");
+
+      const updatedUserResponse = await tryCatch(
+        db.update(users).set(data).where(eq(users.id, user.id)).returning()
+      );
+
+      if (updatedUserResponse.error) {
+        ctx.log(updatedUserResponse.error);
+        return respond.err(
+          ctx,
+          "Failed to update user : " + stringify(updatedUserResponse.error),
+          500
+        );
+      }
+
+      const [newUser] = updatedUserResponse.data;
+
+      return respond.ok(ctx, newUser, "User created successfully", 201);
+    }
+  )
+
   .get(
     "/:id",
     zValidator(

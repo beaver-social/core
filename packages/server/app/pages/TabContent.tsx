@@ -7,12 +7,12 @@ import ForYou from "./home/content/ForYou";
 import Following from "./home/content/Following";
 import Mentioned from "./alerts/content/Mentioned";
 import AllAlerts from "./alerts/content/AllAlerts";
-import ShortsFeed from "./shorts/ShortsFeed";
+import ShortsFeed from "./swipes/SwipeFeed";
 
 export const tabs: Record<Screen, Tab[]> = {
   home: [
     {
-      id: "for-you",
+      id: "default",
       label: "For you",
       content: (<ForYou />),
     },
@@ -24,7 +24,7 @@ export const tabs: Record<Screen, Tab[]> = {
   ],
   profile: [
     {
-      id: "posts",
+      id: "default",
       label: "Posts",
       content: (<Posts />),
     },
@@ -46,7 +46,7 @@ export const tabs: Record<Screen, Tab[]> = {
   ],
   alerts: [
     {
-      id: "all",
+      id: "default",
       label: "All",
       content: (<AllAlerts />),
     },
@@ -58,9 +58,9 @@ export const tabs: Record<Screen, Tab[]> = {
   ],
   messages: [],
   settings: [],
-  shorts: [
+  swipes: [
     {
-      id: "for-you",
+      id: "default",
       label: "For you",
       content: (<ShortsFeed />),
     },
@@ -71,4 +71,5 @@ export const tabs: Record<Screen, Tab[]> = {
     },
   ],
   onboarding: [],
+  create: [],
 };

@@ -11,7 +11,7 @@ import { ThemeProvider } from "./shared/context/theme-provider.tsx";
 import { Web3Provider } from "./shared/context/web3context.tsx";
 import { Toaster } from "sonner";
 import { ErrorBoundary } from "./shared/lib/errorHandling.ts";
-// import { BeaverProvider } from "@beaver/react";
+import { BeaverProvider } from "@beaver/react";
 
 const queryClient = new QueryClient();
 
@@ -28,16 +28,16 @@ function App() {
           <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
             <Web3Provider>
               <Providers>
-                {/* <BeaverProvider
+                <BeaverProvider
                   config={{
                     debug: true,
                     network: "devnet",
-                    apiBaseUrl: "http://localhost:5173/api/v1",
+                    apiBaseUrl: "http://localhost:9090/api/v1",
                   }}
-                > */}
-                <Router />
-                <Toaster />
-                {/* </BeaverProvider> */}
+                >
+                  <Router />
+                  <Toaster />
+                </BeaverProvider>
               </Providers>
             </Web3Provider>
           </ThemeProvider>

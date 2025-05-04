@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect, useCallback, KeyboardEvent } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { Popover, PopoverContent, PopoverTrigger } from "../../shared/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "../../shared/components/ui/command";
+import { Command, CommandGroup, CommandItem, CommandList } from "../../shared/components/ui/command";
 import { Search } from "lucide-react";
 import { Input } from "../../shared/components/ui/input";
 import { Image } from "../../shared/components/Image";
@@ -75,7 +75,6 @@ export default function SearchBar({
 
     // Combined results for keyboard navigation
     const allResults = [...filteredProfiles, ...filteredTopics];
-    const totalResults = allResults.length;
 
     // Handle search submission
     const handleSearchSubmit = useCallback((e: React.FormEvent) => {
@@ -136,7 +135,7 @@ export default function SearchBar({
         let topicStartIndex = filteredProfiles.length;
 
         return (
-            <Command className="rounded-2xl" shouldFilter={false}>
+            <Command className="rounded-sm" shouldFilter={false}>
                 <CommandList>
                     <CommandGroup heading="Search">
                         <CommandItem onSelect={() => handleSelectTopic(searchValue)} className="cursor-default text-muted-foreground">
@@ -189,7 +188,7 @@ export default function SearchBar({
     };
 
     const searchContent = (
-        <form onSubmit={handleSearchSubmit} className={className}>
+        <form onSubmit={handleSearchSubmit} className={`${className}`}>
             <Popover
                 open={isFocused && searchValue.length > 0 && !isModal}
             >

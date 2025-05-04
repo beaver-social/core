@@ -10,5 +10,6 @@ export type Screen =
   | "alerts"
   | "messages"
   | "settings"
-  | "shorts"
-  | "onboarding";
+  | "swipes"
+  | "onboarding"
+  | "create";
