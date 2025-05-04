@@ -71,7 +71,7 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
           <p>Disconnect</p>
         </Button>
       </div>
-    )
+    );
   }
 
   return (
@@ -138,7 +138,7 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
                   variant="outline"
                   className="w-full flex py-10"
                   onClick={() => {
-                    beaver.connect(index)
+                    beaver.connect(index);
                   }}
                 >
                   {isLoadingGoogleOAuthScreen ? (

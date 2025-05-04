@@ -1,9 +1,14 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { BeaverClient, BeaverClientConfig, BeaverUser, Connection } from "@beaver/client";
+import {
+  BeaverClient,
+  BeaverClientConfig,
+  BeaverUser,
+  Connection,
+} from "@beaver/client";
 
 type BeaverContext = {
   client: BeaverClient;
-  user: BeaverUser | null,
+  user: BeaverUser | null;
   isAuthenticated: boolean;
   isConnected: boolean;
   hasIdentity: boolean;
@@ -26,7 +31,7 @@ export function BeaverProvider(props: BeaverConfig) {
   const { children, config } = props;
   const [client, setClient] = useState<BeaverClient>({} as any);
   const [ready, setReady] = useState<boolean>(false);
-  const [user, setUser] = useState<BeaverUser>(null);
+  const [user, setUser] = useState<BeaverUser | null>(null);
   const [connection, setConnection] = useState<Connection | null>(null);
   const [hasIdentity, setHasIdentity] = useState<boolean>(false);
 
@@ -37,7 +42,8 @@ export function BeaverProvider(props: BeaverConfig) {
   function init() {
     const beaver = new BeaverClient(config);
     beaver.on("beaver:ready", () => setReady(true));
-    beaver.on("user:login", (user) => {
+
+    beaver.on("user:login", ({ user }) => {
       setUser(user);
     });
     beaver.on("user:logout", () => {
@@ -46,12 +52,18 @@ export function BeaverProvider(props: BeaverConfig) {
     beaver.on("connection:change", ({ connection, hasIdentity }) => {
       setConnection(connection);
       setHasIdentity(hasIdentity);
-    })
+    });
 
     setClient(beaver);
   }
 
-  const value: BeaverContext = { client, user, isAuthenticated, isConnected, hasIdentity };
+  const value: BeaverContext = {
+    client,
+    user,
+    isAuthenticated,
+    isConnected,
+    hasIdentity,
+  };
 
   useEffect(() => {
     if (!flag.current) {
@@ -62,7 +74,7 @@ export function BeaverProvider(props: BeaverConfig) {
 
   return (
     <BeaverContext.Provider value={value}>
-      {ready && children}
+      {ready ? <>{children}</> : null}
     </BeaverContext.Provider>
   );
 }

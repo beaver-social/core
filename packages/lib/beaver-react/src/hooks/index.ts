@@ -11,10 +11,10 @@ export function useBeaver() {
     client,
     wallet,
     register,
-    login: client.user.login,
-    logout: client.user.logout,
-    connect: client.connector.connect,
-    disconnect: client.connector.disconnect,
+    login: client.user.login.bind(client.user),
+    logout: client.user.logout.bind(client.user),
+    connect: client.connector.connect.bind(client.connector),
+    disconnect: client.connector.disconnect.bind(client.connector),
   };
 }
 

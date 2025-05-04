@@ -102,6 +102,26 @@ fun init(otw: AWARDS, ctx: &mut TxContext) {
     transfer::share_object(awards_data);
 }
 
+
+/// Protected methods
+
+public fun add_award_type(
+    awards_data: &mut AwardsData, 
+    name: string::String, 
+    cost: u64
+) {
+    vector::push_back(&mut awards_data.award_names, name);
+    vector::push_back(&mut awards_data.award_costs, cost);
+}
+
+public fun remove_award_type(
+    awards_data: &mut AwardsData, 
+    index: u64
+) {
+    vector::remove(&mut awards_data.award_names, index);
+    vector::remove(&mut awards_data.award_costs, index);
+}
+
  
 /// Public methods
 
@@ -145,8 +165,3 @@ public entry fun gift(
     transfer::public_transfer(payment, sender);
     transfer::transfer(award, recipient);
 }
-
-
-/// Getters
-
-
