@@ -323,6 +323,99 @@ class Contracts {
         },
 
         /**
+         * Sets the validator for the posts registry.
+         * Requires the caller to possess an AdminCap.
+         * @param tx - The Transaction object to add the move call to.
+         * @param args - The arguments for setting the posts validator.
+         * @param args.adminCap - The AdminCap object of the caller.
+         * @param args.newValidator - The new validator as a byte array.
+         */
+        set_posts_validator: (
+          tx: Transaction,
+          args: {
+            adminCap: MoveKey;
+            newValidator: Uint8Array;
+          }
+        ) => {
+          const postsRegistry = tx.object(this.config.objects.postsRegistry.id);
+          const adminCap = tx.object(args.adminCap.id);
+          const adminsRecord = tx.object(this.config.objects.adminsRecord.id);
+
+          tx.moveCall({
+            target: `${this.config.packageId}::admin::set_posts_validator`,
+            arguments: [
+              postsRegistry, 
+              tx.pure(args.newValidator),
+              adminCap,
+              adminsRecord,
+            ],
+          });
+        },
+
+        /**
+         * Creates a new award type in the awards data.
+         * Requires the caller to possess an AdminCap.
+         * @param tx - The Transaction object to add the move call to.
+         * @param args - The arguments for creating an award type.
+         * @param args.adminCap - The AdminCap object of the caller.
+         * @param args.name - The name of the award type.
+         * @param args.cost - The cost of the award type.
+         */
+        create_award_type: (
+          tx: Transaction,
+          args: {
+            adminCap: MoveKey;
+            name: string;
+            cost: number;
+          }
+        ) => {
+          const adminCap = tx.object(args.adminCap.id);
+          const adminsRecord = tx.object(this.config.objects.adminsRecord.id);
+          const awardsData = tx.object(this.config.objects.awardsData.id);
+
+          tx.moveCall({
+            target: `${this.config.packageId}::admin::create_award_type`,
+            arguments: [
+              adminCap,
+              adminsRecord,
+              awardsData,
+              tx.pure(bcs.String.serialize(args.name)),
+              tx.pure.u64(args.cost),
+            ],
+          });
+        },
+
+        /**
+         * Discontinues an existing award type in the awards data.
+         * Requires the caller to possess an AdminCap.
+         * @param tx - The Transaction object to add the move call to.
+         * @param args - The arguments for discontinuing an award type.
+         * @param args.adminCap - The AdminCap object of the caller.
+         * @param args.index - The index of the award type to remove.
+         */
+        discontinue_award_type: (
+          tx: Transaction,
+          args: {
+            adminCap: MoveKey;
+            index: number;
+          }
+        ) => {
+          const adminCap = tx.object(args.adminCap.id);
+          const adminsRecord = tx.object(this.config.objects.adminsRecord.id);
+          const awardsData = tx.object(this.config.objects.awardsData.id);
+
+          tx.moveCall({
+            target: `${this.config.packageId}::admin::discontinue_award_type`,
+            arguments: [
+              adminCap,
+              adminsRecord,
+              awardsData,
+              tx.pure.u64(args.index),
+            ],
+          });
+        },
+
+        /**
          * Revokes the admin privileges (AdminCap) of a specified address.
          * Requires the caller to possess an AdminCap.
          * @param tx - The Transaction object to add the move call to.
