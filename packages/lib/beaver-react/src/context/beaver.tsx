@@ -37,14 +37,12 @@ export function BeaverProvider(props: BeaverConfig) {
   function init() {
     const beaver = new BeaverClient(config);
     beaver.on("beaver:ready", () => setReady(true));
-
     beaver.on("user:login", (user) => {
       setUser(user);
     });
     beaver.on("user:logout", () => {
       setUser(null);
     });
-
     beaver.on("connection:change", ({ connection, hasIdentity }) => {
       setConnection(connection);
       setHasIdentity(hasIdentity);
