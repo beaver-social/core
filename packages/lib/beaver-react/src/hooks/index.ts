@@ -1,13 +1,15 @@
 import { useBeaverContext } from "../context/beaver";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 export function useBeaver() {
-  const { client } = useBeaverContext();
-
+  const { client, user } = useBeaverContext();
   const register = useRegister();
+  const wallet = useWallets();
 
   return {
+    user,
     client,
+    wallet,
     register,
     login: client.user.login,
     logout: client.user.logout,
@@ -24,6 +26,19 @@ export function useRegister() {
       return await client.user.register(data);
     },
   });
+}
+
+export function useWallets() {
+  const { client, isConnected, hasIdentity } = useBeaverContext();
+  const wallets = client.connector.getWallets();
+
+  return {
+    wallets,
+    isConnected,
+    hasIdentity,
+    connect: client.connector.connect,
+    disconnect: client.connector.disconnect,
+  };
 }
 
 export function useUploadPost() {

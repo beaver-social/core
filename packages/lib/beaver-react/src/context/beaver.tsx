@@ -1,16 +1,20 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { BeaverClient, BeaverClientConfig, BeaverUser } from "@beaver/client";
+import { BeaverClient, BeaverClientConfig, BeaverUser, Connection } from "@beaver/client";
 
 type BeaverContext = {
   client: BeaverClient;
   user: BeaverUser | null,
-  authenticated: boolean;
+  isAuthenticated: boolean;
+  isConnected: boolean;
+  hasIdentity: boolean;
 };
 
 const BeaverContext = createContext<BeaverContext>({
   client: {} as any,
   user: null,
-  authenticated: false,
+  isAuthenticated: false,
+  isConnected: false,
+  hasIdentity: false,
 });
 
 type BeaverConfig = {
@@ -23,8 +27,11 @@ export function BeaverProvider(props: BeaverConfig) {
   const [client, setClient] = useState<BeaverClient>({} as any);
   const [ready, setReady] = useState<boolean>(false);
   const [user, setUser] = useState<BeaverUser>(null);
+  const [connection, setConnection] = useState<Connection | null>(null);
+  const [hasIdentity, setHasIdentity] = useState<boolean>(false);
 
-  const authenticated = !!user;
+  const isAuthenticated = !!user;
+  const isConnected = !!connection;
   const flag = useRef(false);
 
   function init() {
@@ -38,10 +45,15 @@ export function BeaverProvider(props: BeaverConfig) {
       setUser(null);
     });
 
+    beaver.on("connection:change", ({ connection, hasIdentity }) => {
+      setConnection(connection);
+      setHasIdentity(hasIdentity);
+    })
+
     setClient(beaver);
   }
 
-  const value: BeaverContext = { client, user, authenticated };
+  const value: BeaverContext = { client, user, isAuthenticated, isConnected, hasIdentity };
 
   useEffect(() => {
     if (!flag.current) {

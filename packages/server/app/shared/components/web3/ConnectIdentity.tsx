@@ -16,6 +16,7 @@ import {
 } from "../ui/dialog";
 import Icon from "../Icon";
 import WelcomeSplash from "../animations/WelcomeSplash";
+import { useBeaver } from "@beaver/react";
 
 type Props = {
   open?: boolean;
@@ -29,7 +30,8 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
   const [showDisconnectButton, setShowDisconnectButton] = useState(false);
   const [isLoadingGoogleOAuthScreen, setIsLoadingGoogleOAuthScreen] = useState(false);
   const currentAccount = useCurrentAccount();
-  // const { zkLoginData, zkLogin, logout } = useAuth();
+  const beaver = useBeaver();
+
 
   const urlParams = new URLSearchParams(window.location.search);
 
@@ -49,14 +51,6 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
     onOpenChange?.(newOpen);
   };
 
-  // const handleDisconnect = async (type: "wallet" | "social") => {
-  //     try {
-  //         await logout(type);
-  //         setShowDisconnectButton(false);
-  //     } catch (error) {
-  //         toast.error(`Error disconnecting identity: ${error}`);
-  //     }
-  // };
 
   if (showWelcomeSplash) {
     return (
@@ -69,18 +63,25 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
     );
   }
 
-  // if (showDisconnectButton) {
-  //     return (
-  //         <div>
-  //             <Button variant="neon" onClick={() => handleDisconnect(
-  //                 zkLoginData?.userAddress ? "social" : "wallet"
-  //             )}>
-  //                 <Icon name="LogOut" className="size-4" />
-  //                 <p>Disconnect</p>
-  //             </Button>
-  //         </div>
-  //     )
-  // }
+  if (beaver.wallet.isConnected) {
+    return (
+      <div>
+        <Button variant="neon" onClick={beaver.wallet.disconnect}>
+          <Icon name="LogOut" className="size-4" />
+          <p>Disconnect</p>
+        </Button>
+      </div>
+    )
+  }
+
+  async function handleDisconnect(type: "wallet" | "social") {
+    try {
+      await beaver.disconnect();
+      setShowDisconnectButton(false);
+    } catch (error) {
+      toast.error(`Error disconnecting identity: ${error}`);
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -101,7 +102,7 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
         </DialogHeader>
         <div className="grid gap-4 py-4">
           {/* Social Login Section */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <h3 className="text-sm font-medium text-muted-foreground">
               Continue with
             </h3>
@@ -110,7 +111,7 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
               className="w-full"
               onClick={async () => {
                 setIsLoadingGoogleOAuthScreen(true);
-                // await zkLogin();
+                beaver.login();
               }}
             >
               {isLoadingGoogleOAuthScreen ? (
@@ -123,10 +124,10 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
                 />
               )}
             </Button>
-          </div>
+          </div> */}
 
           {/* Divider */}
-          <div className="relative">
+          {/* <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
             </div>
@@ -135,20 +136,32 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
                 Or
               </span>
             </div>
-          </div>
+          </div> */}
 
           {/* Wallet Connect Section */}
           <div className="space-y-2">
-            <h3 className="text-sm font-medium text-muted-foreground">
-              Connect Wallet
-            </h3>
             <div className="space-y-2 w-full">
-              <WalletButton
-                onConnected={() => {
-                  handleOpenChange(false);
-                  setShowWelcomeSplash(true);
-                }}
-              />
+              {beaver.wallet.wallets.map((wallet, index) => (
+                <Button
+                  variant="outline"
+                  className="w-full flex"
+                  onClick={() => {
+                    beaver.connect(index)
+                  }}
+                >
+                  {isLoadingGoogleOAuthScreen ? (
+                    <Icon name="LoaderCircle" className="size-4 animate-spin" />
+                  ) : (
+                    <>
+                      <Image
+                        src={wallet.icon}
+                        alt="Google"
+                        className="size-8 p-[2px] object-contain rounded-full bg-white"
+                      />
+                      <p>{wallet.name}</p></>
+                  )}
+                </Button>
+              ))}
             </div>
           </div>
         </div>
