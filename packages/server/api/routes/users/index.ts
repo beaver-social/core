@@ -28,7 +28,7 @@ import { stringify } from "../../../utils";
 import { getPreviousActionHash } from "../../lib/actions/helpers";
 import { followUser, unfollowUser } from "./actions";
 
-const { users } = db.schema;
+const { users, follows } = db.schema;
 
 export default new Hono()
 
@@ -400,6 +400,66 @@ export default new Hono()
       }
 
       return respond.ok(ctx, user, "User details from ID", 200);
+    }
+  )
+
+  .get(
+    "/followers",
+    authenticated,
+    zValidator(
+      "query",
+      z.object({
+        page: zNumberString()
+          .default("1")
+          .transform((v) => v - 1),
+        perPage: zNumberString()
+          .transform((v) => Math.min(v, 32))
+          .default("8"),
+      })
+    ),
+    async (ctx) => {
+      const { page, perPage } = ctx.req.valid("query");
+      const { data: user } = await tryCatch(getUserFromCtx(ctx));
+
+      if (!user) {
+        return respond.err(ctx, "User not found", 404);
+      }
+
+      const followersResponse = await tryCatch(
+        db
+          .select({
+            id: follows.followerId,
+            username: users.username,
+            fullName: users.fullName,
+            imageUrl: users.imageUrl,
+          })
+          .from(follows)
+          .innerJoin(users, eq(follows.followerId, users.id))
+          .where(eq(follows.followingId, user.id))
+          .limit(perPage)
+          .offset(page * perPage)
+      );
+
+      if (followersResponse.error) {
+        ctx.log(followersResponse.error);
+        return respond.err(ctx, "Failed to fetch followers", 500);
+      }
+      const followers = followersResponse.data.map((follower) => ({
+        id: follower.id,
+        username: follower.username,
+        fullName: follower.fullName,
+        imageUrl: follower.imageUrl,
+      }));
+
+      return respond.ok(
+        ctx,
+        {
+          followers: followers,
+          hasMore: !(followers.length < perPage),
+        },
+        "Replies fetched successfully",
+        200
+      );
     }
   )
 
