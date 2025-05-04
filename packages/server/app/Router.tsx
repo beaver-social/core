@@ -8,32 +8,34 @@ import Message from "./pages/messages/message";
 import Profile from "./pages/profile";
 import GoogleOAuth from "./pages/oauth/GoogleOAuth";
 import { PageErrorBoundary } from "./shared/lib/errorHandling";
-import Shorts from "./pages/shorts";
+import Swipes from "./pages/swipes";
 import Settings from "./pages/settings";
 import SearchResults from "./pages/explore/SearchResults";
 import Demo from "./pages/demo";
 import Onboarding from "./pages/onboarding";
+import Create from "./pages/create";
 // import { useAuth } from "@beaver/react";
 
 import { useEffect } from "react";
+import Landing from "./pages/landing";
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary =
   (Component: React.ComponentType<any>) => (props: any) =>
-    (
-      <PageErrorBoundary>
-        <Component {...props} />
-      </PageErrorBoundary>
-    );
+  (
+    <PageErrorBoundary>
+      <Component {...props} />
+    </PageErrorBoundary>
+  );
 
 function OnboardingProtection({ children }: { children: React.ReactNode }) {
   const { userId, isConnected } = {} as any;
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (isConnected && !userId) {
-      navigate("/onboarding");
-    }
-  }, [userId, isConnected]);
+  // useEffect(() => {
+  //   if (isConnected && !userId) {
+  //     navigate("/onboarding");
+  //   }
+  // }, [userId, isConnected]);
 
   return children;
 }

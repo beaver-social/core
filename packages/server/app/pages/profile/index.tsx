@@ -1,5 +1,5 @@
 import { useParams } from "react-router"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import Layout from "../layout"
 import SecondaryPanel from "../explore/SecondaryPanel"
 import ProfileHeader from "./ProfileHeader"
@@ -15,30 +15,49 @@ export type UserDetails = {
     verified: boolean;
     bio: string;
     location: string;
-    website: string;
     birthday: string;
     joined: string;
     followers: number;
     following: number;
     profilePicture: string;
     coverPhoto: string;
+    socials?: {
+        email?: string;
+        twitter?: string;
+        youtube?: string;
+        instagram?: string;
+    };
+    website?: {
+        heading: string;
+        subHeading: string;
+    };
+    pinnedPost?: string;
 }
 
 const userDetails: UserDetails = {
     id: "1",
     username: "@ishtails",
     address: "0x1234567890123456789012345678901234567890",
-    name: "Kartik",
+    name: "Kartikay Tiwari",
     verified: true,
-    bio: "Full Stack Web3 Developer. Designer. Musician. etc.",
-    location: "New York, USA",
-    website: "styles-portfolio.vercel.app",
+    bio: "Music Producer, DJ, and Software Engineer from Mumbai, India",
+    location: "Mumbai, India",
     birthday: "March 12, 2001",
-    joined: "January 2022",
-    followers: 100,
-    following: 50,
+    joined: "May 2025",
+    followers: 12400,
+    following: 320,
     profilePicture: "/images/user.webp",
-    coverPhoto: "/images/wallpapers/11.jpeg",
+    coverPhoto: "/images/wallpapers/7.jpeg",
+    socials: {
+        twitter: "ishtails",
+        youtube: "ishtails",
+        instagram: "ishtails"
+    },
+    website: {
+        heading: "Beaver Social",
+        subHeading: "A social media platform for the next generation"
+    },
+    pinnedPost: "/videos/workout.mp4"
 }
 
 export default function Profile() {

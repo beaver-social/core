@@ -21,7 +21,7 @@ interface ShortVideoProps {
 }
 
 // Using memo to prevent unnecessary re-renders
-const ShortVideo = memo(function ShortVideo({
+const SwipeVideo = memo(function SwipeVideo({
     id,
     videoUrl,
     username,
@@ -167,7 +167,7 @@ const ShortVideo = memo(function ShortVideo({
                     <video
                         ref={videoRef}
                         src={videoUrl}
-                        className="h-full w-full object-contain"
+                        className="h-full w-full object-cover"
                         loop
                         playsInline
                         muted={isMuted}
@@ -289,4 +289,4 @@ const ShortVideo = memo(function ShortVideo({
     );
 });
 
-export default ShortVideo; 
+export default SwipeVideo;

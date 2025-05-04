@@ -27,8 +27,7 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
   const [isOpen, setIsOpen] = useState(open || false);
   const [showWelcomeSplash, setShowWelcomeSplash] = useState(false);
   const [showDisconnectButton, setShowDisconnectButton] = useState(false);
-  const [isLoadingGoogleOAuthScreen, setIsLoadingGoogleOAuthScreen] =
-    useState(false);
+  const [isLoadingGoogleOAuthScreen, setIsLoadingGoogleOAuthScreen] = useState(false);
   const currentAccount = useCurrentAccount();
   // const { zkLoginData, zkLogin, logout } = useAuth();
 

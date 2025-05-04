@@ -148,7 +148,7 @@ export function IdentityManagementContent() {
                     <div>
                         <h3 className="text-lg font-medium">Identity Status</h3>
                         <div className="flex items-center mt-2 text-sm">
-                            <Icon name="CircleCheckBig" className="h-4 w-4 mr-2 text-green-500" />
+                            <Icon name="SquareCheckBig" className="h-4 w-4 mr-2 text-green-500" />
                             <span className="font-medium">Verified Identity</span>
                             <span className="ml-2 px-2 py-0.5 bg-blue-500/10 text-blue-500 rounded-full text-xs">
                                 DID:sui:0x3f8a...21cb

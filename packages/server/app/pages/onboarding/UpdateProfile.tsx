@@ -6,25 +6,23 @@ import { Textarea } from "@/shared/components/ui/textarea";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Image } from "@/shared/components/Image";
 import { useGlobalUIStore } from "@/shared/stores/zustand";
-// import { useAuth } from "@beaver/react";
+import { useAuth } from "@beaver/react";
 type Props = {
   onComplete: () => void;
   handleBack: () => void;
-};
+}
 
 export default function UpdateProfile({ onComplete, handleBack }: Props) {
-  const [name, setName] = useState("");
-  const [bio, setBio] = useState("");
+  const [name, setName] = useState('');
+  const [bio, setBio] = useState('');
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useState<HTMLInputElement | null>(null);
   const { onboardingData, setOnboardingData } = useGlobalUIStore();
-  const { uploadImage } = {} as any;
+  const { uploadImage } = useAuth();
 
-  async function handleProfileImageUpload(
-    e: React.ChangeEvent<HTMLInputElement>
-  ) {
+  async function handleProfileImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files[0]) {
       setIsUploading(true);
 
@@ -41,7 +39,7 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
 
       setIsUploading(false);
     }
-  }
+  };
 
   const handleSaveProfile = () => {
     if (!name) return;
@@ -51,7 +49,7 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
       fullName: name,
       username: onboardingData ? onboardingData.username : null,
       about: bio,
-      imageUrl: profilePicture,
+      imageUrl: profilePicture
     });
 
     setTimeout(() => {
@@ -112,25 +110,9 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
                 >
                   {isUploading ? (
                     <div className="absolute inset-0 flex items-center justify-center bg-gray-800/30">
-                      <svg
-                        className="animate-spin h-8 w-8 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
+                      <svg className="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
                     </div>
                   ) : profilePicture ? (
@@ -141,75 +123,22 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                        <svg
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="text-white"
-                        >
-                          <path
-                            d="M16 18L14 20H10L8 18H4V6H20V18H16Z"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                          <path
-                            d="M12 14C13.6569 14 15 12.6569 15 11C15 9.34315 13.6569 8 12 8C10.3431 8 9 9.34315 9 11C9 12.6569 10.3431 14 12 14Z"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white">
+                          <path d="M16 18L14 20H10L8 18H4V6H20V18H16Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M12 14C13.6569 14 15 12.6569 15 11C15 9.34315 13.6569 8 12 8C10.3431 8 9 9.34315 9 11C9 12.6569 10.3431 14 12 14Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </div>
                     </>
                   ) : (
                     <>
-                      <svg
-                        width="32"
-                        height="32"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="text-gray-400"
-                      >
-                        <path
-                          d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                        />
-                        <path
-                          d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                        />
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-gray-400">
+                        <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                        <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                       </svg>
                       <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                        <svg
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="text-white"
-                        >
-                          <path
-                            d="M12 6V18"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                          />
-                          <path
-                            d="M6 12H18"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                          />
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white">
+                          <path d="M12 6V18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                          <path d="M6 12H18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                         </svg>
                       </div>
                     </>
@@ -222,25 +151,9 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
                   whileTap={{ scale: 0.9 }}
                   onClick={() => fileInputRef[0]?.click()}
                 >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M12 6V18"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M6 12H18"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 6V18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    <path d="M6 12H18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                 </motion.div>
               </motion.div>
@@ -266,14 +179,9 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
 
             {/* Bio Input */}
             <div className="space-y-2">
-              <label
-                htmlFor="bio"
-                className="text-sm font-medium flex justify-between"
-              >
+              <label htmlFor="bio" className="text-sm font-medium flex justify-between">
                 <span>About</span>
-                <span className="text-muted-foreground text-xs">
-                  {bio.length}/160
-                </span>
+                <span className="text-muted-foreground text-xs">{bio.length}/160</span>
               </label>
               <Textarea
                 id="bio"
@@ -292,25 +200,9 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
             >
               {isSaving ? (
                 <>
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   Saving...
                 </>
@@ -342,4 +234,4 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
       </motion.div>
     </div>
   );
-}
+} 

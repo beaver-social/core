@@ -6,8 +6,5 @@
   ],
   "[move]": {
     "files.autoSave": "onFocusChange"
-  },
-  "workbench.colorTheme": "Default Dark Modern"
-  // Uncomment the next line if you want to use this theme
-  // "workbench.colorTheme": "Tokyo Night Dark"
+  }
 }
