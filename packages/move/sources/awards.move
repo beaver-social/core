@@ -145,3 +145,8 @@ public entry fun gift(
     transfer::public_transfer(payment, sender);
     transfer::transfer(award, recipient);
 }
+
+
+/// Getters
+
+

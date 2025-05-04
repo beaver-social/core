@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { tryCatch, tryCatchSync } from "../../lib/tryCatch";
+import { tryCatch } from "../../lib/tryCatch";
 import db from "../../lib/db";
 import { respond } from "../../lib/utils/respond";
 import { zValidator } from "@hono/zod-validator";
@@ -27,7 +27,6 @@ import { preprocessImageMedia } from "./helpers";
 import s3 from "../../lib/s3/client";
 import { and, eq, isNotNull } from "drizzle-orm";
 import { contracts } from "../../lib/sui/contracts";
-import { Transaction } from "@mysten/sui/transactions";
 
 const { posts, post_media, post_topics, post_mentions, likes, users } =
   db.schema;

@@ -1,22 +1,19 @@
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
+import { Contracts } from "./services";
+import { onchainDefinitions } from "./definitions";
+import { Transaction } from "@mysten/sui/transactions";
+import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
+
+const client = new SuiClient({
+  url: getFullnodeUrl("testnet"),
+});
 
 const passphrase = Bun.env["PVT_KEY"]!;
 
 const keypair = Ed25519Keypair.deriveKeypair(passphrase);
 
-console.log(keypair.getPublicKey().toSuiAddress());
+const contracts = new Contracts(onchainDefinitions);
 
-const c = JSON.stringify({
-  content: "This is a post I want to try posting lol",
-  userId: 2,
-  type: "v1.user.create.post",
-  previous: "GENESIS",
-});
+const awards = await contracts.awards.read.getAwardsData();
 
-console.log(c);
-
-const message = new TextEncoder().encode(c);
-
-const signature = await keypair.signPersonalMessage(message);
-
-console.log(signature);
+console.log(awards);

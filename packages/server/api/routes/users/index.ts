@@ -26,6 +26,7 @@ import { sign } from "hono/jwt";
 import { JWTalgorithm, JWTexpiration, JWTPrivateKey } from "../../constants";
 import { stringify } from "../../../utils";
 import { getPreviousActionHash } from "../../lib/actions/helpers";
+import { followUser, unfollowUser } from "./actions";
 
 const { users } = db.schema;
 
@@ -245,6 +246,25 @@ export default new Hono()
         return respond.err(ctx, "username already taken", 409);
       }
 
+      const { data: onchainIdentity } = await tryCatch(
+        contracts.registry.read.getByOwner({ address: user.address })
+      );
+      const { data: collectionNft } = await tryCatch(
+        contracts.posts.read.getCollectionByOwner({ address: user.address })
+      );
+
+      if (onchainIdentity && collectionNft) {
+        await db.insert(users).values({
+          identity: onchainIdentity.objectId,
+          collectionNft: collectionNft.objectId,
+          username: onchainIdentity.username,
+          fullName: user.fullName,
+          address: address,
+        });
+
+        return respond.err(ctx, "User already exists", 409);
+      }
+
       const tx = new Transaction();
       contracts.admin.write.mint_for(tx, {
         adminCap: { id: defaultAdminCapId },
@@ -380,5 +400,85 @@ export default new Hono()
       }
 
       return respond.ok(ctx, user, "User details from ID", 200);
+    }
+  )
+
+  .post(
+    "/:id/follow",
+    authenticated,
+    zValidator(
+      "param",
+      z.object({
+        id: zNumberString(),
+      })
+    ),
+    zValidator(
+      "json",
+      z.object({
+        signature: zSuiSignature(),
+      })
+    ),
+    async (ctx) => {
+      const { id: followingId } = ctx.req.valid("param");
+      const { signature } = ctx.req.valid("json");
+      const user = ctx.get("user");
+
+      if (!user) {
+        return respond.err(ctx, "User not found", 404);
+      }
+
+      const { error: followError } = await tryCatch(
+        followUser({ followingId, userId: user.id }, signature)
+      );
+
+      if (followError) {
+        return respond.err(
+          ctx,
+          "Failed to follow user : " + followError.message,
+          500
+        );
+      }
+
+      return respond.ok(ctx, {}, "Followed user successfully", 200);
+    }
+  )
+
+  .delete(
+    "/:id/follow",
+    authenticated,
+    zValidator(
+      "param",
+      z.object({
+        id: zNumberString(),
+      })
+    ),
+    zValidator(
+      "json",
+      z.object({
+        signature: zSuiSignature(),
+      })
+    ),
+    async (ctx) => {
+      const { id: followingId } = ctx.req.valid("param");
+      const { signature } = ctx.req.valid("json");
+      const user = ctx.get("user");
+
+      if (!user) {
+        return respond.err(ctx, "User not found", 404);
+      }
+
+      const { error: unfollowError } = await tryCatch(
+        unfollowUser({ followingId, userId: user.id }, signature)
+      );
+
+      if (unfollowError) {
+        return respond.err(
+          ctx,
+          "Failed to unfollow user : " + unfollowError,
+          500
+        );
+      }
+
+      return respond.ok(ctx, {}, "Unfollowed user successfully", 200);
     }
   );

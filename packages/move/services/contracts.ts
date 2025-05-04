@@ -3,6 +3,7 @@ import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
 import { z } from "zod";
 import { zNumberString, zSuiRPCObjectResult } from "./utils";
+import { zSuiAddress } from "../../server/api/lib/zod/helpers";
 
 type MoveKey = {
   id: string;
@@ -131,7 +132,7 @@ class Contracts {
             key: { type: "0x1::string::String", value: args.username },
           });
 
-          return owner;
+          return zSuiAddress().parse(owner);
         },
 
         resolveUsername: async (args: { address: string }) => {
@@ -144,7 +145,31 @@ class Contracts {
             },
           });
 
-          return username;
+          return z.string().parse(username);
+        },
+
+        getByOwner: async (args: { address: string }) => {
+          const nfts = await this.client.getOwnedObjects({
+            owner: args.address,
+            filter: {
+              StructType: `${this.config.packageId}::identity_registration::IdentityRegistration`,
+            },
+            options: { showContent: true },
+          });
+
+          for (const item of nfts.data) {
+            const id = item.data?.objectId;
+            if (!id) continue;
+
+            const object = await this.identityRegistration.read.data({
+              registration: { id },
+            });
+            if (object.owner === args.address) {
+              return { ...object, objectId: id };
+            }
+          }
+
+          return null;
         },
       },
     };
@@ -392,6 +417,53 @@ class Contracts {
             .parse(postResponse);
 
           return post.fields;
+        },
+
+        collection: async (args: { address: string }) => {
+          const registration = await this.client.getObject({
+            id: args.address,
+            options: { showContent: true },
+          });
+
+          const parsedObject = zSuiRPCObjectResult({
+            username: z.string(),
+          }).parse(registration);
+
+          const username = parsedObject.username;
+
+          const data = {
+            username: username,
+          };
+
+          return data;
+        },
+
+        getCollectionByOwner: async (args: { address: string }) => {
+          const username = await this.registry.read.resolveUsername({
+            address: args.address,
+          });
+
+          const nfts = await this.client.getOwnedObjects({
+            owner: args.address,
+            filter: {
+              StructType: `${this.config.packageId}::posts::MY_BEAVER_POSTS`,
+            },
+            options: { showContent: true },
+          });
+
+          for (const item of nfts.data) {
+            const id = item.data?.objectId;
+            if (!id) continue;
+
+            const object = await this.posts.read.collection({
+              address: id,
+            });
+            if (object.username === username) {
+              return { ...object, objectId: id };
+            }
+          }
+
+          return null;
         },
       },
     };
