@@ -43,26 +43,6 @@ export const zSuiSignature = () =>
     .string()
     .regex(/^[A-Za-z0-9+/=]+$/, "Invalid signature: must be a Base64 string");
 
-export const zMedia = z.object({
-  url: z.string(),
-  type: z.enum(["image", "video", "audio"]),
-  order: z.number(),
-  thumbnailUrl: z.string().optional(),
-  duration: z.number().optional(),
-  width: z.number().optional(),
-  height: z.number().optional(),
-  altText: z.string().optional(),
-});
-
-export const zSwipeMedia = z.object({
-  buffer: z.instanceof(Buffer),
-  thumbnailUrl: z.string().optional(),
-  duration: z.number().optional(),
-  width: z.number().optional(),
-  height: z.number().optional(),
-  altText: z.string().optional(),
-});
-
 export const zJwtPayload = () =>
   z.object({
     app: z.number(),
