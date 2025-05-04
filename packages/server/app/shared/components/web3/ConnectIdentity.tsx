@@ -28,10 +28,10 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
   const [isOpen, setIsOpen] = useState(open || false);
   const [showWelcomeSplash, setShowWelcomeSplash] = useState(false);
   const [showDisconnectButton, setShowDisconnectButton] = useState(false);
-  const [isLoadingGoogleOAuthScreen, setIsLoadingGoogleOAuthScreen] = useState(false);
+  const [isLoadingGoogleOAuthScreen, setIsLoadingGoogleOAuthScreen] =
+    useState(false);
   const currentAccount = useCurrentAccount();
   const beaver = useBeaver();
-
 
   const urlParams = new URLSearchParams(window.location.search);
 
@@ -50,7 +50,6 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
     setIsOpen(newOpen);
     onOpenChange?.(newOpen);
   };
-
 
   if (showWelcomeSplash) {
     return (
@@ -71,7 +70,7 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
           <p>Disconnect</p>
         </Button>
       </div>
-    )
+    );
   }
 
   async function handleDisconnect(type: "wallet" | "social") {
@@ -81,7 +80,7 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
     } catch (error) {
       toast.error(`Error disconnecting identity: ${error}`);
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -146,7 +145,7 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
                   variant="outline"
                   className="w-full flex"
                   onClick={() => {
-                    beaver.connect(index)
+                    beaver.connect(index);
                   }}
                 >
                   {isLoadingGoogleOAuthScreen ? (
@@ -158,7 +157,8 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
                         alt="Google"
                         className="size-8 p-[2px] object-contain rounded-full bg-white"
                       />
-                      <p>{wallet.name}</p></>
+                      <p>{wallet.name}</p>
+                    </>
                   )}
                 </Button>
               ))}

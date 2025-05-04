@@ -132,7 +132,7 @@ public entry fun revoke(
     vector::remove(&mut record.admin_caps, index);
 }
 
-public entry fun create_award(
+public entry fun create_award_type(
     cap: &mut AdminCap,
     record: &mut AdminsRecord,
     awards_data: &mut awards::AwardsData,
@@ -140,19 +140,15 @@ public entry fun create_award(
     cost: u64
 ){
     validate_admin(cap, record);
-
-    vector::push_back(&mut awards_data.award_names, name);
-    vector::push_back(&mut awards_data.award_costs, cost);
+    awards::add_award_type(awards_data, name, cost);
 }
 
-public entry fun discontinue_award(
+public entry fun discontinue_award_type(
     cap: &mut AdminCap,
     record: &mut AdminsRecord,
     awards_data: &mut awards::AwardsData,
     index: u64,
 ){
     validate_admin(cap, record);
-
-    vector::remove(&mut awards_data.award_names, index);
-    vector::remove(&mut awards_data.award_costs, index);
+    awards::remove_award_type(awards_data, index);
 }
