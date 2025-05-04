@@ -8,7 +8,7 @@ import { useNavigate } from "react-router";
 interface CreatePostSuccessDialogProps {
     isOpen: boolean;
     onClose: () => void;
-    type: "post" | "short";
+    type: "post" | "swipe";
 }
 
 export default function CreatePostSuccessDialog({

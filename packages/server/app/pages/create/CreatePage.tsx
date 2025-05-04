@@ -54,7 +54,7 @@ const itemAnimations = {
 };
 
 export default function CreatePage() {
-    const [activeTab, setActiveTab] = useState<"post" | "short">("post");
+    const [activeTab, setActiveTab] = useState<"post" | "swipe">("post");
     const [content, setContent] = useState("");
     const [location, setLocation] = useState("");
     const [privacy, setPrivacy] = useState("public");
@@ -223,12 +223,12 @@ export default function CreatePage() {
             <Tabs
                 defaultValue="post"
                 value={activeTab}
-                onValueChange={(v) => setActiveTab(v as "post" | "short")}
+                onValueChange={(v) => setActiveTab(v as "post" | "swipe")}
                 className="w-full"
             >
                 <TabsList className="grid grid-cols-2 mb-8">
                     <TabsTrigger value="post" className="text-base">Post</TabsTrigger>
-                    <TabsTrigger value="short" className="text-base">Short</TabsTrigger>
+                    <TabsTrigger value="swipe" className="text-base">Swipe</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="post" className="focus-visible:outline-none focus-visible:ring-0">
@@ -343,7 +343,7 @@ export default function CreatePage() {
                                                             variant="ghost"
                                                             className="rounded-full hover:bg-secondary transition-colors"
                                                             onClick={() => videoInputRef.current?.click()}
-                                                            disabled={isSubmitting || activeTab === "short"}
+                                                            disabled={isSubmitting || activeTab === "swipe"}
                                                         >
                                                             <Icon name="Video" className="size-5" />
                                                             <input
@@ -419,7 +419,7 @@ export default function CreatePage() {
                     </motion.div>
                 </TabsContent>
 
-                <TabsContent value="short" className="focus-visible:outline-none focus-visible:ring-0">
+                <TabsContent value="swipe" className="focus-visible:outline-none focus-visible:ring-0">
                     <motion.div
                         initial="hidden"
                         animate="visible"
@@ -463,7 +463,7 @@ export default function CreatePage() {
                                             <div className="relative mt-2">
                                                 <Textarea
                                                     id="caption"
-                                                    placeholder="Add a caption to your short"
+                                                    placeholder="Add a caption to your swipe"
                                                     value={content}
                                                     onChange={(e) => setContent(e.target.value)}
                                                     className="w-full resize-none min-h-[100px]"

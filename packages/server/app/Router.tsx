@@ -94,7 +94,11 @@ export default function () {
                     element={withPageErrorBoundary(Profile)({})}
                   />
                   <Route
-                    path="/shorts"
+                    path="/create"
+                    element={withPageErrorBoundary(Create)({})}
+                  />
+                  <Route
+                    path="/swipes"
                     element={withPageErrorBoundary(Swipes)({})}
                   />
                   <Route
