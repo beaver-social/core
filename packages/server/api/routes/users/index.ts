@@ -374,38 +374,7 @@ export default new Hono()
   )
 
   .get(
-    "/:id",
-    zValidator(
-      "param",
-      z.object({
-        id: zNumberString(),
-      })
-    ),
-    async (ctx) => {
-      const { id: userId } = ctx.req.valid("param");
-
-      const userResponse = await tryCatch(
-        db.select().from(users).where(eq(users.id, userId)).limit(1)
-      );
-
-      if (userResponse.error) {
-        ctx.log(userResponse.error);
-        return respond.err(ctx, "Failed to find user", 500);
-      }
-
-      const [user] = userResponse.data;
-
-      if (!user) {
-        return respond.err(ctx, "User not found", 404);
-      }
-
-      return respond.ok(ctx, user, "User details from ID", 200);
-    }
-  )
-
-  .get(
-    "/followers",
-    authenticated,
+    "/:id/followers",
     zValidator(
       "query",
       z.object({
@@ -417,25 +386,22 @@ export default new Hono()
           .default("8"),
       })
     ),
+    zValidator(
+      "param",
+      z.object({
+        id: zNumberString(),
+      })
+    ),
     async (ctx) => {
       const { page, perPage } = ctx.req.valid("query");
-      const { data: user } = await tryCatch(getUserFromCtx(ctx));
-
-      if (!user) {
-        return respond.err(ctx, "User not found", 404);
-      }
+      const { id: userId } = ctx.req.valid("param");
 
       const followersResponse = await tryCatch(
         db
-          .select({
-            id: follows.followerId,
-            username: users.username,
-            fullName: users.fullName,
-            imageUrl: users.imageUrl,
-          })
+          .select({ user: users })
           .from(follows)
           .innerJoin(users, eq(follows.followerId, users.id))
-          .where(eq(follows.followingId, user.id))
+          .where(eq(follows.followingId, userId))
           .limit(perPage)
           .offset(page * perPage)
       );
@@ -444,20 +410,70 @@ export default new Hono()
         ctx.log(followersResponse.error);
         return respond.err(ctx, "Failed to fetch followers", 500);
       }
-      const followers = followersResponse.data.map((follower) => ({
-        id: follower.id,
-        username: follower.username,
-        fullName: follower.fullName,
-        imageUrl: follower.imageUrl,
-      }));
+
+      const followers = followersResponse.data.map((follower) => follower.user);
 
       return respond.ok(
         ctx,
         {
-          followers: followers,
+          followers,
           hasMore: !(followers.length < perPage),
         },
-        "Replies fetched successfully",
+        "Followers fetched successfully",
+        200
+      );
+    }
+  )
+
+  .get(
+    "/:id/following",
+    zValidator(
+      "query",
+      z.object({
+        page: zNumberString()
+          .default("1")
+          .transform((v) => v - 1),
+        perPage: zNumberString()
+          .transform((v) => Math.min(v, 32))
+          .default("8"),
+      })
+    ),
+    zValidator(
+      "param",
+      z.object({
+        id: zNumberString(),
+      })
+    ),
+    async (ctx) => {
+      const { page, perPage } = ctx.req.valid("query");
+      const { id: userId } = ctx.req.valid("param");
+
+      const followingResponse = await tryCatch(
+        db
+          .select({ user: users })
+          .from(follows)
+          .innerJoin(users, eq(follows.followingId, users.id))
+          .where(eq(follows.followerId, userId))
+          .limit(perPage)
+          .offset(page * perPage)
+      );
+
+      if (followingResponse.error) {
+        ctx.log(followingResponse.error);
+        return respond.err(ctx, "Failed to fetch following", 500);
+      }
+
+      const following = followingResponse.data.map(
+        (following) => following.user
+      );
+
+      return respond.ok(
+        ctx,
+        {
+          following,
+          hasMore: !(following.length < perPage),
+        },
+        "Following fetched successfully",
         200
       );
     }
@@ -540,5 +556,35 @@ export default new Hono()
       }
 
       return respond.ok(ctx, {}, "Unfollowed user successfully", 200);
+    }
+  )
+
+  .get(
+    "/:id",
+    zValidator(
+      "param",
+      z.object({
+        id: zNumberString(),
+      })
+    ),
+    async (ctx) => {
+      const { id: userId } = ctx.req.valid("param");
+
+      const userResponse = await tryCatch(
+        db.select().from(users).where(eq(users.id, userId)).limit(1)
+      );
+
+      if (userResponse.error) {
+        ctx.log(userResponse.error);
+        return respond.err(ctx, "Failed to find user", 500);
+      }
+
+      const [user] = userResponse.data;
+
+      if (!user) {
+        return respond.err(ctx, "User not found", 404);
+      }
+
+      return respond.ok(ctx, user, "User details from ID", 200);
     }
   );
