@@ -54,15 +54,6 @@ export const zMedia = z.object({
   altText: z.string().optional(),
 });
 
-export const zSwipeMedia = z.object({
-  buffer: z.instanceof(Buffer),
-  thumbnailUrl: z.string().optional(),
-  duration: z.number().optional(),
-  width: z.number().optional(),
-  height: z.number().optional(),
-  altText: z.string().optional(),
-});
-
 export const zJwtPayload = () =>
   z.object({
     app: z.number(),
