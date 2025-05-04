@@ -19,15 +19,17 @@ import Create from "./pages/create";
 import { useEffect } from "react";
 import Landing from "./pages/landing";
 // Wrap each page component with PageErrorBoundary
-const withPageErrorBoundary = (Component: React.ComponentType<any>) => (props: any) => (
-  <PageErrorBoundary>
-    <Component {...props} />
-  </PageErrorBoundary>
-);
+const withPageErrorBoundary =
+  (Component: React.ComponentType<any>) => (props: any) =>
+  (
+    <PageErrorBoundary>
+      <Component {...props} />
+    </PageErrorBoundary>
+  );
 
 function OnboardingProtection({ children }: { children: React.ReactNode }) {
-  // const { userId, isConnected } = useAuth();
-  // const navigate = useNavigate();
+  const { userId, isConnected } = {} as any;
+  const navigate = useNavigate();
 
   // useEffect(() => {
   //   if (isConnected && !userId) {
@@ -39,11 +41,15 @@ function OnboardingProtection({ children }: { children: React.ReactNode }) {
 }
 
 function LoadingAuth({ children }: { children: React.ReactNode }) {
-  // const { isLoading } = useAuth();
+  const { isLoading } = {} as any;
 
-  // if (isLoading) {
-  //   return <div className="flex items-center justify-center h-screen">Loading...</div>;
-  // }
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
+  }
 
   return children;
 }
@@ -52,29 +58,66 @@ export default function () {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/onboarding" element={withPageErrorBoundary(Onboarding)({})} />
-        <Route path="/landing" element={withPageErrorBoundary(Landing)({})} />
-        <Route path="/oauth/google" element={withPageErrorBoundary(GoogleOAuth)({})} />
-        <Route path="/*" element={
-          <LoadingAuth>
-            <OnboardingProtection>
-              <Routes>
-                <Route path="/" element={withPageErrorBoundary(Home)({})} />
-                <Route path="/alerts" element={withPageErrorBoundary(Notifications)({})} />
-                <Route path="/messages" element={withPageErrorBoundary(Messages)({})} />
-                <Route path="/messages/:id" element={withPageErrorBoundary(Message)({})} />
-                <Route path="post/:id" element={withPageErrorBoundary(Post)({})} />
-                <Route path="/profile/:id" element={withPageErrorBoundary(Profile)({})} />
-                <Route path="/swipes" element={withPageErrorBoundary(Swipes)({})} />
-                <Route path="/settings" element={withPageErrorBoundary(Settings)({})} />
-                <Route path="/create" element={withPageErrorBoundary(Create)({})} />
-                <Route path="/explore/search" element={withPageErrorBoundary(SearchResults)({})} />
-                <Route path="/demo" element={withPageErrorBoundary(Demo)({})} />
-                <Route path="*" element={withPageErrorBoundary(Error404)({})} />
-              </Routes>
-            </OnboardingProtection>
-          </LoadingAuth>
-        } />
+        <Route
+          path="/onboarding"
+          element={withPageErrorBoundary(Onboarding)({})}
+        />
+        <Route
+          path="/oauth/google"
+          element={withPageErrorBoundary(GoogleOAuth)({})}
+        />
+        <Route
+          path="/*"
+          element={
+            <LoadingAuth>
+              <OnboardingProtection>
+                <Routes>
+                  <Route path="/" element={withPageErrorBoundary(Home)({})} />
+                  <Route
+                    path="/alerts"
+                    element={withPageErrorBoundary(Notifications)({})}
+                  />
+                  <Route
+                    path="/messages"
+                    element={withPageErrorBoundary(Messages)({})}
+                  />
+                  <Route
+                    path="/message/:id"
+                    element={withPageErrorBoundary(Message)({})}
+                  />
+                  <Route
+                    path="post/:id"
+                    element={withPageErrorBoundary(Post)({})}
+                  />
+                  <Route
+                    path="/profile/:id"
+                    element={withPageErrorBoundary(Profile)({})}
+                  />
+                  <Route
+                    path="/shorts"
+                    element={withPageErrorBoundary(Shorts)({})}
+                  />
+                  <Route
+                    path="/settings"
+                    element={withPageErrorBoundary(Settings)({})}
+                  />
+                  <Route
+                    path="/explore/search"
+                    element={withPageErrorBoundary(SearchResults)({})}
+                  />
+                  <Route
+                    path="/demo"
+                    element={withPageErrorBoundary(Demo)({})}
+                  />
+                  <Route
+                    path="*"
+                    element={withPageErrorBoundary(Error404)({})}
+                  />
+                </Routes>
+              </OnboardingProtection>
+            </LoadingAuth>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

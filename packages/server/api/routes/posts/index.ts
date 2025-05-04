@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { tryCatch, tryCatchSync } from "../../lib/tryCatch";
+import { tryCatch } from "../../lib/tryCatch";
 import db from "../../lib/db";
 import { respond } from "../../lib/utils/respond";
 import { zValidator } from "@hono/zod-validator";
@@ -20,8 +20,8 @@ import {
 import { zNumberString, zSuiSignature } from "../../lib/zod/helpers";
 import { preprocessImageMedia } from "./helpers";
 import s3 from "../../lib/s3/client";
-import { eq } from "drizzle-orm";
-import auth from "../../ai/routes/auth";
+import { and, eq, isNotNull } from "drizzle-orm";
+import { contracts } from "../../lib/sui/contracts";
 
 const { posts, post_media, post_topics, post_mentions, likes, users } =
   db.schema;
@@ -84,7 +84,7 @@ const app = new Hono()
       const { media, signature, ...postData } = ctx.req.valid("json");
       const user = ctx.get("user");
 
-      if (postData.content.length! > 0 && !postData.reposting) {
+      if (!(postData.content.length > 0) && !postData.reposting) {
         return respond.err(ctx, "Content is required", 400);
       }
 
@@ -446,5 +446,60 @@ const app = new Hono()
       );
     }
   );
+
+app.get(
+  "/:id/reposts",
+  zValidator(
+    "param",
+    z.object({
+      id: zNumberString(),
+    })
+  ),
+  zValidator(
+    "query",
+    z.object({
+      quotesOnly: z.boolean().default(true),
+      page: zNumberString()
+        .default("1")
+        .transform((v) => v - 1),
+      perPage: zNumberString()
+        .transform((v) => Math.min(v, 32))
+        .default("8"),
+    })
+  ),
+  async (ctx) => {
+    const { id } = ctx.req.valid("param");
+    const { quotesOnly, page, perPage } = ctx.req.valid("query");
+
+    const baseFilter = eq(posts.parentId, id);
+    const filter = quotesOnly
+      ? and(baseFilter, isNotNull(posts.content))
+      : baseFilter;
+
+    const repostsResponse = await tryCatch(
+      db
+        .select()
+        .from(posts)
+        .where(filter)
+        .limit(perPage)
+        .offset(page * perPage)
+    );
+
+    if (repostsResponse.error) {
+      ctx.log(repostsResponse.error);
+      return respond.err(ctx, "Failed to get reposts from db", 500);
+    }
+
+    const repostsData = repostsResponse.data;
+    const hasMore = !(repostsData.length < perPage);
+
+    return respond.ok(
+      ctx,
+      { reposts: repostsData, hasMore },
+      "Reposts fetched successfully",
+      200
+    );
+  }
+);
 
 export default app;

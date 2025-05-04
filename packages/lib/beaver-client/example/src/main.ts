@@ -11,10 +11,10 @@ const beaver = new BeaverClient({
 
 beaver.on("beaver:ready", render);
 beaver.on("user:login", render);
-beaver.on("connection:change", ({ connection }) => {
-  console.log("Connection changed", connection);
-  render();
-});
+beaver.on("user:logout", render);
+beaver.on("connection:change", render);
+beaver.on("connection:disconnect", render);
+
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
   <div id="container">
   </div>
@@ -60,7 +60,7 @@ function render() {
     newUserButton.innerText = "Register";
     newUserButton.onclick = async () => {
       await beaver.user.register({
-        username: "zanzibar",
+        username: "riyariyariya",
         fullName: "fully island",
         about: "kya karna hai iska",
       });
@@ -77,6 +77,14 @@ function render() {
 
   if (!user) return;
 
+  gap();
+
+  const logoutButton = document.createElement("button");
+  logoutButton.innerText = "Logout";
+  logoutButton.onclick = async () => {
+    await beaver.user.logout();
+  };
+  container.appendChild(logoutButton);
   gap();
 
   const postInput = document.createElement("input");

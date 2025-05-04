@@ -28,11 +28,13 @@ function App() {
           <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
             <Web3Provider>
               <Providers>
-                {/* <BeaverProvider config={{
-                  debug: true,
-                  network: "devnet",
-                  apiBaseUrl: "http://localhost:5173/api/v1",
-                }}> */}
+                {/* <BeaverProvider
+                  config={{
+                    debug: true,
+                    network: "devnet",
+                    apiBaseUrl: "http://localhost:5173/api/v1",
+                  }}
+                > */}
                 <Router />
                 <Toaster />
                 {/* </BeaverProvider> */}
@@ -50,9 +52,7 @@ function Providers(props: { children: React.ReactNode }) {
 
   if (!serverConfig.ready) return <></>;
 
-  return <>
-    {props.children}
-  </>;
+  return <>{props.children}</>;
 }
 
 root.render(<App />);

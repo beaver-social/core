@@ -87,7 +87,12 @@ export class BeaverClient {
 
     const localJwt = this.defaults.store.persistent.get("beaver-jwt");
     if (localJwt) {
-      this.defaults.apiClient.setJwt(localJwt);
+      await this.defaults.store.setJwt(localJwt);
+      if (this.defaults.store.isAuthenticated()) {
+        this.defaults.events.emit("user:login", {
+          user: this.defaults.store.user,
+        });
+      }
     }
 
     this.ready = true;
