@@ -95,7 +95,7 @@ export default function () {
                   />
                   <Route
                     path="/shorts"
-                    element={withPageErrorBoundary(Shorts)({})}
+                    element={withPageErrorBoundary(Swipes)({})}
                   />
                   <Route
                     path="/settings"
