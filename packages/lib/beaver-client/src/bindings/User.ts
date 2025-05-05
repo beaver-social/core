@@ -18,7 +18,7 @@ export default class User {
   async register(
     options: Pick<
       ApiParams<Api["users"]["$post"]>["json"],
-      "username" | "fullName" | "about" | "imageUrl" | "bannerUrl"
+      "username" | "fullName" | "about" | "image" | "banner"
     >
   ) {
     const { features, address } = this.defaults.store;
