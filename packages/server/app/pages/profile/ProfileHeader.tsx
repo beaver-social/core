@@ -4,6 +4,9 @@ import { Link, useNavigate } from "react-router";
 import { UserDetails } from ".";
 import { Image } from "@/shared/components/Image";
 import Icon from "@/shared/components/Icon";
+import { useBeaver } from "@beaver/react";
+import { AlertDialogComponent } from "@/shared/components/AlertDialog";
+import Disconnect from "@/shared/components/Disconnect";
 
 type Props = {
     data: UserDetails;
@@ -12,6 +15,7 @@ type Props = {
 
 export default function ProfileHeader({ data, isCurrentUser = false }: Props) {
     const navigate = useNavigate();
+    const beaver = useBeaver();
 
     return (
         <div>
@@ -19,15 +23,22 @@ export default function ProfileHeader({ data, isCurrentUser = false }: Props) {
             <div className="relative">
                 <button
                     onClick={() => navigate(-1)}
-                    className="absolute top-4 left-4 rounded-full p-2 hover:bg-grey-200/10"
+                    className="absolute top-4 left-4 rounded-sm p-2 transition hover:bg-grey-500/10"
                 >
                     <ArrowLeft size={20} />
                 </button>
 
                 {/* QR Code Button */}
-                <button className="absolute top-4 right-4 rounded-full p-2 hover:bg-grey-200/10">
-                    <Icon name="QrCode" className="size-5" />
-                </button>
+                <div className="absolute top-4 right-4 p-2" >
+                    {beaver.wallet.isConnected ? (
+                        <Disconnect />
+                    ) : (
+                        <div className="rounded-sm cursor-pointer">
+                            <Icon name="QrCode" className="size-5" />
+                        </div>
+                    )}
+                </div>
+
 
                 <Image
                     src={data.coverPhoto}

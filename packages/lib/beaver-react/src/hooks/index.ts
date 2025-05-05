@@ -13,8 +13,6 @@ export function useBeaver() {
     register,
     login: client.user.login.bind(client.user),
     logout: client.user.logout.bind(client.user),
-    connect: client.connector.connect.bind(client.connector),
-    disconnect: client.connector.disconnect.bind(client.connector),
   };
 }
 
@@ -36,8 +34,8 @@ export function useWallets() {
     wallets,
     isConnected,
     hasIdentity,
-    connect: client.connector.connect,
-    disconnect: client.connector.disconnect,
+    connect: client.connector.connect.bind(client.connector),
+    disconnect: client.connector.disconnect.bind(client.connector),
   };
 }
 

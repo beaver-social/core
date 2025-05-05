@@ -18,6 +18,7 @@ import Create from "./pages/create";
 
 import { useEffect } from "react";
 import Landing from "./pages/landing";
+import { useBeaver } from "@beaver/react";
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary =
   (Component: React.ComponentType<any>) => (props: any) =>
@@ -28,14 +29,14 @@ const withPageErrorBoundary =
   );
 
 function OnboardingProtection({ children }: { children: React.ReactNode }) {
-  const { userId, isConnected } = {} as any;
+  const beaver = useBeaver();
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   if (isConnected && !userId) {
-  //     navigate("/onboarding");
-  //   }
-  // }, [userId, isConnected]);
+  useEffect(() => {
+    if (beaver.wallet.isConnected && !beaver.wallet.hasIdentity) {
+      navigate("/onboarding");
+    }
+  }, [beaver.wallet.isConnected, beaver.wallet.hasIdentity]);
 
   return children;
 }
