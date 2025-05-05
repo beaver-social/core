@@ -17,6 +17,7 @@ export const users = t.sqliteTable(
     onboardingCompleted: t.int({ mode: "boolean" }).default(false),
 
     imageUrl: t.text(),
+    imageBlurhash: t.text(),
     bannerUrl: t.text(),
     website: t.text(),
     timezone: t.int(),

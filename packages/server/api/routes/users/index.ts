@@ -27,6 +27,8 @@ import { JWTalgorithm, JWTexpiration, JWTPrivateKey } from "../../constants";
 import { stringify } from "../../../utils";
 import { getPreviousActionHash } from "../../lib/actions/helpers";
 import { followUser, unfollowUser } from "./actions";
+import { preprocessImage } from "./helpers";
+import s3 from "../../lib/s3/client";
 
 const { users, follows } = db.schema;
 
@@ -197,14 +199,16 @@ export default new Hono()
         address: zSuiAddress(),
         username: z.string().min(3).max(20).toLowerCase(),
         fullName: z.string().min(3).max(50),
-        imageUrl: z.string().max(255).optional(),
-        bannerUrl: z.string().max(255).optional(),
         about: z.string().max(255).nullable().optional(),
+
+        image: z.instanceof(File).optional(),
+        banner: z.instanceof(File).optional(),
+
         signature: zSuiSignature(),
       })
     ),
     async (ctx) => {
-      const { signature, ...user } = ctx.req.valid("json");
+      const { signature, image, banner, ...user } = ctx.req.valid("json");
       const { address } = user;
 
       const nonce = nonceManager.comsumeNonceBytes(address);
@@ -312,12 +316,41 @@ export default new Hono()
         );
       }
 
+      let imageUrl: string | undefined = undefined;
+      let imageBlurhash: string | undefined = undefined;
+      let bannerUrl: string | undefined = undefined;
+
+      if (image) {
+        const imageData = Buffer.from(await image.arrayBuffer());
+        const { imageBuffer, blurhash } = await preprocessImage(imageData);
+
+        const url = await tryCatch(s3.upload(imageBuffer));
+
+        if (url.data) {
+          imageUrl = url.data;
+          imageBlurhash = blurhash;
+        }
+      }
+      if (banner) {
+        const bannerData = Buffer.from(await banner.arrayBuffer());
+        const { imageBuffer } = await preprocessImage(bannerData);
+
+        const url = await tryCatch(s3.upload(imageBuffer));
+
+        if (url.data) {
+          bannerUrl = url.data;
+        }
+      }
+
       const newUserResponse = await tryCatch(
         db
           .insert(users)
           .values({
             identity: registration.data,
             collectionNft: collection.data,
+            imageUrl,
+            imageBlurhash,
+            bannerUrl,
             ...user,
           })
           .returning()
@@ -345,8 +378,6 @@ export default new Hono()
       "json",
       z.object({
         fullName: z.string().min(3).max(50).optional(),
-        imageUrl: z.string().max(255).optional(),
-        bannerUrl: z.string().max(255).optional(),
         about: z.string().max(255).nullable().optional(),
       })
     ),
