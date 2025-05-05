@@ -16,11 +16,13 @@ beaver.on("connection:change", render);
 beaver.on("connection:disconnect", render);
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
-  <div id="container">
-  </div>
+<div id="container">
+</div>
 `;
 
 function render() {
+  console.log("rendering");
+
   const container = document.querySelector<HTMLDivElement>("#container")!;
   container.innerHTML = "";
 
@@ -101,4 +103,32 @@ function render() {
     console.log(response);
   };
   container.appendChild(postButton);
+
+  const getProfileButton = document.createElement("button");
+  getProfileButton.innerText = "Get Profile";
+  getProfileButton.onclick = async () => {
+    const response = await beaver.user.getProfile();
+    console.log(response);
+  };
+  container.appendChild(getProfileButton);
+
+  const getFollowers = document.createElement("button");
+  getFollowers.innerText = "Get Followers";
+  getFollowers.onclick = async () => {
+    const response = await beaver.user.getFollowers({
+      userId: 1,
+    });
+    console.log(response);
+  };
+  container.appendChild(getFollowers);
+
+  const getFollowing = document.createElement("button");
+  getFollowing.innerText = "Get Following";
+  getFollowing.onclick = async () => {
+    const response = await beaver.user.getFollowing({
+      userId: 1,
+    });
+    console.log(response);
+  };
+  container.appendChild(getFollowing);
 }

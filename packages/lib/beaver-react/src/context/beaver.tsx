@@ -1,9 +1,14 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { BeaverClient, BeaverClientConfig, BeaverUser, Connection } from "@beaver/client";
+import {
+  BeaverClient,
+  BeaverClientConfig,
+  BeaverUser,
+  Connection,
+} from "@beaver/client";
 
 type BeaverContext = {
   client: BeaverClient;
-  user: BeaverUser | null,
+  user: BeaverUser | null;
   isAuthenticated: boolean;
   isConnected: boolean;
   hasIdentity: boolean;
@@ -48,12 +53,18 @@ export function BeaverProvider(props: BeaverConfig) {
     beaver.on("connection:change", ({ connection, hasIdentity }) => {
       setConnection(connection);
       setHasIdentity(hasIdentity);
-    })
+    });
 
     setClient(beaver);
   }
 
-  const value: BeaverContext = { client, user, isAuthenticated, isConnected, hasIdentity };
+  const value: BeaverContext = {
+    client,
+    user,
+    isAuthenticated,
+    isConnected,
+    hasIdentity,
+  };
 
   useEffect(() => {
     if (!flag.current) {

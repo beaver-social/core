@@ -99,4 +99,39 @@ export default class User {
     await this.defaults.store.setJwt(null);
     this.defaults.events.emit("user:logout", {});
   }
+
+  async getProfile() {
+    if (!this.defaults.store.isAuthenticated()) {
+      throw new Error("User not authenticated");
+    }
+    return safeParseResponse(this.defaults.apiClient.rpc.users.$get());
+  }
+
+  async getFollowers(options: {
+    userId: number;
+    page?: number;
+    perPage?: number;
+  }) {
+    const { userId, page = 1, perPage = 8 } = options;
+    return safeParseResponse(
+      this.defaults.apiClient.rpc.users[":id"].followers.$get({
+        query: { page: page.toString(), perPage: perPage.toString() },
+        param: { id: userId.toString() },
+      })
+    );
+  }
+
+  async getFollowing(options: {
+    userId: number;
+    page?: number;
+    perPage?: number;
+  }) {
+    const { userId, page = 1, perPage = 8 } = options;
+    return safeParseResponse(
+      this.defaults.apiClient.rpc.users[":id"].following.$get({
+        query: { page: page.toString(), perPage: perPage.toString() },
+        param: { id: userId.toString() },
+      })
+    );
+  }
 }
