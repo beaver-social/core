@@ -3,17 +3,26 @@ import { useMutation } from "@tanstack/react-query";
 
 export function useBeaver() {
   const { client, user } = useBeaverContext();
-  const register = useRegister();
   const wallet = useWallets();
 
   return {
     user,
     client,
     wallet,
-    register,
+    register: client.user.register.bind(client.user),
     login: client.user.login.bind(client.user),
     logout: client.user.logout.bind(client.user),
   };
+}
+
+export function useLogin() {
+  const { client } = useBeaverContext();
+  return useMutation({
+    mutationKey: ["login"],
+    mutationFn: async () => {
+      return await client.user.login();
+    },
+  });
 }
 
 export function useRegister() {
