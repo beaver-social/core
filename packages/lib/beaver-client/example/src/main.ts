@@ -159,4 +159,20 @@ function render() {
     console.log(response);
   };
   container.appendChild(unfollowButton);
+
+  gap();
+
+  const userId = document.createElement("input");
+  userId.placeholder = "User id";
+  container.appendChild(userId);
+
+  const getUserById = document.createElement("button");
+  getUserById.innerText = "getby id";
+  getUserById.onclick = async () => {
+    const response = await beaver.user.getUserById({
+      id: Number(userId.value),
+    });
+    console.log(response);
+  };
+  container.appendChild(getUserById);
 }

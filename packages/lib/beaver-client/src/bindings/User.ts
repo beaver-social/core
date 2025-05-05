@@ -99,6 +99,32 @@ export default class User {
     this.defaults.events.emit("user:logout", {});
   }
 
+  async getUserById(options: { id: number }) {
+    const { id } = options;
+    return safeParseResponse(
+      this.defaults.apiClient.rpc.users[":id"].$get({
+        param: { id: id.toString() },
+      })
+    );
+  }
+
+  async updateProfile(options: {
+    fullName?: string;
+    imageUrl?: string;
+    bannerUrl?: string;
+    about?: string | null;
+  }) {
+    if (!this.defaults.store.isAuthenticated()) {
+      throw new Error("User not authenticated");
+    }
+
+    return safeParseResponse(
+      this.defaults.apiClient.rpc.users.$patch({
+        json: options,
+      })
+    );
+  }
+
   async getProfile() {
     if (!this.defaults.store.isAuthenticated()) {
       throw new Error("User not authenticated");
