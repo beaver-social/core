@@ -1,6 +1,7 @@
 import { Api, Defaults } from "../types/client";
 import { ApiParams } from "../types/api";
 import { safeParseResponse } from "../utils/apiClient";
+import { stringify } from "../utils/utils";
 import Logger from "./Logger";
 
 export default class User {
@@ -129,6 +130,53 @@ export default class User {
       this.defaults.apiClient.rpc.users[":id"].following.$get({
         query: { page: page.toString(), perPage: perPage.toString() },
         param: { id: userId.toString() },
+      })
+    );
+  }
+
+  async followUser(options: { followingId: number }) {
+    const { followingId } = options;
+    const { features, user, actionPointer } = this.defaults.store;
+    if (!features || !user || !this.defaults.store.isAuthenticated()) {
+      throw new Error("User not authenticated or wallet not connected");
+    }
+
+    const { signature } = await features.signPersonalMessage(
+      stringify({
+        followingId: followingId,
+        userId: user.id,
+        type: "v1.user.follow.user",
+        previous: actionPointer,
+      })
+    );
+
+    return safeParseResponse(
+      this.defaults.apiClient.rpc.users[":id"].follow.$post({
+        json: { signature },
+        param: { id: followingId.toString() },
+      })
+    );
+  }
+
+  async unfollowUser(options: { followingId: number }) {
+    const { followingId } = options;
+    const { features, user, actionPointer } = this.defaults.store;
+    if (!features || !user || !this.defaults.store.isAuthenticated()) {
+      throw new Error("User not authenticated or wallet not connected");
+    }
+    const { signature } = await features.signPersonalMessage(
+      stringify({
+        followingId: followingId,
+        userId: user.id,
+        type: "v1.user.unfollow.user",
+        previous: actionPointer,
+      })
+    );
+
+    return safeParseResponse(
+      this.defaults.apiClient.rpc.users[":id"].follow.$delete({
+        json: { signature },
+        param: { id: followingId.toString() },
       })
     );
   }
