@@ -176,12 +176,15 @@ export default class User {
       })
     );
 
-    return safeParseResponse(
+    const followUser = safeParseResponse(
       this.defaults.apiClient.rpc.users[":id"].follow.$post({
         json: { signature },
         param: { id: followingId.toString() },
       })
     );
+
+    this.defaults.store.syncUserAndActionPointer();
+    return followUser;
   }
 
   async unfollowUser(options: { followingId: number }) {
@@ -199,11 +202,14 @@ export default class User {
       })
     );
 
-    return safeParseResponse(
+    const unfollowUser = safeParseResponse(
       this.defaults.apiClient.rpc.users[":id"].follow.$delete({
         json: { signature },
         param: { id: followingId.toString() },
       })
     );
+
+    this.defaults.store.syncUserAndActionPointer();
+    return unfollowUser;
   }
 }
