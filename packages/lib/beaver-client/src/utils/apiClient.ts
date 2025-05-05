@@ -1,6 +1,7 @@
 import { ClientResponse } from "hono/client";
 import { tryCatch } from "./tryCatch";
 import { z } from "zod";
+import { stringify } from "./utils";
 
 type ErrorResponse = { success: false; error: string };
 type SuccessResponse<T> = { success: true; data: T; message: string };
@@ -11,7 +12,7 @@ export async function safeParseResponse<T>(
   const { error: awaitedError, data: response } = await tryCatch(raw);
 
   if (awaitedError) {
-    throw new Error("Failed to fetch response: " + awaitedError);
+    throw new Error("Failed to fetch response: " + stringify(awaitedError));
   }
 
   let body;
@@ -19,7 +20,7 @@ export async function safeParseResponse<T>(
   const parsed = await tryCatch(response.json());
 
   if (parsed.error) {
-    throw new Error("Failed to parse response: " + parsed.error);
+    throw new Error("Failed to parse response: " + stringify(parsed.error));
   } else {
     body = parsed.data;
   }
@@ -27,7 +28,7 @@ export async function safeParseResponse<T>(
   const resp = z
     .object({
       success: z.boolean(),
-      error: z.string().optional(),
+      error: z.any().optional(),
       data: z.any().optional(),
       message: z.string().optional(),
     })

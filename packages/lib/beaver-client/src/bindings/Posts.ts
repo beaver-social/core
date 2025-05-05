@@ -12,7 +12,7 @@ export default class Posts {
     this.defaults = defaults;
     this.logger = defaults.logger;
 
-    this.logger.info("Post interface instantiated");
+    this.logger.info("Posts interface instantiated");
   }
 
   async upload(
