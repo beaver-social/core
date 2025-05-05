@@ -116,7 +116,7 @@ function render() {
   getFollowers.innerText = "Get Followers";
   getFollowers.onclick = async () => {
     const response = await beaver.user.getFollowers({
-      userId: 1,
+      userId: 3,
     });
     console.log(response);
   };
@@ -126,9 +126,37 @@ function render() {
   getFollowing.innerText = "Get Following";
   getFollowing.onclick = async () => {
     const response = await beaver.user.getFollowing({
-      userId: 1,
+      userId: 3,
     });
     console.log(response);
   };
   container.appendChild(getFollowing);
+
+  const followInput = document.createElement("input");
+  followInput.placeholder = "Follow which user";
+  container.appendChild(followInput);
+
+  const followButton = document.createElement("button");
+  followButton.innerText = "Follow";
+  followButton.onclick = async () => {
+    const response = await beaver.user.followUser({
+      followingId: Number(followInput.value),
+    });
+    console.log(response);
+  };
+  container.appendChild(followButton);
+
+  const unfollowInput = document.createElement("input");
+  unfollowInput.placeholder = "unFollow which user";
+  container.appendChild(unfollowInput);
+
+  const unfollowButton = document.createElement("button");
+  unfollowButton.innerText = "Follow";
+  unfollowButton.onclick = async () => {
+    const response = await beaver.user.unfollowUser({
+      followingId: Number(unfollowInput.value),
+    });
+    console.log(response);
+  };
+  container.appendChild(unfollowButton);
 }
