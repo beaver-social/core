@@ -12,8 +12,6 @@ function Tabs({ className, tabClassName }: TabsProps) {
   const { getTabs, activeTab, setActiveTab } = useGlobalUI();
   const tabs = getTabs();
 
-  console.log(activeTab);
-
   return (
     <div className={cn("w-full", className)}>
       {/* Tabs Header */}

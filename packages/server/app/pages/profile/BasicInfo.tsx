@@ -12,7 +12,7 @@ export default function BasicInfo({ data: userDetails }: { data: UserDetails }) 
                 <div className="flex items-center justify-center gap-2">
                     <h1 className="text-xl font-bold">{userDetails.name}</h1>
                     {userDetails.verified && (
-                        <Icon name="SquareCheckBig" className="text-secondary-foreground" />
+                        <Icon name="SquareCheckBig" className="text-secondary-foreground size-5" />
                     )}
                 </div>
                 <div className="flex items-center justify-center gap-2">

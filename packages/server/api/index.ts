@@ -13,7 +13,7 @@ const app = new Hono()
       origin: (origin, ctx) => {
         const selfUrl = new URL(ctx.req.url);
         const allowedOrigins = [
-          "http://localhost:5173",
+          "http://localhost:9090",
           "https://localhost:3000",
         ];
         const selfOrigin = selfUrl.origin;

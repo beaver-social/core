@@ -11,7 +11,7 @@ import { useGlobalUI } from "@/shared/hooks/useGlobalUI";
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
 import { useNavigate } from "react-router";
 import CompleteOnboarding from "./CompleteOnboarding";
-import ConnectIdentity from "@/shared/components/web3/ConnectIdentity";
+import Disconnect from "@/shared/components/Disconnect";
 // import { useAuth } from "@beaver/react";
 const TOTAL_STEPS = 5;
 
@@ -101,7 +101,7 @@ export default function Onboarding() {
   // }
 
   return (
-    <div className="min-h-screen bg-[url(/images/tailwind-gradient-light.png)] dark:bg-[url(/images/tailwind-gradient-dark.jpg)] flex flex-col items-center justify-center p-4 bg-no-repeat bg-cover">
+    <div className="min-h-screen bg-[url(/images/tailwind-gradient-light.png)] dark:bg-[url(/images/tailwind-gradient-dark.png)] flex flex-col items-center justify-center p-4 bg-no-repeat bg-cover">
       <Card className="w-full max-w-2xl bg-background/30 glass border rounded-xl overflow-hidden shadow-lg">
         {/* Progress Bar - Hide on completion screen */}
         {step <= TOTAL_STEPS && (
@@ -132,7 +132,7 @@ export default function Onboarding() {
       </Card>
 
       <div className="flex gap-2 absolute bottom-4 right-4">
-        <ConnectIdentity />
+        <Disconnect />
         <ThemeSwitch />
       </div>
     </div>

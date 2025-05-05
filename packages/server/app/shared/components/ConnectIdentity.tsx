@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
-import { Button } from "../ui/button";
-import { WalletButton } from "./Wallet";
-import { toast } from "sonner";
-import { Image } from "../Image";
+import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
+import { Image } from "./Image";
 // import { useAuth } from "@beaver/react";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { motion } from "framer-motion";
 import {
   Dialog,
   DialogContent,
@@ -13,9 +11,9 @@ import {
   DialogDescription,
   DialogFooter,
   DialogTrigger,
-} from "../ui/dialog";
-import Icon from "../Icon";
-import WelcomeSplash from "../animations/WelcomeSplash";
+} from "./ui/dialog";
+import Icon from "./Icon";
+import WelcomeSplash from "./animations/WelcomeSplash";
 import { useBeaver } from "@beaver/react";
 
 type Props = {
@@ -25,71 +23,44 @@ type Props = {
 };
 
 export default function ConnectIdentity({ open, onOpenChange }: Props) {
+  const beaver = useBeaver();
   const [isOpen, setIsOpen] = useState(open || false);
   const [showWelcomeSplash, setShowWelcomeSplash] = useState(false);
-  const [showDisconnectButton, setShowDisconnectButton] = useState(false);
-  const [isLoadingGoogleOAuthScreen, setIsLoadingGoogleOAuthScreen] = useState(false);
-  const currentAccount = useCurrentAccount();
-  const beaver = useBeaver();
-
-
-  const urlParams = new URLSearchParams(window.location.search);
-
-  // useEffect(() => {
-  //     // Check if the user is redirected from the OAuth screen
-  //     if (urlParams.get("auth_success")) {
-  //         setShowWelcomeSplash(true);
-  //     }
-
-  //     if (zkLoginData?.userAddress || currentAccount?.address) {
-  //         setShowDisconnectButton(true);
-  //     }
-  // }, [zkLoginData?.userAddress, currentAccount?.address]);
-
-  const handleOpenChange = (newOpen: boolean) => {
-    setIsOpen(newOpen);
-    onOpenChange?.(newOpen);
-  };
-
+  const [isConnectIdentitySelected, setisConnectIdentitySelected] = useState(false);
 
   if (showWelcomeSplash) {
     return (
       <WelcomeSplash
         onComplete={() => {
           setShowWelcomeSplash(false);
-          setShowDisconnectButton(true);
         }}
       />
     );
   }
 
-  if (beaver.wallet.isConnected) {
-    return (
-      <div>
-        <Button variant="neon" onClick={beaver.wallet.disconnect}>
-          <Icon name="LogOut" className="size-4" />
-          <p>Disconnect</p>
-        </Button>
-      </div>
-    )
-  }
-
-  async function handleDisconnect(type: "wallet" | "social") {
-    try {
-      await beaver.disconnect();
-      setShowDisconnectButton(false);
-    } catch (error) {
-      toast.error(`Error disconnecting identity: ${error}`);
-    }
-  };
-
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog open={isOpen} onOpenChange={(newOpen: boolean) => {
+      setIsOpen(newOpen);
+      onOpenChange?.(newOpen);
+      setisConnectIdentitySelected(newOpen);
+    }}>
       <DialogTrigger asChild>
-        <Button variant="neon">
-          <Icon name="LogIn" className="size-4" />
-          <p>Connect Identity</p>
-        </Button>
+        <div
+          className={`relative flex items-center gap-3 px-4 py-3 cursor-pointer rounded-md transition-colors mt-3 ${isConnectIdentitySelected ? 'bg-primary/5' : 'hover:bg-muted'}`}
+        >
+          <Icon name="User" />
+          <span className={isConnectIdentitySelected ? "text-primary font-stretch-semi-condensed" : ""}>Connect</span>
+          {isConnectIdentitySelected && (
+            <motion.div
+              className="absolute left-0 top-0 bottom-0 w-1 h-full bg-primary rounded-r-sm"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "100%", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              layoutId="profileIndicator"
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            />
+          )}
+        </div>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -143,23 +114,21 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
             <div className="space-y-2 w-full">
               {beaver.wallet.wallets.map((wallet, index) => (
                 <Button
+                  key={index}
                   variant="outline"
-                  className="w-full flex"
+                  className="w-full flex py-10"
                   onClick={() => {
-                    beaver.connect(index)
+                    beaver.wallet.connect(index);
                   }}
                 >
-                  {isLoadingGoogleOAuthScreen ? (
-                    <Icon name="LoaderCircle" className="size-4 animate-spin" />
-                  ) : (
-                    <>
-                      <Image
-                        src={wallet.icon}
-                        alt="Google"
-                        className="size-8 p-[2px] object-contain rounded-full bg-white"
-                      />
-                      <p>{wallet.name}</p></>
-                  )}
+                  <>
+                    <Image
+                      src={wallet.icon}
+                      alt="Google"
+                      className="size-8 p-1 object-contain rounded-sm bg-white"
+                    />
+                    <p>{wallet.name}</p>
+                  </>
                 </Button>
               ))}
             </div>
