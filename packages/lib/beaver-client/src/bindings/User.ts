@@ -79,7 +79,9 @@ export default class User {
 
     if (!user) {
       this.logout();
-      console.log("BEAVER FATAL : Unable to fetch user data. Logging out.");
+      return console.log(
+        "BEAVER FATAL : Unable to fetch user data. Logging out."
+      );
     }
 
     this.defaults.store.syncUserAndActionPointer();
@@ -89,10 +91,6 @@ export default class User {
         user: this.defaults.store.user,
       });
     }
-
-    this.defaults.events.emit("user:login", {
-      user,
-    });
   }
 
   async logout() {
