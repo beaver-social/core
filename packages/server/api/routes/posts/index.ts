@@ -18,6 +18,7 @@ import {
   zUnlikePostAction,
 } from "./actions";
 import {
+  zBooleanString,
   zNumberString,
   zPaginatedRequest,
   zSuiAddress,
@@ -442,9 +443,7 @@ const app = new Hono()
     ),
     zValidator(
       "query",
-      zPaginatedRequest().merge(
-        z.object({ quotesOnly: z.boolean().optional() })
-      )
+      zPaginatedRequest().merge(z.object({ quotesOnly: zBooleanString() }))
     ),
     async (ctx) => {
       const { id } = ctx.req.valid("param");
