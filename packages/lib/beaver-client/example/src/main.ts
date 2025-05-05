@@ -30,6 +30,20 @@ function render() {
     container.appendChild(document.createElement("br"));
   }
 
+  function createSection(title: string) {
+    gap();
+    const heading = document.createElement("h3");
+    heading.innerText = title;
+    container.appendChild(heading);
+    const section = document.createElement("div");
+    section.style.marginBottom = "20px";
+    section.style.padding = "10px";
+    section.style.border = "1px solid #ddd";
+    section.style.borderRadius = "5px";
+    container.appendChild(section);
+    return section;
+  }
+
   const address = beaver.connector.address;
   const user = beaver.auth.user;
   const wallets = beaver.connector.getWallets(); //.concat([enoki.wallets.google]);
@@ -87,22 +101,8 @@ function render() {
     await beaver.user.logout();
   };
   container.appendChild(logoutButton);
-  gap();
 
-  const postInput = document.createElement("input");
-  postInput.placeholder = "Post content";
-  container.appendChild(postInput);
-
-  const postButton = document.createElement("button");
-  postButton.innerText = "Post";
-  postButton.onclick = async () => {
-    const response = await beaver.posts.upload({
-      content: postInput.value,
-      media: [],
-    });
-    console.log(response);
-  };
-  container.appendChild(postButton);
+  const userSection = createSection("User Operations");
 
   const getProfileButton = document.createElement("button");
   getProfileButton.innerText = "Get Profile";
@@ -110,7 +110,7 @@ function render() {
     const response = await beaver.user.getProfile();
     console.log(response);
   };
-  container.appendChild(getProfileButton);
+  userSection.appendChild(getProfileButton);
 
   const getFollowers = document.createElement("button");
   getFollowers.innerText = "Get Followers";
@@ -120,7 +120,7 @@ function render() {
     });
     console.log(response);
   };
-  container.appendChild(getFollowers);
+  userSection.appendChild(getFollowers);
 
   const getFollowing = document.createElement("button");
   getFollowing.innerText = "Get Following";
@@ -130,11 +130,13 @@ function render() {
     });
     console.log(response);
   };
-  container.appendChild(getFollowing);
+  userSection.appendChild(getFollowing);
+
+  gap();
 
   const followInput = document.createElement("input");
   followInput.placeholder = "Follow which user";
-  container.appendChild(followInput);
+  userSection.appendChild(followInput);
 
   const followButton = document.createElement("button");
   followButton.innerText = "Follow";
@@ -144,35 +146,205 @@ function render() {
     });
     console.log(response);
   };
-  container.appendChild(followButton);
+  userSection.appendChild(followButton);
 
   const unfollowInput = document.createElement("input");
   unfollowInput.placeholder = "unFollow which user";
-  container.appendChild(unfollowInput);
+  userSection.appendChild(unfollowInput);
 
   const unfollowButton = document.createElement("button");
-  unfollowButton.innerText = "Follow";
+  unfollowButton.innerText = "Unfollow";
   unfollowButton.onclick = async () => {
     const response = await beaver.user.unfollowUser({
       followingId: Number(unfollowInput.value),
     });
     console.log(response);
   };
-  container.appendChild(unfollowButton);
+  userSection.appendChild(unfollowButton);
 
   gap();
 
-  const userId = document.createElement("input");
-  userId.placeholder = "User id";
-  container.appendChild(userId);
+  const userIdInput = document.createElement("input");
+  userIdInput.placeholder = "User id";
+  userSection.appendChild(userIdInput);
 
   const getUserById = document.createElement("button");
-  getUserById.innerText = "getby id";
+  getUserById.innerText = "Get User by ID";
   getUserById.onclick = async () => {
     const response = await beaver.user.getUserById({
-      id: Number(userId.value),
+      id: Number(userIdInput.value),
     });
     console.log(response);
   };
-  container.appendChild(getUserById);
+  userSection.appendChild(getUserById);
+
+  const postsSection = createSection("Post Operations");
+
+  const postInput = document.createElement("input");
+  postInput.placeholder = "Post content";
+  postsSection.appendChild(postInput);
+
+  const postButton = document.createElement("button");
+  postButton.innerText = "Create Post";
+  postButton.onclick = async () => {
+    const response = await beaver.posts.upload({
+      content: postInput.value,
+      media: [],
+    });
+    console.log(response);
+  };
+  postsSection.appendChild(postButton);
+
+  gap();
+
+  // Get Posts
+  const getPostsButton = document.createElement("button");
+  getPostsButton.innerText = "Get All Posts";
+  getPostsButton.onclick = async () => {
+    const response = await beaver.posts.getPosts();
+    console.log(response);
+  };
+  postsSection.appendChild(getPostsButton);
+
+  gap();
+
+  // Post ID for operations
+  const postIdInput = document.createElement("input");
+  postIdInput.placeholder = "Post ID";
+  postsSection.appendChild(postIdInput);
+
+  // Get Post by ID
+  const getPostButton = document.createElement("button");
+  getPostButton.innerText = "Get Post by ID";
+  getPostButton.onclick = async () => {
+    if (!postIdInput.value) {
+      alert("Please enter a post ID");
+      return;
+    }
+    const response = await beaver.posts.getPostById(Number(postIdInput.value));
+    console.log(response);
+  };
+  postsSection.appendChild(getPostButton);
+
+  gap();
+
+  // Like/Unlike
+  const likeButton = document.createElement("button");
+  likeButton.innerText = "Like Post";
+  likeButton.onclick = async () => {
+    if (!postIdInput.value) {
+      alert("Please enter a post ID");
+      return;
+    }
+    const response = await beaver.posts.likePost({
+      postId: Number(postIdInput.value),
+    });
+    console.log(response);
+  };
+  postsSection.appendChild(likeButton);
+
+  const unlikeButton = document.createElement("button");
+  unlikeButton.innerText = "Unlike Post";
+  unlikeButton.onclick = async () => {
+    if (!postIdInput.value) {
+      alert("Please enter a post ID");
+      return;
+    }
+    const response = await beaver.posts.unlikePost({
+      postId: Number(postIdInput.value),
+    });
+    console.log(response);
+  };
+  postsSection.appendChild(unlikeButton);
+
+  gap();
+
+  // Bookmark/Unbookmark
+  const bookmarkButton = document.createElement("button");
+  bookmarkButton.innerText = "Bookmark Post";
+  bookmarkButton.onclick = async () => {
+    if (!postIdInput.value) {
+      alert("Please enter a post ID");
+      return;
+    }
+    const response = await beaver.posts.bookmarkPost({
+      postId: Number(postIdInput.value),
+    });
+    console.log(response);
+  };
+  postsSection.appendChild(bookmarkButton);
+
+  const unbookmarkButton = document.createElement("button");
+  unbookmarkButton.innerText = "Unbookmark Post";
+  unbookmarkButton.onclick = async () => {
+    if (!postIdInput.value) {
+      alert("Please enter a post ID");
+      return;
+    }
+    const response = await beaver.posts.unbookmarkPost({
+      postId: Number(postIdInput.value),
+    });
+    console.log(response);
+  };
+  postsSection.appendChild(unbookmarkButton);
+
+  gap();
+
+  // Get post interactions
+  const getLikesButton = document.createElement("button");
+  getLikesButton.innerText = "Get Post Likes";
+  getLikesButton.onclick = async () => {
+    if (!postIdInput.value) {
+      alert("Please enter a post ID");
+      return;
+    }
+    const response = await beaver.posts.getPostLikes({
+      id: Number(postIdInput.value),
+    });
+    console.log(response);
+  };
+  postsSection.appendChild(getLikesButton);
+
+  const getRepliesButton = document.createElement("button");
+  getRepliesButton.innerText = "Get Post Replies";
+  getRepliesButton.onclick = async () => {
+    if (!postIdInput.value) {
+      alert("Please enter a post ID");
+      return;
+    }
+    const response = await beaver.posts.getPostReplies({
+      id: Number(postIdInput.value),
+    });
+    console.log(response);
+  };
+  postsSection.appendChild(getRepliesButton);
+
+  const getRepostsButton = document.createElement("button");
+  getRepostsButton.innerText = "Get Post Reposts";
+  getRepostsButton.onclick = async () => {
+    if (!postIdInput.value) {
+      alert("Please enter a post ID");
+      return;
+    }
+    const response = await beaver.posts.getPostReposts({
+      id: Number(postIdInput.value),
+    });
+    console.log(response);
+  };
+  postsSection.appendChild(getRepostsButton);
+
+  const getQuotesButton = document.createElement("button");
+  getQuotesButton.innerText = "Get Quotes";
+  getQuotesButton.onclick = async () => {
+    if (!postIdInput.value) {
+      alert("Please enter a post ID");
+      return;
+    }
+    const response = await beaver.posts.getPostReposts({
+      id: Number(postIdInput.value),
+      quotesOnly: quotesOnlyCheckbox.checked,
+    });
+    console.log(response);
+  };
+  postsSection.appendChild(getQuotesButton);
 }
