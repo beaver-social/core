@@ -32,11 +32,9 @@ function OnboardingProtection({ children }: { children: React.ReactNode }) {
   const beaver = useBeaver();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (beaver.wallet.isConnected && !beaver.wallet.hasIdentity) {
-      navigate("/onboarding");
-    }
-  }, [beaver.wallet.isConnected, beaver.wallet.hasIdentity]);
+  if (beaver.wallet.isConnected && !beaver.wallet.hasIdentity) {
+    navigate("/onboarding");
+  }
 
   return children;
 }

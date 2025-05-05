@@ -1,11 +1,13 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Image } from "@/shared/components/Image";
 import { useGlobalUIStore } from "@/shared/stores/zustand";
+import { useBeaver, useRegister } from "@beaver/react";
+import { toast } from "sonner";
 // import { useAuth } from "@beaver/react";
 type Props = {
   onComplete: () => void;
@@ -14,48 +16,33 @@ type Props = {
 
 export default function UpdateProfile({ onComplete, handleBack }: Props) {
   const [name, setName] = useState('');
-  const [bio, setBio] = useState('');
-  const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const [about, setAbout] = useState('');
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useState<HTMLInputElement | null>(null);
   const { onboardingData, setOnboardingData } = useGlobalUIStore();
-  // const { uploadImage } = useAuth();
+  const { mutateAsync: register, isPending } = useRegister()
+  const beaver = useBeaver();
 
-  // async function handleProfileImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-  //   if (e.target.files && e.target.files[0]) {
-  //     setIsUploading(true);
+  async function handleSubmit() {
+    if (!name || name.length < 3) {
+      return toast.error("Invalid Name")
+    }
 
-  //     const file = e.target.files[0];
-  //     // const result = await uploadImage(file);
-
-  //     if (result.error) {
-  //       console.error(result.error);
-  //     }
-
-  //     if (result.url) {
-  //       setProfilePicture(result.url);
-  //     }
-
-  //     setIsUploading(false);
-  //   }
-  // };
-
-  const handleSaveProfile = () => {
-    if (!name) return;
-    setIsSaving(true);
-
-    setOnboardingData({
+    register({
       fullName: name,
-      username: onboardingData ? onboardingData.username : null,
-      about: bio,
-      imageUrl: profilePicture
-    });
-
-    setTimeout(() => {
-      setIsSaving(false);
-      onComplete();
-    }, 1200);
+      about,
+      username: onboardingData?.username,
+      imageUrl: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740",
+      bannerUrl: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740"
+    }).then(
+      () => {
+        setOnboardingData(null);
+        onComplete();
+      }
+    ).catch(() => {
+      toast.error("Error saving profile")
+    })
   };
 
   const canSubmit = name.trim().length > 0;
@@ -99,7 +86,9 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  // onChange={handleProfileImageUpload}
+                  onChange={(e) => {
+                    setProfilePicture(e.target.files?.[0] || null);
+                  }}
                   ref={(input) => fileInputRef[1](input)}
                 />
 
@@ -118,7 +107,7 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
                   ) : profilePicture ? (
                     <>
                       <Image
-                        src={profilePicture}
+                        src={URL.createObjectURL(profilePicture)}
                         alt="Profile"
                         className="w-full h-full object-cover"
                       />
@@ -177,17 +166,17 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
               />
             </div>
 
-            {/* Bio Input */}
+            {/* About Input */}
             <div className="space-y-2">
               <label htmlFor="bio" className="text-sm font-medium flex justify-between">
                 <span>About</span>
-                <span className="text-muted-foreground text-xs">{bio.length}/160</span>
+                <span className="text-muted-foreground text-xs">{about.length}/160</span>
               </label>
               <Textarea
                 id="bio"
                 placeholder="Tell others a bit about yourself"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
+                value={about}
+                onChange={(e) => setAbout(e.target.value)}
                 maxLength={160}
                 className="border-border/60 min-h-[100px] resize-none"
               />
@@ -195,10 +184,10 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
 
             <Button
               className="w-full"
-              onClick={handleSaveProfile}
-              disabled={!canSubmit || isSaving}
+              onClick={handleSubmit}
+              disabled={!canSubmit || isPending}
             >
-              {isSaving ? (
+              {isPending ? (
                 <>
                   <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

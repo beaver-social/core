@@ -12,13 +12,15 @@ import ThemeSwitch from "@/shared/components/ThemeSwitch";
 import { useNavigate } from "react-router";
 import CompleteOnboarding from "./CompleteOnboarding";
 import Disconnect from "@/shared/components/Disconnect";
+import { useBeaver } from "@beaver/react";
 // import { useAuth } from "@beaver/react";
 const TOTAL_STEPS = 5;
 
 export default function Onboarding() {
   const { onboardingProgress, setOnboardingProgress } = useGlobalUIStore();
   const { setScreen } = useGlobalUI();
-  const [step, setStep] = useState(onboardingProgress?.currentStep || 1);
+  const beaver = useBeaver();
+  const [step, setStep] = useState(beaver.wallet.hasIdentity ? onboardingProgress?.currentStep || 4 : onboardingProgress?.currentStep || 1);
   const [completedSteps, setCompletedSteps] = useState<number[]>(
     onboardingProgress?.completed || []
   );

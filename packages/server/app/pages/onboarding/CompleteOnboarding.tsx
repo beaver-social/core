@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Icon from "@/shared/components/Icon";
+import { useBeaver, useLogin } from "@beaver/react";
 
 interface CompleteOnboardingProps {
     onComplete: () => void;
@@ -10,6 +11,10 @@ interface CompleteOnboardingProps {
 
 export default function CompleteOnboarding({ onComplete }: CompleteOnboardingProps) {
     const navigate = useNavigate();
+    const { mutate: login, isPending, isSuccess, isError, error } = useLogin();
+    const beaver = useBeaver();
+
+    beaver.user && navigate("/")
 
     return (
         <div className="flex flex-col items-center justify-center space-y-8 text-center">
@@ -32,7 +37,7 @@ export default function CompleteOnboarding({ onComplete }: CompleteOnboardingPro
                     Welcome to Beaver Social!
                 </h2>
                 <p className="text-muted-foreground max-w-md mx-auto">
-                    Your account has been successfully set up. You're all ready to start connecting, sharing, and exploring!
+                    Your account has been successfully set up. Sign in with your Identity to start exploring.
                 </p>
             </div>
 
@@ -44,11 +49,19 @@ export default function CompleteOnboarding({ onComplete }: CompleteOnboardingPro
                 <Button
                     size="lg"
                     className="px-8"
-                    onClick={() => navigate("/")}
+                    onClick={() => {
+                        login()
+                    }}
                 >
-                    Let's Begin
+                    {isPending ? "Signing in..." : "Sign in with Identity"}
                 </Button>
             </motion.div>
+
+            {isError && (
+                <p className="text-red-500 text-sm mt-2">
+                    {error.message || "An error occurred while signing in."}
+                </p>
+            )}
         </div>
     );
 } 

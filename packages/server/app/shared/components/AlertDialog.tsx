@@ -22,9 +22,9 @@ export function AlertDialogComponent(props: Props) {
     return (
         <AlertDialog >
             <AlertDialogTrigger asChild>
-                <button>
+                <div>
                     {props.children}
-                </button>
+                </div>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>

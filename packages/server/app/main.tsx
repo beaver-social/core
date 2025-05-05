@@ -9,12 +9,14 @@ import { useServerConfig } from "./shared/stores/global.ts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "./shared/context/theme-provider.tsx";
 import { Web3Provider } from "./shared/context/web3context.tsx";
-import { Toaster } from "sonner";
+import { toast, Toaster } from "sonner";
 import { ErrorBoundary } from "./shared/lib/errorHandling.ts";
 import { BeaverProvider } from "@beaver/react";
 
 const queryClient = new QueryClient();
-
+queryClient.defaultMutationOptions({
+  onError: ({ error }) => toast(error)
+})
 const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error("Failed to find the root element");
 
