@@ -1,8 +1,6 @@
 import SideNav from "@/pages/SideNav";
 import BottomBar from "@/pages/BottomBar";
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
-import { useLocation } from "react-router";
-import ConnectIdentity from "@/shared/components/ConnectIdentity";
 import GlobalSearch from "@/shared/components/GlobalSearch";
 
 type LayoutProps = {
@@ -11,8 +9,6 @@ type LayoutProps = {
 };
 
 export default function Layout({ main, secondary }: LayoutProps) {
-    const { pathname } = useLocation();
-
     return (
         <div className="">
             {/* CTRL+K functionality */}

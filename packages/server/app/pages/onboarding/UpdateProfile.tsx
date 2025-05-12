@@ -8,6 +8,7 @@ import { Image } from "@/shared/components/Image";
 import { useGlobalUIStore } from "@/shared/stores/zustand";
 import { useBeaver, useRegister } from "@beaver/react";
 import { toast } from "sonner";
+import Icon from "@/shared/components/Icon";
 // import { useAuth } from "@beaver/react";
 type Props = {
   onComplete: () => void;
@@ -29,19 +30,24 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
       return toast.error("Invalid Name")
     }
 
+    if (!onboardingData?.username) {
+      return toast.error("Set Username first")
+    }
+
     register({
       fullName: name,
       about,
       username: onboardingData?.username,
-      imageUrl: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740",
-      bannerUrl: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740"
+      image: profilePicture,
+      banner: null,
     }).then(
       () => {
         setOnboardingData(null);
         onComplete();
       }
-    ).catch(() => {
+    ).catch((error) => {
       toast.error("Error saving profile")
+      console.error("Error saving profile", error)
     })
   };
 
@@ -112,10 +118,7 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white">
-                          <path d="M16 18L14 20H10L8 18H4V6H20V18H16Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          <path d="M12 14C13.6569 14 15 12.6569 15 11C15 9.34315 13.6569 8 12 8C10.3431 8 9 9.34315 9 11C9 12.6569 10.3431 14 12 14Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
+                        <Icon name="Camera" className="text-white" />
                       </div>
                     </>
                   ) : (

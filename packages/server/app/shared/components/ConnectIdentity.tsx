@@ -14,7 +14,7 @@ import {
 } from "./ui/dialog";
 import Icon from "./Icon";
 import WelcomeSplash from "./animations/WelcomeSplash";
-import { useBeaver } from "@beaver/react";
+import { useBeaver, useLogin } from "@beaver/react";
 
 type Props = {
   open?: boolean;
@@ -24,6 +24,7 @@ type Props = {
 
 export default function ConnectIdentity({ open, onOpenChange }: Props) {
   const beaver = useBeaver();
+  const { mutate: login, isSuccess: isLoginSuccess, isError: isLoginError, isPending: isLoginPending } = useLogin();
   const [isOpen, setIsOpen] = useState(open || false);
   const [showWelcomeSplash, setShowWelcomeSplash] = useState(false);
   const [isConnectIdentitySelected, setisConnectIdentitySelected] = useState(false);
@@ -72,43 +73,6 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          {/* Social Login Section */}
-          {/* <div className="space-y-2">
-            <h3 className="text-sm font-medium text-muted-foreground">
-              Continue with
-            </h3>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={async () => {
-                setIsLoadingGoogleOAuthScreen(true);
-                beaver.login();
-              }}
-            >
-              {isLoadingGoogleOAuthScreen ? (
-                <Icon name="LoaderCircle" className="size-4 animate-spin" />
-              ) : (
-                <Image
-                  src="/icons/google_icon.png"
-                  alt="Google"
-                  className="size-6"
-                />
-              )}
-            </Button>
-          </div> */}
-
-          {/* Divider */}
-          {/* <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or
-              </span>
-            </div>
-          </div> */}
-
           {/* Wallet Connect Section */}
           <div className="space-y-2">
             <div className="space-y-2 w-full">
@@ -124,7 +88,7 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
                   <>
                     <Image
                       src={wallet.icon}
-                      alt="Google"
+                      alt={wallet.name}
                       className="size-8 p-1 object-contain rounded-sm bg-white"
                     />
                     <p>{wallet.name}</p>

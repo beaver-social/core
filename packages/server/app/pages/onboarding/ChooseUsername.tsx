@@ -15,7 +15,6 @@ export default function ChooseUsername({ onComplete, handleBack }: Props) {
   const [isValidFormat, setIsValidFormat] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const { onboardingData, setOnboardingData } = useGlobalUIStore();
-  // const { usernameExists } = useAuth();
 
   // Validate username format
   async function handleSaveUsername(e: React.FormEvent<HTMLFormElement>) {
@@ -30,7 +29,6 @@ export default function ChooseUsername({ onComplete, handleBack }: Props) {
     setIsSaving(true);
 
     try {
-      // const isAvailable = await usernameExists(username);
       setIsAvailable(isAvailable);
 
       if (!onboardingData) {

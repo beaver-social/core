@@ -72,10 +72,40 @@ export default function Onboarding() {
   };
 
   const handleSkip = () => {
-    if (step < TOTAL_STEPS) setStep(step + 1);
+    // When skipping, mark the current step as completed to ensure consistent progress bar behavior
+    if (!completedSteps.includes(step)) {
+      setCompletedSteps([...completedSteps, step]);
+    }
+
+    if (step < TOTAL_STEPS) {
+      setStep(step + 1);
+    }
   };
 
-  const progressPercentage = (Math.max(1, completedSteps.length) / TOTAL_STEPS) * 100;
+  // Calculate progress percentage based on completed steps and current step
+  const calculateProgressPercentage = () => {
+    // If we're on the last step or beyond, show 100%
+    if (step >= TOTAL_STEPS) {
+      return 100;
+    }
+
+    // Count completed steps
+    const completedCount = completedSteps.length;
+
+    // Calculate the base percentage from completed steps
+    let percentage = (completedCount / TOTAL_STEPS) * 100;
+
+    // Add partial progress for current step if it's not already completed
+    // This gives visual feedback that the user is in the middle of a step
+    if (!completedSteps.includes(step)) {
+      // Add half of one step's worth of progress (10% for 5 steps)
+      percentage += (1 / TOTAL_STEPS) * 50;
+    }
+
+    return percentage;
+  };
+
+  const progressPercentage = calculateProgressPercentage();
 
   const renderStep = () => {
     switch (step) {

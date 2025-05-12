@@ -19,6 +19,8 @@ export async function safeParseResponse<T>(
 
   const parsed = await tryCatch(response.json());
 
+  console.log("Parsed response:", parsed);
+
   if (parsed.error) {
     throw new Error("Failed to parse response: " + stringify(parsed.error));
   } else {
