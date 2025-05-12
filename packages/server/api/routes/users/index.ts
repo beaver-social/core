@@ -125,7 +125,7 @@ export default new Hono()
 
       return respond.err(
         ctx,
-        "Address is required in query [address :string]",
+        "Address is required in query [address: string]",
         400
       );
     }
