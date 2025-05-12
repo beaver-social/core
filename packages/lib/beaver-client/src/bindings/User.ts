@@ -15,6 +15,25 @@ export default class User {
     this.logger.info("User interface instantiated");
   }
 
+  async canMint(options: {
+    address?: string;
+    username?: string;
+  }): Promise<boolean> {
+    const { address, username } = options;
+    const alreadyOwnedBy =
+      username &&
+      (await this.defaults.contracts.registry.read.resolveAddress({
+        username,
+      }));
+    const alreadyHasUsername =
+      address &&
+      (await this.defaults.contracts.registry.read.resolveUsername({
+        address,
+      }));
+
+    return !alreadyOwnedBy && !alreadyHasUsername;
+  }
+
   async register(
     options: Pick<
       ApiParams<Api["users"]["$post"]>["json"],
