@@ -123,7 +123,11 @@ export default new Hono()
         return respond.ok(ctx, { nonce }, "Nonce generated", 200);
       }
 
-      return respond.err(ctx, "Address is required", 400);
+      return respond.err(
+        ctx,
+        "Address is required in query [address :string]",
+        400
+      );
     }
   )
 

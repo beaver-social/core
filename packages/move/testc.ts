@@ -12,8 +12,15 @@ const passphrase = Bun.env["PVT_KEY"]!;
 
 const keypair = Ed25519Keypair.deriveKeypair(passphrase);
 
-const contracts = new Contracts(onchainDefinitions);
+// const contracts = new Contracts(onchainDefinitions);
 
-const awards = await contracts.awards.read.getAwardsData();
+// const awards = await contracts.awards.read.getAwardsData();
 
-console.log(awards);
+// console.log(awards);
+
+console.log("Keypair: ", keypair.getPublicKey().toSuiAddress());
+console.log(
+  await keypair.signPersonalMessage(
+    new TextEncoder().encode("23f46168-e392-4590-ab1c-9c6b448575c9")
+  )
+);

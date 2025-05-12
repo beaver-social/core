@@ -2,6 +2,7 @@ import * as user from "./user";
 import * as action from "./action";
 import * as post from "./post";
 import * as interaction from "./interaction";
+import * as ping from "./ping";
 
 // Combine all schema parts
 const schema = {
@@ -9,6 +10,7 @@ const schema = {
   ...post,
   ...interaction,
   ...action,
+  ...ping,
   //   ...short,
   //   ...media,
   //   ...topic,
