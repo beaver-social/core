@@ -6,6 +6,7 @@ import type {
 } from "hono/utils/http-status";
 import type { BaseMime } from "hono/utils/mime";
 import type { JSONObject } from "hono/utils/types";
+import { stringify } from "../../../utils";
 
 export const respond = {
   ok: function <
@@ -28,7 +29,7 @@ export const respond = {
     for (const [name, value] of Object.entries(headers || {})) {
       ctx.header(name, value);
     }
-    return ctx.json({ success: false, error: message }); //, status, headers);
+    return ctx.json({ success: false, error: stringify(message) }); //, status, headers);
   },
 };
 

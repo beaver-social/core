@@ -342,7 +342,7 @@ function render() {
     }
     const response = await beaver.posts.getPostReposts({
       id: Number(postIdInput.value),
-      quotesOnly: quotesOnlyCheckbox.checked,
+      quotesOnly: true,
     });
     console.log(response);
   };
