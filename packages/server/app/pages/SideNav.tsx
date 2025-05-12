@@ -5,7 +5,7 @@ import { Image } from "@/shared/components/Image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import ConnectIdentity from "@/shared/components/ConnectIdentity";
-import { useBeaver } from "@beaver/react";
+import { useBeaver, useLogin } from "@beaver/react";
 
 type sidebarItems = {
     name: string;
@@ -58,6 +58,7 @@ export default function SideNav() {
     const [isProfilePage, setIsProfilePage] = useState(false);
     const location = useLocation();
     const beaver = useBeaver();
+    const login = useLogin()
 
     // Set active index based on current URL
     useEffect(() => {
@@ -177,7 +178,7 @@ export default function SideNav() {
                                 />
                             )}
                             <Image src={
-                                "/images/user.webp"
+                                beaver.user?.imageUrl
                             } alt="user" className={`w-[2rem] border rounded-full ${isProfilePage ? 'border-primary' : ''}`} />
                         </motion.div>
                         <span className={isProfilePage ? "text-primary font-medium" : ""}>Profile</span>

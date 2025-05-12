@@ -14,11 +14,8 @@ import SearchResults from "./pages/explore/SearchResults";
 import Demo from "./pages/demo";
 import Onboarding from "./pages/onboarding";
 import Create from "./pages/create";
-// import { useAuth } from "@beaver/react";
-
-import { useEffect } from "react";
-import Landing from "./pages/landing";
 import { useBeaver } from "@beaver/react";
+
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary =
   (Component: React.ComponentType<any>) => (props: any) =>
@@ -27,6 +24,7 @@ const withPageErrorBoundary =
       <Component {...props} />
     </PageErrorBoundary>
   );
+
 
 function OnboardingProtection({ children }: { children: React.ReactNode }) {
   const beaver = useBeaver();
