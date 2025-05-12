@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router";
+import { BrowserRouter, Route, Routes, useLocation, useNavigate } from "react-router";
 import Error404 from "./pages/_404";
 import Home from "./pages/home";
 import Post from "./pages/post";
@@ -14,7 +14,9 @@ import SearchResults from "./pages/explore/SearchResults";
 import Demo from "./pages/demo";
 import Onboarding from "./pages/onboarding";
 import Create from "./pages/create";
-import { useBeaver } from "@beaver/react";
+import { useBeaver, useLogin } from "@beaver/react";
+import { useEffect, useState } from "react";
+import WelcomeSplash from "./shared/components/animations/WelcomeSplash";
 
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary =
@@ -29,12 +31,26 @@ const withPageErrorBoundary =
 function OnboardingProtection({ children }: { children: React.ReactNode }) {
   const beaver = useBeaver();
   const navigate = useNavigate();
+  const { mutate: login, isSuccess } = useLogin();
+  const [showWelcomeSplash, setShowWelcomeSplash] = useState(false);
 
   if (beaver.wallet.isConnected && !beaver.wallet.hasIdentity) {
     navigate("/onboarding");
   }
 
-  return children;
+  useEffect(() => {
+    if (beaver.wallet.isConnected && beaver.wallet.hasIdentity && !beaver.user) {
+      login();
+    }
+  }, [beaver.wallet.isConnected, beaver.wallet.hasIdentity])
+
+  return (
+    <div className="relative">
+      {isSuccess && <WelcomeSplash />}
+
+      {children}
+    </div>
+  )
 }
 
 function LoadingAuth({ children }: { children: React.ReactNode }) {
@@ -56,10 +72,6 @@ export default function () {
     <BrowserRouter>
       <Routes>
         <Route
-          path="/onboarding"
-          element={withPageErrorBoundary(Onboarding)({})}
-        />
-        <Route
           path="/oauth/google"
           element={withPageErrorBoundary(GoogleOAuth)({})}
         />
@@ -70,6 +82,10 @@ export default function () {
               <OnboardingProtection>
                 <Routes>
                   <Route path="/" element={withPageErrorBoundary(Home)({})} />
+                  <Route
+                    path="/onboarding"
+                    element={withPageErrorBoundary(Onboarding)({})}
+                  />
                   <Route
                     path="/alerts"
                     element={withPageErrorBoundary(Notifications)({})}

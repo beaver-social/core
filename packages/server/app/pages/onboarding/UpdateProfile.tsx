@@ -36,13 +36,11 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
 
     register({
       fullName: name,
-      about,
       username: onboardingData?.username,
       image: profilePicture,
-      banner: null,
+      about,
     }).then(
       () => {
-        setOnboardingData(null);
         onComplete();
       }
     ).catch((error) => {

@@ -3,26 +3,33 @@ import { UserDetails } from "."
 import { Image } from "@/shared/components/Image"
 import { Link } from "react-router"
 import GradientButton from "@/shared/components/GradientButton"
+import { useBeaver } from "@beaver/react";
+import { User } from "@/shared/types/globalUI";
+import { truncateText } from "@/shared/lib/utils"
+import moment from "moment";
 
 export default function BasicInfo({ data: userDetails }: { data: UserDetails }) {
+    const beaver = useBeaver();
+    const user = beaver.user as User;
+
     return (
         <div className="pt-18 px-6 border-b">
             {/* Name and Verification */}
             <div className="flex flex-col justify-center">
                 <div className="flex items-center justify-center gap-2">
-                    <h1 className="text-xl font-bold">{userDetails.name}</h1>
+                    <h1 className="text-xl font-bold">{user.fullName}</h1>
                     {userDetails.verified && (
                         <Icon name="SquareCheckBig" className="text-secondary-foreground size-5" />
                     )}
                 </div>
                 <div className="flex items-center justify-center gap-2">
-                    <p className="w-full text-center text-sm text-grey-500">{userDetails.username}</p>
+                    <p className="w-full text-center text-sm text-grey-500">@{user.username}</p>
                 </div>
             </div>
 
             {/* Social Icons */}
             <div className="flex space-x-4 mt-4 justify-center">
-                <Link to={`/message/${userDetails.username}`}>
+                <Link to={`/message/${user.username}`}>
                     <GradientButton iconName="Mail" />
                 </Link>
                 {userDetails.socials?.twitter && (
@@ -44,8 +51,8 @@ export default function BasicInfo({ data: userDetails }: { data: UserDetails }) 
 
             {/* Bio */}
             <div className="flex justify-center mt-3 text-grey-600">
-                {userDetails.bio && (
-                    <p className="text-sm max-w-lg text-center">{userDetails.bio}</p>
+                {user.about && (
+                    <p className="text-sm max-w-lg text-center">{truncateText(user.about, 100)}</p>
                 )}
             </div>
 
@@ -61,7 +68,7 @@ export default function BasicInfo({ data: userDetails }: { data: UserDetails }) 
                 {userDetails.joined && (
                     <div className="flex items-center text-xs gap-1">
                         <Icon name="Calendar" className="size-4" />
-                        <span>Joined {userDetails.joined}</span>
+                        <span>Joined {moment(user.createdAt).format("MMM D, YYYY")}</span>
                     </div>
                 )}
             </div>

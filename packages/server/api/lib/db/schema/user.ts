@@ -13,9 +13,6 @@ export const users = t.sqliteTable(
     fullName: t.text().notNull(),
     suinsDomainName: t.text(),
 
-    onboardingStep: t.int().default(0),
-    onboardingCompleted: t.int({ mode: "boolean" }).default(false),
-
     imageUrl: t.text(),
     imageBlurhash: t.text(),
     bannerUrl: t.text(),

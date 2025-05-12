@@ -58,7 +58,6 @@ export default function SideNav() {
     const [isProfilePage, setIsProfilePage] = useState(false);
     const location = useLocation();
     const beaver = useBeaver();
-    const login = useLogin()
 
     // Set active index based on current URL
     useEffect(() => {

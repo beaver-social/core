@@ -17,6 +17,7 @@ export function useBeaver() {
 
 export function useLogin() {
   const { client } = useBeaverContext();
+
   return useMutation({
     mutationKey: ["login"],
     mutationFn: async () => {

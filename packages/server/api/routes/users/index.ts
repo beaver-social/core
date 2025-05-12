@@ -198,7 +198,7 @@ export default new Hono()
   .post(
     "/",
     zValidator(
-      "json",
+      "form",
       z.object({
         address: zSuiAddress(),
         username: z.string().min(3).max(20).toLowerCase(),
@@ -212,7 +212,7 @@ export default new Hono()
       })
     ),
     async (ctx) => {
-      const { signature, image, banner, ...user } = ctx.req.valid("json");
+      const { signature, image, banner, ...user } = ctx.req.valid("form");
       const { address } = user;
 
       const nonce = nonceManager.comsumeNonceBytes(address);
@@ -322,7 +322,6 @@ export default new Hono()
 
       let imageUrl: string | undefined = undefined;
       let imageBlurhash: string | undefined = undefined;
-      let bannerUrl: string | undefined = undefined;
 
       if (image) {
         const imageData = Buffer.from(await image.arrayBuffer());
@@ -335,16 +334,6 @@ export default new Hono()
           imageBlurhash = blurhash;
         }
       }
-      if (banner) {
-        const bannerData = Buffer.from(await banner.arrayBuffer());
-        const { imageBuffer } = await preprocessImage(bannerData);
-
-        const url = await tryCatch(s3.upload(imageBuffer));
-
-        if (url.data) {
-          bannerUrl = url.data;
-        }
-      }
 
       const newUserResponse = await tryCatch(
         db
@@ -354,7 +343,6 @@ export default new Hono()
             collectionNft: collection.data,
             imageUrl,
             imageBlurhash,
-            bannerUrl,
             ...user,
           })
           .returning()
