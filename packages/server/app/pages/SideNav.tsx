@@ -150,7 +150,7 @@ export default function SideNav() {
             <div className="my-4 mx-3">
                 {beaver.wallet.isConnected ? (
                     <Link
-                        to={`/profile/${user?.username || "1"}`}
+                        to={`/profile/${user?.id || "1"}`}
                         className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors mt-3 ${isProfilePage ? 'bg-primary/5' : 'hover:bg-muted'}`}
                     >
                         <motion.div

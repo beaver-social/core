@@ -179,6 +179,15 @@ export default class User {
     );
   }
 
+  async getFollowCount(options: { userId: number }) {
+    const { userId } = options;
+    return safeParseResponse(
+      this.defaults.apiClient.rpc.users[":id"]["follow-count"].$get({
+        param: { id: userId.toString() },
+      })
+    );
+  }
+
   async followUser(options: { followingId: number }) {
     const { followingId } = options;
     const { features, user, actionPointer } = this.defaults.store;

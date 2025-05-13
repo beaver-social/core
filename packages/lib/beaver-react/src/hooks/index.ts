@@ -1,9 +1,10 @@
 import { useBeaverContext } from "../context/beaver";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export function useBeaver() {
   const { client, user } = useBeaverContext();
   const wallet = useWallets();
+  const follows = useFollows();
 
   return {
     user,
@@ -12,6 +13,7 @@ export function useBeaver() {
     register: client.user.register.bind(client.user),
     login: client.user.login.bind(client.user),
     logout: client.user.logout.bind(client.user),
+    follows,
   };
 }
 
@@ -57,4 +59,34 @@ export function useUploadPost() {
       return await client.posts.upload(data);
     },
   });
+}
+
+export function useFollows() {
+  const { client } = useBeaverContext();
+
+  return {
+    followUser: useMutation({
+      mutationKey: ["followUser"],
+      mutationFn: async (
+        data: Parameters<typeof client.user.followUser>[0]
+      ) => {
+        return await client.user.followUser(data);
+      },
+    }),
+    unfollowUser: useMutation({
+      mutationKey: ["unfollowUser"],
+      mutationFn: async (
+        data: Parameters<typeof client.user.unfollowUser>[0]
+      ) => {
+        return await client.user.unfollowUser(data);
+      },
+    }),
+    getFollowCount: (userId: number) =>
+      useQuery({
+        queryKey: ["getFollowCount", userId],
+        queryFn: async () => {
+          return await client.user.getFollowCount({ userId });
+        },
+      }),
+  };
 }

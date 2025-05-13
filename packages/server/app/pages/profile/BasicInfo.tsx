@@ -8,11 +8,10 @@ import { User } from "@/shared/types/globalUI";
 import { truncateText } from "@/shared/lib/utils"
 import moment from "moment";
 
-export default function BasicInfo({ data: userDetails }: { data: UserDetails }) {
+export default function BasicInfo({ data: userDetails, id }: { data: UserDetails, id: string | undefined }) {
     const beaver = useBeaver();
-    const user = beaver.user as User;
-
-    console.log(user);
+    const user = beaver.user;
+    const { data: count } = beaver.follows.getFollowCount(Number(id));
 
     return (
         <div className="pt-18 px-6 border-b">
@@ -78,10 +77,10 @@ export default function BasicInfo({ data: userDetails }: { data: UserDetails }) 
             {/* Followers/Following Stats */}
             <div className="flex gap-5 mt-3 text-xs justify-center">
                 <Link to={`/profile/${userDetails.username}/following`} className="hover:underline">
-                    <span className="font-semibold text-grey-300">{userDetails.following}</span> <span className="text-grey-500">Following</span>
+                    <span className="font-semibold text-grey-300">{count?.following}</span> <span className="text-grey-500">Following</span>
                 </Link>
                 <Link to={`/profile/${userDetails.username}/followers`} className="hover:underline">
-                    <span className="font-semibold text-grey-300">{userDetails.followers}</span> <span className="text-grey-500">Followers</span>
+                    <span className="font-semibold text-grey-300">{count?.followers}</span> <span className="text-grey-500">Followers</span>
                 </Link>
             </div>
 

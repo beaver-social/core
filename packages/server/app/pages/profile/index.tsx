@@ -71,13 +71,13 @@ export default function Profile() {
         setScreen("profile");
     }, []);
 
-    const isCurrentUser = id === user?.username;
+    const isCurrentUser = id === user?.id.toString();
 
     return (
         <Layout main={
             <div className="border mb-10  rounded-t-2xl">
                 <ProfileHeader data={userDetails} isCurrentUser={isCurrentUser} />
-                <BasicInfo data={userDetails} />
+                <BasicInfo data={userDetails} id={id} />
                 <Tabs />
             </div>
         } secondary={<SecondaryPanel />} />

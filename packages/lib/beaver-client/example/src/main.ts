@@ -162,6 +162,16 @@ function render() {
   };
   userSection.appendChild(unfollowButton);
 
+  const getFollowCount = document.createElement("button");
+  getFollowCount.innerText = "Get Follow Count";
+  getFollowCount.onclick = async () => {
+    const response = await beaver.user.getFollowCount({
+      userId: Number(2),
+    });
+    console.log(response);
+  };
+  userSection.appendChild(getFollowCount);
+
   gap();
 
   const userIdInput = document.createElement("input");
