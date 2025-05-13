@@ -30,4 +30,9 @@ export type User = {
   bannerUrl: string | null;
   website: string | null;
   timezone: number | null;
+  location: string | null;
+  birthday: string | null;
+  twitter: string | null;
+  youtube: string | null;
+  instagram: string | null;
 };

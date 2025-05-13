@@ -111,7 +111,7 @@ export default function WelcomeSplash() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3, duration: 0.5 }}
                 >
-                    Welcome Back {beaver.user?.name}!
+                    Welcome Back <span className="text-[#4ca5f9]">{beaver.user?.fullName}!</span>
                 </motion.h2>
 
                 <motion.p

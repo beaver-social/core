@@ -44,8 +44,13 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
         onComplete();
       }
     ).catch((error) => {
+
+      if (error.message.includes("Error: User already exists")) {
+        onComplete();
+      }
+
+      console.log(error);
       toast.error("Error saving profile")
-      console.error("Error saving profile", error)
     })
   };
 

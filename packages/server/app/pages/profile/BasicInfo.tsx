@@ -12,38 +12,40 @@ export default function BasicInfo({ data: userDetails }: { data: UserDetails }) 
     const beaver = useBeaver();
     const user = beaver.user as User;
 
+    console.log(user);
+
     return (
         <div className="pt-18 px-6 border-b">
             {/* Name and Verification */}
             <div className="flex flex-col justify-center">
                 <div className="flex items-center justify-center gap-2">
-                    <h1 className="text-xl font-bold">{user.fullName}</h1>
+                    <h1 className="text-xl font-bold">{user?.fullName}</h1>
                     {userDetails.verified && (
                         <Icon name="SquareCheckBig" className="text-secondary-foreground size-5" />
                     )}
                 </div>
                 <div className="flex items-center justify-center gap-2">
-                    <p className="w-full text-center text-sm text-grey-500">@{user.username}</p>
+                    <p className="w-full text-center text-sm text-grey-500">@{user?.username}</p>
                 </div>
             </div>
 
             {/* Social Icons */}
             <div className="flex space-x-4 mt-4 justify-center">
-                <Link to={`/message/${user.username}`}>
+                <Link to={`/message/${user?.username}`}>
                     <GradientButton iconName="Mail" />
                 </Link>
-                {userDetails.socials?.twitter && (
-                    <Link to={`https://twitter.com/${userDetails.socials.twitter}`} target="_blank">
+                {user?.twitter && (
+                    <Link to={`https://twitter.com/${user?.twitter}`} target="_blank">
                         <GradientButton iconName="Twitter" />
                     </Link>
                 )}
-                {userDetails.socials?.youtube && (
-                    <Link to={`https://youtube.com/@${userDetails.socials.youtube}`} target="_blank">
+                {user?.youtube && (
+                    <Link to={`https://youtube.com/@${user?.youtube}`} target="_blank">
                         <GradientButton iconName="Youtube" />
                     </Link>
                 )}
-                {userDetails.socials?.instagram && (
-                    <Link to={`https://instagram.com/${userDetails.socials.instagram}`} target="_blank">
+                {user?.instagram && (
+                    <Link to={`https://instagram.com/${user?.instagram}`} target="_blank">
                         <GradientButton iconName="Instagram" />
                     </Link>
                 )}
@@ -51,8 +53,8 @@ export default function BasicInfo({ data: userDetails }: { data: UserDetails }) 
 
             {/* Bio */}
             <div className="flex justify-center mt-3 text-grey-600">
-                {user.about && (
-                    <p className="text-sm max-w-lg text-center">{truncateText(user.about, 100)}</p>
+                {user?.about && (
+                    <p className="text-sm max-w-lg text-center">{truncateText(user?.about, 100)}</p>
                 )}
             </div>
 
@@ -68,7 +70,7 @@ export default function BasicInfo({ data: userDetails }: { data: UserDetails }) 
                 {userDetails.joined && (
                     <div className="flex items-center text-xs gap-1">
                         <Icon name="Calendar" className="size-4" />
-                        <span>Joined {moment(user.createdAt).format("MMM D, YYYY")}</span>
+                        <span>Joined {moment(user?.createdAt).format("MMM D, YYYY")}</span>
                     </div>
                 )}
             </div>

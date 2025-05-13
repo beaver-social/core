@@ -32,7 +32,6 @@ function OnboardingProtection({ children }: { children: React.ReactNode }) {
   const beaver = useBeaver();
   const navigate = useNavigate();
   const { mutate: login, isSuccess } = useLogin();
-  const [showWelcomeSplash, setShowWelcomeSplash] = useState(false);
 
   if (beaver.wallet.isConnected && !beaver.wallet.hasIdentity) {
     navigate("/onboarding");
@@ -42,12 +41,11 @@ function OnboardingProtection({ children }: { children: React.ReactNode }) {
     if (beaver.wallet.isConnected && beaver.wallet.hasIdentity && !beaver.user) {
       login();
     }
-  }, [beaver.wallet.isConnected, beaver.wallet.hasIdentity])
+  }, [beaver.wallet.isConnected, beaver.wallet.hasIdentity, beaver.user])
 
   return (
     <div className="relative">
       {isSuccess && <WelcomeSplash />}
-
       {children}
     </div>
   )
@@ -71,10 +69,6 @@ export default function () {
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/oauth/google"
-          element={withPageErrorBoundary(GoogleOAuth)({})}
-        />
         <Route
           path="/*"
           element={

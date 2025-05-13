@@ -44,7 +44,7 @@ export default function ProfileHeader({ data, isCurrentUser = false }: Props) {
 
 
                 <Image
-                    src={user.bannerUrl || data.coverPhoto}
+                    src={user?.bannerUrl || data.coverPhoto}
                     alt="Cover"
                     className="w-full h-48 object-cover sm:rounded-t-xl"
                 />
@@ -52,7 +52,7 @@ export default function ProfileHeader({ data, isCurrentUser = false }: Props) {
                 <div className="absolute top-24 left-0 w-full h-full flex items-center justify-center">
                     <div className="relative">
                         <Image
-                            src={user.imageUrl || data.profilePicture}
+                            src={user?.imageUrl || data.profilePicture}
                             alt="Profile"
                             className="size-32 rounded-full border-4 border-background bg-grey-900"
                         />
