@@ -18,6 +18,7 @@ export const users = t.sqliteTable(
     youtube: t.text(),
     instagram: t.text(),
     website: t.text(),
+    pinnedPost: t.int(),
 
     imageUrl: t.text(),
     bannerUrl: t.text(),

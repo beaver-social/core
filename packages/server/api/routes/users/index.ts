@@ -26,11 +26,11 @@ import { sign } from "hono/jwt";
 import { JWTalgorithm, JWTexpiration, JWTPrivateKey } from "../../constants";
 import { stringify } from "../../../utils";
 import { getPreviousActionHash } from "../../lib/actions/helpers";
-import { followUser, unfollowUser } from "./actions";
+import { followUser, pinPost, unfollowUser, unpinPost } from "./actions";
 import { preprocessImage } from "./helpers";
 import s3 from "../../lib/s3/client";
 
-const { users, follows } = db.schema;
+const { users, follows, posts } = db.schema;
 
 export default new Hono()
 
@@ -393,6 +393,132 @@ export default new Hono()
       const [newUser] = updatedUserResponse.data;
 
       return respond.ok(ctx, newUser, "User created successfully", 201);
+    }
+  )
+
+  .get(
+    "/:id/pin",
+    zValidator(
+      "param",
+      z.object({
+        id: zNumberString(),
+      })
+    ),
+    async (ctx) => {
+      const { id: userId } = ctx.req.valid("param");
+
+      const userResponse = await tryCatch(
+        db
+          .select({ pinnedPost: users.pinnedPost })
+          .from(users)
+          .where(eq(users.id, userId))
+          .limit(1)
+      );
+
+      if (userResponse.error) {
+        return respond.err(
+          ctx,
+          "Failed to find user:" + userResponse.error.message,
+          500
+        );
+      }
+
+      const [pinnedPost] = userResponse.data;
+
+      if (!pinnedPost) {
+        return respond.ok(ctx, {}, "No pinned post", 200);
+      }
+
+      return respond.ok(
+        ctx,
+        pinnedPost,
+        "Pinned post fetched successfully",
+        200
+      );
+    }
+  )
+
+  .post(
+    "/:id/pin",
+    authenticated,
+    zValidator(
+      "json",
+      z.object({
+        signature: zSuiSignature(),
+      })
+    ),
+    zValidator(
+      "param",
+      z.object({
+        id: zNumberString(),
+      })
+    ),
+    async (ctx) => {
+      const { signature } = ctx.req.valid("json");
+      const { id } = ctx.req.valid("param");
+      const user = ctx.var.user;
+
+      const { error: pinError } = await tryCatch(
+        pinPost(
+          {
+            userId: user.id,
+            postId: id,
+          },
+          signature
+        )
+      );
+
+      if (pinError) {
+        return respond.err(
+          ctx,
+          "Failed to follow user : " + pinError.message,
+          400
+        );
+      }
+
+      return respond.ok(ctx, {}, "Post pinned successfully", 200);
+    }
+  )
+
+  .delete(
+    "/:id/pin",
+    authenticated,
+    zValidator(
+      "json",
+      z.object({
+        signature: zSuiSignature(),
+      })
+    ),
+    zValidator(
+      "param",
+      z.object({
+        id: zNumberString(),
+      })
+    ),
+    async (ctx) => {
+      const { signature } = ctx.req.valid("json");
+      const { id } = ctx.req.valid("param");
+      const user = ctx.var.user;
+
+      const { error: unpinError } = await tryCatch(
+        unpinPost(
+          {
+            userId: user.id,
+            postId: id,
+          },
+          signature
+        )
+      );
+
+      if (unpinError) {
+        return respond.err(
+          ctx,
+          "Failed to follow user : " + unpinError.message,
+          400
+        );
+      }
+
+      return respond.ok(ctx, {}, "Post unpinned successfully", 200);
     }
   )
 

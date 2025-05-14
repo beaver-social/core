@@ -25,6 +25,4 @@ export default class Awards {
 
     return awardTypes;
   }
-
-  async giveAwardToPost(options: { postId: number }) {}
 }

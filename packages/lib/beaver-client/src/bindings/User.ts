@@ -231,4 +231,66 @@ export default class User {
     this.defaults.store.syncUserAndActionPointer();
     return unfollowUser;
   }
+
+  async getPinned(options: { userId: number }) {
+    const { userId } = options;
+    const pinnedPost = safeParseResponse(
+      this.defaults.apiClient.rpc.users[":id"].pin.$get({
+        param: { id: userId.toString() },
+      })
+    );
+    return pinnedPost;
+  }
+
+  async pinPost(options: { postId: number }) {
+    const { postId } = options;
+
+    const { features, user, actionPointer } = this.defaults.store;
+    if (!features || !user || !this.defaults.store.isAuthenticated()) {
+      throw new Error("User not authenticated or wallet not connected");
+    }
+
+    const { signature } = await features.signPersonalMessage(
+      stringify({
+        postId: postId,
+        userId: user.id,
+        type: "v1.user.pin.post",
+        previous: actionPointer,
+      })
+    );
+
+    const pinPost = safeParseResponse(
+      this.defaults.apiClient.rpc.users[":id"].pin.$post({
+        json: { signature },
+        param: { id: user.id.toString() },
+      })
+    );
+    return pinPost;
+  }
+
+  async unpinPost(options: { postId: number }) {
+    const { postId } = options;
+
+    const { features, user, actionPointer } = this.defaults.store;
+    if (!features || !user || !this.defaults.store.isAuthenticated()) {
+      throw new Error("User not authenticated or wallet not connected");
+    }
+
+    const { signature } = await features.signPersonalMessage(
+      stringify({
+        postId: postId,
+        userId: user.id,
+        type: "v1.user.pin.post",
+        previous: actionPointer,
+      })
+    );
+
+    const unpinPost = safeParseResponse(
+      this.defaults.apiClient.rpc.users[":id"].pin.$delete({
+        json: { signature },
+        param: { id: user.id.toString() },
+      })
+    );
+    return unpinPost;
+  }
 }
