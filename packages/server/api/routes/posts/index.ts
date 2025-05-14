@@ -87,17 +87,17 @@ const app = new Hono()
         })
       )
     ),
-    zValidator(
-      "form",
-      z.object({
-        media: z.array(zPostMedia()).optional(),
-      })
-    ),
+    zValidator("form", z.any()),
     async (ctx) => {
       const user = ctx.get("user");
       const { signature, ...postData } = ctx.req.valid("json");
-      const { media } = ctx.req.valid("form");
-      ctx.log(media);
+      const { media, type, previewUrl, aspectRatio } = ctx.req.valid("form");
+      ctx.log({
+        media,
+        type,
+        previewUrl,
+        aspectRatio,
+      });
 
       if (!(postData.content.length > 0) && !postData.reposting) {
         return respond.err(ctx, "Content is required", 400);

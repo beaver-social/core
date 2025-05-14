@@ -41,15 +41,21 @@ export default class Posts {
       })
     );
 
+    const formData = new FormData();
+    for (const item of media) {
+      formData.append("media", item.file);
+      formData.append("type", item.type);
+      formData.append("previewUrl", item.previewUrl);
+      formData.append("aspectRatio", item.aspectRatio);
+    }
+
     const { post } = await safeParseResponse(
       this.defaults.apiClient.rpc.posts.$post({
         json: {
           ...data,
           signature,
         },
-        form: {
-          media,
-        },
+        form: formData,
       })
     );
 
