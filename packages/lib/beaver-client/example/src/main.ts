@@ -188,6 +188,55 @@ function render() {
   };
   userSection.appendChild(getUserById);
 
+  gap();
+
+  // Pin operations
+  const getPinnedButton = document.createElement("button");
+  getPinnedButton.innerText = "Get Pinned Post";
+  getPinnedButton.onclick = async () => {
+    if (!userIdInput.value) {
+      alert("Please enter a user ID");
+      return;
+    }
+    const response = await beaver.user.getPinned({
+      userId: Number(userIdInput.value),
+    });
+    console.log(response);
+  };
+  userSection.appendChild(getPinnedButton);
+
+  const pinPostInput = document.createElement("input");
+  pinPostInput.placeholder = "Post ID to pin";
+  userSection.appendChild(pinPostInput);
+
+  const pinButton = document.createElement("button");
+  pinButton.innerText = "Pin Post";
+  pinButton.onclick = async () => {
+    if (!pinPostInput.value) {
+      alert("Please enter a post ID to pin");
+      return;
+    }
+    const response = await beaver.user.pinPost({
+      postId: Number(pinPostInput.value),
+    });
+    console.log(response);
+  };
+  userSection.appendChild(pinButton);
+
+  const unpinButton = document.createElement("button");
+  unpinButton.innerText = "Unpin Post";
+  unpinButton.onclick = async () => {
+    if (!pinPostInput.value) {
+      alert("Please enter a post ID to unpin");
+      return;
+    }
+    const response = await beaver.user.unpinPost({
+      postId: Number(pinPostInput.value),
+    });
+    console.log(response);
+  };
+  userSection.appendChild(unpinButton);
+
   const postsSection = createSection("Post Operations");
 
   const postInput = document.createElement("input");
