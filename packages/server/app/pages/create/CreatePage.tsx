@@ -69,8 +69,31 @@ export default function CreatePage() {
     const [createdPostId, setCreatedPostId] = useState<string | undefined>(undefined);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const videoInputRef = useRef<HTMLInputElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
     const beaver = useBeaver();
-    const { mutateAsync: createPost, isPending: isCreatingPost, isSuccess: isPostCreated, isError: isPostCreationError } = beaver.post.createPost;
+    const { mutateAsync: createPost } = beaver.post.createPost;
+
+    // Mention suggestion state
+    const [showMentions, setShowMentions] = useState(false);
+    const [mentionQuery, setMentionQuery] = useState("");
+    const [debouncedMentionQuery, setDebouncedMentionQuery] = useState("");
+    const [mentionPosition, setMentionPosition] = useState({ top: 0, left: 0 });
+    const [cursorPosition, setCursorPosition] = useState(0);
+
+    // Debounce the mention query to reduce API calls
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedMentionQuery(mentionQuery);
+        }, 200); // 200ms debounce delay
+
+        return () => clearTimeout(timer);
+    }, [mentionQuery]);
+
+    // Fetch user suggestions when debounced query changes
+    const { data: userSuggestions, isLoading: isLoadingUsers } = beaver.profile.searchSuggestions({
+        search: debouncedMentionQuery,
+        limit: 5
+    });
 
     // Reset state when tab changes
     useEffect(() => {
@@ -168,6 +191,143 @@ export default function CreatePage() {
             });
     }, []);
 
+    // Handle text changes and detect @ mentions
+    const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const newContent = e.target.value;
+        setContent(newContent);
+
+        // Track cursor position
+        const cursorPos = e.target.selectionStart;
+        setCursorPosition(cursorPos);
+
+        // Check if we're typing a mention
+        let mentionStart = -1;
+        for (let i = cursorPos - 1; i >= 0; i--) {
+            if (newContent[i] === '@') {
+                mentionStart = i;
+                break;
+            } else if (newContent[i] === ' ' || newContent[i] === '\n') {
+                break;
+            }
+        }
+
+        if (mentionStart !== -1) {
+            // We're in a mention
+            const query = newContent.substring(mentionStart + 1, cursorPos).toLowerCase();
+            setMentionQuery(query);
+
+            // Position the mention dropdown
+            if (textareaRef.current) {
+                // Get cursor position for positioning dropdown
+                const cursorCoords = getCursorXY(textareaRef.current, cursorPos);
+
+                // Position dropdown below cursor
+                setMentionPosition({
+                    top: cursorCoords.top + 20, // Add some offset for better positioning
+                    left: cursorCoords.left
+                });
+            }
+
+            // Show mentions dropdown if query is not empty
+            setShowMentions(true);
+        } else {
+            setShowMentions(false);
+            setMentionQuery("");
+        }
+    }, []);
+
+    // Helper function to get cursor position in textarea
+    const getCursorXY = (input: HTMLTextAreaElement, selectionPoint: number) => {
+        const { offsetLeft: inputX, offsetTop: inputY } = input;
+
+        // Create a copy of the textarea styles to measure text
+        const div = document.createElement('div');
+        const styles = getComputedStyle(input);
+
+        // Copy styles to make the measurement div look like the textarea
+        const props = [
+            'fontFamily', 'fontSize', 'fontWeight', 'letterSpacing',
+            'lineHeight', 'textTransform', 'wordSpacing', 'textIndent',
+            'paddingLeft', 'paddingRight', 'paddingTop', 'paddingBottom',
+            'borderLeftWidth', 'borderRightWidth', 'borderTopWidth', 'borderBottomWidth'
+        ];
+
+        props.forEach(prop => {
+            div.style[prop as any] = styles[prop as any];
+        });
+
+        // Set essential styles for text measurement
+        div.style.position = 'absolute';
+        div.style.top = '0';
+        div.style.left = '0';
+        div.style.visibility = 'hidden';
+        div.style.whiteSpace = 'pre-wrap';
+        div.style.overflow = 'hidden';
+        div.style.width = input.offsetWidth + 'px';
+        div.style.height = 'auto';
+
+        // Get the text content up to the cursor
+        const textBeforeCaret = input.value.substring(0, selectionPoint);
+        div.textContent = textBeforeCaret;
+
+        // Add a span at the end to get cursor position
+        const span = document.createElement('span');
+        span.textContent = '.';
+        div.appendChild(span);
+
+        document.body.appendChild(div);
+
+        // Measure position
+        const { offsetLeft: spanX, offsetTop: spanY } = span;
+
+        // Consider textarea scroll position
+        const x = inputX + spanX - input.scrollLeft;
+        const y = inputY + spanY - input.scrollTop;
+
+        // Clean up
+        document.body.removeChild(div);
+
+        return { left: x, top: y };
+    };
+
+    // Handle selecting a user from mentions
+    const handleSelectMention = useCallback((user: any) => {
+        // Find the start and end of the current mention
+        let mentionStart = -1;
+        for (let i = cursorPosition - 1; i >= 0; i--) {
+            if (content[i] === '@') {
+                mentionStart = i;
+                break;
+            } else if (content[i] === ' ' || content[i] === '\n') {
+                break;
+            }
+        }
+
+        if (mentionStart !== -1) {
+            // Replace the partial mention with the selected username
+            const newContent =
+                content.substring(0, mentionStart) +
+                '@' + user?.username + ' ' +
+                content.substring(cursorPosition);
+
+            setContent(newContent);
+
+            // Calculate new cursor position after the inserted mention
+            const newPosition = mentionStart + user?.username.length + 2; // +2 for @ and space
+
+            // Set focus back to textarea with new cursor position
+            setTimeout(() => {
+                if (textareaRef.current) {
+                    textareaRef.current.focus();
+                    textareaRef.current.setSelectionRange(newPosition, newPosition);
+                }
+            }, 0);
+        }
+
+        setShowMentions(false);
+        setMentionQuery("");
+    }, [content, cursorPosition]);
+
     // Handle form submission
     const handleSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
@@ -255,14 +415,56 @@ export default function CreatePage() {
                                         <Textarea
                                             placeholder="What's on your mind?"
                                             value={content}
-                                            onChange={(e) => setContent(e.target.value)}
+                                            onChange={handleContentChange}
                                             className="w-full p-4 resize-none min-h-[120px] text-base focus:ring-primary"
                                             disabled={isSubmitting}
+                                            ref={textareaRef}
                                         />
 
                                         <div className="absolute bottom-3 right-3 text-xs text-muted-foreground">
                                             {content.length} / 280
                                         </div>
+
+                                        {/* Mention suggestions dropdown */}
+                                        {showMentions && (
+                                            <div
+                                                className="absolute z-10 bg-background border rounded-md shadow-lg w-64 max-h-60 overflow-y-auto"
+                                                style={{
+                                                    top: `${mentionPosition.top}px`,
+                                                    left: `${mentionPosition.left}px`
+                                                }}
+                                            >
+                                                {isLoadingUsers && (
+                                                    <div className="flex items-center justify-center p-4">
+                                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                                                    </div>
+                                                )}
+
+                                                {!isLoadingUsers && userSuggestions?.users.length === 0 && (
+                                                    <div className="p-3 text-center text-muted-foreground">
+                                                        No users found
+                                                    </div>
+                                                )}
+
+                                                {!isLoadingUsers && userSuggestions?.users.map(user => (
+                                                    <div
+                                                        key={user.id}
+                                                        className="flex items-center gap-2 p-2 hover:bg-accent cursor-pointer"
+                                                        onClick={() => handleSelectMention(user)}
+                                                    >
+                                                        <Image
+                                                            src={user?.imageUrl || "/images/user.webp"}
+                                                            alt={user?.fullName || user?.username}
+                                                            className="w-8 h-8 rounded-full"
+                                                        />
+                                                        <div>
+                                                            <div className="font-medium">{user?.fullName || user?.username}</div>
+                                                            <div className="text-xs text-muted-foreground">@{user?.username}</div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Media Preview Section */}
@@ -468,13 +670,55 @@ export default function CreatePage() {
                                                     id="caption"
                                                     placeholder="Add a caption to your swipe"
                                                     value={content}
-                                                    onChange={(e) => setContent(e.target.value)}
+                                                    onChange={handleContentChange}
                                                     className="w-full resize-none min-h-[100px]"
                                                     disabled={isSubmitting}
+                                                    ref={textareaRef}
                                                 />
                                                 <div className="absolute bottom-3 right-3 text-xs text-muted-foreground">
                                                     {content.length} / 150
                                                 </div>
+
+                                                {/* Mention suggestions dropdown for swipe tab */}
+                                                {showMentions && (
+                                                    <div
+                                                        className="absolute z-10 bg-background border rounded-md shadow-lg w-64 max-h-60 overflow-y-auto"
+                                                        style={{
+                                                            top: `${mentionPosition.top}px`,
+                                                            left: `${mentionPosition.left}px`
+                                                        }}
+                                                    >
+                                                        {isLoadingUsers && (
+                                                            <div className="flex items-center justify-center p-4">
+                                                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                                                            </div>
+                                                        )}
+
+                                                        {!isLoadingUsers && userSuggestions?.users.length === 0 && (
+                                                            <div className="p-3 text-center text-muted-foreground">
+                                                                No users found
+                                                            </div>
+                                                        )}
+
+                                                        {!isLoadingUsers && userSuggestions?.users.map(user => (
+                                                            <div
+                                                                key={user.id}
+                                                                className="flex items-center gap-2 p-2 hover:bg-accent cursor-pointer"
+                                                                onClick={() => handleSelectMention(user)}
+                                                            >
+                                                                <Image
+                                                                    src={user?.imageUrl || "/images/user.webp"}
+                                                                    alt={user?.fullName || user?.username}
+                                                                    className="w-8 h-8 rounded-full"
+                                                                />
+                                                                <div>
+                                                                    <div className="font-medium">{user?.fullName || user?.username}</div>
+                                                                    <div className="text-xs text-muted-foreground">@{user?.username}</div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
 
                                             <div className="flex gap-2">

@@ -141,10 +141,9 @@ export function usePost() {
 }
 
 export function useProfile() {
-  const { client, user } = useBeaverContext();
+  const { client } = useBeaverContext();
 
   return {
-    currentUser: user,
     getProfileById: (options: Parameters<typeof client.user.getUserById>[0]) =>
       useQuery({
         queryKey: ["getProfileById", options],
@@ -152,13 +151,21 @@ export function useProfile() {
           return await client.user.getUserById(options);
         },
       }),
-    canMint: useMutation({
-      mutationKey: ["canMint"],
-      mutationFn: async (
-        options: Parameters<typeof client.user.canMint>[0]
-      ) => {
-        return await client.user.canMint(options);
-      },
-    }),
+    findProfile: (options: Parameters<typeof client.user.findProfile>[0]) =>
+      useQuery({
+        queryKey: ["findProfile", options],
+        queryFn: async () => {
+          return await client.user.findProfile(options);
+        },
+      }),
+    searchSuggestions: (
+      options: Parameters<typeof client.user.searchSuggestions>[0]
+    ) =>
+      useQuery({
+        queryKey: ["searchSuggestions", options],
+        queryFn: async () => {
+          return await client.user.searchSuggestions(options);
+        },
+      }),
   };
 }

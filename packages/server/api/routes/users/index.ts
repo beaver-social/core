@@ -5,7 +5,7 @@ import authenticated, { getUserFromCtx } from "../../middlewares/authenticated";
 import { respond } from "../../lib/utils/respond";
 import { tryCatch, tryCatchSync } from "../../lib/tryCatch";
 import db from "../../lib/db";
-import { count, eq, or } from "drizzle-orm";
+import { count, eq, like, or } from "drizzle-orm";
 import { contracts } from "../../lib/sui/contracts";
 import { Transaction } from "@mysten/sui/transactions";
 import { defaultAdminCapId } from "contracts/definitions";
@@ -86,6 +86,45 @@ export default new Hono()
       }
 
       return respond.ok(ctx, user, "User details", 200);
+    }
+  )
+
+  .get(
+    "/search-suggestions",
+    zValidator(
+      "query",
+      z.object({
+        search: z.string(),
+        limit: zNumberString(),
+      })
+    ),
+    async (ctx) => {
+      const { search, limit } = ctx.req.valid("query");
+
+      const userResponse = await tryCatch(
+        db
+          .select({
+            id: users.id,
+            username: users.username,
+            imageUrl: users.imageUrl,
+            fullName: users.fullName,
+          })
+          .from(users)
+          .where(like(users.username, `%${search}%`))
+          .limit(limit)
+      );
+
+      if (userResponse.error) {
+        ctx.log(userResponse.error);
+        return respond.err(ctx, "Failed to find user", 500);
+      }
+
+      return respond.ok(
+        ctx,
+        { users: userResponse.data },
+        "User search suggestions",
+        200
+      );
     }
   )
 

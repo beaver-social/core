@@ -144,11 +144,26 @@ export default class User {
     );
   }
 
-  async getProfile() {
-    if (!this.defaults.store.isAuthenticated()) {
-      throw new Error("User not authenticated");
-    }
-    return safeParseResponse(this.defaults.apiClient.rpc.users.$get());
+  async findProfile(options: {
+    type: "identity" | "username" | "suinsDomainName" | "address";
+    value: string;
+  }) {
+    const { type, value } = options;
+    return safeParseResponse(
+      this.defaults.apiClient.rpc.users.find.$get({
+        query: { type, value },
+      })
+    );
+  }
+
+  async searchSuggestions(options: { search: string; limit: number }) {
+    const { search, limit } = options;
+
+    return safeParseResponse(
+      this.defaults.apiClient.rpc.users["search-suggestions"].$get({
+        query: { search, limit: limit.toString() },
+      })
+    );
   }
 
   async getFollowers(options: {
