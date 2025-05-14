@@ -82,24 +82,15 @@ const app = new Hono()
       "json",
       zCreatePostAction().merge(
         z.object({
+          media: z.array(z.instanceof(File)).optional(),
           signature: zSuiSignature(),
         })
       )
     ),
-    zValidator(
-      "form",
-      z.object({
-        media: z.array(z.instanceof(File)).optional(),
-      })
-    ),
     async (ctx) => {
-      const { signature, ...postData } = ctx.req.valid("json");
-      const { media } = ctx.req.valid("form");
       const user = ctx.get("user");
-
-      console.log({
-        media,
-      });
+      const { media, signature, ...postData } = ctx.req.valid("json");
+      ctx.log(media);
 
       if (!(postData.content.length > 0) && !postData.reposting) {
         return respond.err(ctx, "Content is required", 400);

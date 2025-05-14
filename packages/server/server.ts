@@ -60,7 +60,7 @@ app.get("*", (ctx) => ctx.html(html));
 
 export default {
   ...app,
-  maxRequestBodySize: 4 * 1024 * 1024, // 4 MB
+  maxRequestBodySize: 10 * 1024 * 1024, // 10 MB
 };
 
 declare module "hono" {

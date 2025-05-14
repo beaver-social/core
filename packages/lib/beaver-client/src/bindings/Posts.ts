@@ -40,10 +40,8 @@ export default class Posts {
       this.defaults.apiClient.rpc.posts.$post({
         json: {
           ...data,
-          signature,
-        },
-        form: {
           media,
+          signature,
         },
       })
     );
