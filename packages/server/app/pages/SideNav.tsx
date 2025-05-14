@@ -54,22 +54,12 @@ export const sidebarItems: sidebarItems[] = [
 ];
 
 export default function SideNav() {
-<<<<<<< HEAD
   const [hoveredItem, setHoveredItem] = useState<number | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(0);
   const [isProfilePage, setIsProfilePage] = useState(false);
   const location = useLocation();
   const beaver = useBeaver();
-  beaver.user;
-  const login = useLogin();
-=======
-    const [hoveredItem, setHoveredItem] = useState<number | null>(null);
-    const [activeIndex, setActiveIndex] = useState<number | null>(0);
-    const [isProfilePage, setIsProfilePage] = useState(false);
-    const location = useLocation();
-    const beaver = useBeaver();
-    const user = beaver.user as User;
->>>>>>> 79f47398045660778bad576a0831a0a75306d32d
+  const user = beaver.user as User;
 
   // Set active index based on current URL
   useEffect(() => {
@@ -112,9 +102,8 @@ export default function SideNav() {
             >
               {item.to ? (
                 <Link
-                  className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${
-                    activeIndex === index ? "bg-primary/5" : "hover:bg-muted"
-                  }`}
+                  className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${activeIndex === index ? "bg-primary/5" : "hover:bg-muted"
+                    }`}
                   to={item.to}
                 >
                   <Icon
@@ -147,9 +136,8 @@ export default function SideNav() {
                 </Link>
               ) : (
                 <button
-                  className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${
-                    activeIndex === index ? "bg-primary/5" : "hover:bg-muted"
-                  }`}
+                  className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${activeIndex === index ? "bg-primary/5" : "hover:bg-muted"
+                    }`}
                   onClick={item.onClick}
                 >
                   <Icon
@@ -186,35 +174,33 @@ export default function SideNav() {
         </ul>
       </div>
 
-<<<<<<< HEAD
       <div className="my-4 mx-3">
         {beaver.wallet.isConnected ? (
           <Link
             to="/profile/ishtails"
-            className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors mt-3 ${
-              isProfilePage ? "bg-primary/5" : "hover:bg-muted"
-            }`}
+            className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors mt-3 ${isProfilePage ? "bg-primary/5" : "hover:bg-muted"
+              }`}
           >
             <motion.div
               className="relative rounded-full"
               animate={
                 isProfilePage
                   ? {
-                      boxShadow: [
-                        "0 0 0px rgba(76, 165, 249, 0)",
-                        "0 0 12px rgba(76, 165, 249, 0.7)",
-                        "0 0 0px rgba(76, 165, 249, 0)",
-                      ],
-                    }
+                    boxShadow: [
+                      "0 0 0px rgba(76, 165, 249, 0)",
+                      "0 0 12px rgba(76, 165, 249, 0.7)",
+                      "0 0 0px rgba(76, 165, 249, 0)",
+                    ],
+                  }
                   : {}
               }
               transition={
                 isProfilePage
                   ? {
-                      duration: 4,
-                      repeat: Infinity,
-                      repeatType: "mirror",
-                    }
+                    duration: 4,
+                    repeat: Infinity,
+                    repeatType: "mirror",
+                  }
                   : {}
               }
             >
@@ -237,11 +223,10 @@ export default function SideNav() {
                 />
               )}
               <Image
-                src={beaver.user?.imageUrl}
+                src={beaver.user?.imageUrl || "/images/user.webp"}
                 alt="user"
-                className={`w-[2rem] border rounded-full ${
-                  isProfilePage ? "border-primary" : ""
-                }`}
+                className={`w-[2rem] border rounded-full ${isProfilePage ? "border-primary" : ""
+                  }`}
               />
             </motion.div>
             <span className={isProfilePage ? "text-primary font-medium" : ""}>
@@ -265,63 +250,3 @@ export default function SideNav() {
     </div>
   );
 }
-=======
-
-                </ul>
-            </div>
-
-            <div className="my-4 mx-3">
-                {beaver.wallet.isConnected ? (
-                    <Link
-                        to={`/profile/${user?.id || "1"}`}
-                        className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors mt-3 ${isProfilePage ? 'bg-primary/5' : 'hover:bg-muted'}`}
-                    >
-                        <motion.div
-                            className="relative rounded-full"
-                            animate={isProfilePage ? {
-                                boxShadow: ["0 0 0px rgba(76, 165, 249, 0)", "0 0 12px rgba(76, 165, 249, 0.7)", "0 0 0px rgba(76, 165, 249, 0)"],
-                            } : {}}
-                            transition={isProfilePage ? {
-                                duration: 4,
-                                repeat: Infinity,
-                                repeatType: "mirror"
-                            } : {}}
-                        >
-                            {isProfilePage && (
-                                <motion.div
-                                    className="absolute inset-0 rounded-full border-2 border-primary"
-                                    animate={{
-                                        borderColor: ["rgba(76, 165, 249, 0.4)", "rgba(76, 165, 249, 1)", "rgba(76, 165, 249, 0.4)"],
-                                        rotate: [0, 360],
-                                    }}
-                                    transition={{
-                                        duration: 3,
-                                        repeat: Infinity,
-                                        ease: "linear"
-                                    }}
-                                />
-                            )}
-                            <Image src={
-                                beaver.user?.imageUrl
-                            } alt="user" className={`w-[2rem] border rounded-full ${isProfilePage ? 'border-primary' : ''}`} />
-                        </motion.div>
-                        <span className={isProfilePage ? "text-primary font-medium" : ""}>Profile</span>
-                        {isProfilePage && (
-                            <motion.div
-                                className="absolute left-0 top-0 bottom-0 w-1 h-full bg-primary rounded-r-sm"
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "100%", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                layoutId="profileIndicator"
-                                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                            />
-                        )}
-                    </Link>
-                ) : (
-                    <ConnectIdentity />
-                )}
-            </div>
-        </div>
-    )
-}
->>>>>>> 79f47398045660778bad576a0831a0a75306d32d
