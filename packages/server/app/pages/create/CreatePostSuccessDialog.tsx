@@ -4,6 +4,7 @@ import { Dialog, DialogContent } from "@/shared/components/ui/dialog";
 import { Button } from "@/shared/components/ui/button";
 import Icon from "@/shared/components/Icon";
 import { useNavigate } from "react-router";
+import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 
 interface CreatePostSuccessDialogProps {
     isOpen: boolean;
@@ -52,6 +53,12 @@ export default function CreatePostSuccessDialog({
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-md p-0 overflow-hidden gap-0">
+                <DialogTitle className="sr-only">
+                    {type === "post" ? "Post Published Successfully" : "Swipe Published Successfully"}
+                </DialogTitle>
+                <DialogDescription className="sr-only">
+                    {type === "post" ? "Your post has been successfully published" : "Your Swipe has been successfully published"}
+                </DialogDescription>
                 <div className="p-6 text-center">
                     <AnimatePresence mode="wait">
                         {!animationComplete ? (

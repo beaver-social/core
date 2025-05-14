@@ -16,7 +16,9 @@ export default class Posts {
   }
 
   async upload(
-    options: Omit<ApiParams<Api["posts"]["$post"]>["json"], "signature">
+    options: Omit<ApiParams<Api["posts"]["$post"]>["json"], "signature"> & {
+      media: File[];
+    }
   ) {
     const { features, user, actionPointer } = this.defaults.store;
     if (!features || !user) {
@@ -37,8 +39,11 @@ export default class Posts {
     const { post } = await safeParseResponse(
       this.defaults.apiClient.rpc.posts.$post({
         json: {
-          ...options,
+          ...data,
           signature,
+        },
+        form: {
+          media,
         },
       })
     );
