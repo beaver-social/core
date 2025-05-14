@@ -36,8 +36,8 @@ export default class User {
 
   async register(
     options: Pick<
-      ApiParams<Api["users"]["$post"]>["json"],
-      "username" | "fullName" | "about" | "image" | "banner"
+      ApiParams<Api["users"]["$post"]>["form"],
+      "username" | "fullName" | "about" | "image"
     >
   ) {
     const { features, address } = this.defaults.store;
@@ -55,7 +55,7 @@ export default class User {
 
     const user = await safeParseResponse(
       this.defaults.apiClient.rpc.users.$post({
-        json: {
+        form: {
           ...options,
           address: address,
           signature,
@@ -174,6 +174,15 @@ export default class User {
     return safeParseResponse(
       this.defaults.apiClient.rpc.users[":id"].following.$get({
         query: { page: page.toString(), perPage: perPage.toString() },
+        param: { id: userId.toString() },
+      })
+    );
+  }
+
+  async getFollowCount(options: { userId: number }) {
+    const { userId } = options;
+    return safeParseResponse(
+      this.defaults.apiClient.rpc.users[":id"]["follow-count"].$get({
         param: { id: userId.toString() },
       })
     );

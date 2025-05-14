@@ -3,6 +3,8 @@ import Icon from "@/shared/components/Icon";
 import Layout from "@/pages/layout";
 import PostContent from "./PostContent";
 import ReplyForm from "./ReplyForm";
+import { useBeaver } from "@beaver/react";
+import SecondaryPanel from "../explore/SecondaryPanel";
 
 // Sample data - replace with actual data from your backend
 const samplePost = {
@@ -10,7 +12,7 @@ const samplePost = {
     handle: "johndoe",
     timestamp: "2h",
     content: "Just launched my new project! 🚀 Check it out and let me know what you think.",
-    imageUrl: "/icons/logo_light.png",
+    imageUrl: "/images/wallpapers/1.jpeg",
     likes: 42,
     comments: 12,
     reposts: 5,
@@ -45,6 +47,9 @@ const sampleReplies = [
 
 export default function Post() {
     const { postId } = useParams();
+    const beaver = useBeaver();
+    const { data: post } = beaver.post.getPostById(postId || "1")
+    console.log(post)
 
     return (
         <Layout main={
@@ -75,6 +80,6 @@ export default function Post() {
                     ))}
                 </div>
             </div>
-        } />
+        } secondary={<SecondaryPanel />} />
     );
 } 

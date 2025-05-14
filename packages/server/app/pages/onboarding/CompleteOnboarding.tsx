@@ -1,8 +1,6 @@
 import { Button } from "@/shared/components/ui/button";
 import { useNavigate } from "react-router";
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Icon from "@/shared/components/Icon";
 import { useBeaver, useLogin } from "@beaver/react";
 
 interface CompleteOnboardingProps {

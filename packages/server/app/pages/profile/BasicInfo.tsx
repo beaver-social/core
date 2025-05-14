@@ -3,40 +3,54 @@ import { UserDetails } from "."
 import { Image } from "@/shared/components/Image"
 import { Link } from "react-router"
 import GradientButton from "@/shared/components/GradientButton"
+import { useBeaver } from "@beaver/react";
+import { truncateText } from "@/shared/lib/utils"
+import moment from "moment";
+import FollowDialog from "./FollowDialog"
+import { User } from "@/shared/types/globalUI";
 
-export default function BasicInfo({ data: userDetails }: { data: UserDetails }) {
+export default function BasicInfo({ data: userDetails, id }: { data: UserDetails, id: string | undefined }) {
+    const beaver = useBeaver();
+    const user = beaver.user as User;
+
+    const { data: followerData } = beaver.follows.getFollowers(Number(id), 1, 8);
+    const { data: followingData } = beaver.follows.getFollowing(Number(id), 1, 8);
+    const { data: count } = beaver.follows.getFollowCount(Number(id));
+
+    console.log({ followerData, followingData, count });
+
     return (
         <div className="pt-18 px-6 border-b">
             {/* Name and Verification */}
             <div className="flex flex-col justify-center">
                 <div className="flex items-center justify-center gap-2">
-                    <h1 className="text-xl font-bold">{userDetails.name}</h1>
+                    <h1 className="text-xl font-bold">{user?.fullName}</h1>
                     {userDetails.verified && (
                         <Icon name="SquareCheckBig" className="text-secondary-foreground size-5" />
                     )}
                 </div>
                 <div className="flex items-center justify-center gap-2">
-                    <p className="w-full text-center text-sm text-grey-500">{userDetails.username}</p>
+                    <p className="w-full text-center text-sm text-grey-500">@{user?.username}</p>
                 </div>
             </div>
 
             {/* Social Icons */}
             <div className="flex space-x-4 mt-4 justify-center">
-                <Link to={`/message/${userDetails.username}`}>
+                <Link to={`/message/${user?.username}`}>
                     <GradientButton iconName="Mail" />
                 </Link>
-                {userDetails.socials?.twitter && (
-                    <Link to={`https://twitter.com/${userDetails.socials.twitter}`} target="_blank">
+                {user?.twitter && (
+                    <Link to={`https://twitter.com/${user?.twitter}`} target="_blank">
                         <GradientButton iconName="Twitter" />
                     </Link>
                 )}
-                {userDetails.socials?.youtube && (
-                    <Link to={`https://youtube.com/@${userDetails.socials.youtube}`} target="_blank">
+                {user?.youtube && (
+                    <Link to={`https://youtube.com/@${user?.youtube}`} target="_blank">
                         <GradientButton iconName="Youtube" />
                     </Link>
                 )}
-                {userDetails.socials?.instagram && (
-                    <Link to={`https://instagram.com/${userDetails.socials.instagram}`} target="_blank">
+                {user?.instagram && (
+                    <Link to={`https://instagram.com/${user?.instagram}`} target="_blank">
                         <GradientButton iconName="Instagram" />
                     </Link>
                 )}
@@ -44,36 +58,40 @@ export default function BasicInfo({ data: userDetails }: { data: UserDetails }) 
 
             {/* Bio */}
             <div className="flex justify-center mt-3 text-grey-600">
-                {userDetails.bio && (
-                    <p className="text-sm max-w-lg text-center">{userDetails.bio}</p>
+                {user?.about && (
+                    <p className="text-sm max-w-lg text-center">{truncateText(user?.about, 100)}</p>
                 )}
             </div>
 
             {/* Profile Metadata (Location, Website, Join Date) */}
-            <div className="flex flex-wrap justify-center mt-4 gap-x-5 gap-y-2 text-sm text-grey-500">
-                {userDetails.location && (
+            <div className="flex flex-wrap justify-center mt-2 gap-x-5 gap-y-2 text-sm text-grey-500">
+                {user?.location && (
                     <div className="flex items-center text-xs gap-1">
                         <Icon name="MapPin" className="size-4" />
-                        <span>{userDetails.location}</span>
+                        <span>{user?.location}</span>
                     </div>
                 )}
 
                 {userDetails.joined && (
                     <div className="flex items-center text-xs gap-1">
                         <Icon name="Calendar" className="size-4" />
-                        <span>Joined {userDetails.joined}</span>
+                        <span>Joined {moment(user?.createdAt).format("MMM D, YYYY")}</span>
                     </div>
                 )}
             </div>
 
             {/* Followers/Following Stats */}
             <div className="flex gap-5 mt-3 text-xs justify-center">
-                <Link to={`/profile/${userDetails.username}/following`} className="hover:underline">
-                    <span className="font-semibold text-grey-300">{userDetails.following}</span> <span className="text-grey-500">Following</span>
-                </Link>
-                <Link to={`/profile/${userDetails.username}/followers`} className="hover:underline">
-                    <span className="font-semibold text-grey-300">{userDetails.followers}</span> <span className="text-grey-500">Followers</span>
-                </Link>
+                <FollowDialog
+                    data={followerData?.followers}
+                    count={count?.followers}
+                    title="Followers"
+                />
+                <FollowDialog
+                    data={followingData?.following}
+                    count={count?.following}
+                    title="Following"
+                />
             </div>
 
             {/* Buy Template Section */}

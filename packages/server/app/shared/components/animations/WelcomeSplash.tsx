@@ -1,17 +1,24 @@
 import { useTheme } from "@/shared/context/theme-provider";
+import { useBeaver } from "@beaver/react";
 import { motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-export default function WelcomeSplash({ onComplete }: { onComplete: () => void }) {
+export default function WelcomeSplash() {
     const { theme } = useTheme();
+    const [isComplete, setIsComplete] = useState(false);
+    const beaver = useBeaver();
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            onComplete();
+            setIsComplete(true);
         }, 3000);
 
         return () => clearTimeout(timer);
-    }, [onComplete]);
+    }, []);
+
+    if (isComplete) {
+        return null;
+    }
 
     return (
         <motion.div
@@ -104,7 +111,7 @@ export default function WelcomeSplash({ onComplete }: { onComplete: () => void }
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3, duration: 0.5 }}
                 >
-                    Welcome Back!
+                    Welcome Back <span className="text-[#4ca5f9]">{beaver.user?.fullName}!</span>
                 </motion.h2>
 
                 <motion.p
@@ -113,7 +120,7 @@ export default function WelcomeSplash({ onComplete }: { onComplete: () => void }
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6, duration: 0.5 }}
                 >
-                    Your identity is now connected to Beaver Social.
+                    You are now logged in to Beaver Social.
                 </motion.p>
             </motion.div>
         </motion.div>

@@ -31,7 +31,6 @@ export async function getUserFromCtx(ctx: Context) {
   const decodedJwt = await tryCatch(verify(token, JWTPrivateKey, JWTalgorithm));
 
   if (decodedJwt.error) {
-    ctx.log(decodedJwt.error);
     throw new Error("Unable to verify Auth Token " + decodedJwt.error);
   }
   const { sub } = zJwtPayload().parse(decodedJwt.data);

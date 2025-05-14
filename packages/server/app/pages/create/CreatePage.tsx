@@ -16,6 +16,7 @@ import CreatePostSuccessDialog from "./CreatePostSuccessDialog";
 import EmojiPicker from "./EmojiPicker";
 import GifPicker from "./GifPicker";
 import MediaPreview from "./MediaPreview";
+import { useBeaver } from "@beaver/react";
 
 type MediaFile = {
     file: File;
@@ -67,6 +68,8 @@ export default function CreatePage() {
     const [error, setError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const videoInputRef = useRef<HTMLInputElement>(null);
+    const beaver = useBeaver();
+    const { mutateAsync: createPost, isPending: isCreatingPost, isSuccess: isPostCreated, isError: isPostCreationError } = beaver.post.createPost;
 
     // Reset state when tab changes
     useEffect(() => {
@@ -175,23 +178,36 @@ export default function CreatePage() {
         setIsSubmitting(true);
         setError(null);
 
+        const fileArray = mediaFiles.map(file => file.file)
+
+
         try {
+            console.log({
+                content,
+                fileArray,
+                location,
+                privacy
+            })
+
+
             // Simulate upload with progress
             const totalSteps = mediaFiles.length + 1;
-            let currentStep = 0;
+            setUploadProgress(Math.floor((1 / totalSteps) * 100));
 
-            // Simulate API request with progress
-            await new Promise<void>((resolve) => {
-                const interval = setInterval(() => {
-                    currentStep++;
-                    setUploadProgress(Math.floor((currentStep / totalSteps) * 100));
+            const result = await createPost({
+                content,
+                media: fileArray,
+                nsfw: false,
+                parentId: null,
+                reposting: null,
+                subscriberOnly: false
+            })
 
-                    if (currentStep >= totalSteps) {
-                        clearInterval(interval);
-                        resolve();
-                    }
-                }, 500);
-            });
+            setUploadProgress(Math.floor((totalSteps / totalSteps) * 100));
+
+            console.log({
+                result
+            })
 
             // Show success dialog
             setShowSuccess(true);

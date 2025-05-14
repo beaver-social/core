@@ -12,14 +12,16 @@ export const users = t.sqliteTable(
     about: t.text(),
     fullName: t.text().notNull(),
     suinsDomainName: t.text(),
-
-    onboardingStep: t.int().default(0),
-    onboardingCompleted: t.int({ mode: "boolean" }).default(false),
+    location: t.text(),
+    birthday: t.text(),
+    twitter: t.text(),
+    youtube: t.text(),
+    instagram: t.text(),
+    website: t.text(),
 
     imageUrl: t.text(),
-    imageBlurhash: t.text(),
     bannerUrl: t.text(),
-    website: t.text(),
+    imageBlurhash: t.text(),
     timezone: t.int(),
 
     ...timestamps,

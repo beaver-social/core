@@ -24,20 +24,8 @@ type Props = {
 
 export default function ConnectIdentity({ open, onOpenChange }: Props) {
   const beaver = useBeaver();
-  const { mutate: login, isSuccess: isLoginSuccess, isError: isLoginError, isPending: isLoginPending } = useLogin();
   const [isOpen, setIsOpen] = useState(open || false);
-  const [showWelcomeSplash, setShowWelcomeSplash] = useState(false);
   const [isConnectIdentitySelected, setisConnectIdentitySelected] = useState(false);
-
-  if (showWelcomeSplash) {
-    return (
-      <WelcomeSplash
-        onComplete={() => {
-          setShowWelcomeSplash(false);
-        }}
-      />
-    );
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={(newOpen: boolean) => {

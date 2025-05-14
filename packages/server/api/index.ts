@@ -14,7 +14,8 @@ const app = new Hono()
         const selfUrl = new URL(ctx.req.url);
         const allowedOrigins = [
           "http://localhost:9090",
-          "https://localhost:3000",
+          "http://localhost:3000",
+          "http://localhost:5173",
         ];
         const selfOrigin = selfUrl.origin;
         if (

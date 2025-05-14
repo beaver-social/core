@@ -1,21 +1,11 @@
 import { Image } from "@/shared/components/Image";
 import PostActions from "./PostFunctions";
+import { useBeaver } from "@beaver/react";
 
 
-export default function PostContent({ post }: {
-    post: {
-        username: string;
-        handle: string;
-        timestamp: string;
-        content: string;
-        imageUrl?: string;
-        likes: number;
-        comments: number;
-        reposts: number;
-        shares: number;
-        avatarUrl: string;
-    }
-}) {
+export default function PostContent({ post }: { post: any }) {
+    const beaver = useBeaver()
+
     return (
         <div className="flex gap-4 p-4 border-b">
             <Image src={post.avatarUrl} alt={`${post.username}'s avatar`} className="w-10 h-10 rounded-full" />
