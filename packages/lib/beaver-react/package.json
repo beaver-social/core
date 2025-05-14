@@ -2,14 +2,18 @@
   "name": "@beaver/react",
   "version": "0.1.0",
   "description": "React SDK for integrating with Beaver Social - Complete wrapper for @beaver/client",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
   "license": "MIT",
   "private": false,
   "type": "module",
   "exports": {
-    ".": "./exports.ts"
+    ".": {
+      "import": "./src/index.ts",
+      "require": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
   },
   "repository": {
     "type": "git",
@@ -17,7 +21,7 @@
     "directory": "packages/lib/beaver-react"
   },
   "scripts": {
-    "build": "tsup src/index.tsx --format cjs,esm --dts",
+    "build": "tsup src/index.ts --format cjs,esm --dts",
     "build:all": "cd ../beaver-client && bun run build && cd ../beaver-react && bun run build",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf .turbo && rm -rf dist"
