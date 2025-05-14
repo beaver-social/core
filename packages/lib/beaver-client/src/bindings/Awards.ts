@@ -1,5 +1,6 @@
 import { Defaults } from "../types/client";
 import Logger from "./Logger";
+import { Transaction } from "@mysten/sui/transactions";
 
 export default class Awards {
   private defaults: Defaults;
@@ -24,5 +25,20 @@ export default class Awards {
     });
 
     return awardTypes;
+  }
+
+  async giveAwardToPost(options: {
+    postId: number;
+    awardType: number;
+    recipient: string;
+  }) {
+    const { postId, awardType, recipient } = options;
+
+    const tx = new Transaction();
+    this.defaults.contracts.awards.write.gift(tx, {
+      postId,
+      awardType,
+      recipient,
+    });
   }
 }

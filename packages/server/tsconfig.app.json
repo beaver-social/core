@@ -4,7 +4,11 @@
     "target": "ES2020",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./app/*"]
+      "@/*": ["./app/*"],
+      "@beaver/react": ["../lib/beaver-react/src"],
+      "@beaver/react/*": ["../lib/beaver-react/src/*"],
+      "@beaver/client": ["../lib/beaver-client/src"],
+      "@beaver/client/*": ["../lib/beaver-client/src/*"]
     },
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
@@ -16,7 +20,15 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
-    "strict": true
+    "strict": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "composite": true
   },
-  "include": ["app"]
+  "include": ["app"],
+  "references": [
+    { "path": "../lib/beaver-react" },
+    { "path": "../lib/beaver-client" }
+  ]
 }

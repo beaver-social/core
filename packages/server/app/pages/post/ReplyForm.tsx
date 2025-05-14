@@ -1,52 +1,81 @@
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/shared/components/ui/tooltip";
+import { useState } from "react";
+import { Image } from "@/shared/components/Image";
+import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
 import Icon from "@/shared/components/Icon";
-import { Image } from "@/shared/components/Image";
+import { motion } from "framer-motion";
 
-export default function ReplyForm() {
+export default function ReplyForm({
+    postId,
+    authorId,
+    userAvatar = "/images/user.webp"
+}: {
+    postId: string;
+    authorId?: string;
+    userAvatar?: string;
+}) {
+    const [reply, setReply] = useState("");
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!reply.trim()) return;
+
+        // TODO: Implement reply submission logic
+        console.log({ postId, reply });
+
+        // Reset form
+        setReply("");
+    };
+
     return (
-        <div className="p-4 border-b">
-            <div className="flex gap-4">
-                <Image src="/images/user.webp" alt="User avatar" className="w-10 h-10 rounded-full" />
-                <div className="flex-1">
-                    <textarea
-                        placeholder="Post your reply"
-                        className="w-full p-2 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-                        rows={3}
-                    />
-                    <div className="flex justify-between items-center mt-2">
-                        <div className="flex gap-4 text-primary">
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="hover:bg-primary/10">
-                                            <Icon name="Image" className="size-5" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        Add image
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="hover:bg-primary/10">
-                                            <Icon name="Smile" className="size-5" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        Add emoji
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        </div>
-                        <Button className="bg-primary text-white px-4 py-2 rounded-full font-semibold hover:bg-primary/90">
-                            Reply
+        <div className="flex gap-3 p-4 border-t border-b">
+            <Image
+                src={userAvatar}
+                alt="Your avatar"
+                className="size-8 rounded-full border-2 border-primary/20"
+            />
+            <form onSubmit={handleSubmit} className="flex-1">
+                <Input
+                    placeholder="Post your reply"
+                    value={reply}
+                    onChange={(e) => setReply(e.target.value)}
+                    className="bg-transparent border-none focus-visible:ring-0 text-sm p-0 h-auto min-h-[40px]"
+                />
+                <div className="flex justify-between items-center mt-3">
+                    <div className="flex items-center gap-2">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full hover:bg-primary/10"
+                        >
+                            <Icon name="Image" className="size-4" />
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-full hover:bg-primary/10"
+                        >
+                            <Icon name="Smile" className="size-4" />
                         </Button>
                     </div>
+                    <motion.div
+                        initial={{ opacity: 0.9 }}
+                        whileHover={{ scale: 1.05, opacity: 1 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <Button
+                            type="submit"
+                            size="sm"
+                            disabled={!reply.trim()}
+                            className="rounded-full"
+                        >
+                            Reply
+                        </Button>
+                    </motion.div>
                 </div>
-            </div>
+            </form>
         </div>
     );
-}
+} 

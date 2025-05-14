@@ -4,15 +4,20 @@ import { Image } from "@/shared/components/Image"
 import { Link } from "react-router"
 import GradientButton from "@/shared/components/GradientButton"
 import { useBeaver } from "@beaver/react";
-import { User } from "@/shared/types/globalUI";
 import { truncateText } from "@/shared/lib/utils"
 import moment from "moment";
+import FollowDialog from "./FollowDialog"
+import { User } from "@/shared/types/globalUI";
 
-export default function BasicInfo({ data: userDetails }: { data: UserDetails }) {
+export default function BasicInfo({ data: userDetails, id }: { data: UserDetails, id: string | undefined }) {
     const beaver = useBeaver();
     const user = beaver.user as User;
 
-    console.log(user);
+    const { data: followerData } = beaver.follows.getFollowers(Number(id), 1, 8);
+    const { data: followingData } = beaver.follows.getFollowing(Number(id), 1, 8);
+    const { data: count } = beaver.follows.getFollowCount(Number(id));
+
+    console.log({ followerData, followingData, count });
 
     return (
         <div className="pt-18 px-6 border-b">
@@ -59,11 +64,11 @@ export default function BasicInfo({ data: userDetails }: { data: UserDetails }) 
             </div>
 
             {/* Profile Metadata (Location, Website, Join Date) */}
-            <div className="flex flex-wrap justify-center mt-4 gap-x-5 gap-y-2 text-sm text-grey-500">
-                {userDetails.location && (
+            <div className="flex flex-wrap justify-center mt-2 gap-x-5 gap-y-2 text-sm text-grey-500">
+                {user?.location && (
                     <div className="flex items-center text-xs gap-1">
                         <Icon name="MapPin" className="size-4" />
-                        <span>{userDetails.location}</span>
+                        <span>{user?.location}</span>
                     </div>
                 )}
 
@@ -77,12 +82,16 @@ export default function BasicInfo({ data: userDetails }: { data: UserDetails }) 
 
             {/* Followers/Following Stats */}
             <div className="flex gap-5 mt-3 text-xs justify-center">
-                <Link to={`/profile/${userDetails.username}/following`} className="hover:underline">
-                    <span className="font-semibold text-grey-300">{userDetails.following}</span> <span className="text-grey-500">Following</span>
-                </Link>
-                <Link to={`/profile/${userDetails.username}/followers`} className="hover:underline">
-                    <span className="font-semibold text-grey-300">{userDetails.followers}</span> <span className="text-grey-500">Followers</span>
-                </Link>
+                <FollowDialog
+                    data={followerData?.followers}
+                    count={count?.followers}
+                    title="Followers"
+                />
+                <FollowDialog
+                    data={followingData?.following}
+                    count={count?.following}
+                    title="Following"
+                />
             </div>
 
             {/* Buy Template Section */}

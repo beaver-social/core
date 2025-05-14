@@ -5,7 +5,7 @@ import authenticated, { getUserFromCtx } from "../../middlewares/authenticated";
 import { respond } from "../../lib/utils/respond";
 import { tryCatch, tryCatchSync } from "../../lib/tryCatch";
 import db from "../../lib/db";
-import { eq, or } from "drizzle-orm";
+import { count, eq, or } from "drizzle-orm";
 import { contracts } from "../../lib/sui/contracts";
 import { Transaction } from "@mysten/sui/transactions";
 import { defaultAdminCapId } from "contracts/definitions";
@@ -393,6 +393,60 @@ export default new Hono()
       const [newUser] = updatedUserResponse.data;
 
       return respond.ok(ctx, newUser, "User created successfully", 201);
+    }
+  )
+
+  .get(
+    "/:id/follow-count",
+    zValidator(
+      "param",
+      z.object({
+        id: zNumberString(),
+      })
+    ),
+    async (ctx) => {
+      const { id: userId } = ctx.req.valid("param");
+
+      const followerCountResponse = await tryCatch(
+        db
+          .select({
+            followers: count(),
+          })
+          .from(follows)
+          .where(eq(follows.followingId, userId))
+      );
+
+      if (followerCountResponse.error) {
+        ctx.log(followerCountResponse.error);
+        return respond.err(ctx, "Failed to fetch followers", 500);
+      }
+
+      const followingCountResponse = await tryCatch(
+        db
+          .select({
+            following: count(),
+          })
+          .from(follows)
+          .where(eq(follows.followerId, userId))
+      );
+
+      if (followingCountResponse.error) {
+        ctx.log(followingCountResponse.error);
+        return respond.err(ctx, "Failed to fetch following", 500);
+      }
+
+      const [followerCount] = followerCountResponse.data;
+      const [followingCount] = followingCountResponse.data;
+
+      return respond.ok(
+        ctx,
+        {
+          followers: followerCount.followers,
+          following: followingCount.following,
+        },
+        "Follow count fetched successfully",
+        200
+      );
     }
   )
 

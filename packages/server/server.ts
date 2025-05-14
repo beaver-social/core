@@ -5,13 +5,6 @@ import path from "path";
 import { ensureEnv } from "./env";
 import staticRequestsHandler from "./api/middlewares/staticRequestsHandler";
 import { fileURLToPath } from "url";
-import {
-  ContentfulStatusCode,
-  ClientErrorStatusCode,
-  ServerErrorStatusCode,
-} from "hono/utils/http-status";
-import { ResponseHeader } from "hono/utils/headers";
-import { BaseMime } from "hono/utils/mime";
 
 const isProd =
   process.env.NODE_ENV === "production" || process.env.NODE_ENV === "prod";
@@ -60,7 +53,7 @@ app.get("*", (ctx) => ctx.html(html));
 
 export default {
   ...app,
-  maxRequestBodySize: 4 * 1024 * 1024, // 4 MB
+  maxRequestBodySize: 10 * 1024 * 1024, // 10 MB
 };
 
 declare module "hono" {

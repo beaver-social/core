@@ -7,7 +7,6 @@ import Tabs from "@/shared/components/Tabs"
 import { useGlobalUI } from "@/shared/hooks/useGlobalUI"
 import BasicInfo from "./BasicInfo"
 import { useBeaver } from "@beaver/react";
-import { User } from "@/shared/types/globalUI";
 
 export type UserDetails = {
     id: string;
@@ -64,20 +63,22 @@ const userDetails: UserDetails = {
 
 export default function Profile() {
     const beaver = useBeaver();
-    const user = beaver.user as User;
+    const user = beaver.user;
+
+
     const { id } = useParams<{ id: string }>()
     const { setScreen } = useGlobalUI();
     useEffect(() => {
         setScreen("profile");
     }, []);
 
-    const isCurrentUser = id === user?.username;
+    const isCurrentUser = id === user?.id.toString();
 
     return (
         <Layout main={
             <div className="border mb-10  rounded-t-2xl">
                 <ProfileHeader data={userDetails} isCurrentUser={isCurrentUser} />
-                <BasicInfo data={userDetails} />
+                <BasicInfo data={userDetails} id={id} />
                 <Tabs />
             </div>
         } secondary={<SecondaryPanel />} />

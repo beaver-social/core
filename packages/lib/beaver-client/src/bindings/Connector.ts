@@ -6,7 +6,7 @@ import { Defaults } from "../types/client";
 import Logger from "./Logger";
 import { getWalletUniqueIdentifier } from "../utils/wallet";
 import { z } from "zod";
-import { BeaverProvidedWallet, Connection } from "../types/wallet";
+import { BeaverProvidedWallet } from "../types/wallet";
 import { registerEnokiWallets } from "@mysten/enoki";
 import { BeaverStore } from "../store";
 import { normalizeSuiAddress } from "@mysten/sui/utils";

@@ -54,6 +54,7 @@ const app = new Hono()
         db
           .select()
           .from(posts)
+          .leftJoin(post_media, eq(posts.id, post_media.postId))
           .limit(perPage)
           .offset(page * perPage)
       );
@@ -81,14 +82,15 @@ const app = new Hono()
       "json",
       zCreatePostAction().merge(
         z.object({
-          media: z.array(z.instanceof(File)),
+          media: z.array(z.instanceof(File)).optional(),
           signature: zSuiSignature(),
         })
       )
     ),
     async (ctx) => {
-      const { media, signature, ...postData } = ctx.req.valid("json");
       const user = ctx.get("user");
+      const { media, signature, ...postData } = ctx.req.valid("json");
+      ctx.log(media);
 
       if (!(postData.content.length > 0) && !postData.reposting) {
         return respond.err(ctx, "Content is required", 400);
@@ -137,55 +139,57 @@ const app = new Hono()
         }
       }
 
-      for (const file of media) {
-        const mimeType = file.type.split("/")[0];
+      if (media) {
+        for (const file of media) {
+          const mimeType = file.type.split("/")[0];
 
-        if (mimeType === "image") {
-          const imageData = Buffer.from(await file.arrayBuffer());
-          const { imageBuffer, blurhash } = await preprocessImageMedia(
-            imageData
-          );
+          if (mimeType === "image") {
+            const imageData = Buffer.from(await file.arrayBuffer());
+            const { imageBuffer, blurhash } = await preprocessImageMedia(
+              imageData
+            );
 
-          const imageUrl = await tryCatch(s3.upload(imageBuffer));
+            const imageUrl = await tryCatch(s3.upload(imageBuffer));
 
-          if (imageUrl.error) {
-            ctx.log(imageUrl.error);
-            continue;
+            if (imageUrl.error) {
+              ctx.log(imageUrl.error);
+              continue;
+            }
+
+            const { error } = await tryCatch(
+              db.insert(post_media).values({
+                postId: post.id,
+                url: imageUrl.data,
+                blurhash,
+              })
+            );
+
+            if (error) {
+              ctx.log(error);
+              continue;
+            }
           }
 
-          const { error } = await tryCatch(
-            db.insert(post_media).values({
-              postId: post.id,
-              url: imageUrl.data,
-              blurhash,
-            })
-          );
+          if (mimeType === "video") {
+            const videoData = Buffer.from(await file.arrayBuffer());
+            const videoUrl = await tryCatch(s3.upload(videoData));
 
-          if (error) {
-            ctx.log(error);
-            continue;
-          }
-        }
+            if (videoUrl.error) {
+              ctx.log(videoUrl.error);
+              continue;
+            }
 
-        if (mimeType === "video") {
-          const videoData = Buffer.from(await file.arrayBuffer());
-          const videoUrl = await tryCatch(s3.upload(videoData));
+            const { error } = await tryCatch(
+              db.insert(post_media).values({
+                postId: post.id,
+                url: videoUrl.data,
+              })
+            );
 
-          if (videoUrl.error) {
-            ctx.log(videoUrl.error);
-            continue;
-          }
-
-          const { error } = await tryCatch(
-            db.insert(post_media).values({
-              postId: post.id,
-              url: videoUrl.data,
-            })
-          );
-
-          if (error) {
-            ctx.log(error);
-            continue;
+            if (error) {
+              ctx.log(error);
+              continue;
+            }
           }
         }
       }

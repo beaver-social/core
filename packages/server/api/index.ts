@@ -15,7 +15,6 @@ const app = new Hono()
         const allowedOrigins = [
           "http://localhost:9090",
           "http://localhost:3000",
-          "http://localhost:3001",
           "http://localhost:5173",
         ];
         const selfOrigin = selfUrl.origin;
