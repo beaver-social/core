@@ -13,6 +13,7 @@ export default class ApiClient {
     this.logger = logger;
     this.client = this.createClient();
     this.authHeader = { Authorization: "Bearer null" };
+    this.logger.info("ApiClient instantiated");
   }
 
   set baseUrl(url: string) {

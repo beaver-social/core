@@ -6,7 +6,8 @@
   ],
   "[move]": {
     "files.autoSave": "onFocusChange"
-  }
+  },
+  "workbench.colorTheme": "Tokyo Night Dark"
   // "workbench.colorTheme": "Tokyo Night Dark"
   // "workbench.colorTheme": "Tokyo Night Dark"
 }
