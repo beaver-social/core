@@ -17,7 +17,12 @@ export default class Posts {
 
   async upload(
     options: Omit<ApiParams<Api["posts"]["$post"]>["json"], "signature"> & {
-      media: File[];
+      media: {
+        file: File;
+        type: "image" | "video";
+        previewUrl: string;
+        aspectRatio: "square" | "portrait" | "custom";
+      }[];
     }
   ) {
     const { features, user, actionPointer } = this.defaults.store;
@@ -40,8 +45,10 @@ export default class Posts {
       this.defaults.apiClient.rpc.posts.$post({
         json: {
           ...data,
-          media,
           signature,
+        },
+        form: {
+          media,
         },
       })
     );

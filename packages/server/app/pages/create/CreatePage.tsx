@@ -22,7 +22,7 @@ type MediaFile = {
     file: File;
     type: "image" | "video";
     previewUrl: string;
-    aspectRatio?: "square" | "portrait" | "custom";
+    aspectRatio: "square" | "portrait" | "custom";
 };
 
 // Compression options
@@ -66,6 +66,7 @@ export default function CreatePage() {
     const [uploadProgress, setUploadProgress] = useState(0);
     const [showSuccess, setShowSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [createdPostId, setCreatedPostId] = useState<string | undefined>(undefined);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const videoInputRef = useRef<HTMLInputElement>(null);
     const beaver = useBeaver();
@@ -104,6 +105,7 @@ export default function CreatePage() {
                     file: selectedFile,
                     type: "video",
                     previewUrl,
+                    aspectRatio: "custom"
                 }]);
             }
         } catch (error) {
@@ -178,25 +180,13 @@ export default function CreatePage() {
         setIsSubmitting(true);
         setError(null);
 
-        const fileArray = mediaFiles.map(file => file.file)
-
-
         try {
-            console.log({
-                content,
-                fileArray,
-                location,
-                privacy
-            })
-
-
-            // Simulate upload with progress
             const totalSteps = mediaFiles.length + 1;
             setUploadProgress(Math.floor((1 / totalSteps) * 100));
 
             const result = await createPost({
                 content,
-                media: fileArray,
+                media: mediaFiles,
                 nsfw: false,
                 parentId: null,
                 reposting: null,
@@ -205,12 +195,9 @@ export default function CreatePage() {
 
             setUploadProgress(Math.floor((totalSteps / totalSteps) * 100));
 
-            console.log({
-                result
-            })
-
             // Show success dialog
             setShowSuccess(true);
+            setCreatedPostId(result.id.toString())
 
             // Reset form
             setContent("");
@@ -588,6 +575,7 @@ export default function CreatePage() {
                 isOpen={showSuccess}
                 onClose={() => setShowSuccess(false)}
                 type={activeTab}
+                postId={createdPostId}
             />
         </div>
     );

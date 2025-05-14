@@ -10,12 +10,14 @@ interface CreatePostSuccessDialogProps {
     isOpen: boolean;
     onClose: () => void;
     type: "post" | "swipe";
+    postId: string | undefined;
 }
 
 export default function CreatePostSuccessDialog({
     isOpen,
     onClose,
-    type
+    type,
+    postId
 }: CreatePostSuccessDialogProps) {
     const navigate = useNavigate();
     const [animationComplete, setAnimationComplete] = useState(false);
@@ -41,13 +43,15 @@ export default function CreatePostSuccessDialog({
 
     const handleViewPost = () => {
         onClose();
-        // Navigate to the home page or post detail
-        navigate("/");
+        if (postId) {
+            navigate(`/post/${postId}`);
+        } else {
+            navigate("/");
+        }
     };
 
     const handleCreateAnother = () => {
         onClose();
-        // The dialog will close, keeping user on the create page
     };
 
     return (

@@ -71,3 +71,11 @@ export const zPaginatedRequest = (options?: {
       .transform((v) => Math.min(v, maxPerPage)),
   });
 };
+
+export const zPostMedia = () =>
+  z.object({
+    file: z.instanceof(File),
+    type: z.enum(["image", "video"]),
+    previewUrl: z.string(),
+    aspectRatio: z.enum(["square", "portrait", "custom"]),
+  });

@@ -21,6 +21,7 @@ import {
   zBooleanString,
   zNumberString,
   zPaginatedRequest,
+  zPostMedia,
   zSuiAddress,
   zSuiSignature,
 } from "../../lib/zod/helpers";
@@ -82,14 +83,20 @@ const app = new Hono()
       "json",
       zCreatePostAction().merge(
         z.object({
-          media: z.array(z.instanceof(File)).optional(),
           signature: zSuiSignature(),
         })
       )
     ),
+    zValidator(
+      "form",
+      z.object({
+        media: z.array(zPostMedia()).optional(),
+      })
+    ),
     async (ctx) => {
       const user = ctx.get("user");
-      const { media, signature, ...postData } = ctx.req.valid("json");
+      const { signature, ...postData } = ctx.req.valid("json");
+      const { media } = ctx.req.valid("form");
       ctx.log(media);
 
       if (!(postData.content.length > 0) && !postData.reposting) {
@@ -140,11 +147,11 @@ const app = new Hono()
       }
 
       if (media) {
-        for (const file of media) {
-          const mimeType = file.type.split("/")[0];
+        for (const item of media) {
+          const mimeType = item.file.type.split("/")[0];
 
           if (mimeType === "image") {
-            const imageData = Buffer.from(await file.arrayBuffer());
+            const imageData = Buffer.from(await item.file.arrayBuffer());
             const { imageBuffer, blurhash } = await preprocessImageMedia(
               imageData
             );
@@ -171,7 +178,7 @@ const app = new Hono()
           }
 
           if (mimeType === "video") {
-            const videoData = Buffer.from(await file.arrayBuffer());
+            const videoData = Buffer.from(await item.file.arrayBuffer());
             const videoUrl = await tryCatch(s3.upload(videoData));
 
             if (videoUrl.error) {
