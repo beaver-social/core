@@ -23,8 +23,6 @@ export default function Post() {
         id: post?.authorId || 1
     });
 
-    console.log({ post, author });
-
     // Simulate loading state
     useEffect(() => {
         if (post?.id && author?.id) {
@@ -79,9 +77,6 @@ export default function Post() {
 
                         {/* Replies Section */}
                         <div className="pt-2">
-                            <div className="px-4 py-2 border-b">
-                                <h3 className="font-semibold text-lg">Replies</h3>
-                            </div>
                             <div className="divide-y">
                                 {replies.map((reply, index) => (
                                     <Reply key={index} reply={reply} />

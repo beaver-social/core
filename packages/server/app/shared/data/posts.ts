@@ -5,7 +5,7 @@ export const samplePosts = [
     handle: "ishtails",
     timestamp: "2h",
     content: "wtf is wrong with people..",
-    images: ["/images/user.webp"],
+    images: ["/images/wallpapers/4.jpeg"],
     aspectRatio: "square" as const,
     analytics: {
       likes: 42,

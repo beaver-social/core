@@ -35,6 +35,7 @@ const { posts, post_media, post_topics, post_mentions, likes, users } =
 
 const app = new Hono()
 
+  // Get postIDs
   .get(
     "/",
     zValidator(
@@ -51,21 +52,22 @@ const app = new Hono()
     async (ctx) => {
       const { page, perPage } = ctx.req.valid("query");
 
-      const postsResposne = await tryCatch(
+      const postsResponse = await tryCatch(
         db
-          .select()
+          .select({
+            id: posts.id,
+          })
           .from(posts)
-          .leftJoin(post_media, eq(posts.id, post_media.postId))
           .limit(perPage)
           .offset(page * perPage)
       );
 
-      if (postsResposne.error) {
-        ctx.log(postsResposne.error);
+      if (postsResponse.error) {
+        ctx.log(postsResponse.error);
         return respond.err(ctx, "Failed to get posts from db", 500);
       }
 
-      const postsData = postsResposne.data;
+      const postsData = postsResponse.data;
 
       return respond.ok(
         ctx,
@@ -76,6 +78,59 @@ const app = new Hono()
     }
   )
 
+  // Get post data by ID
+  .get(
+    "/:id",
+    zValidator(
+      "param",
+      z.object({
+        id: zNumberString(),
+      })
+    ),
+    async (ctx) => {
+      const { id } = ctx.req.valid("param");
+
+      const postResponse = await tryCatch(
+        db.select().from(posts).where(eq(posts.id, id)).limit(1)
+      );
+
+      const mentions = await tryCatch(
+        db
+          .select({
+            userId: users.id,
+            username: users.username,
+            fullName: users.fullName,
+            imageUrl: users.imageUrl,
+          })
+          .from(users)
+          .innerJoin(post_mentions, eq(users.id, post_mentions.userId))
+          .where(eq(post_mentions.postId, id))
+      );
+
+      if (postResponse.error) {
+        ctx.log(postResponse.error);
+        return respond.err(ctx, "Failed to get post from db", 500);
+      }
+
+      const [post] = postResponse.data;
+
+      if (!post) {
+        return respond.err(ctx, "Post not found", 404);
+      }
+
+      return respond.ok(
+        ctx,
+        {
+          ...post,
+          mentions,
+        },
+        "Post fetched successfully",
+        200
+      );
+    }
+  )
+
+  // Create post
   .post(
     "/",
     authenticated,
@@ -205,55 +260,7 @@ const app = new Hono()
     }
   )
 
-  .get(
-    "/:id",
-    zValidator(
-      "param",
-      z.object({
-        id: zNumberString(),
-      })
-    ),
-    async (ctx) => {
-      const { id } = ctx.req.valid("param");
-
-      const postResponse = await tryCatch(
-        db.select().from(posts).where(eq(posts.id, id)).limit(1)
-      );
-
-      const mentions = await tryCatch(
-        db
-          .select({
-            userId: users.id,
-            username: users.username,
-          })
-          .from(users)
-          .innerJoin(post_mentions, eq(users.id, post_mentions.userId))
-          .where(eq(post_mentions.postId, id))
-      );
-
-      if (postResponse.error) {
-        ctx.log(postResponse.error);
-        return respond.err(ctx, "Failed to get post from db", 500);
-      }
-
-      const [post] = postResponse.data;
-
-      if (!post) {
-        return respond.err(ctx, "Post not found", 404);
-      }
-
-      return respond.ok(
-        ctx,
-        {
-          ...post,
-          mentions,
-        },
-        "Post fetched successfully",
-        200
-      );
-    }
-  )
-
+  // Like post
   .post(
     "/like",
     authenticated,
@@ -283,6 +290,7 @@ const app = new Hono()
     }
   )
 
+  // Unlike post
   .delete(
     "/like",
     authenticated,
@@ -312,6 +320,7 @@ const app = new Hono()
     }
   )
 
+  // Bookmark post
   .post(
     "/bookmark",
     authenticated,
@@ -341,6 +350,7 @@ const app = new Hono()
     }
   )
 
+  // Unbookmark post
   .delete(
     "/bookmark",
     authenticated,
@@ -370,6 +380,7 @@ const app = new Hono()
     }
   )
 
+  // Get likes
   .get(
     "/:id/likes",
     authenticated,
@@ -407,6 +418,7 @@ const app = new Hono()
     }
   )
 
+  // Get replies
   .get(
     "/:id/replies",
     authenticated,
@@ -444,6 +456,7 @@ const app = new Hono()
     }
   )
 
+  // Get reposts
   .get(
     "/:id/reposts",
     zValidator(

@@ -15,6 +15,7 @@ export const zCreatePostAction = () =>
     reposting: true,
     parentId: true,
     subscriberOnly: true,
+    location: true,
   });
 
 export const createPost = createAction<
@@ -22,7 +23,7 @@ export const createPost = createAction<
 >()(
   async function createPost(
     tx,
-    { user, content, nsfw, parentId, reposting, subscriberOnly }
+    { user, content, nsfw, parentId, reposting, subscriberOnly, location }
   ) {
     if (!!parentId && !!reposting) {
       throw new Error(
@@ -59,6 +60,7 @@ export const createPost = createAction<
         authorId: user.id,
         content: sanitizedContent,
         parentId: parentId,
+        location: location,
         nsfw: nsfw,
         subscriberOnly: subscriberOnly,
       })

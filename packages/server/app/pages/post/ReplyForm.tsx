@@ -4,6 +4,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
 import Icon from "@/shared/components/Icon";
 import { motion } from "framer-motion";
+import { Textarea } from "@/shared/components/ui/textarea";
 
 export default function ReplyForm({
     postId,
@@ -35,11 +36,12 @@ export default function ReplyForm({
                 className="size-8 rounded-full border-2 border-primary/20"
             />
             <form onSubmit={handleSubmit} className="flex-1">
-                <Input
+                <Textarea
                     placeholder="Post your reply"
                     value={reply}
                     onChange={(e) => setReply(e.target.value)}
-                    className="bg-transparent border-none focus-visible:ring-0 text-sm p-0 h-auto min-h-[40px]"
+                    className="text-sm p-4"
+                    rows={2}
                 />
                 <div className="flex justify-between items-center mt-3">
                     <div className="flex items-center gap-2">

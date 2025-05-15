@@ -3,45 +3,25 @@ import { Link } from "react-router";
 import { motion } from "framer-motion";
 import Reactions from "@/shared/components/Reactions";
 import ImageCarousel from "@/shared/components/ImageCarousel";
-import { truncateText } from "@/shared/lib/utils";
 import { useState } from "react";
 import moment from "moment";
 import { useBeaver } from "@beaver/react"
+import React from "react";
+
+type MentionedUser = {
+    userId: number;
+    username: string;
+    fullName: string;
+    imageUrl: string | null;
+}
 
 export default function PostContent({ post, author }: {
     post: ReturnType<ReturnType<typeof useBeaver>["post"]["getPostById"]>["data"],
     author: ReturnType<typeof useBeaver>["user"]
 }) {
     const [showMore, setShowMore] = useState(false);
-    const hasImages = post?.media && post.media.length > 0;
-
-    const samplePost = {
-        "id": 5,
-        "authorId": 2,
-        "content": "kartik is @ishtails",
-        "nsfw": false,
-        "suiAddress": null,
-        "parentId": null,
-        "reposting": null,
-        "viewCount": 0,
-        "likesCount": 0,
-        "repliesCount": 0,
-        "repostsCount": 0,
-        "sharesCount": 0,
-        "actionId": 6,
-        "subscriberOnly": false,
-        "createdAt": 1747239146753,
-        "deletedAt": null,
-        "mentions": {
-            "data": [
-                {
-                    "userId": 2,
-                    "username": "ishtails"
-                }
-            ],
-            "error": null
-        }
-    }
+    // const hasImages = post?.media && post.media.length > 0;
+    const hasImages = false;
 
     // Format post analytics
     const analytics = {
@@ -54,6 +34,38 @@ export default function PostContent({ post, author }: {
 
     // Format date in a more readable way
     const formattedDate = post?.createdAt ? moment(post.createdAt).format("MMM D") : "";
+    const mentionedUsers = post?.mentions?.data || [];
+
+    // Create formatted content with clickable mentions
+    const formatContentWithMentions = (content: string) => {
+        if (!content || !mentionedUsers.length) return content;
+
+        // Split content by spaces to identify words
+        const words = content.split(/(\s+)/);
+
+        return words.map((word, index) => {
+            // Check if the word starts with @ symbol
+            if (word.startsWith('@')) {
+                const username = word.substring(1); // Remove the @ symbol
+                const mentionedUser = mentionedUsers.find(user => user.username === username);
+
+                if (mentionedUser) {
+                    return (
+                        <React.Fragment key={index}>
+                            <Link
+                                to={`/profile/${mentionedUser.userId}`}
+                                className="text-primary font-medium hover:underline"
+                            >
+                                {word}
+                            </Link>
+                        </React.Fragment>
+                    );
+                }
+            }
+
+            return <React.Fragment key={index}>{word}</React.Fragment>;
+        });
+    };
 
     return (
         <motion.div
@@ -95,15 +107,7 @@ export default function PostContent({ post, author }: {
 
                     <div className="mt-2">
                         <p className="text-sm">
-                            {showMore ? post?.content : truncateText(post?.content || "", 280)}
-                            {post?.content && post.content.length > 280 && (
-                                <button
-                                    className="text-primary text-sm ml-1 hover:underline"
-                                    onClick={() => setShowMore(!showMore)}
-                                >
-                                    {showMore ? "See less" : "See more"}
-                                </button>
-                            )}
+                            {post?.content ? formatContentWithMentions(post.content) : null}
                         </p>
                     </div>
 
@@ -111,8 +115,8 @@ export default function PostContent({ post, author }: {
                     {hasImages && (
                         <div className="w-full mt-3 rounded-lg overflow-hidden">
                             <ImageCarousel
-                                images={post.media}
-                                aspectRatio={post.aspectRatio || "portrait"}
+                                images={[]}
+                                aspectRatio="square"
                             />
                         </div>
                     )}

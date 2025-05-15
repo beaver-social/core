@@ -55,6 +55,10 @@ const itemAnimations = {
 };
 
 export default function CreatePage() {
+    const beaver = useBeaver();
+    const { mutateAsync: createPost } = beaver.post.createPost;
+
+    // States
     const [activeTab, setActiveTab] = useState<"post" | "swipe">("post");
     const [content, setContent] = useState("");
     const [location, setLocation] = useState("");
@@ -70,8 +74,6 @@ export default function CreatePage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const videoInputRef = useRef<HTMLInputElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const beaver = useBeaver();
-    const { mutateAsync: createPost } = beaver.post.createPost;
 
     // Mention suggestion state
     const [showMentions, setShowMentions] = useState(false);
@@ -223,7 +225,7 @@ export default function CreatePage() {
 
                 // Position dropdown below cursor
                 setMentionPosition({
-                    top: cursorCoords.top + 20, // Add some offset for better positioning
+                    top: cursorCoords.top + 30, // Add some offset for better positioning
                     left: cursorCoords.left
                 });
             }
@@ -347,9 +349,10 @@ export default function CreatePage() {
             const result = await createPost({
                 content,
                 media: mediaFiles,
-                nsfw: false,
+                location,
                 parentId: null,
                 reposting: null,
+                nsfw: false,
                 subscriberOnly: false
             })
 
@@ -436,12 +439,12 @@ export default function CreatePage() {
                                             >
                                                 {isLoadingUsers && (
                                                     <div className="flex items-center justify-center p-4">
-                                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                                                        <Icon name="LoaderCircle" className="size-5 animate-spin" />
                                                     </div>
                                                 )}
 
                                                 {!isLoadingUsers && userSuggestions?.users.length === 0 && (
-                                                    <div className="p-3 text-center text-muted-foreground">
+                                                    <div className="p-3 text-center text-muted-foreground text-sm">
                                                         No users found
                                                     </div>
                                                 )}
