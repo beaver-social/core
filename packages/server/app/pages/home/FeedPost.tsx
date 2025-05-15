@@ -47,7 +47,9 @@ const schema = {
           "id": 1,
           "postId": 9,
           "url": "https://picsum.photos/200/300",
-          "blurhash": null
+          "blurhash": null,
+          "aspectRatio": "square",
+          "type": "image"
         }
       ],
       "error": null
