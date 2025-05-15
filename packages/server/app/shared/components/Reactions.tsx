@@ -3,11 +3,11 @@ import Icon from "@/shared/components/Icon";
 import { motion } from "framer-motion";
 
 type Props = {
-    analytics: {
-        likes: number;
-        comments: number;
-        reposts: number;
-        shares: number;
+    analytics?: {
+        likes: number | null;
+        comments: number | null;
+        reposts: number | null;
+        shares: number | null;
     }
 }
 
@@ -28,7 +28,7 @@ export default function Reactions(props: Props) {
                         className="size-5 group-hover:text-like transition-colors"
                     />
                 </motion.div>
-                <span className="text-sm font-medium group-hover:text-like transition-colors">{props.analytics.likes}</span>
+                <span className="text-sm font-medium group-hover:text-like transition-colors">{props.analytics?.likes}</span>
             </motion.button>
 
             <motion.button
@@ -45,7 +45,7 @@ export default function Reactions(props: Props) {
                         className="size-5 group-hover:text-comment transition-colors"
                     />
                 </motion.div>
-                <span className="text-sm font-medium group-hover:text-comment transition-colors">{props.analytics.comments}</span>
+                <span className="text-sm font-medium group-hover:text-comment transition-colors">{props.analytics?.comments}</span>
             </motion.button>
 
             <motion.button
@@ -63,7 +63,7 @@ export default function Reactions(props: Props) {
                         className="size-5 group-hover:text-repost transition-colors"
                     />
                 </motion.div>
-                <span className="text-sm font-medium group-hover:text-repost transition-colors">{props.analytics.reposts}</span>
+                <span className="text-sm font-medium group-hover:text-repost transition-colors">{props.analytics?.reposts}</span>
             </motion.button>
 
             <motion.button
@@ -81,7 +81,7 @@ export default function Reactions(props: Props) {
                         className="size-5 group-hover:text-share transition-colors"
                     />
                 </motion.div>
-                <span className="text-sm font-medium group-hover:text-share transition-colors">{props.analytics.shares}</span>
+                <span className="text-sm font-medium group-hover:text-share transition-colors">{props.analytics?.shares}</span>
             </motion.button>
         </div>
     )

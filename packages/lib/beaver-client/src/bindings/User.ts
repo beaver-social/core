@@ -118,8 +118,12 @@ export default class User {
     this.defaults.events.emit("user:logout", {});
   }
 
-  async getUserById(options: { id: number }) {
+  async getUserById(options: { id: number | undefined }) {
     const { id } = options;
+    if (!id) {
+      return null;
+    }
+
     return safeParseResponse(
       this.defaults.apiClient.rpc.users[":id"].$get({
         param: { id: id.toString() },

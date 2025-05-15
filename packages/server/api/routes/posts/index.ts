@@ -107,26 +107,43 @@ const app = new Hono()
           .where(eq(post_mentions.postId, id))
       );
 
+      const postMedia = await tryCatch(
+        db.select().from(post_media).where(eq(post_media.postId, id))
+      );
+
       if (postResponse.error) {
         ctx.log(postResponse.error);
         return respond.err(ctx, "Failed to get post from db", 500);
       }
 
+      if (mentions.error) {
+        ctx.log(mentions.error);
+      }
+
+      if (postMedia.error) {
+        ctx.log(postMedia.error);
+      }
+
       const [post] = postResponse.data;
+      const mediaArray = postMedia.data;
 
       if (!post) {
         return respond.err(ctx, "Post not found", 404);
       }
 
-      return respond.ok(
-        ctx,
-        {
-          ...post,
-          mentions,
+      const parsedPost = {
+        media: mediaArray,
+        mentions: mentions.data,
+        analytics: {
+          likes: post.likesCount || 0,
+          reposts: post.repostsCount || 0,
+          comments: post.repliesCount || 0,
+          shares: post.sharesCount || 0,
         },
-        "Post fetched successfully",
-        200
-      );
+        ...post,
+      };
+
+      return respond.ok(ctx, parsedPost, "Post fetched successfully", 200);
     }
   )
 

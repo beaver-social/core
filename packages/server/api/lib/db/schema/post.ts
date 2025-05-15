@@ -48,6 +48,7 @@ export const post_media = t.sqliteTable(
     postId: t.int().notNull(),
     url: t.text().notNull(),
     blurhash: t.text(),
+    aspectRatio: t.text(),
   },
   (table) => [t.index("media_post_id_idx").on(table.postId)]
 );
