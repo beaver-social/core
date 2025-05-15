@@ -9,14 +9,17 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
-
 interface ImageCarouselProps {
-    images: string[];
+    media: {
+        id: number;
+        postId: number;
+        url: string;
+        blurhash: string | null;
+    }[];
     className?: string;
-    aspectRatio: 'square' | 'portrait';
 }
 
-export default function ImageCarousel({ images, className = '', aspectRatio }: ImageCarouselProps) {
+export default function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [errorImages, setErrorImages] = useState<Set<number>>(new Set());
 

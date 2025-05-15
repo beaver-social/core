@@ -1,6 +1,6 @@
 import Icon from "@/shared/components/Icon";
 import { Link, useNavigate } from "react-router";
-import ImageCarousel from "@/shared/components/ImageCarousel";
+import ImageCarousel from "@/shared/components/MediaCarousel";
 import { Image } from "@/shared/components/Image";
 
 export default function NotificationBody({

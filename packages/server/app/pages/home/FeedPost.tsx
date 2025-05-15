@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router";
-import ImageCarousel from "@/shared/components/ImageCarousel";
+import ImageCarousel from "@/shared/components/MediaCarousel";
 import { Image } from "@/shared/components/Image";
 import Reactions from "@/shared/components/Reactions";
 import { motion } from "framer-motion";
@@ -148,7 +148,7 @@ function FeedPost({
                 e.stopPropagation();
               }}
             >
-              <ImageCarousel media={post?.media} aspectRatio={post?.media[0].aspectRatio} />
+              <ImageCarousel media={post?.media} />
             </div>
           )}
 

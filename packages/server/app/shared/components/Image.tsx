@@ -1,8 +1,8 @@
 import { cn } from "@/shared/lib/utils";
 
 type Props = {
-    src: string;
-    alt: string;
+    src?: string | null;
+    alt?: string | null;
     className?: string;
     [key: string]: any;
 }

@@ -6,7 +6,7 @@ import { useBeaver } from "@beaver/react";
 import { truncateText } from "@/shared/lib/utils"
 import moment from "moment";
 import FollowDialog from "./FollowDialog"
-import ImageCarousel from "@/shared/components/ImageCarousel";
+import ImageCarousel from "@/shared/components/MediaCarousel";
 
 type Props = {
     data: ReturnType<typeof useBeaver>["user"]

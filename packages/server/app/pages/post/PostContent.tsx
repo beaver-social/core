@@ -2,7 +2,7 @@ import { Image } from "@/shared/components/Image";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
 import Reactions from "@/shared/components/Reactions";
-import ImageCarousel from "@/shared/components/ImageCarousel";
+import ImageCarousel from "@/shared/components/MediaCarousel";
 import { useState } from "react";
 import moment from "moment";
 import { useBeaver } from "@beaver/react"

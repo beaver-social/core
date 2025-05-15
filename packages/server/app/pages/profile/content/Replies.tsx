@@ -1,5 +1,5 @@
 import { Image } from "@/shared/components/Image";
-import ImageCarousel from "@/shared/components/ImageCarousel";
+import ImageCarousel from "@/shared/components/MediaCarousel";
 import Reactions from "@/shared/components/Reactions";
 import { samplePosts } from "@/shared/data/posts";
 
