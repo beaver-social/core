@@ -59,7 +59,7 @@ export default function SideNav() {
   const [isProfilePage, setIsProfilePage] = useState(false);
   const location = useLocation();
   const beaver = useBeaver();
-  const user = beaver.user as User;
+  const user = beaver.user;
 
   // Set active index based on current URL
   useEffect(() => {
@@ -177,7 +177,7 @@ export default function SideNav() {
       <div className="my-4 mx-3">
         {beaver.wallet.isConnected ? (
           <Link
-            to="/profile/ishtails"
+            to={`/profile/${user?.id}`}
             className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors mt-3 ${isProfilePage ? "bg-primary/5" : "hover:bg-muted"
               }`}
           >

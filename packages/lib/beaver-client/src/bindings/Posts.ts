@@ -76,7 +76,9 @@ export default class Posts {
     );
   }
 
-  async getPostById(id: number | string) {
+  async getPostById(options: { id: number | string }) {
+    const { id } = options;
+
     return safeParseResponse(
       this.defaults.apiClient.rpc.posts[`:id`].$get({
         param: { id: id.toString() },

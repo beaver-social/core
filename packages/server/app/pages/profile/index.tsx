@@ -7,6 +7,7 @@ import Tabs from "@/shared/components/Tabs"
 import { useGlobalUI } from "@/shared/hooks/useGlobalUI"
 import BasicInfo from "./BasicInfo"
 import { useBeaver } from "@beaver/react";
+import Icon from "@/shared/components/Icon"
 
 export type UserDetails = {
     id: string;
@@ -62,24 +63,28 @@ const userDetails: UserDetails = {
 }
 
 export default function Profile() {
-    const beaver = useBeaver();
-    const user = beaver.user;
-
-
     const { id } = useParams<{ id: string }>()
+    const beaver = useBeaver();
+    const { data: user, isLoading, isError, isSuccess } = beaver.profile.getProfileById({ id: parseInt(id || "1") });
+    const isCurrentUser = id === beaver.user?.id.toString();
+
     const { setScreen } = useGlobalUI();
     useEffect(() => {
         setScreen("profile");
     }, []);
 
-    const isCurrentUser = id === user?.id.toString();
-
     return (
         <Layout main={
-            <div className="border mb-10  rounded-t-2xl">
-                <ProfileHeader data={userDetails} isCurrentUser={isCurrentUser} />
-                <BasicInfo data={userDetails} id={id} />
-                <Tabs />
+            <div className="border mb-10 rounded-t-2xl h-screen">
+                {isSuccess ? <div>
+                    <ProfileHeader data={userDetails} isCurrentUser={isCurrentUser} />
+                    <BasicInfo data={user} />
+                    <Tabs />
+                </div> :
+                    <div className="flex justify-center items-center h-full">
+                        <Icon name="LoaderCircle" className="size-10 animate-spin" />
+                    </div>
+                }
             </div>
         } secondary={<SecondaryPanel />} />
     )

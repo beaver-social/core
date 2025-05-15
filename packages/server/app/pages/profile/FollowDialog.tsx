@@ -7,9 +7,8 @@ export default function FollowDialog({ data, count, title }: { data: any, count:
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <button className="hover:underline">
-                    <span className="font-semibold text-grey-400">{count} {title}</span> <span className="text-grey-500">
-                    </span>
+                <button className="hover:underline underline-offset-2 text-sm">
+                    <span className="font-semibold text-grey-300">{count} <span className="text-grey-500">{title}</span></span>
                 </button>
             </DialogTrigger>
             <DialogContent>
