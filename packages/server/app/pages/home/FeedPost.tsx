@@ -1,5 +1,4 @@
 import { Link, useNavigate } from "react-router";
-import ImageCarousel from "@/shared/components/MediaCarousel";
 import { Image } from "@/shared/components/Image";
 import Reactions from "@/shared/components/Reactions";
 import { motion } from "framer-motion";
@@ -10,6 +9,7 @@ import { Button } from "@/shared/components/ui/button";
 import Icon from "@/shared/components/Icon";
 import { useBeaver } from "@beaver/react";
 import moment from "moment";
+import MediaCarousel from "@/shared/components/MediaCarousel";
 
 const schema = {
   "post": {
@@ -150,7 +150,7 @@ function FeedPost({
                 e.stopPropagation();
               }}
             >
-              <ImageCarousel media={post?.media} />
+              <MediaCarousel media={post?.media} />
             </div>
           )}
 

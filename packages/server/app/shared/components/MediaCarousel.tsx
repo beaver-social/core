@@ -11,7 +11,7 @@ interface MediaCarouselProps {
         postId: number;
         url: string;
         blurhash: string | null;
-        aspectRatio: 'square' | 'portrait';
+        aspectRatio: 'square' | 'portrait' | 'custom';
         type: 'image' | 'video';
     }[];
     className?: string;

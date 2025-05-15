@@ -240,6 +240,8 @@ const app = new Hono()
                 postId: post.id,
                 url: imageUrl.data,
                 blurhash,
+                aspectRatio: item.aspectRatio || "square",
+                type: "image",
               })
             );
 
@@ -262,6 +264,8 @@ const app = new Hono()
               db.insert(post_media).values({
                 postId: post.id,
                 url: videoUrl.data,
+                aspectRatio: item.aspectRatio || "square",
+                type: "video",
               })
             );
 
