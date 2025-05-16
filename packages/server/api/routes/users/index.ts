@@ -574,7 +574,7 @@ export default new Hono()
   )
 
   .delete(
-    "/:id/pin",
+    "/pin",
     authenticated,
     zValidator(
       "json",
@@ -582,22 +582,23 @@ export default new Hono()
         signature: zSuiSignature(),
       })
     ),
-    zValidator(
-      "param",
-      z.object({
-        id: zNumberString(),
-      })
-    ),
     async (ctx) => {
       const { signature } = ctx.req.valid("json");
-      const { id } = ctx.req.valid("param");
       const user = ctx.var.user;
+
+      if (!user) {
+        return respond.err(ctx, "User not found", 404);
+      }
+
+      if (!user.pinnedPost) {
+        return respond.ok(ctx, {}, "No pinned post", 200);
+      }
 
       const { error: unpinError } = await tryCatch(
         unpinPost(
           {
             userId: user.id,
-            postId: id,
+            postId: user.pinnedPost,
           },
           signature
         )

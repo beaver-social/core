@@ -107,7 +107,7 @@ function render() {
   const getProfileButton = document.createElement("button");
   getProfileButton.innerText = "Get Profile";
   getProfileButton.onclick = async () => {
-    const response = await beaver.user.getProfile();
+    const response = await beaver.user.findProfile();
     console.log(response);
   };
   userSection.appendChild(getProfileButton);
@@ -230,9 +230,7 @@ function render() {
       alert("Please enter a post ID to unpin");
       return;
     }
-    const response = await beaver.user.unpinPost({
-      postId: Number(pinPostInput.value),
-    });
+    const response = await beaver.user.unpinPost();
     console.log(response);
   };
   userSection.appendChild(unpinButton);
@@ -280,7 +278,7 @@ function render() {
       alert("Please enter a post ID");
       return;
     }
-    const response = await beaver.posts.getPostById(Number(postIdInput.value));
+    const response = await beaver.posts.getPostById(postIdInput.value);
     console.log(response);
   };
   postsSection.appendChild(getPostButton);
