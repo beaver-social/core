@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router";
 import { Image } from "@/shared/components/Image";
-import Reactions from "@/shared/components/Reactions";
+import Reactions from "@/pages/post/Reactions";
 import { motion } from "framer-motion";
 import { truncateText } from "@/shared/lib/utils";
 import { useState } from "react";
@@ -10,6 +10,7 @@ import Icon from "@/shared/components/Icon";
 import { useBeaver } from "@beaver/react";
 import moment from "moment";
 import MediaCarousel from "@/shared/components/MediaCarousel";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 
 function FeedPost({
   postId
@@ -23,6 +24,49 @@ function FeedPost({
   const beaver = useBeaver();
   const { data: post, isLoading: postLoading, isError: postError, isSuccess: postSuccess, refetch: refetchPost } = beaver.post.getPostById({ id: postId });
   const { data: author, isLoading: userLoading, isError: userError, isSuccess: userSuccess } = beaver.profile.getProfile({ value: post?.authorId.toString() || "", type: "id" });
+
+  const isLoading = postLoading || userLoading;
+
+  // Skeleton loader
+  if (isLoading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+        className="mb-6 pb-6"
+      >
+        <div className="flex flex-col rounded-sm overflow-hidden bg-secondary shadow-sm transition-all duration-300 border mx-6 sm:mx-0">
+          {/* Header skeleton */}
+          <div className="flex items-center gap-3 p-4 pb-2">
+            <Skeleton className="size-8 rounded-full" />
+            <div className="flex flex-col gap-2 w-full">
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-3 w-16" />
+            </div>
+          </div>
+
+          {/* Content skeleton */}
+          <div className="px-4 pt-1 pb-3">
+            <Skeleton className="h-4 w-full mb-2" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+
+          {/* Media skeleton */}
+          <Skeleton className="w-full h-56 rounded-none" />
+
+          {/* Actions skeleton */}
+          <div className="px-4 py-3 border-t border-border">
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-16" />
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -62,7 +106,7 @@ function FeedPost({
                 </Link>
                 <span className="text-muted-foreground text-sm">@{author?.username}</span>
                 <span className="text-muted-foreground mx-1">·</span>
-                <time className="text-muted-foreground text-sm hover:underline">{moment(post?.createdAt).format("MMM D, YYYY")}</time>
+                <time className="text-muted-foreground text-sm hover:underline">{moment(post?.createdAt).fromNow()}</time>
               </div>
               {post?.location && (
                 <div className="flex items-center gap-1 text-muted-foreground ">
@@ -175,7 +219,7 @@ function FeedPost({
                 </Link>
                 <span className="text-muted-foreground text-sm">@{author?.username}</span>
                 <span className="text-muted-foreground mx-1">·</span>
-                <time className="text-muted-foreground text-sm hover:underline">{moment(post?.createdAt).format("MMM D, YYYY")}</time>
+                <time className="text-muted-foreground text-sm hover:underline">{moment(post?.createdAt).fromNow()}</time>
               </div>
             </div>
           </div>

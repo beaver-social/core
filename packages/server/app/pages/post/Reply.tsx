@@ -1,7 +1,7 @@
 import { Image } from "@/shared/components/Image";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
-import Reactions from "@/shared/components/Reactions";
+import Reactions from "@/pages/post/Reactions";
 import { truncateText } from "@/shared/lib/utils";
 import { useState } from "react";
 import { useBeaver } from "@beaver/react";

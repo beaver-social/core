@@ -1,10 +1,10 @@
 import { useBeaverContext } from "../context/beaver";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 
 export function useBeaver() {
   const { client, user } = useBeaverContext();
   const wallet = useWallets();
-  const follows = useFollows();
+  const follow = useFollow();
   const post = usePost();
   const profile = useProfile();
 
@@ -15,7 +15,7 @@ export function useBeaver() {
     register: client.user.register.bind(client.user),
     login: client.user.login.bind(client.user),
     logout: client.user.logout.bind(client.user),
-    follows,
+    follow,
     post,
     profile,
   };
@@ -55,7 +55,7 @@ export function useWallets() {
   };
 }
 
-export function useFollows() {
+export function useFollow() {
   const { client } = useBeaverContext();
 
   return {
@@ -113,11 +113,15 @@ export function usePost() {
         return await client.posts.createPost(options);
       },
     }),
-    getPosts: (options?: Parameters<typeof client.posts.getPosts>[0]) =>
-      useQuery({
-        queryKey: ["getPosts", options],
-        queryFn: async () => {
-          return await client.posts.getPosts(options);
+    getPosts: ({ perPage = 10 }: { perPage?: number }) =>
+      useInfiniteQuery({
+        queryKey: ["getPosts", perPage],
+        queryFn: async ({ pageParam }) => {
+          return await client.posts.getPosts({ perPage, page: pageParam });
+        },
+        initialPageParam: 1,
+        getNextPageParam: (lastPage, pages) => {
+          return lastPage.hasMore ? pages.length + 1 : undefined;
         },
       }),
     getFollowingPosts: (

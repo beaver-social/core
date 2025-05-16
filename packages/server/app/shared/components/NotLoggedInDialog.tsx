@@ -26,17 +26,13 @@ export default function NotLoggedInDialog({ open, onOpenChange }: Props) {
     useEffect(() => {
         if (!isOpen) {
             setAnimationStep(0);
+            navigate("/");
         } else {
             const timer = setTimeout(() => {
                 setAnimationStep(1);
             }, 800);
 
             return () => clearTimeout(timer);
-        }
-
-        // if the dialog is closed, redirect to the home page
-        if (!isOpen) {
-            navigate("/");
         }
     }, [isOpen]);
 

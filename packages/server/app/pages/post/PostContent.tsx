@@ -1,7 +1,7 @@
 import { Image } from "@/shared/components/Image";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
-import Reactions from "@/shared/components/Reactions";
+import Reactions from "@/pages/post/Reactions";
 import ImageCarousel from "@/shared/components/MediaCarousel";
 import { useState } from "react";
 import { useBeaver } from "@beaver/react"
@@ -45,8 +45,8 @@ export default function PostContent({ post, author, refetchPost }: {
                     return (
                         <React.Fragment key={index}>
                             <Link
-                                to={`/profile/${mentionedUser.userId}`}
-                                className="text-primary font-medium hover:underline"
+                                to={`/profile/${mentionedUser.username}`}
+                                className="text-sky-500 font-medium hover:underline"
                             >
                                 {word}
                             </Link>

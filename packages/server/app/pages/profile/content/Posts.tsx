@@ -1,6 +1,6 @@
 import Icon from "@/shared/components/Icon";
 import { Image } from "@/shared/components/Image";
-import Reactions from "@/shared/components/Reactions";
+import Reactions from "@/pages/post/Reactions";
 import { samplePosts } from "@/shared/data/posts";
 
 export default function PostData() {

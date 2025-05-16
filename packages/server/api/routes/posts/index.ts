@@ -28,7 +28,6 @@ import {
 import { preprocessImageMedia } from "./helpers";
 import s3 from "../../lib/s3/client";
 import { and, eq, inArray, isNotNull, desc } from "drizzle-orm";
-import { contracts } from "../../lib/sui/contracts";
 import { bookmarks } from "../../lib/db/schema/interaction";
 import { follows } from "../../lib/db/schema/user";
 
@@ -62,6 +61,7 @@ const app = new Hono()
           .from(posts)
           .limit(perPage)
           .offset(page * perPage)
+          .orderBy(desc(posts.createdAt))
       );
 
       if (postsResponse.error) {

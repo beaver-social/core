@@ -42,9 +42,9 @@ export default function BasicInfo({ data: user }: Props) {
 
     const { data: pinnedPostDetails, isSuccess: pinnedPostSuccess } = beaver.post.getPostById({ id: Number(user?.pinnedPost) });
 
-    const { data: followerData } = beaver.follows.getFollowers({ userId: Number(user?.id), page: 1, perPage: 10 });
-    const { data: followingData } = beaver.follows.getFollowing({ userId: Number(user?.id), page: 1, perPage: 10 });
-    const { data: count } = beaver.follows.getFollowCount({ userId: Number(user?.id) });
+    const { data: followerData } = beaver.follow.getFollowers({ userId: Number(user?.id), page: 1, perPage: 10 });
+    const { data: followingData } = beaver.follow.getFollowing({ userId: Number(user?.id), page: 1, perPage: 10 });
+    const { data: count } = beaver.follow.getFollowCount({ userId: Number(user?.id) });
 
     return (
         <div className="pt-18 px-6 border-b">

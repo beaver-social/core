@@ -122,8 +122,6 @@ export class BeaverStore {
 
     const user = await safeParseResponse(this.apiClient.rpc.users.$get());
 
-    console.log("user", user);
-
     if (!user) {
       this.setJwt(null);
       return false;

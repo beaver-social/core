@@ -1,6 +1,6 @@
 import { Image } from "@/shared/components/Image";
 import ImageCarousel from "@/shared/components/MediaCarousel";
-import Reactions from "@/shared/components/Reactions";
+import Reactions from "@/pages/post/Reactions";
 import { samplePosts } from "@/shared/data/posts";
 
 // Sample replies data

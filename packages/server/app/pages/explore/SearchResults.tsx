@@ -7,6 +7,9 @@ import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router";
 import SearchBar from "@/pages/explore/SearchBar";
 import { samplePosts } from "@/shared/data/posts";
+import { useBeaver } from "@beaver/react";
+import useInfiniteScroll from "@/shared/hooks/useInfiniteScroll";
+import { motion } from "framer-motion";
 
 // Sample data for profiles and topics in search
 const sampleProfiles = [
@@ -25,39 +28,28 @@ export default function SearchResults() {
     const [searchParams, setSearchParams] = useSearchParams();
     const query = searchParams.get("q") || "";
     const navigate = useNavigate();
-    const [filteredPosts, setFilteredPosts] = useState(samplePosts);
 
-    // Filter posts based on search query
-    const filterPosts = useCallback((searchQuery: string) => {
-        if (!searchQuery) {
-            setFilteredPosts(samplePosts);
-            return;
-        }
+    const beaver = useBeaver();
+    const { data: postArray, fetchNextPage, hasNextPage } = beaver.post.getPosts({ perPage: 10 });
 
-        // Case-insensitive search on content
-        const filtered = samplePosts.filter(post =>
-            post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            post.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            post.handle.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        setFilteredPosts(filtered);
-    }, []);
+    const { infiniteScrollRef } = useInfiniteScroll({
+        fetchNextPage,
+        hasNextPage,
+    });
+
+    console.log({
+        infiniteScrollRef,
+    });
 
     // Handle search from the search bar
     const handleSearch = useCallback((searchQuery: string) => {
         setSearchParams({ q: searchQuery });
-        filterPosts(searchQuery);
-    }, [setSearchParams, filterPosts]);
-
-    // Initial filter on component mount and when query changes
-    useEffect(() => {
-        filterPosts(query);
-    }, [query, filterPosts]);
+    }, [setSearchParams]);
 
     return (
         <Layout
             main={
-                <div className="">
+                <>
                     {/* Search Header */}
                     <div className="top-0 z-10 backdrop-blur-sm rounded-t-2xl">
                         <div className="flex items-center gap-4 mb-5">
@@ -86,23 +78,27 @@ export default function SearchResults() {
                     </div>
 
                     {/* Search Results */}
-                    {filteredPosts.length > 0 ? (
-                        <div className="mt-8 divide-y">
-                            {filteredPosts.map((post) => (
-                                <FeedPost key={post.id} {...post} />
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center py-16 px-4">
-                            <h2 className="text-xl font-semibold mb-2">No results found</h2>
-                            <p className="text-center text-muted-foreground">
-                                Try searching for different terms or check your spelling.
-                            </p>
-                        </div>
-                    )}
-                </div>
+                    <div className="divide-y my-6">
+                        {postArray?.pages && postArray?.pages.length > 0 ? postArray?.pages.map((page) => page.posts.map((postId, index) => (
+                            <FeedPost key={index} postId={postId.id} />
+                        ))) : (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="flex flex-col gap-2 border items-center text-grey-500 justify-center p-10 rounded-sm"
+                            >
+                                <p className="text-sm">No posts found..</p>
+                            </motion.div>
+                        )}
+
+                        {hasNextPage && (
+                            <div ref={infiniteScrollRef} className="h-1" />
+                        )}
+                    </div >
+                </>
             }
-            secondary={<SecondaryPanel />}
+            secondary={< SecondaryPanel />}
         />
     );
 } 

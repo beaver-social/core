@@ -75,7 +75,7 @@ export default function Profile() {
 
     return (
         <Layout main={
-            <div className="border mb-10 rounded-t-2xl h-screen">
+            <div className="border mb-10 rounded-t-2xl">
                 {isSuccess ? <div>
                     <ProfileHeader data={userDetails} isCurrentUser={isCurrentUser} />
                     <BasicInfo data={profile} />
