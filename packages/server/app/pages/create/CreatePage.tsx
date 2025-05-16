@@ -22,7 +22,7 @@ type MediaFile = {
     file: File;
     type: "image" | "video";
     previewUrl: string;
-    aspectRatio: "square" | "portrait" | "custom";
+    aspectRatio: "square" | "portrait" | "landscape" | "banner" | "wide" | "custom";
 };
 
 // Compression options
@@ -143,7 +143,7 @@ export default function CreatePage() {
     }, []);
 
     // Handle cropping for images
-    const handleCrop = useCallback((croppedFile: File, aspectRatio: 'square' | 'portrait') => {
+    const handleCrop = useCallback((croppedFile: File, aspectRatio: 'square' | 'portrait' | 'landscape' | 'banner' | 'wide' | 'custom') => {
         const previewUrl = URL.createObjectURL(croppedFile);
 
         setMediaFiles(prev => [...prev, {
@@ -814,6 +814,8 @@ export default function CreatePage() {
                     }}
                     image={tempFile}
                     onCrop={handleCrop}
+                    initialAspectRatio="square"
+                    allowedAspectRatios={['square', 'portrait']}
                 />
             )}
 

@@ -21,7 +21,13 @@ export default class Posts {
         file: File;
         type: "image" | "video";
         previewUrl: string;
-        aspectRatio: "square" | "portrait" | "custom";
+        aspectRatio:
+          | "square"
+          | "portrait"
+          | "landscape"
+          | "banner"
+          | "wide"
+          | "custom";
       }[];
     }
   ) {

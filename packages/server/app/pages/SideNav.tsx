@@ -230,7 +230,7 @@ export default function SideNav() {
               />
             </motion.div>
             <span className={isProfilePage ? "text-primary font-medium" : ""}>
-              Profile
+              {beaver.user?.username ? beaver.user?.username : "Profile"}
             </span>
             {isProfilePage && (
               <motion.div
