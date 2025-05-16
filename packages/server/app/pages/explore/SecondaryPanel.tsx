@@ -153,7 +153,7 @@ export default function SecondaryPanel() {
                                             />
                                             {profile.verified && (
                                                 <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-0.5">
-                                                    <Icon name="BadgeCheck" size={12} className="text-primary size-3" />
+                                                    <Icon name="BadgeCheck" className="text-primary size-3" />
                                                 </div>
                                             )}
                                         </motion.div>

@@ -118,19 +118,6 @@ export default class User {
     this.defaults.events.emit("user:logout", {});
   }
 
-  async getUserById(options: { id: number | undefined }) {
-    const { id } = options;
-    if (!id) {
-      return null;
-    }
-
-    return safeParseResponse(
-      this.defaults.apiClient.rpc.users[":id"].$get({
-        param: { id: id.toString() },
-      })
-    );
-  }
-
   async updateProfile(options: {
     fullName?: string;
     imageUrl?: string;
@@ -148,11 +135,12 @@ export default class User {
     );
   }
 
-  async findProfile(options: {
-    type: "identity" | "username" | "suinsDomainName" | "address";
+  async getProfile(options: {
+    type: "id" | "identity" | "username" | "suinsDomainName" | "address";
     value: string;
   }) {
     const { type, value } = options;
+
     return safeParseResponse(
       this.defaults.apiClient.rpc.users.find.$get({
         query: { type, value },

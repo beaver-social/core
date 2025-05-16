@@ -27,16 +27,17 @@ import {
 } from "../../lib/zod/helpers";
 import { preprocessImageMedia } from "./helpers";
 import s3 from "../../lib/s3/client";
-import { and, eq, isNotNull } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, desc } from "drizzle-orm";
 import { contracts } from "../../lib/sui/contracts";
 import { bookmarks } from "../../lib/db/schema/interaction";
+import { follows } from "../../lib/db/schema/user";
 
 const { posts, post_media, post_topics, post_mentions, likes, users } =
   db.schema;
 
 const app = new Hono()
 
-  // Get postIDs
+  // Get all posts
   .get(
     "/",
     zValidator(
@@ -74,6 +75,70 @@ const app = new Hono()
         ctx,
         { posts: postsData, hasMore: !(postsData.length < perPage) },
         "Posts fetched successfully",
+        200
+      );
+    }
+  )
+
+  // Get all following posts
+  .get(
+    "/following",
+    zValidator(
+      "query",
+      z.object({
+        page: zNumberString()
+          .default("1")
+          .transform((v) => v - 1),
+        perPage: zNumberString()
+          .transform((v) => Math.min(v, 32))
+          .default("8"),
+      })
+    ),
+    authenticated,
+    async (ctx) => {
+      const { page, perPage } = ctx.req.valid("query");
+      const user = ctx.get("user");
+
+      // find all following users
+      const followingResponse = await tryCatch(
+        db
+          .select({
+            id: follows.followingId,
+          })
+          .from(follows)
+          .where(eq(follows.followerId, user.id))
+      );
+
+      if (followingResponse.error) {
+        ctx.log(followingResponse.error);
+        return respond.err(ctx, "Failed to get following users from db", 500);
+      }
+
+      const following = followingResponse.data;
+      const followingIds = following.map((f) => f.id);
+
+      const postsResponse = await tryCatch(
+        db
+          .select({
+            id: posts.id,
+          })
+          .from(posts)
+          .where(inArray(posts.authorId, followingIds))
+          .limit(perPage)
+          .offset(page * perPage)
+      );
+
+      if (postsResponse.error) {
+        ctx.log(postsResponse.error);
+        return respond.err(ctx, "Failed to get following posts from db", 500);
+      }
+
+      const postsData = postsResponse.data;
+
+      return respond.ok(
+        ctx,
+        { posts: postsData, hasMore: !(postsData.length < perPage) },
+        "Following posts fetched successfully",
         200
       );
     }
@@ -452,11 +517,14 @@ const app = new Hono()
 
       const repliesResponse = await tryCatch(
         db
-          .select()
+          .select({
+            id: posts.id,
+          })
           .from(posts)
           .where(eq(posts.parentId, id))
           .limit(perPage)
           .offset(page * perPage)
+          .orderBy(desc(posts.createdAt))
       );
 
       if (repliesResponse.error) {

@@ -12,6 +12,7 @@ interface IIconProps {
   | "semibold"
   | "bold";
   className?: string;
+  fill?: string;
 }
 
 export default function Icon(props: IIconProps) {
@@ -23,6 +24,7 @@ export default function Icon(props: IIconProps) {
       className={props.className}
       color={props.color}
       strokeWidth={parseWeight(weight)}
+      {...(props.fill && { fill: props.fill })}
     />
   );
 }

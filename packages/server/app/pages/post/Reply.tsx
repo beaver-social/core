@@ -4,11 +4,19 @@ import { motion } from "framer-motion";
 import Reactions from "@/shared/components/Reactions";
 import { truncateText } from "@/shared/lib/utils";
 import { useState } from "react";
+import { useBeaver } from "@beaver/react";
+import moment from "moment";
 
-export default function Reply({ reply }: {
-    reply: any
+export default function Reply({ id }: {
+    id: number
 }) {
     const [showMore, setShowMore] = useState(false);
+    const beaver = useBeaver();
+    const { data: reply, refetch: refetchReply } = beaver.post.getPostById({ id: id.toString() });
+    const { data: author } = beaver.profile.getProfile({
+        value: reply?.authorId.toString() || "",
+        type: "id"
+    });
 
     return (
         <motion.div
@@ -18,29 +26,29 @@ export default function Reply({ reply }: {
             className="p-4 hover:bg-secondary/40 transition-colors"
         >
             <div className="flex gap-3">
-                <Link to={`/profile/${reply.handle}`}>
+                <Link to={`/profile/${author?.username}`}>
                     <Image
-                        src={reply.avatarUrl}
-                        alt={`${reply.username}'s avatar`}
+                        src={author?.imageUrl}
+                        alt={`${author?.username}'s avatar`}
                         className="size-8 rounded-full border-2 border-primary/20"
                     />
                 </Link>
                 <div className="flex-1">
                     <div className="flex items-center gap-1 flex-wrap">
                         <Link
-                            to={`/profile/${reply.handle}`}
+                            to={`/profile/${author?.username}`}
                             className="font-semibold hover:text-primary transition-colors"
                         >
-                            {reply.username}
+                            {author?.fullName}
                         </Link>
-                        <span className="text-muted-foreground text-sm">@{reply.handle}</span>
+                        <span className="text-muted-foreground text-sm">@{author?.username}</span>
                         <span className="text-muted-foreground mx-1">·</span>
-                        <time className="text-muted-foreground text-sm hover:underline">{reply.timestamp}</time>
+                        <span className="text-muted-foreground text-sm hover:underline">{moment(reply?.createdAt).fromNow()}</span>
                     </div>
 
                     <p className="text-sm mt-1">
-                        {showMore ? reply.content : truncateText(reply.content, 150)}
-                        {reply.content.length > 150 && (
+                        {showMore ? reply?.content : truncateText(reply?.content || "", 150)}
+                        {reply?.content && reply?.content.length > 150 && (
                             <button
                                 className="text-primary text-sm ml-1 hover:underline"
                                 onClick={() => setShowMore(!showMore)}
@@ -51,12 +59,7 @@ export default function Reply({ reply }: {
                     </p>
 
                     <div className="mt-3">
-                        <Reactions analytics={{
-                            likes: reply.likes || 0,
-                            comments: reply.comments || 0,
-                            reposts: reply.reposts || 0,
-                            shares: reply.shares || 0
-                        }} />
+                        <Reactions postId={id} analytics={reply?.analytics} refetchPost={refetchReply} />
                     </div>
                 </div>
             </div>

@@ -2,6 +2,7 @@ import Icon from "@/shared/components/Icon";
 import { useBeaver } from "@beaver/react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 type Props = {
     postId: number;
@@ -17,6 +18,7 @@ type Props = {
 export default function Reactions(props: Props) {
     const { postId, refetchPost } = props;
     const beaver = useBeaver();
+    const user = beaver.user;
     const [commentDialogOpen, setCommentDialogOpen] = useState(false);
 
     // like post 
@@ -37,23 +39,29 @@ export default function Reactions(props: Props) {
 
     return (
         <div className="flex items-center justify-between">
-            <motion.div
+            <motion.button
                 className="flex items-center gap-1 text-muted-foreground group"
                 whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-            >
-                <motion.button
-                    whileHover={{ y: -2 }}
-                    className={`p-1.5 rounded-full group-hover:bg-like ${userPostInteraction?.hasLiked ? "text-like bg-like" : ""}`}
-                    onClick={(e) => {
-                        if (isLikePending) return;
+                whileTap={{ scale: 1 }}
+                onClick={(e) => {
+                    if (isLikePending) return;
 
-                        if (userPostInteraction?.hasLiked) {
-                            unlikePost({ postId });
-                        } else {
-                            likePost({ postId });
-                        }
-                    }}
+                    if (!user) {
+                        toast.error("You must be logged in to like a post");
+                        return;
+                    }
+
+                    if (userPostInteraction?.hasLiked) {
+                        unlikePost({ postId });
+                    } else {
+                        likePost({ postId });
+                    }
+                }}
+            >
+                <motion.div
+                    whileHover={{ y: -2 }}
+                    className={`p-1.5 rounded-full group-hover:bg-like ${userPostInteraction?.hasLiked ? "text-like" : ""}`}
+
                 >
                     {isLikePending ? <Icon
                         name="LoaderCircle"
@@ -61,15 +69,16 @@ export default function Reactions(props: Props) {
                     /> : <Icon
                         name="Heart"
                         className="size-5 group-hover:text-like transition-colors"
+                        fill={userPostInteraction?.hasLiked ? "#ff2681" : "none"}
                     />}
-                </motion.button>
+                </motion.div>
                 <span className={`text-sm font-medium ${userPostInteraction?.hasLiked ? "text-like" : "text-muted-foreground"} transition-colors`}>{props.analytics?.likes}</span>
-            </motion.div>
+            </motion.button>
 
             <motion.button
                 className="flex items-center gap-1 text-muted-foreground group"
                 whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileTap={{ scale: 1 }}
             >
                 <motion.div
                     whileHover={{ y: -2 }}
@@ -87,7 +96,7 @@ export default function Reactions(props: Props) {
             <motion.button
                 className="flex items-center gap-1 text-muted-foreground group"
                 whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileTap={{ scale: 1 }}
                 onClick={(e) => e.stopPropagation()}
             >
                 <motion.div
@@ -105,7 +114,7 @@ export default function Reactions(props: Props) {
             <motion.button
                 className="flex items-center gap-1 text-muted-foreground group"
                 whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileTap={{ scale: 1 }}
                 onClick={(e) => e.stopPropagation()}
             >
                 <motion.div

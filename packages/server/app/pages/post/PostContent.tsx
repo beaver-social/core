@@ -4,9 +4,9 @@ import { motion } from "framer-motion";
 import Reactions from "@/shared/components/Reactions";
 import ImageCarousel from "@/shared/components/MediaCarousel";
 import { useState } from "react";
-import moment from "moment";
 import { useBeaver } from "@beaver/react"
 import React from "react";
+import moment from "moment";
 
 export default function PostContent({ post, author, refetchPost }: {
     post: ReturnType<ReturnType<typeof useBeaver>["post"]["getPostById"]>["data"],
@@ -14,8 +14,6 @@ export default function PostContent({ post, author, refetchPost }: {
     refetchPost: ReturnType<ReturnType<typeof useBeaver>["post"]["getPostById"]>["refetch"]
 }) {
     const [showMore, setShowMore] = useState(false);
-    // const hasImages = post?.media && post.media.length > 0;
-    const hasImages = false;
 
     // Format post analytics
     const analytics = {
@@ -27,7 +25,7 @@ export default function PostContent({ post, author, refetchPost }: {
     };
 
     // Format date in a more readable way
-    const formattedDate = post?.createdAt ? moment(post.createdAt).format("MMM D") : "";
+    const formattedDate = post?.createdAt ? moment(post.createdAt).fromNow() : "";
     const mentionedUsers = post?.mentions || [];
 
     // Create formatted content with clickable mentions
@@ -106,22 +104,11 @@ export default function PostContent({ post, author, refetchPost }: {
                     </div>
 
                     {/* Post Images */}
-                    {hasImages && (
+                    {post?.media && post.media.length > 0 && (
                         <div className="w-full mt-3 rounded-lg overflow-hidden">
                             <ImageCarousel
-                                media={post?.media || []}
-                                aspectRatio={post?.media[0]?.aspectRatio || "square"}
-                            />
-                        </div>
-                    )}
-
-                    {/* Single image fallback */}
-                    {!hasImages && post?.media[0]?.url && (
-                        <div className="mt-3">
-                            <Image
-                                src={post?.media[0]?.url}
-                                alt="Post image"
-                                className="w-full rounded-lg max-h-[500px] object-cover"
+                                media={post.media || []}
+                                aspectRatio={post.media[0].aspectRatio}
                             />
                         </div>
                     )}

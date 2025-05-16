@@ -17,7 +17,7 @@ export default class Posts {
 
   async createPost(
     options: Omit<ApiParams<Api["posts"]["$post"]>["json"], "signature"> & {
-      media: {
+      media?: {
         file: File;
         type: "image" | "video";
         previewUrl: string;
@@ -41,21 +41,15 @@ export default class Posts {
       })
     );
 
-    const formData = new FormData();
-    for (const item of media) {
-      formData.append("media", item.file);
-      formData.append("type", item.type);
-      formData.append("previewUrl", item.previewUrl);
-      formData.append("aspectRatio", item.aspectRatio);
-    }
-
     const { post } = await safeParseResponse(
       this.defaults.apiClient.rpc.posts.$post({
         json: {
           ...data,
           signature,
         },
-        form: formData,
+        form: {
+          media,
+        },
       })
     );
 
@@ -76,6 +70,15 @@ export default class Posts {
     );
   }
 
+  async getFollowingPosts(options: { page?: number; perPage?: number } = {}) {
+    const { page = 1, perPage = 8 } = options;
+
+    return safeParseResponse(
+      this.defaults.apiClient.rpc.posts.following.$get({
+        query: { page: page.toString(), perPage: perPage.toString() },
+      })
+    );
+  }
   async getPostById(options: { id: number | string }) {
     const { id } = options;
 
@@ -225,7 +228,7 @@ export default class Posts {
   }
 
   async getPostReplies(options: {
-    id: number;
+    id: number | string;
     page?: number;
     perPage?: number;
   }) {

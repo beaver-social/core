@@ -43,7 +43,13 @@ export default new Hono()
     zValidator(
       "query",
       z.object({
-        type: z.enum(["identity", "username", "suinsDomainName", "address"]),
+        type: z.enum([
+          "id",
+          "identity",
+          "username",
+          "suinsDomainName",
+          "address",
+        ]),
         value: z.string(),
       })
     ),
@@ -52,6 +58,9 @@ export default new Hono()
 
       let filter;
       switch (type) {
+        case "id":
+          filter = eq(users.id, parseInt(value));
+          break;
         case "identity":
           filter = eq(users.identity, value);
           break;
@@ -71,12 +80,12 @@ export default new Hono()
       }
 
       const userResponse = await tryCatch(
-        db.select({ id: users.id }).from(users).where(filter).limit(1)
+        db.select().from(users).where(filter).limit(1)
       );
 
       if (userResponse.error) {
         ctx.log(userResponse.error);
-        return respond.err(ctx, "Failed to find user", 500);
+        return respond.err(ctx, "Failed to fetch user", 500);
       }
 
       const [user] = userResponse.data;
@@ -799,35 +808,5 @@ export default new Hono()
       }
 
       return respond.ok(ctx, {}, "Unfollowed user successfully", 200);
-    }
-  )
-
-  .get(
-    "/:id",
-    zValidator(
-      "param",
-      z.object({
-        id: zNumberString(),
-      })
-    ),
-    async (ctx) => {
-      const { id: userId } = ctx.req.valid("param");
-
-      const userResponse = await tryCatch(
-        db.select().from(users).where(eq(users.id, userId)).limit(1)
-      );
-
-      if (userResponse.error) {
-        ctx.log(userResponse.error);
-        return respond.err(ctx, "Failed to find user", 500);
-      }
-
-      const [user] = userResponse.data;
-
-      if (!user) {
-        return respond.err(ctx, "User not found", 404);
-      }
-
-      return respond.ok(ctx, user, "User details from ID", 200);
     }
   );

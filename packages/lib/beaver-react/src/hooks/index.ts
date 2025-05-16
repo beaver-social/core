@@ -120,6 +120,15 @@ export function usePost() {
           return await client.posts.getPosts(options);
         },
       }),
+    getFollowingPosts: (
+      options?: Parameters<typeof client.posts.getFollowingPosts>[0]
+    ) =>
+      useQuery({
+        queryKey: ["getFollowingPosts", options],
+        queryFn: async () => {
+          return await client.posts.getFollowingPosts(options);
+        },
+      }),
     getPostById: (options: Parameters<typeof client.posts.getPostById>[0]) =>
       useQuery({
         queryKey: ["getPostById", options],
@@ -200,18 +209,11 @@ export function useProfile() {
   const { client } = useBeaverContext();
 
   return {
-    getProfileById: (options: Parameters<typeof client.user.getUserById>[0]) =>
+    getProfile: (options: Parameters<typeof client.user.getProfile>[0]) =>
       useQuery({
-        queryKey: ["getProfileById", options],
+        queryKey: ["getProfile", options],
         queryFn: async () => {
-          return await client.user.getUserById(options);
-        },
-      }),
-    findProfile: (options: Parameters<typeof client.user.findProfile>[0]) =>
-      useQuery({
-        queryKey: ["findProfile", options],
-        queryFn: async () => {
-          return await client.user.findProfile(options);
+          return await client.user.getProfile(options);
         },
       }),
     searchSuggestions: (

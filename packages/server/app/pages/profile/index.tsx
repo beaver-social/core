@@ -63,10 +63,10 @@ const userDetails: UserDetails = {
 }
 
 export default function Profile() {
-    const { id } = useParams<{ id: string }>()
+    const { username } = useParams<{ username: string }>()
     const beaver = useBeaver();
-    const { data: user, isLoading, isError, isSuccess } = beaver.profile.getProfileById({ id: parseInt(id || "1") });
-    const isCurrentUser = id === beaver.user?.id.toString();
+    const { data: profile, isLoading, isError, isSuccess } = beaver.profile.getProfile({ type: "username", value: username || "ishtails" });
+    const isCurrentUser = username === beaver.user?.username;
 
     const { setScreen } = useGlobalUI();
     useEffect(() => {
@@ -78,7 +78,7 @@ export default function Profile() {
             <div className="border mb-10 rounded-t-2xl h-screen">
                 {isSuccess ? <div>
                     <ProfileHeader data={userDetails} isCurrentUser={isCurrentUser} />
-                    <BasicInfo data={user} />
+                    <BasicInfo data={profile} />
                     <Tabs />
                 </div> :
                     <div className="flex justify-center items-center h-full">

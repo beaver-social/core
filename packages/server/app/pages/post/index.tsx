@@ -15,14 +15,17 @@ export default function Post() {
     const navigate = useNavigate();
     const beaver = useBeaver();
     const [loading, setLoading] = useState(true);
-    const [replies, setReplies] = useState(sampleReplies);
 
     // Fetch post data
     const { data: post, refetch: refetchPost } = beaver.post.getPostById({
-        id: postId || "1"
+        id: postId || ""
     });
-    const { data: author } = beaver.profile.getProfileById({
-        id: post?.authorId || 1
+    const { data: author } = beaver.profile.getProfile({
+        value: post?.authorId.toString() || "",
+        type: "id"
+    });
+    const { data: repliesResponse, refetch: refetchReplies } = beaver.post.getPostReplies({
+        id: postId || ""
     });
 
     // Simulate loading state
@@ -34,10 +37,10 @@ export default function Post() {
 
     return (
         <Layout main={
-            <div className="flex-1 border-x max-w-2xl mx-auto">
+            <div className="flex-1 border rounded-sm max-w-2xl mx-auto mb-10">
                 {/* Post Header */}
                 <motion.div
-                    className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b"
+                    className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b rounded-t-sm"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
@@ -75,13 +78,13 @@ export default function Post() {
                         {(post && author) && <PostContent post={post} author={author} refetchPost={refetchPost} />}
 
                         {/* Reply Form */}
-                        <ReplyForm postId={postId || "1"} userAvatar={author?.imageUrl || "/images/user.webp"} />
+                        <ReplyForm postId={postId} refetchReplies={refetchReplies} />
 
                         {/* Replies Section */}
                         <div className="pt-2">
                             <div className="divide-y">
-                                {replies.map((reply, index) => (
-                                    <Reply key={index} reply={reply} />
+                                {repliesResponse?.replies && repliesResponse.replies.map((reply, index) => (
+                                    <Reply key={index} id={reply.id} />
                                 ))}
                             </div>
                         </div>
@@ -89,16 +92,16 @@ export default function Post() {
                 )}
 
                 {/* No Replies State */}
-                {!loading && replies.length === 0 && (
+                {!loading && repliesResponse?.replies.length === 0 && (
                     <div className="py-8 text-center">
-                        <Icon name="MessageCircle" className="size-12 mx-auto mb-3 text-muted-foreground" />
+                        <Icon name="MessageSquare" className="size-12 mx-auto mb-3 text-muted-foreground" />
                         <h3 className="font-semibold text-lg">No replies yet</h3>
                         <p className="text-sm text-muted-foreground">Be the first to reply to this post</p>
                     </div>
                 )}
 
                 {/* Load More Button */}
-                {!loading && replies.length > 0 && (
+                {!loading && repliesResponse?.hasMore && (
                     <div className="p-4 flex justify-center">
                         <Button
                             variant="outline"

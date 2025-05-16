@@ -11,75 +11,6 @@ import { useBeaver } from "@beaver/react";
 import moment from "moment";
 import MediaCarousel from "@/shared/components/MediaCarousel";
 
-const schema = {
-  "post": {
-    "id": 9,
-    "authorId": 2,
-    "content": "asfqwqt",
-    "nsfw": false,
-    "suiAddress": null,
-    "location": null,
-    "parentId": null,
-    "reposting": null,
-    "viewCount": 0,
-    "likesCount": 0,
-    "repliesCount": 0,
-    "repostsCount": 0,
-    "sharesCount": 0,
-    "actionId": 10,
-    "subscriberOnly": false,
-    "createdAt": 1747260798296,
-    "deletedAt": null,
-    "mentions": {
-      "data": [
-        {
-          "userId": 2,
-          "username": "ishtails",
-          "fullName": "kartik",
-          "imageUrl": null
-        }
-      ],
-      "error": null
-    },
-    "media": {
-      "data": [
-        {
-          "id": 1,
-          "postId": 9,
-          "url": "https://picsum.photos/200/300",
-          "blurhash": null,
-          "aspectRatio": "square",
-          "type": "image"
-        }
-      ],
-      "error": null
-    }
-  },
-  "author": {
-    "id": 2,
-    "address": "0xf0efcd7dd2fbacb23f861fa11de038a9891f6087acf140ecbe0d0a2132ae23f0",
-    "identity": "0xcba30e4e8e04b56c0e365c8d79c0909a1fd028583a1ba75b0d19668eaefe040f",
-    "collectionNft": "0x31d856dca7a6210c797dc842848003a09a13095335a00b2c38b0c312b60374e8",
-    "username": "ishtails",
-    "about": null,
-    "fullName": "kartik",
-    "suinsDomainName": null,
-    "location": null,
-    "birthday": null,
-    "twitter": null,
-    "youtube": null,
-    "instagram": null,
-    "website": null,
-    "pinnedPost": null,
-    "imageUrl": null,
-    "bannerUrl": null,
-    "imageBlurhash": null,
-    "timezone": null,
-    "createdAt": 1747071796060,
-    "deletedAt": null
-  }
-}
-
 function FeedPost({
   postId
 }: {
@@ -91,7 +22,7 @@ function FeedPost({
 
   const beaver = useBeaver();
   const { data: post, isLoading: postLoading, isError: postError, isSuccess: postSuccess, refetch: refetchPost } = beaver.post.getPostById({ id: postId });
-  const { data: author, isLoading: userLoading, isError: userError, isSuccess: userSuccess } = beaver.profile.getProfileById({ id: post?.authorId });
+  const { data: author, isLoading: userLoading, isError: userError, isSuccess: userSuccess } = beaver.profile.getProfile({ value: post?.authorId.toString() || "", type: "id" });
 
   return (
     <motion.div
@@ -213,7 +144,6 @@ function FeedPost({
       ) : (
         <motion.article
           className="flex flex-col rounded-sm overflow-hidden bg-secondary shadow-sm hover:shadow-md transition-all duration-300 border mx-6 sm:mx-0 cursor-pointer"
-          whileTap={{ scale: 0.99 }}
           onClick={(e) => {
             e.preventDefault();
             navigate(`/post/${postId}`, { state: { postId } });

@@ -107,7 +107,7 @@ export default function () {
                         element={withPageErrorBoundary(Post)({})}
                       />
                       <Route
-                        path="/profile/:id"
+                        path="/profile/:username"
                         element={withPageErrorBoundary(Profile)({})}
                       />
                       <Route
