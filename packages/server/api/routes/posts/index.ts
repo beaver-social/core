@@ -29,6 +29,7 @@ import { preprocessImageMedia } from "./helpers";
 import s3 from "../../lib/s3/client";
 import { and, eq, isNotNull } from "drizzle-orm";
 import { contracts } from "../../lib/sui/contracts";
+import { bookmarks } from "../../lib/db/schema/interaction";
 
 const { posts, post_media, post_topics, post_mentions, likes, users } =
   db.schema;
@@ -520,6 +521,56 @@ const app = new Hono()
         ctx,
         { reposts: repostsData, hasMore },
         "Reposts fetched successfully",
+        200
+      );
+    }
+  )
+
+  // user post interaction
+  .get(
+    "/:id/interacted",
+    authenticated,
+    zValidator("param", z.object({ id: zNumberString() })),
+    async (ctx) => {
+      const { id: postId } = ctx.req.valid("param");
+      const user = ctx.get("user");
+
+      const hasLikedResponse = await tryCatch(
+        db
+          .select()
+          .from(likes)
+          .where(and(eq(likes.postId, postId), eq(likes.userId, user.id)))
+          .limit(1)
+      );
+
+      if (hasLikedResponse.error) {
+        ctx.log(hasLikedResponse.error);
+        return respond.err(ctx, "Failed to get has liked from db", 500);
+      }
+
+      const hasLiked = hasLikedResponse.data.length > 0;
+
+      const hasBookmarkedResponse = await tryCatch(
+        db
+          .select()
+          .from(bookmarks)
+          .where(
+            and(eq(bookmarks.postId, postId), eq(bookmarks.userId, user.id))
+          )
+          .limit(1)
+      );
+
+      if (hasBookmarkedResponse.error) {
+        ctx.log(hasBookmarkedResponse.error);
+        return respond.err(ctx, "Failed to get has bookmarked from db", 500);
+      }
+
+      const hasBookmarked = hasBookmarkedResponse.data.length > 0;
+
+      return respond.ok(
+        ctx,
+        { hasLiked, hasBookmarked },
+        "User post interaction fetched successfully",
         200
       );
     }

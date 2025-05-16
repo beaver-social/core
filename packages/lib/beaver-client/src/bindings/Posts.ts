@@ -15,7 +15,7 @@ export default class Posts {
     this.logger.info("Posts interface instantiated");
   }
 
-  async upload(
+  async createPost(
     options: Omit<ApiParams<Api["posts"]["$post"]>["json"], "signature"> & {
       media: {
         file: File;
@@ -82,6 +82,24 @@ export default class Posts {
     return safeParseResponse(
       this.defaults.apiClient.rpc.posts[`:id`].$get({
         param: { id: id.toString() },
+      })
+    );
+  }
+
+  async getPostLikes(options: { id: number; page?: number; perPage?: number }) {
+    const { id, page = 1, perPage = 8 } = options;
+
+    if (!this.defaults.store.isAuthenticated()) {
+      throw new Error("Login to view post likes.");
+    }
+
+    return safeParseResponse(
+      this.defaults.apiClient.rpc.posts[`:id`].likes.$get({
+        param: { id: id.toString() },
+        query: {
+          page: page.toString(),
+          perPage: perPage.toString(),
+        },
       })
     );
   }
@@ -206,24 +224,6 @@ export default class Posts {
     return result;
   }
 
-  async getPostLikes(options: { id: number; page?: number; perPage?: number }) {
-    const { id, page = 1, perPage = 8 } = options;
-
-    if (!this.defaults.store.isAuthenticated()) {
-      throw new Error("Login to view post likes.");
-    }
-
-    return safeParseResponse(
-      this.defaults.apiClient.rpc.posts[`:id`].likes.$get({
-        param: { id: id.toString() },
-        query: {
-          page: page.toString(),
-          perPage: perPage.toString(),
-        },
-      })
-    );
-  }
-
   async getPostReplies(options: {
     id: number;
     page?: number;
@@ -262,6 +262,16 @@ export default class Posts {
           perPage: perPage.toString(),
           quotesOnly: quotesOnly ? "true" : "false",
         },
+      })
+    );
+  }
+
+  async getUserPostInteraction(options: { id: number }) {
+    const { id } = options;
+
+    return safeParseResponse(
+      this.defaults.apiClient.rpc.posts[`:id`].interacted.$get({
+        param: { id: id.toString() },
       })
     );
   }

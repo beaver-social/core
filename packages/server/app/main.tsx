@@ -27,25 +27,25 @@ function App() {
     <StrictMode>
       <ErrorBoundary>
         <QueryClientProvider client={queryClient}>
-          <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-            <Web3Provider>
-              <Providers>
-                <BeaverProvider
-                  config={{
-                    debug: true,
-                    network: "devnet",
-                    apiBaseUrl: "http://localhost:9090/api/v1",
-                    zkLoginWallets: {
-                      enabled: true,
-                    }
-                  }}
-                >
+          <Web3Provider>
+            <Providers>
+              <BeaverProvider
+                config={{
+                  debug: true,
+                  network: "devnet",
+                  apiBaseUrl: "http://localhost:9090/api/v1",
+                  zkLoginWallets: {
+                    enabled: true,
+                  }
+                }}
+              >
+                <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
                   <Router />
                   <Toaster />
-                </BeaverProvider>
-              </Providers>
-            </Web3Provider>
-          </ThemeProvider>
+                </ThemeProvider>
+              </BeaverProvider>
+            </Providers>
+          </Web3Provider>
         </QueryClientProvider>
       </ErrorBoundary>
     </StrictMode>

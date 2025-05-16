@@ -18,7 +18,9 @@ export default function Post() {
     const [replies, setReplies] = useState(sampleReplies);
 
     // Fetch post data
-    const { data: post } = beaver.post.getPostById(postId || "1");
+    const { data: post, refetch: refetchPost } = beaver.post.getPostById({
+        id: postId || "1"
+    });
     const { data: author } = beaver.profile.getProfileById({
         id: post?.authorId || 1
     });
@@ -70,7 +72,7 @@ export default function Post() {
                 ) : (
                     <>
                         {/* Main Post */}
-                        {(post && author) && <PostContent post={post} author={author} />}
+                        {(post && author) && <PostContent post={post} author={author} refetchPost={refetchPost} />}
 
                         {/* Reply Form */}
                         <ReplyForm postId={postId || "1"} userAvatar={author?.imageUrl || "/images/user.webp"} />

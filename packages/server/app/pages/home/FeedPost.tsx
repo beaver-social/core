@@ -90,7 +90,7 @@ function FeedPost({
   const [reply, setReply] = useState("");
 
   const beaver = useBeaver();
-  const { data: post, isLoading: postLoading, isError: postError, isSuccess: postSuccess } = beaver.post.getPostById({ id: postId });
+  const { data: post, isLoading: postLoading, isError: postError, isSuccess: postSuccess, refetch: refetchPost } = beaver.post.getPostById({ id: postId });
   const { data: author, isLoading: userLoading, isError: userError, isSuccess: userSuccess } = beaver.profile.getProfileById({ id: post?.authorId });
 
   return (
@@ -160,7 +160,7 @@ function FeedPost({
               initial={{ opacity: 0.8 }}
               whileHover={{ opacity: 1 }}
             >
-              <Reactions analytics={post?.analytics} />
+              <Reactions postId={postId} analytics={post?.analytics} refetchPost={refetchPost} />
             </motion.div>
           </div>
 
@@ -199,7 +199,6 @@ function FeedPost({
             {/* add a comment box */}
             <form onSubmit={(e) => {
               e.preventDefault();
-              console.log({ reply });
             }} className="mt-2 relative">
               <Input placeholder="Reply to post" value={reply} onChange={(e) => setReply(e.target.value)} />
               {reply.length > 0 && (
@@ -213,7 +212,7 @@ function FeedPost({
         </motion.article>
       ) : (
         <motion.article
-          className="flex flex-col rounded-sm overflow-hidden bg-secondary shadow-sm hover:shadow-md transition-all duration-300 border mx-6 sm:mx-0"
+          className="flex flex-col rounded-sm overflow-hidden bg-secondary shadow-sm hover:shadow-md transition-all duration-300 border mx-6 sm:mx-0 cursor-pointer"
           whileTap={{ scale: 0.99 }}
           onClick={(e) => {
             e.preventDefault();
@@ -261,8 +260,12 @@ function FeedPost({
             <motion.div
               initial={{ opacity: 0.8 }}
               whileHover={{ opacity: 1 }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
             >
-              <Reactions analytics={post?.analytics} />
+              <Reactions postId={postId} analytics={post?.analytics} refetchPost={refetchPost} />
             </motion.div>
           </div>
         </motion.article>

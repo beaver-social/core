@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "./ui/button";
 import { Image } from "./Image";
-// import { useAuth } from "@beaver/react";
 import { motion } from "framer-motion";
 import {
   Dialog,
@@ -13,8 +12,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import Icon from "./Icon";
-import WelcomeSplash from "./animations/WelcomeSplash";
-import { useBeaver, useLogin } from "@beaver/react";
+import { useBeaver } from "@beaver/react";
 
 type Props = {
   open?: boolean;
@@ -71,6 +69,7 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
                   className="w-full flex py-10"
                   onClick={() => {
                     beaver.wallet.connect(index);
+                    console.log(beaver.wallet)
                   }}
                 >
                   <>

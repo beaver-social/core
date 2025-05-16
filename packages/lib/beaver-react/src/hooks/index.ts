@@ -55,16 +55,6 @@ export function useWallets() {
   };
 }
 
-export function useUploadPost() {
-  const { client } = useBeaverContext();
-  return useMutation({
-    mutationKey: ["uploadPost"],
-    mutationFn: async (data: Parameters<typeof client.posts.upload>[0]) => {
-      return await client.posts.upload(data);
-    },
-  });
-}
-
 export function useFollows() {
   const { client } = useBeaverContext();
 
@@ -118,9 +108,9 @@ export function usePost() {
     createPost: useMutation({
       mutationKey: ["createPost"],
       mutationFn: async (
-        options: Parameters<typeof client.posts.upload>[0]
+        options: Parameters<typeof client.posts.createPost>[0]
       ) => {
-        return await client.posts.upload(options);
+        return await client.posts.createPost(options);
       },
     }),
     getPosts: (options?: Parameters<typeof client.posts.getPosts>[0]) =>
@@ -135,6 +125,72 @@ export function usePost() {
         queryKey: ["getPostById", options],
         queryFn: async () => {
           return await client.posts.getPostById(options);
+        },
+      }),
+    likePost: useMutation({
+      mutationKey: ["likePost"],
+      mutationFn: async (
+        options: Parameters<typeof client.posts.likePost>[0]
+      ) => {
+        return await client.posts.likePost(options);
+      },
+    }),
+    unlikePost: useMutation({
+      mutationKey: ["unlikePost"],
+      mutationFn: async (
+        options: Parameters<typeof client.posts.unlikePost>[0]
+      ) => {
+        return await client.posts.unlikePost(options);
+      },
+    }),
+    bookmarkPost: useMutation({
+      mutationKey: ["bookmarkPost"],
+      mutationFn: async (
+        options: Parameters<typeof client.posts.bookmarkPost>[0]
+      ) => {
+        return await client.posts.bookmarkPost(options);
+      },
+    }),
+    unbookmarkPost: useMutation({
+      mutationKey: ["unbookmarkPost"],
+      mutationFn: async (
+        options: Parameters<typeof client.posts.unbookmarkPost>[0]
+      ) => {
+        return await client.posts.unbookmarkPost(options);
+      },
+    }),
+    getPostLikes: (options: Parameters<typeof client.posts.getPostLikes>[0]) =>
+      useQuery({
+        queryKey: ["getPostLikes", options],
+        queryFn: async () => {
+          return await client.posts.getPostLikes(options);
+        },
+      }),
+    getPostReplies: (
+      options: Parameters<typeof client.posts.getPostReplies>[0]
+    ) =>
+      useQuery({
+        queryKey: ["getPostReplies", options],
+        queryFn: async () => {
+          return await client.posts.getPostReplies(options);
+        },
+      }),
+    getPostReposts: (
+      options: Parameters<typeof client.posts.getPostReposts>[0]
+    ) =>
+      useQuery({
+        queryKey: ["getPostReposts", options],
+        queryFn: async () => {
+          return await client.posts.getPostReposts(options);
+        },
+      }),
+    getUserPostInteraction: (
+      options: Parameters<typeof client.posts.getUserPostInteraction>[0]
+    ) =>
+      useQuery({
+        queryKey: ["getPostInteracted", options],
+        queryFn: async () => {
+          return await client.posts.getUserPostInteraction(options);
         },
       }),
   };

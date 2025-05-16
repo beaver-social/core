@@ -8,16 +8,10 @@ import moment from "moment";
 import { useBeaver } from "@beaver/react"
 import React from "react";
 
-type MentionedUser = {
-    userId: number;
-    username: string;
-    fullName: string;
-    imageUrl: string | null;
-}
-
-export default function PostContent({ post, author }: {
+export default function PostContent({ post, author, refetchPost }: {
     post: ReturnType<ReturnType<typeof useBeaver>["post"]["getPostById"]>["data"],
     author: ReturnType<typeof useBeaver>["user"]
+    refetchPost: ReturnType<ReturnType<typeof useBeaver>["post"]["getPostById"]>["refetch"]
 }) {
     const [showMore, setShowMore] = useState(false);
     // const hasImages = post?.media && post.media.length > 0;
@@ -34,7 +28,7 @@ export default function PostContent({ post, author }: {
 
     // Format date in a more readable way
     const formattedDate = post?.createdAt ? moment(post.createdAt).format("MMM D") : "";
-    const mentionedUsers = post?.mentions?.data || [];
+    const mentionedUsers = post?.mentions || [];
 
     // Create formatted content with clickable mentions
     const formatContentWithMentions = (content: string) => {
@@ -115,17 +109,17 @@ export default function PostContent({ post, author }: {
                     {hasImages && (
                         <div className="w-full mt-3 rounded-lg overflow-hidden">
                             <ImageCarousel
-                                images={[]}
-                                aspectRatio="square"
+                                media={post?.media || []}
+                                aspectRatio={post?.media[0]?.aspectRatio || "square"}
                             />
                         </div>
                     )}
 
                     {/* Single image fallback */}
-                    {!hasImages && post?.imageUrl && (
+                    {!hasImages && post?.media[0]?.url && (
                         <div className="mt-3">
                             <Image
-                                src={post.imageUrl}
+                                src={post?.media[0]?.url}
                                 alt="Post image"
                                 className="w-full rounded-lg max-h-[500px] object-cover"
                             />
@@ -134,7 +128,7 @@ export default function PostContent({ post, author }: {
 
                     {/* Post Analytics */}
                     <div className="mt-4">
-                        <Reactions analytics={analytics} />
+                        <Reactions analytics={analytics} postId={post?.id || 0} refetchPost={refetchPost} />
                     </div>
                 </div>
             </div>
