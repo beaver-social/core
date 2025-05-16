@@ -296,9 +296,7 @@ export default class User {
     return pinPost;
   }
 
-  async unpinPost(options: { postId: number }) {
-    const { postId } = options;
-
+  async unpinPost() {
     const { features, user, actionPointer } = this.defaults.store;
     if (!features || !user || !this.defaults.store.isAuthenticated()) {
       throw new Error("User not authenticated or wallet not connected");
@@ -306,7 +304,7 @@ export default class User {
 
     const { signature } = await features.signPersonalMessage(
       stringify({
-        postId: postId,
+        postId: user.pinnedPost,
         userId: user.id,
         type: "v1.user.pin.post",
         previous: actionPointer,
@@ -314,9 +312,8 @@ export default class User {
     );
 
     const unpinPost = safeParseResponse(
-      this.defaults.apiClient.rpc.users[":id"].pin.$delete({
+      this.defaults.apiClient.rpc.users.pin.$delete({
         json: { signature },
-        param: { id: user.id.toString() },
       })
     );
     return unpinPost;
