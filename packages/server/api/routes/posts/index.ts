@@ -602,6 +602,8 @@ const app = new Hono()
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
       const user = ctx.get("user");
+      
+      ctx.log({ id: user.id })
 
       const hasLikedResponse = await tryCatch(
         db

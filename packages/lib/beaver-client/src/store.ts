@@ -78,6 +78,7 @@ export class BeaverStore {
     const valid = await this.syncUserAndActionPointer();
     if (!valid) {
       this.user = null;
+      this.persistent.delete("beaver-jwt");
     }
     return valid;
   }

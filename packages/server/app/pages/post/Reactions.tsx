@@ -21,10 +21,14 @@ export default function Reactions(props: Props) {
     const user = beaver.user;
     const [commentDialogOpen, setCommentDialogOpen] = useState(false);
 
+    console.log({ user });
+
     // like post 
     const { data: userPostInteraction, status: userPostInteractionStatus, refetch: refetchUserPostInteraction } = beaver.post.getUserPostInteraction({ id: postId });
     const { mutate: likePost, isPending: isLikePending, isSuccess: isLikeSuccess, isError: isLikeError } = beaver.post.likePost;
     const { mutate: unlikePost, isSuccess: isUnlikeSuccess, isError: isUnlikeError } = beaver.post.unlikePost;
+
+    console.log(userPostInteraction);
 
     useEffect(() => {
         if (isLikeSuccess || isUnlikeSuccess) {

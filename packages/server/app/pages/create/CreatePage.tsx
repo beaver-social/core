@@ -405,7 +405,12 @@ export default function CreatePage() {
                         variants={itemAnimations}
                         className="space-y-6"
                     >
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} onKeyDown={(e) => {
+                            if (e.ctrlKey && e.key === "Enter") {
+                                e.preventDefault();
+                                handleSubmit(e);
+                            }
+                        }} className="space-y-6">
                             <div className="flex gap-4">
                                 <Image
                                     src="/images/user.webp"

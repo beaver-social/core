@@ -11,6 +11,7 @@ import { useBeaver } from "@beaver/react";
 import moment from "moment";
 import MediaCarousel from "@/shared/components/MediaCarousel";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { FeedPostMenu } from "./FeedPostMenu";
 
 function FeedPost({
   postId
@@ -81,39 +82,43 @@ function FeedPost({
           whileTap={{ scale: 0.99 }}
         >
           {/* Header with Avatar */}
-          <div className="flex items-center gap-2 mb-4">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex-shrink-0"
-            >
-              <Link to={`/profile/${author?.username}`} onClick={(e) => e.stopPropagation()}>
-                <Image
-                  src={author?.imageUrl}
-                  alt={author?.username}
-                  className="size-8 rounded-full border-2 border-primary/20"
-                />
-              </Link>
-            </motion.div>
-
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1 flex-wrap">
-                <Link
-                  to={`/profile/${author?.id}`}
-                  className="font-semibold hover:text-primary transition-colors"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {author?.username}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="flex-shrink-0"
+              >
+                <Link to={`/profile/${author?.username}`} onClick={(e) => e.stopPropagation()}>
+                  <Image
+                    src={author?.imageUrl}
+                    alt={author?.username}
+                    className="size-8 rounded-full border-2 border-primary/20"
+                  />
                 </Link>
-                <span className="text-muted-foreground text-sm">@{author?.username}</span>
-                <span className="text-muted-foreground mx-1">·</span>
-                <time className="text-muted-foreground text-sm hover:underline">{moment(post?.createdAt).fromNow()}</time>
-              </div>
-              {post?.location && (
-                <div className="flex items-center gap-1 text-muted-foreground ">
-                  <span className="text-xs">{post?.location}</span>
+              </motion.div>
+
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1 flex-wrap">
+                  <Link
+                    to={`/profile/${author?.id}`}
+                    className="font-semibold hover:text-primary transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {author?.username}
+                  </Link>
+                  <span className="text-muted-foreground text-sm">@{author?.username}</span>
+                  <span className="text-muted-foreground mx-1">·</span>
+                  <time className="text-muted-foreground text-sm hover:underline">{moment(post?.createdAt).fromNow()}</time>
                 </div>
-              )}
+                {post?.location && (
+                  <div className="flex items-center gap-1 text-muted-foreground ">
+                    <span className="text-xs">{post?.location}</span>
+                  </div>
+                )}
+              </div>
             </div>
+
+            <FeedPostMenu post={post} author={author} />
           </div>
 
           {/* Images if present */}
@@ -187,41 +192,49 @@ function FeedPost({
         </motion.article>
       ) : (
         <motion.article
-          className="flex flex-col rounded-sm overflow-hidden bg-secondary shadow-sm hover:shadow-md transition-all duration-300 border mx-6 sm:mx-0 cursor-pointer"
+          className="flex flex-col rounded-sm overflow-hidden bg-secondary shadow-sm hover:shadow-md transition-all duration-300 border mx-6 sm:mx-0 cursor-pointer relative"
           onClick={(e) => {
             e.preventDefault();
             navigate(`/post/${postId}`, { state: { postId } });
           }}
         >
           {/* Header with Avatar */}
-          <div className="flex items-center gap-3 p-4 pb-2">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex-shrink-0"
-            >
-              <Link to={`/profile/${author?.username}`} onClick={(e) => e.stopPropagation()}>
-                <Image
-                  src={author?.imageUrl}
-                  alt={author?.username}
-                  className="size-8 rounded-full border-2 border-primary/20"
-                />
-              </Link>
-            </motion.div>
-
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1 flex-wrap">
-                <Link
-                  to={`/profile/${author?.username}`}
-                  className="font-semibold hover:text-primary transition-colors"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {author?.username}
+          <div className="flex items-center justify-between p-4 pb-2"
+            onClick={(e) => {
+              e.stopPropagation()
+              e.preventDefault()
+            }}>
+            <div className="flex items-center gap-3">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="flex-shrink-0"
+              >
+                <Link to={`/profile/${author?.username}`} onClick={(e) => e.stopPropagation()}>
+                  <Image
+                    src={author?.imageUrl}
+                    alt={author?.username}
+                    className="size-8 rounded-full border-2 border-primary/20"
+                  />
                 </Link>
-                <span className="text-muted-foreground text-sm">@{author?.username}</span>
-                <span className="text-muted-foreground mx-1">·</span>
-                <time className="text-muted-foreground text-sm hover:underline">{moment(post?.createdAt).fromNow()}</time>
+              </motion.div>
+
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1 flex-wrap">
+                  <Link
+                    to={`/profile/${author?.username}`}
+                    className="font-semibold hover:text-primary transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {author?.username}
+                  </Link>
+                  <span className="text-muted-foreground text-sm">@{author?.username}</span>
+                  <span className="text-muted-foreground mx-1">·</span>
+                  <time className="text-muted-foreground text-sm hover:underline">{moment(post?.createdAt).fromNow()}</time>
+                </div>
               </div>
             </div>
+
+            <FeedPostMenu post={post} author={author} />
           </div>
 
           {/* Post Content */}
