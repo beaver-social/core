@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import WelcomeSplash from "./shared/components/animations/WelcomeSplash";
 import Icon from "./shared/components/Icon";
 import NotLoggedInDialog from "./shared/components/NotLoggedInDialog";
+import Landing from "./pages/landing";
 
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary =
@@ -84,6 +85,11 @@ export default function () {
                 <Route
                   path="/onboarding"
                   element={withPageErrorBoundary(Onboarding)({})}
+                />
+
+                <Route
+                  path="/landing"
+                  element={withPageErrorBoundary(Landing)({})}
                 />
 
                 <Route

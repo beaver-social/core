@@ -1,11 +1,20 @@
-type Props = {}
+import { BackgroundEffect, ModernNavbar, EnhancedHero, AnimatedFeatures, CodeShowcase, ModernIntegrations, InteractivePricing, AnimatedCTA, ModernFooter } from "./components";
 
-export default function Landing({ }: Props) {
+export default function Landing() {
     return (
-        <div className="bg-background min-h-screen flex flex-col items-center justify-center">
-            <p className="text-7xl font-extralight">
-                Beaver Social.
-            </p>
+        <div className="relative flex min-h-screen flex-col overflow-hidden bg-zinc-950 text-zinc-200">
+            {/* Animated background effects */}
+            <BackgroundEffect />
+
+            {/* Main content */}
+            <ModernNavbar />
+            <EnhancedHero />
+            <AnimatedFeatures />
+            <CodeShowcase />
+            <ModernIntegrations />
+            <InteractivePricing />
+            <AnimatedCTA />
+            <ModernFooter />
         </div>
-    )
+    );
 }

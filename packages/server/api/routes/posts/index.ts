@@ -27,9 +27,10 @@ import {
 } from "../../lib/zod/helpers";
 import { preprocessImageMedia } from "./helpers";
 import s3 from "../../lib/s3/client";
-import { and, eq, inArray, isNotNull, desc } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, desc, sql } from "drizzle-orm";
 import { bookmarks } from "../../lib/db/schema/interaction";
 import { follows } from "../../lib/db/schema/user";
+import env from "../../../env";
 
 const { posts, post_media, post_topics, post_mentions, likes, users } =
   db.schema;
@@ -602,8 +603,8 @@ const app = new Hono()
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
       const user = ctx.get("user");
-      
-      ctx.log({ id: user.id })
+
+      ctx.log({ id: user.id });
 
       const hasLikedResponse = await tryCatch(
         db
@@ -645,5 +646,78 @@ const app = new Hono()
       );
     }
   );
+
+//   .get(
+//     "/:id/share",
+//     authenticated,
+//     zValidator(
+//       "param",
+//       z.object({
+//         id: zNumberString(),
+//       })
+//     ),
+//     async (ctx) => {
+//       const { id } = ctx.req.valid("param");
+
+//       const newCode = (): number => Math.floor(100000 + Math.random() * 900000);
+//       sharedLinkIds[newCode.toString()] = Number(id);
+
+//       return respond.ok(
+//         ctx,
+//         {
+//           success: true,
+//           sharedCode: newCode,
+//         },
+//         "Post shared successfully",
+//         200
+//       );
+//     }
+//   )
+
+//   .post(
+//     "/:id/share/:code",
+//     authenticated,
+//     zValidator(
+//       "param",
+//       z.object({
+//         id: zNumberString(),
+//         code: zNumberString(),
+//       })
+//     ),
+//     async (ctx) => {
+//       const { id, code } = ctx.req.valid("param");
+//       const user = ctx.get("user");
+
+//       const sharedLinkId = Number(code);
+//       if (!sharedLinkIds[sharedLinkId]) {
+//         return respond.err(ctx, "Invalid reference", 400);
+//       }
+
+//       const now: number = Date.now();
+//       const lastSharedAt = sharedLinkCooldowns.get(sharedLinkId);
+//       if (lastSharedAt && now - lastSharedAt < 60_000) {
+//         return respond.ok(ctx, {}, "Share already counted recently", 200);
+//       }
+
+//       const { error: actionError } = await tryCatch(
+//         db
+//           .update(posts)
+//           .set({ sharesCount: sql`${posts.sharesCount} + 1` })
+//           .where(eq(posts.id, Number(id)))
+//       );
+
+//       if (actionError) {
+//         ctx.log(actionError);
+//         return respond.err(ctx, actionError.message, 400);
+//       }
+
+//       sharedLinkCooldowns.set(sharedLinkId, now);
+
+//       return respond.ok(ctx, {}, "Post shared successfully", 201);
+//     }
+//   );
+
+// const sharedLinkIds: Record<string, number> = {};
+// const sharedLinkCooldowns = new Map<number, number>();
 
 export default app;

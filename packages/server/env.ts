@@ -11,6 +11,7 @@ const envKeys = [
   "SUI_NETWORK",
   "JWT_SECRET",
   "GEMINI_API_KEY",
+  "REFERRAL_DOMAIN",
 ] as const;
 
 type ENV = Record<(typeof envKeys)[number], string>;
