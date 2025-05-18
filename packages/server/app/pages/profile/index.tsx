@@ -65,7 +65,7 @@ const userDetails: UserDetails = {
 export default function Profile() {
     const { username } = useParams<{ username: string }>()
     const beaver = useBeaver();
-    const { data: profile, isLoading, isError, isSuccess } = beaver.profile.getProfile({ type: "username", value: username || "ishtails" });
+    const { data: profile, isLoading, isSuccess } = beaver.profile.getProfile({ type: "username", value: username || "ishtails" });
     const isCurrentUser = username === beaver.user?.username;
 
     const { setScreen } = useGlobalUI();
@@ -76,15 +76,21 @@ export default function Profile() {
     return (
         <Layout main={
             <div className="border mb-10 rounded-t-2xl">
-                {isSuccess ? <div>
-                    <ProfileHeader data={userDetails} isCurrentUser={isCurrentUser} />
-                    <BasicInfo data={profile} />
-                    <Tabs />
-                </div> :
-                    <div className="flex justify-center items-center h-full">
+                {isLoading ? (
+                    <div className="flex justify-center items-center h-screen">
                         <Icon name="LoaderCircle" className="size-10 animate-spin" />
                     </div>
-                }
+                ) : isSuccess ? (
+                    <div>
+                        <ProfileHeader data={userDetails} isCurrentUser={isCurrentUser} />
+                        <BasicInfo data={profile} />
+                        <Tabs />
+                    </div>
+                ) : (
+                    <div className="flex justify-center items-center h-screen">
+                        <p className="text-2xl text-gray-500">Error loading profile</p>
+                    </div>
+                )}
             </div>
         } secondary={<SecondaryPanel />} />
     )

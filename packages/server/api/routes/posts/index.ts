@@ -27,7 +27,7 @@ import {
 } from "../../lib/zod/helpers";
 import { preprocessImageMedia } from "./helpers";
 import s3 from "../../lib/s3/client";
-import { and, eq, inArray, isNotNull, desc, sql } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, desc, sql, isNull } from "drizzle-orm";
 import { bookmarks } from "../../lib/db/schema/interaction";
 import { follows } from "../../lib/db/schema/user";
 import env from "../../../env";
@@ -49,10 +49,25 @@ const app = new Hono()
         perPage: zNumberString()
           .transform((v) => Math.min(v, 32))
           .default("8"),
+        authorId: zNumberString().optional(),
+        parentId: zNumberString().optional(),
+        repliesOnly: zBooleanString().optional(),
+        mediaOnly: zBooleanString().optional(),
       })
     ),
     async (ctx) => {
-      const { page, perPage } = ctx.req.valid("query");
+      const { page, perPage, authorId, parentId, repliesOnly, mediaOnly } =
+        ctx.req.valid("query");
+
+      const baseFilter = repliesOnly
+        ? isNotNull(posts.parentId)
+        : isNull(posts.parentId);
+
+      let filter = authorId
+        ? and(baseFilter, eq(posts.authorId, authorId))
+        : baseFilter;
+
+      filter = parentId ? and(filter, eq(posts.parentId, parentId)) : filter;
 
       const postsResponse = await tryCatch(
         db
@@ -60,6 +75,7 @@ const app = new Hono()
             id: posts.id,
           })
           .from(posts)
+          .where(filter)
           .limit(perPage)
           .offset(page * perPage)
           .orderBy(desc(posts.createdAt))
@@ -74,7 +90,10 @@ const app = new Hono()
 
       return respond.ok(
         ctx,
-        { posts: postsData, hasMore: !(postsData.length < perPage) },
+        {
+          posts: postsData,
+          hasMore: !(postsData.length < perPage),
+        },
         "Posts fetched successfully",
         200
       );

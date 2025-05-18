@@ -6,6 +6,7 @@ import { truncateText } from "@/shared/lib/utils";
 import { useState } from "react";
 import { useBeaver } from "@beaver/react";
 import moment from "moment";
+import { useNavigate } from "react-router";
 
 export default function Reply({ id }: {
     id: number
@@ -18,12 +19,19 @@ export default function Reply({ id }: {
         type: "id"
     });
 
+    const navigate = useNavigate();
+
     return (
         <motion.div
+            onClick={(e) => {
+                e.preventDefault();
+                navigate(`/post/${id}`);
+
+            }}
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className="p-4 hover:bg-secondary/40 transition-colors"
+            className="p-4 hover:bg-secondary/40 transition-colors cursor-pointer"
         >
             <div className="flex gap-3">
                 <Link to={`/profile/${author?.username}`}>

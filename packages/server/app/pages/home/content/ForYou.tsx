@@ -5,7 +5,7 @@ import useInfiniteScroll from "@/shared/hooks/useInfiniteScroll";
 
 export default function ForYou() {
     const beaver = useBeaver();
-    const { data: postArray, fetchNextPage, hasNextPage } = beaver.post.getPosts({ perPage: 15 });
+    const { data: postArray, fetchNextPage, hasNextPage } = beaver.post.getPosts({ perPage: 10 });
     const { infiniteScrollRef } = useInfiniteScroll({
         fetchNextPage,
         hasNextPage,

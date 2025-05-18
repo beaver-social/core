@@ -247,10 +247,6 @@ function FeedPost({
             <motion.div
               initial={{ opacity: 0.8 }}
               whileHover={{ opacity: 1 }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
             >
               <Reactions postId={postId} analytics={post?.analytics} refetchPost={refetchPost} />
             </motion.div>

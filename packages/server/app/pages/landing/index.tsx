@@ -4,9 +4,7 @@ import Orb from "./ui/orb";
 import Squares from "./ui/grid";
 import LetterGlitch from "./ui/crypto";
 import Particles from "./ui/particles";
-import FooterAlt from "./components/FooterAlt";
 import Chatbot from "@/pages/landing/chatbot/index";
-import FeatureSection from "./components/features";
 
 export default function Landing() {
     return (

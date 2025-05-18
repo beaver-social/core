@@ -113,11 +113,27 @@ export function usePost() {
         return await client.posts.createPost(options);
       },
     }),
-    getPosts: ({ perPage = 10 }: { perPage?: number }) =>
+    getPosts: ({
+      perPage = 10,
+      authorId,
+      parentId,
+      repliesOnly,
+    }: {
+      perPage?: number;
+      authorId?: number;
+      parentId?: number;
+      repliesOnly?: boolean;
+    }) =>
       useInfiniteQuery({
         queryKey: ["getPosts", perPage],
         queryFn: async ({ pageParam }) => {
-          return await client.posts.getPosts({ perPage, page: pageParam });
+          return await client.posts.getPosts({
+            perPage,
+            page: pageParam,
+            authorId,
+            parentId,
+            repliesOnly,
+          });
         },
         initialPageParam: 1,
         getNextPageParam: (lastPage, pages) => {

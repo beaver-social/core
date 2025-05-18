@@ -63,14 +63,25 @@ export default class Posts {
     return post;
   }
 
-  async getPosts(options: { page?: number; perPage?: number } = {}) {
-    const { page = 1, perPage = 8 } = options;
+  async getPosts(
+    options: {
+      page?: number;
+      perPage?: number;
+      authorId?: number;
+      parentId?: number;
+      repliesOnly?: boolean;
+    } = {}
+  ) {
+    const { page = 1, perPage = 8, authorId, parentId, repliesOnly } = options;
 
     return safeParseResponse(
       this.defaults.apiClient.rpc.posts.$get({
         query: {
           page: page.toString(),
           perPage: perPage.toString(),
+          authorId: authorId?.toString(),
+          parentId: parentId?.toString(),
+          repliesOnly,
         },
       })
     );

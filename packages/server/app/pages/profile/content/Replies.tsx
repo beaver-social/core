@@ -1,49 +1,41 @@
-import { Image } from "@/shared/components/Image";
-import ImageCarousel from "@/shared/components/MediaCarousel";
-import Reactions from "@/pages/post/Reactions";
-import { samplePosts } from "@/shared/data/posts";
+import { useBeaver } from "@beaver/react";
+import FeedPost from "@/pages/home/FeedPost";
+import useInfiniteScroll from "@/shared/hooks/useInfiniteScroll";
+import { motion } from "framer-motion";
+import { useParams } from "react-router";
 
-// Sample replies data
+export default function PostData() {
+    const beaver = useBeaver();
+    const { username } = useParams();
 
-export default function Replies() {
-    const repliesData = samplePosts.filter((post) => post.parent !== null && post.handle === "ishtails");
+    const { data: user, isError: userError } = beaver.profile.getProfile({ value: username || "", type: "username" });
+    const { data: postArray, fetchNextPage, hasNextPage } = beaver.post.getPosts({ perPage: 10, authorId: user?.id, repliesOnly: true });
+
+    const { infiniteScrollRef } = useInfiniteScroll({
+        fetchNextPage,
+        hasNextPage,
+    });
 
     return (
-        <div className="space-y-1">
-            {repliesData.map((reply) => (
-                reply.parent && (
-                    <div key={reply.id} className="p-4 border-b hover:bg-accent/10 transition cursor-pointer">
-                        <div className="flex gap-3">
-                            <Image src={reply.avatarUrl} alt={reply.username} className="size-10 rounded-full" />
-                            <div className="flex-1">
-                                <div className="flex items-center gap-1">
-                                    <span className="font-semibold">{reply.username}</span>
-                                    <span className="text-grey-500">@{reply.handle}</span>
-                                    <span className="text-grey-500">·</span>
-                                    <span className="text-grey-500">{reply.timestamp}</span>
-                                </div>
+        <>
+            <div className="divide-y mx-4">
+                {postArray?.pages && postArray?.pages.length > 0 ? postArray?.pages.map((page) => page.posts.map((postId, index) => (
+                    <FeedPost key={index} postId={postId.id} />
+                ))) : (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="flex flex-col gap-2 border items-center text-grey-500 justify-center p-10 rounded-sm"
+                    >
+                        <p className="text-sm">No posts found..</p>
+                    </motion.div>
+                )}
 
-                                <div className="mt-1 text-sm text-grey-500">
-                                    Replying to <span className="text-primary">@{reply.parent?.handle}</span>
-                                </div>
-
-                                {/* Parent Post */}
-                                <div className="my-4 p-3 border rounded-md bg-accent/5">
-                                    <div className="flex items-center gap-1 mb-1">
-                                        <span className="font-medium">{reply.parent?.username}</span>
-                                        <span className="text-grey-500 text-sm">@{reply.parent?.handle}</span>
-                                    </div>
-                                    <p className="text-sm line-clamp-2">{reply.parent?.content}</p>
-                                </div>
-
-                                <p className="my-2">{reply.content}</p>
-
-                                <Reactions analytics={reply.analytics} />
-                            </div>
-                        </div>
-                    </div>
-                )
-            ))}
-        </div>
-    );
+                {hasNextPage && (
+                    <div ref={infiniteScrollRef} className="h-1" />
+                )}
+            </div >
+        </>
+    )
 }
