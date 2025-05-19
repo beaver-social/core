@@ -52,7 +52,7 @@ const FeatureCard = ({
 
 export function AnimatedFeatures() {
     return (
-        <section id="features" className="container relative mx-auto px-4 py-24">
+        <section id="features" className="container relative mx-auto px-4 py-24 max-w-7xl">
             {/* Section header */}
             <div className="mb-16 max-w-3xl">
                 <motion.div

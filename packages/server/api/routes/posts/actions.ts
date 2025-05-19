@@ -90,27 +90,25 @@ export const createPost = createAction<
       .where(eq(posts.id, post.id));
 
     if (post.parentId) {
-      let current = post.parentId;
+      let currentParentId = post.parentId;
 
-      while (current != null) {
-        const [{ next }] = await tx
-          .select({
-            next: posts.parentId,
-          })
+      while (currentParentId != null) {
+        const [parent] = await tx
+          .select()
           .from(posts)
-          .where(eq(posts.id, current))
+          .where(eq(posts.id, currentParentId))
           .limit(1);
+
+        if (!parent.parentId) break;
 
         await tx
           .update(posts)
           .set({
             repliesCount: sql`${posts.repliesCount} + 1`,
           })
-          .where(eq(posts.id, post.parentId));
+          .where(eq(posts.id, parent.parentId));
 
-        if (!next) break;
-
-        current = next;
+        currentParentId = parent.parentId;
       }
     }
 

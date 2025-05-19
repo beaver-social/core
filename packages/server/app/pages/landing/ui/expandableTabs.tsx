@@ -1,11 +1,12 @@
 import * as React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/shared/lib/utils";
-import { LucideIcon } from "lucide-react";
+import Icon from "@/shared/components/Icon";
+import { icons } from "lucide-react";
 
 interface Tab {
     title: string;
-    icon: LucideIcon;
+    icon: keyof typeof icons;
     type?: never;
 }
 
@@ -98,7 +99,6 @@ export function ExpandableTabs({
                     return <Separator key={`separator-${index}`} />;
                 }
 
-                const Icon = tab.icon;
                 return (
                     <motion.button
                         key={tab.title}
@@ -115,7 +115,7 @@ export function ExpandableTabs({
                                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
                         )}
                     >
-                        <Icon size={20} />
+                        <Icon name={tab.icon} className="size-8" />
                         <AnimatePresence initial={false}>
                             {selected === index && (
                                 <motion.span

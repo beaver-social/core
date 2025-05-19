@@ -86,7 +86,7 @@ class _BeaverSocialAppState extends State<BeaverSocialApp> {
 
     return (
         <section id="code" className="container mx-auto px-4 py-24">
-            <div className="flex flex-col items-center justify-center text-center mb-16">
+            <div className="flex flex-col items-center justify-center text-center mb-16 max-w-7xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -94,7 +94,7 @@ class _BeaverSocialAppState extends State<BeaverSocialApp> {
                     transition={{ duration: 0.5 }}
                 >
                     <h2 className="text-3xl md:text-4xl font-bold text-zinc-100 mb-4">
-                        Simple <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">Integration</span>
+                        Simple <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">Implementation</span>
                     </h2>
                     <p className="text-zinc-400 max-w-2xl mx-auto">
                         A few lines of code is all it takes to add powerful social features to your decentralized application.

@@ -1,24 +1,32 @@
+import { BackgroundEffect, ModernNavbar, EnhancedHero, AnimatedFeatures, CodeShowcase, ModernIntegrations, AnimatedCTA, ModernFooter } from "./ai";
 import { Image } from "@/shared/components/Image";
-import { BackgroundEffect, ModernNavbar, EnhancedHero, AnimatedFeatures, CodeShowcase, ModernIntegrations, InteractivePricing, AnimatedCTA, ModernFooter } from "./ai";
-import Orb from "./ui/orb";
-import Squares from "./ui/grid";
-import LetterGlitch from "./ui/crypto";
-import Particles from "./ui/particles";
-import Chatbot from "@/pages/landing/chatbot/index";
 
 export default function Landing() {
     return (
-        <div className="relative flex min-h-screen flex-col overflow-hidden bg-zinc-950 text-zinc-200">
-            <BackgroundEffect />
-            <ModernNavbar />
-            <EnhancedHero />
-            <AnimatedFeatures />
-            <CodeShowcase />
-            <ModernIntegrations />
-            <InteractivePricing />
-            <AnimatedCTA />
+        <div className="relative flex min-h-screen flex-col overflow-hidden bg-zinc-950 text-zinc-200 px-8">
+            {/* <BackgroundEffect /> */}
+
+            <div className="absolute w-full inset-0 opacity-40">
+                <Image src="/images/landing/15.jpg" alt="Background Effect" className="object-cover min-h-screen w-screen" />
+            </div>
+
+            <section className="relative z-10 md:h-screen">
+                <ModernNavbar />
+                <EnhancedHero />
+            </section>
+            <section className="relative z-10">
+                <AnimatedFeatures />
+            </section>
+            <section className="relative z-10">
+                <CodeShowcase />
+            </section>
+            <section className="relative z-10">
+                <ModernIntegrations />
+            </section>
+            <section className="relative z-10">
+                <AnimatedCTA />
+            </section>
             <ModernFooter />
-            <Chatbot />
         </div>
     );
 }

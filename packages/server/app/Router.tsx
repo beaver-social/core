@@ -19,6 +19,7 @@ import WelcomeSplash from "./shared/components/animations/WelcomeSplash";
 import Icon from "./shared/components/Icon";
 import NotLoggedInDialog from "./shared/components/NotLoggedInDialog";
 import Landing from "./pages/landing";
+import Docs from "./pages/docs";
 
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary =
@@ -90,6 +91,11 @@ export default function () {
                 <Route
                   path="/landing"
                   element={withPageErrorBoundary(Landing)({})}
+                />
+
+                <Route
+                  path="/docs"
+                  element={withPageErrorBoundary(Docs)({})}
                 />
 
                 <Route

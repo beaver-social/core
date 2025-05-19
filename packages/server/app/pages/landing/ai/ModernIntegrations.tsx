@@ -20,7 +20,7 @@ const IntegrationLogo = ({ children, delay = 0 }: { children: React.ReactNode; d
 
 export function ModernIntegrations() {
     return (
-        <section id="integrations" className="container mx-auto px-4 py-24">
+        <section id="integrations" className="container mx-auto px-4 py-24 max-w-7xl">
             {/* Section header */}
             <div className="flex flex-col items-center text-center mb-16">
                 <motion.div

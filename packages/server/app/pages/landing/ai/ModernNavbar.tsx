@@ -1,18 +1,20 @@
 import * as React from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { X, Menu } from "lucide-react";
+import Icon from "@/shared/components/Icon";
 
 const navItems = [
     { name: "Features", href: "#features" },
     { name: "Code", href: "#code" },
     { name: "Integrations", href: "#integrations" },
     { name: "Pricing", href: "#pricing" },
-    { name: "Docs", href: "#docs" },
+    { name: "Docs", href: "/docs" },
 ];
 
 export function ModernNavbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+    const navigate = useNavigate();
 
     return (
         <motion.header
@@ -21,7 +23,7 @@ export function ModernNavbar() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
         >
-            <div className="container mx-auto flex items-center justify-between px-4">
+            <div className="container flex items-center justify-between px-4 max-w-7xl mx-auto">
                 {/* Logo */}
                 <Link to="/" className="flex items-center gap-2">
                     <div className="flex flex-col">
@@ -49,17 +51,14 @@ export function ModernNavbar() {
                 </nav>
 
                 {/* CTA Button */}
-                <div className="hidden md:block">
-                    <motion.button
-                        className="rounded-full bg-transparent px-5 py-2 text-sm font-medium text-white border border-zinc-700/50"
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
-                    >
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-                            Get Started
-                        </span>
-                    </motion.button>
-                </div>
+                <motion.button
+                    className="hidden md:flex rounded-sm px-6 py-2.5 text-sm font-medium text-zinc-400 border border-zinc-800 gap-2 items-center hover:text-zinc-200 hover:border-zinc-700"
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => navigate("/docs")}
+                >
+                    <Icon name="Book" className="w-4 h-4" />
+                    <p>View Docs</p>
+                </motion.button>
 
                 {/* Mobile menu button */}
                 <div className="flex md:hidden">

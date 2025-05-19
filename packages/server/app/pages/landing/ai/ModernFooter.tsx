@@ -67,7 +67,7 @@ export function ModernFooter() {
 
     return (
         <footer className="border-t border-zinc-800/50 bg-zinc-900/50 backdrop-blur-md">
-            <div className="container mx-auto px-4 pt-16 pb-8">
+            <div className="container mx-auto px-4 pt-16 pb-8 max-w-7xl">
                 {/* Top section with logo and navigation */}
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-6 lg:grid-cols-12">
                     {/* Logo and company info */}

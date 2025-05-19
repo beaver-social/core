@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 
 export function AnimatedCTA() {
     return (
-        <section className="container mx-auto px-4 py-16 md:py-24">
+        <section className="container mx-auto px-4 py-16 md:py-24 max-w-7xl">
             <motion.div
                 className="relative overflow-hidden rounded-3xl bg-zinc-900/80 border border-zinc-800/50 p-8 md:p-16 backdrop-blur-sm"
                 initial={{ opacity: 0, y: 20 }}
