@@ -163,7 +163,7 @@ export default function Chatbot() {
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="max-w-[800px] h-[600px] p-0 overflow-y-scroll no-scrollbar">
+            <DialogContent className="max-w-[800px] w-[85vw] h-[70vh] p-0 overflow-y-scroll no-scrollbar">
                 <div className="flex flex-col h-full">
                     {/* Header */}
                     <div className="p-4 sticky top-0 border-b flex items-center justify-between ">
