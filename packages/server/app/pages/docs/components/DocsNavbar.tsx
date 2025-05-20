@@ -15,7 +15,7 @@ export function DocsNavbar() {
 
     return (
         <motion.div
-            className=""
+            className="sticky top-0 z-50"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}

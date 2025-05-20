@@ -14,12 +14,35 @@ export default function DocsContent() {
     const currentPath = location.pathname;
     const selectedDoc = currentPath.split("/").pop() || "installation";
 
+    // Find the current document and section
+    const currentItem = docItems.find(item => item.id === selectedDoc);
+    const currentSection = docSections.find(section => section.id === currentItem?.parentId);
+
     // Generate sample markdown content based on selected doc
     const content = generateDocContent(selectedDoc);
 
     // Track scroll progress for a progress indicator
     const [scrollProgress, setScrollProgress] = useState(0);
     const contentRef = useRef<HTMLDivElement>(null);
+
+    // Find related documents in the same section
+    const relatedDocs = docItems
+        .filter(item =>
+            item.id !== selectedDoc &&
+            item.parentId === currentItem?.parentId
+        )
+        .slice(0, 2);
+
+    // Find next and previous documents for navigation
+    const allDocsFlattened = docSections.flatMap(section =>
+        docItems
+            .filter(item => item.parentId === section.id)
+            .map(item => ({ ...item, sectionTitle: section.title }))
+    );
+
+    const currentIndex = allDocsFlattened.findIndex(item => item.id === selectedDoc);
+    const prevDoc = currentIndex > 0 ? allDocsFlattened[currentIndex - 1] : null;
+    const nextDoc = currentIndex < allDocsFlattened.length - 1 ? allDocsFlattened[currentIndex + 1] : null;
 
     useEffect(() => {
         const handleScroll = () => {
@@ -37,6 +60,11 @@ export default function DocsContent() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // Scroll to top when changing documents
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [selectedDoc]);
+
     return (
         <div className="container py-8 max-w-none" ref={contentRef}>
             {/* Progress indicator */}
@@ -46,25 +74,37 @@ export default function DocsContent() {
             />
 
             <div className="mb-8">
-                {docItems.find(item => item.id === selectedDoc) && (
+                {currentItem && currentSection && (
                     <>
+                        <div className="flex flex-wrap gap-2 text-sm text-zinc-500 mb-4">
+                            <button
+                                onClick={() => navigate('/docs')}
+                                className="hover:text-zinc-300 transition-colors"
+                            >
+                                Documentation
+                            </button>
+                            <span>/</span>
+                            <span className="text-zinc-400">{currentSection.title}</span>
+                            <span>/</span>
+                            <span className="text-zinc-300">{currentItem.title}</span>
+                        </div>
+
                         <motion.h1
                             className="text-3xl sm:text-4xl font-bold mb-4 text-zinc-100"
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3 }}
                         >
-                            {docItems.find(item => item.id === selectedDoc)?.title}
+                            {currentItem.title}
                         </motion.h1>
                         <motion.div
-                            className="text-zinc-400"
+                            className="text-zinc-400 flex items-center gap-2"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.3, delay: 0.1 }}
                         >
-                            {docSections.find(
-                                section => section.id === docItems.find(item => item.id === selectedDoc)?.parentId
-                            )?.description}
+                            <Icon name={currentSection.icon} className="h-4 w-4 text-blue-400" />
+                            {currentSection.description}
                         </motion.div>
                     </>
                 )}
@@ -79,87 +119,55 @@ export default function DocsContent() {
                 dangerouslySetInnerHTML={{ __html: content }}
             />
 
-            {/* Interactive demo section */}
-            {selectedDoc === "quick-start" && (
-                <motion.div
-                    className="mt-12 border border-zinc-800 rounded-lg p-6 bg-zinc-900/50"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.2 }}
-                >
-                    <h3 className="text-xl font-bold mb-4 text-zinc-100">Interactive Demo</h3>
-                    <p className="mb-6 text-zinc-300">Try out the Beaver Social SDK with this interactive example:</p>
-
-                    <AnimatedCodeBlock
-                        language="tsx"
-                        delay={0.3}
-                        code={`import { useBeaver } from '@beaver/react';
-import { useState } from 'react';
-
-function UserDemo() {
-    const beaver = useBeaver();
-    const [userId, setUserId] = useState("");
-    const { data: user, isLoading, error } = beaver.useUser(userId);
-    
-    return (
-        <div className="p-4 border rounded">
-            <input 
-                type="text" 
-                value={userId} 
-                onChange={(e) => setUserId(e.target.value)}
-                placeholder="Enter user ID"
-            />
-            
-            {isLoading && <div>Loading...</div>}
-            {error && <div>Error: {error.message}</div>}
-            {user && (
-                <div>
-                    <h2>{user.name}</h2>
-                    <p>@{user.username}</p>
-                    <p>{user.bio}</p>
-                </div>
-            )}
-        </div>
-    );
-}`}
-                    />
-
-                    <div className="flex gap-4 mt-6">
-                        <motion.button
-                            className="px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 rounded-md font-medium text-blue-400"
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                        >
-                            Run Demo
-                        </motion.button>
-
-                        <motion.button
-                            className="px-4 py-2 border border-zinc-800 hover:border-zinc-700 rounded-md font-medium text-zinc-300"
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                        >
-                            View Full Code
-                        </motion.button>
-                    </div>
-                </motion.div>
-            )}
-
-            {/* Related docs section */}
+            {/* Next/Previous Navigation */}
             <motion.div
-                className="mt-12 border-t border-zinc-800 pt-8"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+                className="mt-16 border-t border-zinc-800 pt-8 grid grid-cols-1 md:grid-cols-2 gap-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.3 }}
             >
-                <h3 className="text-xl font-bold mb-4 text-zinc-100">Related Documentation</h3>
-                <div className="grid sm:grid-cols-2 gap-4">
-                    {docItems
-                        .filter(item =>
-                            item.id !== selectedDoc &&
-                            item.parentId === docItems.find(i => i.id === selectedDoc)?.parentId
-                        )
-                        .slice(0, 2)
-                        .map((item, i) => (
+                {prevDoc && (
+                    <motion.button
+                        className="p-4 border border-zinc-800 hover:border-zinc-700 rounded-lg flex items-start gap-3 text-left group"
+                        whileHover={{ y: -2, borderColor: 'rgb(59, 130, 246, 0.5)' }}
+                        onClick={() => navigate(`/docs/${prevDoc.id}`)}
+                    >
+                        <Icon name="ArrowLeft" className="h-5 w-5 mt-0.5 text-zinc-500 group-hover:text-blue-400 transition-colors" />
+                        <div>
+                            <div className="text-sm text-zinc-500 mb-1">Previous</div>
+                            <div className="font-medium text-zinc-300 group-hover:text-blue-400 transition-colors">{prevDoc.title}</div>
+                            <div className="text-xs text-zinc-500 mt-1">{prevDoc.sectionTitle}</div>
+                        </div>
+                    </motion.button>
+                )}
+
+                {nextDoc && (
+                    <motion.button
+                        className="p-4 border border-zinc-800 hover:border-zinc-700 rounded-lg flex items-start gap-3 text-left md:ml-auto group"
+                        whileHover={{ y: -2, borderColor: 'rgb(59, 130, 246, 0.5)' }}
+                        onClick={() => navigate(`/docs/${nextDoc.id}`)}
+                    >
+                        <div className="flex-1">
+                            <div className="text-sm text-zinc-500 mb-1">Next</div>
+                            <div className="font-medium text-zinc-300 group-hover:text-blue-400 transition-colors">{nextDoc.title}</div>
+                            <div className="text-xs text-zinc-500 mt-1">{nextDoc.sectionTitle}</div>
+                        </div>
+                        <Icon name="ArrowRight" className="h-5 w-5 mt-0.5 text-zinc-500 group-hover:text-blue-400 transition-colors" />
+                    </motion.button>
+                )}
+            </motion.div>
+
+            {/* Related docs section */}
+            {relatedDocs.length > 0 && (
+                <motion.div
+                    className="mt-12 border-t border-zinc-800 pt-8"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.4, delay: 0.3 }}
+                >
+                    <h3 className="text-xl font-bold mb-4 text-zinc-100">Related Documentation</h3>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                        {relatedDocs.map((item, i) => (
                             <motion.div
                                 key={item.id}
                                 className="p-4 border border-zinc-800 hover:border-zinc-700 rounded-lg bg-zinc-900/50 hover:bg-zinc-900 cursor-pointer"
@@ -175,8 +183,9 @@ function UserDemo() {
                                 </p>
                             </motion.div>
                         ))}
-                </div>
-            </motion.div>
+                    </div>
+                </motion.div>
+            )}
 
             {/* Feedback section */}
             <motion.div

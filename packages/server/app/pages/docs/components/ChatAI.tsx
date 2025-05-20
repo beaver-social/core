@@ -1,18 +1,24 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, X, Sparkles, Bot, Loader2 } from "lucide-react";
+import { Send, X, Sparkles, Bot, Loader2, Search, BookOpen, FileCode } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger, DialogClose } from "@/shared/components/ui/dialog";
-import { Input } from "@/shared/components/ui/input";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { SparklesText } from "@/pages/landing/ui/text/sparkles";
 import { TextShimmer } from "@/pages/landing/ui/text/shimmer";
+import { useNavigate } from "react-router";
+import { docItems, docSections } from "../data";
 
 type Message = {
     id: string;
     content: string;
     role: "user" | "ai";
     timestamp: Date;
+    relatedLinks?: Array<{
+        title: string;
+        url: string;
+        description?: string;
+    }>;
 };
 
 export default function Chatbot() {
@@ -22,6 +28,33 @@ export default function Chatbot() {
     const [isOpen, setIsOpen] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
+    const navigate = useNavigate();
+
+    // Welcome message when chat opens
+    useEffect(() => {
+        if (isOpen && messages.length === 0) {
+            setMessages([
+                {
+                    id: `ai-welcome`,
+                    content: "Hi there! I'm Beaver AI, your documentation assistant. Ask me anything about Beaver Social, our SDKs, or how to integrate our platform.",
+                    role: "ai",
+                    timestamp: new Date(),
+                    relatedLinks: [
+                        {
+                            title: "Quick Start Guide",
+                            url: "/docs/quick-start",
+                            description: "Get started with Beaver Social quickly"
+                        },
+                        {
+                            title: "SDK Reference",
+                            url: "/docs/client-api",
+                            description: "Comprehensive API documentation"
+                        }
+                    ]
+                }
+            ]);
+        }
+    }, [isOpen, messages.length]);
 
     // Scroll to bottom when messages change
     useEffect(() => {
@@ -34,6 +67,36 @@ export default function Chatbot() {
             setTimeout(() => inputRef.current?.focus(), 100);
         }
     }, [isOpen]);
+
+    // Simple search function to find related documentation
+    const findRelatedDocumentation = (query: string) => {
+        const searchTerms = query.toLowerCase().split(' ');
+
+        // Search docs for relevant items
+        const relevantDocs = docItems
+            .map(item => {
+                // Calculate relevance score
+                const score = searchTerms.reduce((acc, term) => {
+                    if (item.title.toLowerCase().includes(term)) acc += 3;
+                    if (item.id.toLowerCase().includes(term)) acc += 2;
+                    return acc;
+                }, 0);
+
+                return { item, score };
+            })
+            .filter(item => item.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 3);
+
+        return relevantDocs.map(({ item }) => {
+            const section = docSections.find(s => s.id === item.parentId);
+            return {
+                title: item.title,
+                url: `/docs/${item.id}`,
+                description: section?.title
+            };
+        });
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -52,27 +115,52 @@ export default function Chatbot() {
         setIsProcessing(true);
 
         try {
-            // Placeholder for API call
-            // const response = await fetchAIResponse(inputValue);
+            // Find related documentation links
+            const relatedLinks = findRelatedDocumentation(inputValue);
 
-            // Simulate API call with timeout
+            // Simulate response generation
             await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // Generate a response based on the query
+            let responseContent = "";
+
+            if (inputValue.toLowerCase().includes("how to install") || inputValue.toLowerCase().includes("installation")) {
+                responseContent = "You can install Beaver Social SDK using npm or yarn:\n\n```\nnpm install @beaver/client @beaver/react\n```\n\nFor more details, check out our installation guide.";
+            } else if (inputValue.toLowerCase().includes("react") || inputValue.toLowerCase().includes("hooks")) {
+                responseContent = "The Beaver React SDK provides hooks for easy integration with React applications. The main hooks include useBeaver(), usePost(), useProfile(), and useWallets(). Check the React SDK documentation for more details.";
+            } else if (inputValue.toLowerCase().includes("authentication") || inputValue.toLowerCase().includes("login")) {
+                responseContent = "Beaver Social uses blockchain wallet authentication. You can authenticate users with:\n\n```jsx\nconst { login } = useLogin();\n// Then call login() when needed\n```";
+            } else {
+                responseContent = `I'll help you find information about "${inputValue}". I've provided some related documentation links that might answer your question. Feel free to ask more specific questions!`;
+            }
 
             // Add AI response
             const aiMessage: Message = {
                 id: `ai-${Date.now()}`,
-                content: `This is a sample response to "${inputValue}"`,
+                content: responseContent,
                 role: "ai",
                 timestamp: new Date(),
+                relatedLinks: relatedLinks
             };
 
             setMessages(prev => [...prev, aiMessage]);
         } catch (error) {
             console.error("Error getting AI response:", error);
             // Handle error - add error message to chat
+            setMessages(prev => [...prev, {
+                id: `ai-error-${Date.now()}`,
+                content: "I'm sorry, I encountered an error processing your request. Please try again.",
+                role: "ai",
+                timestamp: new Date()
+            }]);
         } finally {
             setIsProcessing(false);
         }
+    };
+
+    const handleNavigateToLink = (url: string) => {
+        navigate(url);
+        setIsOpen(false);
     };
 
     const MorphingBubble = () => (
@@ -113,7 +201,7 @@ export default function Chatbot() {
                 transition={{ duration: 0.3 }}
             >
                 <div
-                    className={`relative max-w-[80%] p-4 rounded-2xl ${isAI
+                    className={`relative max-w-[90%] md:max-w-[80%] p-4 rounded-2xl ${isAI
                         ? "bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20"
                         : "bg-gradient-to-br from-blue-600/20 to-indigo-600/20 text-right border border-indigo-500/20"
                         }`}
@@ -127,13 +215,55 @@ export default function Chatbot() {
                             </div>
                         )}
 
-                        <div>
+                        <div className="flex-1">
                             {isAI ? (
-                                <p>{message.content}</p>
+                                <div className="prose prose-invert prose-sm max-w-none prose-pre:bg-zinc-900/90 prose-pre:text-xs prose-pre:border prose-pre:border-zinc-800">
+                                    {/* Simple markdown-like rendering */}
+                                    {message.content.split('\n').map((line, i) => {
+                                        if (line.startsWith('```') && line.endsWith('```')) {
+                                            return <pre key={i} className="p-2 rounded my-2 overflow-x-auto">{line.slice(3, -3)}</pre>;
+                                        } else if (line.startsWith('```')) {
+                                            // Start of code block
+                                            return <pre key={i} className="p-2 rounded my-2 overflow-x-auto">{line.slice(3)}</pre>;
+                                        } else if (line.endsWith('```')) {
+                                            // End of code block
+                                            return <pre key={i} className="p-2 rounded my-2 overflow-x-auto">{line.slice(0, -3)}</pre>;
+                                        } else {
+                                            return <p key={i}>{line}</p>;
+                                        }
+                                    })}
+                                </div>
                             ) : (
                                 <span className="text-foreground">{message.content}</span>
                             )}
-                            <div className="text-xs text-muted-foreground mt-1">
+
+                            {isAI && message.relatedLinks && message.relatedLinks.length > 0 && (
+                                <div className="mt-3 pt-3 border-t border-blue-500/10">
+                                    <div className="text-xs text-blue-400 mb-2 flex items-center gap-1">
+                                        <BookOpen size={12} />
+                                        <span>Related Documentation</span>
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        {message.relatedLinks.map((link, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => handleNavigateToLink(link.url)}
+                                                className="text-left text-sm p-2 rounded bg-blue-500/10 hover:bg-blue-500/20 transition-colors flex items-start gap-2"
+                                            >
+                                                <FileCode size={14} className="mt-0.5 text-blue-400" />
+                                                <div>
+                                                    <div className="font-medium text-blue-300">{link.title}</div>
+                                                    {link.description && (
+                                                        <div className="text-xs text-zinc-400">{link.description}</div>
+                                                    )}
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="text-xs text-muted-foreground mt-2">
                                 {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </div>
                         </div>
@@ -163,10 +293,10 @@ export default function Chatbot() {
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="max-w-[800px] w-[85vw] h-[70vh] p-0 overflow-y-scroll no-scrollbar">
+            <DialogContent className="max-w-[800px] glass bg-background/50 w-[90vw] md:w-[85vw] h-[80vh] md:h-[70vh] p-0 overflow-y-scroll no-scrollbar">
                 <div className="flex flex-col h-full">
                     {/* Header */}
-                    <div className="p-4 sticky top-0 border-b flex items-center justify-between ">
+                    <div className="p-4 sticky top-0 border-b flex items-center justify-between backdrop-blur-sm bg-background/80 z-10">
                         <div className="flex items-center gap-2">
                             <div className="bg-blue-500/20 p-1.5 rounded-full">
                                 <Bot size={18} className="text-blue-500" />
@@ -174,7 +304,6 @@ export default function Chatbot() {
                             <TextShimmer className="text-xl font-medium" duration={5}>
                                 Beaver AI
                             </TextShimmer>
-
                         </div>
                         <DialogClose asChild>
                             <Button variant="ghost" size="icon" className="rounded-full">
@@ -184,7 +313,7 @@ export default function Chatbot() {
                     </div>
 
                     {/* Messages Container */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-background to-background/50">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
                         {messages.length === 0 ? (
                             <div className="h-full flex items-center justify-center flex-col gap-4 text-center p-6">
                                 <motion.div
@@ -211,8 +340,27 @@ export default function Chatbot() {
                                     How can I help you today?
                                 </TextShimmer>
                                 <p className="text-muted-foreground text-sm max-w-xs">
-                                    Ask me anything about Drizzle ORM, code examples, or documentation help.
+                                    Ask me anything about Beaver Social, our SDKs, or how to use our platform.
                                 </p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 w-full max-w-md">
+                                    {["How do I install Beaver SDK?", "How to authenticate users?", "What hooks are available?"].map((question, i) => (
+                                        <button
+                                            key={i}
+                                            className="text-sm p-2 rounded-md bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors text-left flex items-center gap-2"
+                                            onClick={() => {
+                                                setInputValue(question);
+                                                setTimeout(() => {
+                                                    if (inputRef.current) {
+                                                        inputRef.current.focus();
+                                                    }
+                                                }, 100);
+                                            }}
+                                        >
+                                            <Search className="h-3 w-3" />
+                                            {question}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         ) : (
                             <>
@@ -225,13 +373,13 @@ export default function Chatbot() {
                     </div>
 
                     {/* Input Area */}
-                    <form onSubmit={handleSubmit} className="p-4 border-t bg-background">
+                    <form onSubmit={handleSubmit} className="p-4 border-t sticky bottom-0 backdrop-blur-sm bg-background/80">
                         <div className="relative">
                             <Textarea
                                 ref={inputRef}
                                 value={inputValue}
                                 onChange={(e) => setInputValue(e.target.value)}
-                                placeholder="Ask me anything..."
+                                placeholder="Ask me anything about Beaver Social..."
                                 className="pr-12 min-h-[60px] max-h-[120px] resize-none bg-background/50 border-blue-500/20 focus-visible:ring-blue-500/30"
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter" && !e.shiftKey) {
