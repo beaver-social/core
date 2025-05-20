@@ -18,12 +18,35 @@ export default function DocsContent() {
     const currentItem = docItems.find(item => item.id === selectedDoc);
     const currentSection = docSections.find(section => section.id === currentItem?.parentId);
 
-    // Generate sample markdown content based on selected doc
-    const content = generateDocContent(selectedDoc);
-
     // Track scroll progress for a progress indicator
     const [scrollProgress, setScrollProgress] = useState(0);
     const contentRef = useRef<HTMLDivElement>(null);
+
+    // State for storing the loaded HTML content
+    const [content, setContent] = useState<string>("");
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    // Load documentation content when the selected doc changes
+    useEffect(() => {
+        setIsLoading(true);
+
+        // Load the documentation
+        generateDocContent(selectedDoc)
+            .then(htmlContent => {
+                setContent(htmlContent);
+            })
+            .catch(error => {
+                console.error("Error loading documentation:", error);
+                setContent(`
+                    <h2>Documentation Error</h2>
+                    <p>We're sorry, but there was an error loading the documentation for "${selectedDoc}".</p>
+                    <p>Please try another topic from the navigation menu.</p>
+                `);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
+    }, [selectedDoc]);
 
     // Find related documents in the same section
     const relatedDocs = docItems
@@ -110,14 +133,20 @@ export default function DocsContent() {
                 )}
             </div>
 
-            <motion.div
-                className="prose prose-invert max-w-none prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-zinc-800 prose-a:text-blue-400 prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-code:text-amber-400 prose-strong:text-zinc-200 prose-em:text-zinc-300"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                key={selectedDoc} // Remount on doc change
-                dangerouslySetInnerHTML={{ __html: content }}
-            />
+            {isLoading ? (
+                <div className="flex items-center justify-center py-20">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                </div>
+            ) : (
+                <motion.div
+                    className="prose prose-invert max-w-none prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-zinc-800 prose-a:text-blue-400 prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-code:text-amber-400 prose-strong:text-zinc-200 prose-em:text-zinc-300"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                    key={selectedDoc} // Remount on doc change
+                    dangerouslySetInnerHTML={{ __html: content }}
+                />
+            )}
 
             {/* Next/Previous Navigation */}
             <motion.div
