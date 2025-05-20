@@ -93,7 +93,7 @@ export default function () {
                 />
 
                 <Route
-                  path="/docs"
+                  path="/docs/*"
                   element={withPageErrorBoundary(Docs)({})}
                 />
 

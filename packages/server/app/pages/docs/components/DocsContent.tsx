@@ -1,15 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useLocation, useNavigate } from "react-router";
 import Icon from "@/shared/components/Icon";
 import { docItems, docSections } from "../data";
 import AnimatedCodeBlock from "./AnimatedCodeBlock";
 import { generateDocContent } from "../utils";
 
-type DocsContentProps = {
-    selectedDoc: string;
-};
+export default function DocsContent() {
+    const location = useLocation();
+    const navigate = useNavigate();
 
-export default function DocsContent({ selectedDoc }: DocsContentProps) {
+    // Extract the current doc ID from the URL path
+    const currentPath = location.pathname;
+    const selectedDoc = currentPath.split("/").pop() || "installation";
+
     // Generate sample markdown content based on selected doc
     const content = generateDocContent(selectedDoc);
 
@@ -34,10 +38,10 @@ export default function DocsContent({ selectedDoc }: DocsContentProps) {
     }, []);
 
     return (
-        <div className="container py-6 max-w-4xl" ref={contentRef}>
+        <div className="container py-8 max-w-none" ref={contentRef}>
             {/* Progress indicator */}
             <motion.div
-                className="fixed top-0 left-0 right-0 h-1 bg-primary/50 z-50"
+                className="fixed top-0 left-0 right-0 h-1 bg-blue-500/50 z-50"
                 style={{ scaleX: scrollProgress, transformOrigin: 'left' }}
             />
 
@@ -45,7 +49,7 @@ export default function DocsContent({ selectedDoc }: DocsContentProps) {
                 {docItems.find(item => item.id === selectedDoc) && (
                     <>
                         <motion.h1
-                            className="text-3xl sm:text-4xl font-bold mb-4"
+                            className="text-3xl sm:text-4xl font-bold mb-4 text-zinc-100"
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3 }}
@@ -53,7 +57,7 @@ export default function DocsContent({ selectedDoc }: DocsContentProps) {
                             {docItems.find(item => item.id === selectedDoc)?.title}
                         </motion.h1>
                         <motion.div
-                            className="text-muted-foreground"
+                            className="text-zinc-400"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.3, delay: 0.1 }}
@@ -67,7 +71,7 @@ export default function DocsContent({ selectedDoc }: DocsContentProps) {
             </div>
 
             <motion.div
-                className="prose prose-neutral dark:prose-invert max-w-none"
+                className="prose prose-invert max-w-none prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-zinc-800 prose-a:text-blue-400 prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-code:text-amber-400 prose-strong:text-zinc-200 prose-em:text-zinc-300"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
@@ -78,13 +82,13 @@ export default function DocsContent({ selectedDoc }: DocsContentProps) {
             {/* Interactive demo section */}
             {selectedDoc === "quick-start" && (
                 <motion.div
-                    className="mt-12 border rounded-lg p-6 bg-secondary/10"
+                    className="mt-12 border border-zinc-800 rounded-lg p-6 bg-zinc-900/50"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.2 }}
                 >
-                    <h3 className="text-xl font-bold mb-4">Interactive Demo</h3>
-                    <p className="mb-6">Try out the Beaver Social SDK with this interactive example:</p>
+                    <h3 className="text-xl font-bold mb-4 text-zinc-100">Interactive Demo</h3>
+                    <p className="mb-6 text-zinc-300">Try out the Beaver Social SDK with this interactive example:</p>
 
                     <AnimatedCodeBlock
                         language="tsx"
@@ -122,7 +126,7 @@ function UserDemo() {
 
                     <div className="flex gap-4 mt-6">
                         <motion.button
-                            className="px-4 py-2 bg-primary/10 hover:bg-primary/20 rounded-md font-medium"
+                            className="px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 rounded-md font-medium text-blue-400"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                         >
@@ -130,7 +134,7 @@ function UserDemo() {
                         </motion.button>
 
                         <motion.button
-                            className="px-4 py-2 border rounded-md font-medium"
+                            className="px-4 py-2 border border-zinc-800 hover:border-zinc-700 rounded-md font-medium text-zinc-300"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                         >
@@ -142,12 +146,12 @@ function UserDemo() {
 
             {/* Related docs section */}
             <motion.div
-                className="mt-12 border-t pt-8"
+                className="mt-12 border-t border-zinc-800 pt-8"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.4, delay: 0.3 }}
             >
-                <h3 className="text-xl font-bold mb-4">Related Documentation</h3>
+                <h3 className="text-xl font-bold mb-4 text-zinc-100">Related Documentation</h3>
                 <div className="grid sm:grid-cols-2 gap-4">
                     {docItems
                         .filter(item =>
@@ -158,15 +162,15 @@ function UserDemo() {
                         .map((item, i) => (
                             <motion.div
                                 key={item.id}
-                                className="p-4 border rounded-lg hover:bg-secondary/10 cursor-pointer"
+                                className="p-4 border border-zinc-800 hover:border-zinc-700 rounded-lg bg-zinc-900/50 hover:bg-zinc-900 cursor-pointer"
                                 whileHover={{ y: -2 }}
-                                onClick={() => window.location.hash = `#${item.id}`}
+                                onClick={() => navigate(`/docs/${item.id}`)}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.3, delay: 0.4 + (i * 0.1) }}
                             >
-                                <h4 className="font-bold">{item.title}</h4>
-                                <p className="text-sm text-muted-foreground">
+                                <h4 className="font-bold text-zinc-100">{item.title}</h4>
+                                <p className="text-sm text-zinc-400">
                                     Continue your learning journey
                                 </p>
                             </motion.div>
@@ -176,15 +180,15 @@ function UserDemo() {
 
             {/* Feedback section */}
             <motion.div
-                className="mt-12 border-t pt-8"
+                className="mt-12 border-t border-zinc-800 pt-8"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.4, delay: 0.5 }}
             >
-                <h3 className="text-xl font-bold mb-4">Was this helpful?</h3>
+                <h3 className="text-xl font-bold mb-4 text-zinc-100">Was this helpful?</h3>
                 <div className="flex gap-3">
                     <motion.button
-                        className="px-4 py-2 border rounded-md flex items-center gap-2"
+                        className="px-4 py-2 border border-zinc-800 hover:border-zinc-700 rounded-md flex items-center gap-2 text-zinc-300"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
@@ -192,7 +196,7 @@ function UserDemo() {
                         Yes
                     </motion.button>
                     <motion.button
-                        className="px-4 py-2 border rounded-md flex items-center gap-2"
+                        className="px-4 py-2 border border-zinc-800 hover:border-zinc-700 rounded-md flex items-center gap-2 text-zinc-300"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
