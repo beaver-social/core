@@ -80,7 +80,7 @@ export default function SearchBar({
     const handleSearchSubmit = useCallback((e: React.FormEvent) => {
         e.preventDefault();
         if (searchValue.trim()) {
-            navigate(`/explore/search?q=${encodeURIComponent(searchValue.trim())}`);
+            navigate(`/app/explore/search?q=${encodeURIComponent(searchValue.trim())}`);
             setOpen(false);
             if (isModal && onModalClose) {
                 onModalClose();
@@ -90,7 +90,7 @@ export default function SearchBar({
 
     // Select a profile
     const handleSelectProfile = useCallback((handle: string) => {
-        navigate(`/profile/${handle}`);
+        navigate(`/app/profile/${handle}`);
         setOpen(false);
         setIsFocused(false);
         if (isModal && onModalClose) {
@@ -100,7 +100,7 @@ export default function SearchBar({
 
     // Select a topic
     const handleSelectTopic = useCallback((topic: string) => {
-        navigate(`/explore/search?q=${encodeURIComponent(topic)}`);
+        navigate(`/app/explore/search?q=${encodeURIComponent(topic)}`);
         setOpen(false);
         setIsFocused(false);
         if (isModal && onModalClose) {

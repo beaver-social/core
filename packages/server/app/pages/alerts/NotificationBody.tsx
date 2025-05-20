@@ -20,7 +20,7 @@ export default function NotificationBody({
         <div onClick={
             (e) => {
                 e.preventDefault();
-                navigate(`/post/${id}`, { state: { postId: id } });
+                navigate(`/app/post/${id}`, { state: { postId: id } });
             }
         } className="block cursor-pointer">
             <article className="flex gap-4 p-4 border-b hover:bg-secondary/50 transition-colors">

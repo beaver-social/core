@@ -19,37 +19,37 @@ export const sidebarItems: sidebarItems[] = [
   {
     name: "Home",
     iconName: "House",
-    to: "/",
+    to: "/app",
   },
   {
     name: "Explore",
     iconName: "Search",
-    to: "/explore/search",
+    to: "/app/explore/search",
   },
   {
     name: "Create",
     iconName: "SquarePlus",
-    to: "/create",
+    to: "/app/create",
   },
   {
     name: "Swipes",
     iconName: "Clapperboard",
-    to: "/swipes",
+    to: "/app/swipes",
   },
   {
     name: "Alerts",
     iconName: "Bell",
-    to: "/alerts",
+    to: "/app/alerts",
   },
   {
     name: "Messages",
     iconName: "Mail",
-    to: "/messages",
+    to: "/app/messages",
   },
   {
     name: "Settings",
     iconName: "Settings",
-    to: "/settings",
+    to: "/app/settings",
   },
 ];
 
@@ -66,7 +66,7 @@ export default function SideNav() {
     const currentPath = location.pathname;
 
     // Check if on profile page
-    const isOnProfilePage = currentPath.startsWith("/profile");
+    const isOnProfilePage = currentPath.startsWith("/app/profile");
     setIsProfilePage(isOnProfilePage);
 
     // If on settings or profile page, no sidebar item should be active
@@ -177,7 +177,7 @@ export default function SideNav() {
       <div className="my-4 mx-3">
         {beaver.wallet.isConnected ? (
           <Link
-            to={`/profile/${user?.username}`}
+            to={`/app/profile/${user?.username}`}
             className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors mt-3 ${isProfilePage ? "bg-primary/5" : "hover:bg-muted"
               }`}
           >

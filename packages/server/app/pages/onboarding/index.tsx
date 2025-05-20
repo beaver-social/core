@@ -107,18 +107,18 @@ export default function Onboarding() {
       case 4:
         return <ConnectSuiNS onComplete={handleNext} handleBack={handleBack} handleSkip={handleSkip} />;
       case 5:
-        return <CompleteOnboarding onComplete={() => navigate("/")} />;
+        return <CompleteOnboarding onComplete={() => navigate("/app/")} />;
       default:
         return <Introduction onComplete={handleNext} />;
     }
   };
 
   if ((onboardingProgress?.completed.length === TOTAL_STEPS && step !== 6)) {
-    navigate("/");
+    navigate("/app/");
   }
 
   // if (!isConnected || userId) {
-  //   navigate("/");
+  //   navigate("/app/");
   // }
 
   return (

@@ -11,7 +11,7 @@ export default function Error404() {
             </h1>
 
             <Button variant="secondary">
-                <Link to="/">
+                <Link to="/app">
                     Back to Home
                 </Link>
             </Button>

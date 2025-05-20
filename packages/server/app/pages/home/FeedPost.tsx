@@ -163,14 +163,14 @@ function FeedPost({
           <div className="mt-3">
             {/* {topReply && (
               <button onClick={() => {
-                navigate(`/post/${postId}/replies/${topReply.id}`, { state: { postId: postId } });
+                navigate(`/app/post/${postId}/replies/${topReply.id}`, { state: { postId: postId } });
               }} className="text-sm text-muted-foreground">
                 <span className="font-semibold">{topReply.handle}</span> {truncateText(topReply.content, 50)}
               </button>
             )} */}
             <br />
             <button onClick={() => {
-              navigate(`/post/${postId}`, { state: { postId: postId } });
+              navigate(`/app/post/${postId}`, { state: { postId: postId } });
             }
             } className="text-sm hover:text-primary transition-colors text-muted-foreground">
               View all {post?.analytics.comments} replies
@@ -195,7 +195,7 @@ function FeedPost({
           className="flex flex-col rounded-sm overflow-hidden bg-secondary shadow-sm hover:shadow-md transition-all duration-300 border mx-6 sm:mx-0 cursor-pointer relative"
           onClick={(e) => {
             e.preventDefault();
-            navigate(`/post/${postId}`, { state: { postId } });
+            navigate(`/app/post/${postId}`, { state: { postId } });
           }}
         >
           {/* Header with Avatar */}

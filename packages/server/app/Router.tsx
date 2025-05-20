@@ -37,7 +37,7 @@ function OnboardingProtection({ children }: { children: React.ReactNode }) {
   const { mutate: login, isSuccess, isPending } = useLogin();
 
   if (beaver.wallet.isConnected && !beaver.wallet.hasIdentity) {
-    navigate("/onboarding");
+    navigate("/app/onboarding");
   }
 
   useEffect(() => {
@@ -82,15 +82,14 @@ export default function () {
           element={
             <OnboardingProtection>
               <Routes>
-                <Route path="/" element={withPageErrorBoundary(Home)({})} />
                 <Route
-                  path="/onboarding"
-                  element={withPageErrorBoundary(Onboarding)({})}
+                  path="/"
+                  element={withPageErrorBoundary(Landing)({})}
                 />
 
                 <Route
-                  path="/landing"
-                  element={withPageErrorBoundary(Landing)({})}
+                  path="/onboarding"
+                  element={withPageErrorBoundary(Onboarding)({})}
                 />
 
                 <Route
@@ -98,8 +97,9 @@ export default function () {
                   element={withPageErrorBoundary(Docs)({})}
                 />
 
+                <Route path="/app" element={withPageErrorBoundary(Home)({})} />
                 <Route
-                  path="/*"
+                  path="/app/*"
                   element={<NotLoggedInProtection>
                     <Routes>
                       <Route
@@ -115,7 +115,7 @@ export default function () {
                         element={withPageErrorBoundary(Message)({})}
                       />
                       <Route
-                        path="post/:id"
+                        path="/post/:id"
                         element={withPageErrorBoundary(Post)({})}
                       />
                       <Route
@@ -138,20 +138,22 @@ export default function () {
                         path="/explore/search"
                         element={withPageErrorBoundary(SearchResults)({})}
                       />
-                      <Route
-                        path="/demo"
-                        element={withPageErrorBoundary(Demo)({})}
-                      />
-                      <Route
-                        path="*"
-                        element={withPageErrorBoundary(Error404)({})}
-                      />
                     </Routes>
                   </NotLoggedInProtection>}
+                />
+
+                <Route
+                  path="/demo"
+                  element={withPageErrorBoundary(Demo)({})}
                 />
               </Routes>
             </OnboardingProtection>
           }
+        />
+
+        <Route
+          path="*"
+          element={withPageErrorBoundary(Error404)({})}
         />
       </Routes>
     </BrowserRouter>

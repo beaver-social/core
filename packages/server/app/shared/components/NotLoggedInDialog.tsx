@@ -26,7 +26,7 @@ export default function NotLoggedInDialog({ open, onOpenChange }: Props) {
     useEffect(() => {
         if (!isOpen) {
             setAnimationStep(0);
-            navigate("/");
+            navigate("/app");
         } else {
             const timer = setTimeout(() => {
                 setAnimationStep(1);

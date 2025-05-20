@@ -91,7 +91,7 @@ export default function SecondaryPanel() {
                             whileHover={{ scale: 1.01 }}
                             whileTap={{ scale: 0.98 }}
                             className="space-y-1 cursor-pointer hover:bg-background/20 p-3 rounded-lg transition-colors border border-transparent hover:border-primary/20 group"
-                            onClick={() => navigate(`/explore/search?q=${encodeURIComponent(topic.name)}`)}
+                            onClick={() => navigate(`/app/explore/search?q=${encodeURIComponent(topic.name)}`)}
                         >
                             <div className="flex items-center justify-between">
                                 <p className="text-sm text-muted-foreground flex items-center gap-1.5">

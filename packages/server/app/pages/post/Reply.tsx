@@ -25,7 +25,7 @@ export default function Reply({ id }: {
         <motion.div
             onClick={(e) => {
                 e.preventDefault();
-                navigate(`/post/${id}`);
+                navigate(`/app/post/${id}`);
 
             }}
             initial={{ opacity: 0, y: 5 }}

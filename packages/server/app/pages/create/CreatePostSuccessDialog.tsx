@@ -44,9 +44,9 @@ export default function CreatePostSuccessDialog({
     const handleViewPost = () => {
         onClose();
         if (postId) {
-            navigate(`/post/${postId}`);
+            navigate(`/app/post/${postId}`);
         } else {
-            navigate("/");
+            navigate("/app/");
         }
     };
 

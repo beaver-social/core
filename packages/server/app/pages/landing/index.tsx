@@ -1,4 +1,4 @@
-import { BackgroundEffect, ModernNavbar, EnhancedHero, AnimatedFeatures, CodeShowcase, ModernIntegrations, AnimatedCTA, ModernFooter } from "./ai";
+import { BackgroundEffect, ModernNavbar, EnhancedHero, AnimatedFeatures, CodeShowcase, ModernIntegrations, AnimatedCTA, ModernFooter } from "./components";
 import { Image } from "@/shared/components/Image";
 
 export default function Landing() {

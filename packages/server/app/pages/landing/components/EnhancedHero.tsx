@@ -1,6 +1,7 @@
 import Icon from "@/shared/components/Icon";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 const AnimatedCodeSnippet = () => {
     const [copied, setCopied] = useState(false);
@@ -322,6 +323,8 @@ function YourSocialApp () {
 };
 
 export function EnhancedHero() {
+    const navigate = useNavigate();
+
     return (
         <section className="container relative mx-auto flex flex-col md:flex-row items-center justify-between gap-8 px-4 py-16 md:py-28 max-w-7xl h-[90vh]">
             {/* Left side - Text content */}
@@ -354,11 +357,14 @@ export function EnhancedHero() {
                     <motion.button
                         className="rounded-sm bg-zinc-800/20 px-6 py-2.5 text-md text-white hover:bg-zinc-800/40 border border-zinc-700/50 hover:border-purple-400/50 font-semibold flex gap-2 items-center transition-all"
                         whileTap={{ scale: 0.97 }}
+                        onClick={() => {
+                            navigate("/app");
+                        }}
                     >
                         <Icon name="Activity" className="w-4 h-4 text-blue-400" />
 
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-                            Get Started
+                            Try Beaver Social
                         </span>
                     </motion.button>
                 </motion.div>
