@@ -1,7 +1,3 @@
-# Beaver Client SDK
-
-This document provides comprehensive documentation for the Beaver Client SDK, the TypeScript foundation that powers the Beaver React SDK and enables direct interaction with the Beaver Social API.
-
 ## Installation
 
 ```bash

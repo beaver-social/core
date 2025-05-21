@@ -33,6 +33,10 @@ const app = new Hono()
 
       const metadata = docsMetadata.find((doc) => doc.id === id);
 
+      console.log({
+        content: result.data,
+      });
+
       return respond.ok(
         ctx,
         {

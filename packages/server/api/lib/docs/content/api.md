@@ -1,7 +1,3 @@
-# Beaver Server API
-
-This document provides comprehensive documentation for the Beaver Server API, which serves as the foundation (Level 0) of the Beaver Social platform architecture.
-
 ## Overview
 
 The Beaver Server API is a RESTful API service that powers the social network functionality and handles blockchain integration. It provides endpoints for user management, authentication, social interactions, content creation, and blockchain transactions.

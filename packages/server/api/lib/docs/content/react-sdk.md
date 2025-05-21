@@ -1,7 +1,3 @@
-# Beaver React SDK
-
-This document provides comprehensive documentation for working with the Beaver React SDK, which offers React-specific bindings for interacting with the Beaver Social API.
-
 ## Installation
 
 ```bash

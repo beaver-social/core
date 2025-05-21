@@ -1,7 +1,3 @@
-# Beaver Social Documentation
-
-Welcome to the Beaver Social documentation. This comprehensive guide covers everything you need to know about integrating and using the Beaver Social Web3 Social Network Layer.
-
 ## What is Beaver Social?
 
 Beaver Social is a Web3 Social Network Layer built on the Sui Blockchain. It's designed as a headless logic layer that provides developers with the tools to create customized social network UI clients.
@@ -12,21 +8,21 @@ The platform consists of several modular components that work together to delive
 
 ### Getting Started
 
-- [Getting Started Guide](./1_getting_started.md) - A quick introduction to Beaver Social with examples to get you up and running
+- [Getting Started Guide](./getting-started) - A quick introduction to Beaver Social with examples to get you up and running
 
 ### Architecture
 
-- [Architecture Overview](./2_architecture.md) - Comprehensive information about the platform's architecture and component structure
+- [Architecture Overview](./architecture) - Comprehensive information about the platform's architecture and component structure
 
 ### SDKs
 
-- [React SDK Documentation](./3_beaver_react_sdk.md) - Complete guide to using the React-specific SDK
-- [Client SDK Documentation](./4_beaver_client_sdk.md) - Documentation for the TypeScript Client SDK
+- [React SDK Documentation](./react-sdk) - Complete guide to using the React-specific SDK
+- [TypeScript SDK Documentation](./typescript-sdk) - Documentation for the TypeScript Client SDK
 
 ### Backend
 
-- [Server API Documentation](./5_server_api.md) - Details about the RESTful API endpoints and usage
-- [Move Contracts Documentation](./6_move_contracts.md) - Information about the blockchain smart contracts
+- [Server API Documentation](./api) - Details about the RESTful API endpoints and usage
+- [Move Contracts Documentation](./contracts) - Information about the blockchain smart contracts
 
 ## Key Features
 

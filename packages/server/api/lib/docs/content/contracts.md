@@ -1,7 +1,3 @@
-# Move Smart Contracts
-
-This document provides comprehensive documentation for the Move smart contracts that power the Beaver Social platform on the Sui blockchain.
-
 ## Overview
 
 The Beaver Social platform leverages Sui's Move smart contracts to provide on-chain verification and permanence for social interactions. These contracts handle identity management, content verification, and social graph relationships in a decentralized manner.

@@ -20,12 +20,9 @@ export default function DocsContent({ data }: DocsContentProps) {
     const currentPath = location.pathname;
     const selectedDoc = currentPath.split("/").pop() || "";
 
-    // Find the current document and section
+    // Find the current document and its group
     const currentDoc = useMemo(() => allDocs.find(doc => doc.id === selectedDoc), [selectedDoc, allDocs]);
-    const parentDoc = useMemo(() =>
-        currentDoc?.parentId ? allDocs.find(doc => doc.id === currentDoc.parentId) : null,
-        [currentDoc, allDocs]
-    );
+    const currentGroup = useMemo(() => currentDoc?.group || "", [currentDoc]);
 
     // Track scroll progress for a progress indicator
     const [scrollProgress, setScrollProgress] = useState(0);
@@ -47,26 +44,33 @@ export default function DocsContent({ data }: DocsContentProps) {
                 .slice(0, 2);
         }
 
-        // Fallback: find docs with the same parent
+        // Fallback: find docs in the same group
         return allDocs
             .filter(doc =>
                 doc.id !== currentDoc.id &&
-                doc.parentId === currentDoc.parentId
+                doc.group === currentDoc.group
             )
             .slice(0, 2);
     }, [currentDoc, allDocs]);
 
     // Find next and previous documents for navigation
     const { prevDoc, nextDoc } = useMemo(() => {
-        // Create a flat array of all documents with parent documents first
-        const rootDocs = allDocs.filter(doc => !doc.parentId);
-        const childDocs = allDocs.filter(doc => doc.parentId);
+        // Group documents by their groups
+        const docsByGroup = new Map<string, typeof allDocs>();
+        allDocs.forEach(doc => {
+            if (doc.group) {
+                const groupDocs = docsByGroup.get(doc.group) || [];
+                docsByGroup.set(doc.group, [...groupDocs, doc]);
+            }
+        });
 
-        // Sort by index
-        const allDocsFlattened = [
-            ...rootDocs,
-            ...childDocs
-        ];
+        // Get all groups
+        const groups = Array.from(new Set(allDocs.map(doc => doc.group).filter(Boolean)));
+
+        // Create a flat array of all documents organized by groups
+        const allDocsFlattened = groups.flatMap(group =>
+            docsByGroup.get(group) || []
+        );
 
         const currentIndex = allDocsFlattened.findIndex(doc => doc.id === selectedDoc);
         const prev = currentIndex > 0 ? allDocsFlattened[currentIndex - 1] : null;
@@ -129,7 +133,7 @@ export default function DocsContent({ data }: DocsContentProps) {
     // If no document is selected or found, show a message
     if (!currentDoc) {
         return (
-            <div className="py-8 text-center">
+            <div className="py-8 text-center h-[85vh] flex flex-col w-full items-center justify-center">
                 <h2 className="text-xl font-bold mb-4">Document Not Found</h2>
                 <p className="text-zinc-400">The requested document could not be found.</p>
                 <button
@@ -143,7 +147,7 @@ export default function DocsContent({ data }: DocsContentProps) {
     }
 
     return (
-        <div className="py-8" ref={contentRef}>
+        <div className="py-8 px-2 lg:px-0" ref={contentRef}>
             {/* Progress indicator */}
             <motion.div
                 className="fixed top-0 left-0 right-0 h-1 bg-blue-500/50 z-50"
@@ -161,14 +165,9 @@ export default function DocsContent({ data }: DocsContentProps) {
                                 Documentation
                             </button>
                             <span>/</span>
-                            {parentDoc && (
+                            {currentGroup && (
                                 <>
-                                    <button
-                                        onClick={() => navigate(`/docs/${parentDoc.id}`)}
-                                        className="hover:text-zinc-300 transition-colors"
-                                    >
-                                        {parentDoc.title}
-                                    </button>
+                                    <span className="text-zinc-300">{currentGroup}</span>
                                     <span>/</span>
                                 </>
                             )}
@@ -189,7 +188,7 @@ export default function DocsContent({ data }: DocsContentProps) {
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.3, delay: 0.1 }}
                         >
-                            <Icon name={currentDoc.icon || parentDoc?.icon || "Book"} className="h-4 w-4 text-blue-400" />
+                            <Icon name={currentDoc.icon || "Book"} className="h-4 w-4 text-blue-400" />
                             {currentDoc.description}
                         </motion.div>
                     </>
@@ -228,9 +227,9 @@ export default function DocsContent({ data }: DocsContentProps) {
                         <div>
                             <div className="text-sm text-zinc-500 mb-1">Previous</div>
                             <div className="font-medium text-zinc-300 group-hover:text-blue-400 transition-colors">{prevDoc.title}</div>
-                            {prevDoc.parentId && (
+                            {prevDoc.group && (
                                 <div className="text-xs text-zinc-500 mt-1">
-                                    {allDocs.find(doc => doc.id === prevDoc.parentId)?.title}
+                                    {prevDoc.group}
                                 </div>
                             )}
                         </div>
@@ -246,9 +245,9 @@ export default function DocsContent({ data }: DocsContentProps) {
                         <div className="flex-1">
                             <div className="text-sm text-zinc-500 mb-1">Next</div>
                             <div className="font-medium text-zinc-300 group-hover:text-blue-400 transition-colors">{nextDoc.title}</div>
-                            {nextDoc.parentId && (
+                            {nextDoc.group && (
                                 <div className="text-xs text-zinc-500 mt-1">
-                                    {allDocs.find(doc => doc.id === nextDoc.parentId)?.title}
+                                    {nextDoc.group}
                                 </div>
                             )}
                         </div>

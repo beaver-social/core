@@ -9,6 +9,7 @@ import DocsContent from "./components/DocsContent";
 import { DocsNavbar } from "./components/DocsNavbar";
 import Chatbot from "./components/ChatAI";
 import { useBeaver } from "@beaver/react";
+import { Image } from "@/shared/components/Image";
 
 function DocRedirect() {
     const navigate = useNavigate();
@@ -16,14 +17,27 @@ function DocRedirect() {
     const metadata = docsMetadata?.metadata || [];
 
     useEffect(() => {
-        // Find a default doc to navigate to (preferably first non-parent doc)
-        const defaultDoc = metadata.find(doc => doc.parentId) || metadata[0];
+        // Try to find the introduction document first
+        const introDoc = metadata.find(doc => doc.id === 'introduction');
 
-        if (defaultDoc) {
-            // Redirect to the first available doc
-            navigate(`/docs/${defaultDoc.id}`, { replace: true });
+        if (introDoc) {
+            navigate(`/docs/${introDoc.id}`, { replace: true });
+            return;
+        }
+
+        // If no introduction document, find the first document from the "Getting Started" group
+        const gettingStartedDoc = metadata.find(doc => doc.group === 'Getting Started');
+
+        if (gettingStartedDoc) {
+            navigate(`/docs/${gettingStartedDoc.id}`, { replace: true });
+            return;
+        }
+
+        // Fallback to the first document in the metadata
+        if (metadata.length > 0) {
+            navigate(`/docs/${metadata[0].id}`, { replace: true });
         } else {
-            // Fallback if no docs are available
+            // Last resort fallback if no docs are available
             navigate("/docs/introduction", { replace: true });
         }
     }, [navigate, metadata]);
@@ -55,28 +69,25 @@ export default function Docs() {
 
     return (
         <HelmetProvider>
-            <div className="min-h-screen bg-zinc-950 text-zinc-200 relative">
+            <div className="min-h-screen text-zinc-200 relative">
                 <Helmet>
                     <title>Documentation | Beaver Social</title>
                     <meta name="description" content="Comprehensive documentation for Beaver Social - the Web3 Social Network Layer built on Sui Blockchain" />
                 </Helmet>
 
-                <div className="absolute w-full inset-0 opacity-10 overflow-hidden">
-                    <img src="/images/landing/15.jpg" alt="Background Effect" className="object-cover min-h-screen w-screen" />
+                {/* Background Image */}
+                <div className="absolute w-full inset-0 opacity-10 -z-10 overflow-hidden">
+                    <Image src="/images/landing/15.jpg" alt="Background Effect" className="object-cover min-h-screen w-screen" />
                 </div>
 
                 <div className="sticky top-0 z-10">
-                    <DocsNavbar />
+                    <DocsNavbar data={docsMetadata} />
                 </div>
 
                 <div className="flex">
                     {/* Sidebar */}
                     <div className="hidden lg:flex flex-col w-64 border-r border-zinc-800 sticky top-[80px] h-[calc(100vh-80px)]">
                         <DocsTree data={docsMetadata} className="flex-1 mt-2" />
-
-                        <div className="p-4">
-                            <DocsSearch data={docsMetadata} />
-                        </div>
                     </div>
 
                     {/* Content */}

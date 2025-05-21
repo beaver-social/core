@@ -1,7 +1,3 @@
-# Getting Started with Beaver Social
-
-This guide will help you get started with integrating Beaver Social into your application or building a custom UI client on top of our platform.
-
 ## Overview
 
 Beaver Social is a Web3 Social Network Layer built on the Sui Blockchain. It provides developers with:

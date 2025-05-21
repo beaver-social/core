@@ -93,11 +93,10 @@ export default function Chatbot() {
             .slice(0, 3);
 
         return relevantDocs.map(({ item }) => {
-            const parentItem = metadata.find(doc => doc.id === item.parentId);
             return {
                 title: item.title,
                 url: `/docs/${item.id}`,
-                description: parentItem?.title || item.description.substring(0, 50)
+                description: item.group || item.description.substring(0, 50)
             };
         });
     };

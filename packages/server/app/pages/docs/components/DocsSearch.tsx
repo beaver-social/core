@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { Input } from "@/shared/components/ui/input";
 import Icon from "@/shared/components/Icon";
 import { useBeaver } from "@beaver/react";
+import { icons } from "lucide-react";
 
 type DocsSearchProps = {
     className?: string;
@@ -20,15 +21,26 @@ export default function DocsSearch({
     const [results, setResults] = useState<Array<typeof metadata[0]>>([]);
     const [showResults, setShowResults] = useState(false);
 
-    // Create a lookup of parent docs for section information
-    const parentDocs = useMemo(() => {
-        const parents = new Map<string, typeof metadata[0]>();
-        metadata?.forEach(doc => {
-            if (!doc.parentId) {
-                parents.set(doc.id, doc);
+    // Get information about groups for display
+    const groupIcons = useMemo(() => {
+        const iconMap = new Map<string, string>();
+
+        // For each group, find the first document with an icon
+        const groups = new Set(metadata.map(doc => doc.group));
+        groups.forEach(group => {
+            if (!group) return;
+
+            const docsInGroup = metadata.filter(doc => doc.group === group);
+            const docWithIcon = docsInGroup.find(doc => doc.icon);
+
+            if (docWithIcon?.icon) {
+                iconMap.set(group, docWithIcon.icon);
+            } else {
+                iconMap.set(group, "Book"); // Default icon
             }
         });
-        return parents;
+
+        return iconMap;
     }, [metadata]);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,11 +68,6 @@ export default function DocsSearch({
         setQuery("");
     };
 
-    const getParentForDoc = (doc: typeof metadata[0]) => {
-        if (!doc.parentId) return null;
-        return parentDocs.get(doc.parentId);
-    };
-
     return (
         <div className={`relative ${className}`}>
             <div className="relative">
@@ -68,7 +75,7 @@ export default function DocsSearch({
                     placeholder="Search documentation..."
                     value={query}
                     onChange={handleSearch}
-                    className="w-full pl-10 pr-4 bg-zinc-900/50 border-zinc-800 focus-visible:ring-blue-500"
+                    className="pl-10 pr-4 sm:w-80 bg-zinc-900/50 border-zinc-800 focus-visible:ring-blue-500"
                 />
                 <Icon
                     name="Search"
@@ -82,42 +89,37 @@ export default function DocsSearch({
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute top-full left-0 right-0 mt-1 z-10 bg-zinc-900 border border-zinc-800 rounded-md shadow-lg overflow-hidden max-h-80 overflow-y-auto"
+                        className="absolute top-full left-0 right-0 mt-4 z-10 border border-zinc-800 rounded-md shadow-lg overflow-hidden max-h-80 overflow-y-auto bg-background"
                     >
                         {results.length > 0 ? (
-                            results.map(doc => {
-                                const parent = getParentForDoc(doc);
-                                return (
-                                    <button
-                                        key={doc.id}
-                                        className="w-full text-left p-3 hover:bg-zinc-800 border-b border-zinc-800 last:border-0 flex flex-col gap-1"
-                                        onClick={() => handleSelectDoc(doc.id)}
-                                    >
-                                        <span className="text-zinc-200 font-medium">{doc.title}</span>
+                            results.map(doc => (
+                                <button
+                                    key={doc.id}
+                                    className="w-full text-left p-3 hover:bg-zinc-800 border-b border-zinc-800 last:border-0 flex flex-col gap-1"
+                                    onClick={() => handleSelectDoc(doc.id)}
+                                >
+                                    <span className="text-zinc-200 font-medium">{doc.title}</span>
+                                    {doc.group && (
                                         <div className="flex items-center gap-2 text-xs">
-                                            {parent && (
-                                                <>
-                                                    <Icon
-                                                        name={parent.icon || "Book"}
-                                                        className="h-3 w-3 text-blue-400"
-                                                    />
-                                                    <span className="text-zinc-400">
-                                                        {parent.title}
-                                                    </span>
-                                                </>
-                                            )}
+                                            <Icon
+                                                name={groupIcons.get(doc.group) as keyof typeof icons || "Book"}
+                                                className="h-3 w-3 text-blue-400"
+                                            />
+                                            <span className="text-zinc-400">
+                                                {doc.group}
+                                            </span>
                                         </div>
-                                        {doc.description && (
-                                            <p className="text-xs text-zinc-500 mt-1 line-clamp-1">
-                                                {doc.description}
-                                            </p>
-                                        )}
-                                    </button>
-                                );
-                            })
+                                    )}
+                                    {doc.description && (
+                                        <p className="text-xs text-zinc-500 mt-1 line-clamp-1">
+                                            {doc.description}
+                                        </p>
+                                    )}
+                                </button>
+                            ))
                         ) : (
-                            <div className="p-4 text-center text-zinc-400">
-                                <p>No results found for "{query}"</p>
+                            <div className="p-4 text-center text-sm text-zinc-400">
+                                <p className="font-semibold">No results found for "{query}"</p>
                                 <p className="text-xs mt-1">Try a different search term</p>
                             </div>
                         )}

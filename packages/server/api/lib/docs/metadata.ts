@@ -7,8 +7,8 @@ interface DocMetadata {
   tags: string[];
   related: string[];
   contentId: string;
-  parentId?: string;
   icon?: keyof typeof icons;
+  group: string;
 }
 
 export const docsMetadata: DocMetadata[] = [
@@ -20,6 +20,7 @@ export const docsMetadata: DocMetadata[] = [
     related: ["architecture", "react-sdk"],
     contentId: "introduction",
     icon: "Book",
+    group: "Getting Started",
   },
 
   {
@@ -29,7 +30,7 @@ export const docsMetadata: DocMetadata[] = [
     tags: ["getting-started", "getting-started"],
     related: ["introduction", "architecture"],
     contentId: "getting_started.md",
-    parentId: "introduction",
+    group: "Getting Started",
   },
 
   {
@@ -39,6 +40,7 @@ export const docsMetadata: DocMetadata[] = [
     tags: ["architecture", "getting-started", "architecture"],
     related: ["introduction", "react-sdk"],
     contentId: "architecture",
+    group: "Getting Started",
   },
 
   {
@@ -49,6 +51,7 @@ export const docsMetadata: DocMetadata[] = [
     tags: ["react-sdk", "getting-started", "react-sdk"],
     related: ["introduction", "architecture"],
     contentId: "react_sdk",
+    group: "Integration",
   },
 
   {
@@ -59,6 +62,7 @@ export const docsMetadata: DocMetadata[] = [
     tags: ["typescript-sdk", "getting-started", "typescript-sdk"],
     related: ["introduction", "architecture"],
     contentId: "typescript_sdk",
+    group: "Integration",
   },
 
   {
@@ -69,6 +73,7 @@ export const docsMetadata: DocMetadata[] = [
     tags: ["api", "getting-started", "api"],
     related: ["react-sdk", "typescript-sdk"],
     contentId: "api",
+    group: "Integration",
   },
 
   {
@@ -78,5 +83,6 @@ export const docsMetadata: DocMetadata[] = [
     tags: ["move-contracts", "getting-started", "move-contracts"],
     related: ["introduction", "architecture"],
     contentId: "move_contracts",
+    group: "Integration",
   },
 ];

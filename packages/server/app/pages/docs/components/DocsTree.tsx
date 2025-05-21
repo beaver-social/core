@@ -23,66 +23,51 @@ export default function DocsTree({
     const currentPath = location.pathname;
     const selectedDoc = currentPath.split("/").pop() || "";
 
-    // Create sections from metadata
-    const sections = useMemo(() => {
-        const allSections = new Map<string, {
-            id: string;
-            title: string;
-            description?: string;
-            icon: keyof typeof icons;
-        }>();
-
-        // First pass: identify all unique parent sections
+    // Get all unique groups from metadata
+    const groups = useMemo(() => {
+        const uniqueGroups = new Set<string>();
         metadata?.forEach(doc => {
-            if (!doc.parentId) {
-                allSections.set(doc.id, {
-                    id: doc.id,
-                    title: doc.title,
-                    description: doc.description,
-                    icon: doc.icon || "Book"
-                });
+            if (doc.group) {
+                uniqueGroups.add(doc.group);
             }
         });
-
-        return Array.from(allSections.values());
+        return Array.from(uniqueGroups);
     }, [metadata]);
 
-    // Group docs by their parent section
-    const docsBySection = useMemo(() => {
+    // Group docs by their group
+    const docsByGroup = useMemo(() => {
         const grouped = new Map<string, typeof metadata>();
 
-        // Group docs by their parent
+        // Group docs by their group property
         metadata?.forEach(doc => {
-            if (doc.parentId) {
-                const sectionDocs = grouped.get(doc.parentId) || [];
-                grouped.set(doc.parentId, [...sectionDocs, doc]);
+            if (doc.group) {
+                const groupDocs = grouped.get(doc.group) || [];
+                grouped.set(doc.group, [...groupDocs, doc]);
             }
         });
 
         return grouped;
     }, [metadata]);
 
-    // Find the current section for better highlighting
-    const currentSection = useMemo(() => {
+    // Find the current document's group
+    const currentGroup = useMemo(() => {
         const currentDoc = metadata?.find(doc => doc.id === selectedDoc);
-        return currentDoc?.parentId || currentDoc?.id || "";
+        return currentDoc?.group || "";
     }, [selectedDoc, metadata]);
 
-    // Expand the section containing the current doc
+    // Expand the group containing the current doc
     useEffect(() => {
         const currentDoc = metadata?.find(doc => doc.id === selectedDoc);
-        if (currentDoc && currentDoc.parentId && !expandedSections.includes(currentDoc.parentId)) {
-            setExpandedSections(prev => [...prev, currentDoc.parentId]);
-        } else if (currentDoc && !currentDoc.parentId) {
-            setExpandedSections(prev => [...prev, currentDoc.id]);
+        if (currentDoc && currentDoc.group && !expandedSections.includes(currentDoc.group)) {
+            setExpandedSections(prev => [...prev, currentDoc.group]);
         }
     }, [selectedDoc, metadata]);
 
-    const toggleSection = (sectionId: string) => {
+    const toggleSection = (groupName: string) => {
         setExpandedSections(prev =>
-            prev.includes(sectionId)
-                ? prev.filter(id => id !== sectionId)
-                : [...prev, sectionId]
+            prev.includes(groupName)
+                ? prev.filter(name => name !== groupName)
+                : [...prev, groupName]
         );
     };
 
@@ -92,14 +77,17 @@ export default function DocsTree({
 
     return (
         <div className={`overflow-auto px-2 py-4 ${className}`}>
-            {sections.map((section) => {
-                const isActive = section.id === currentSection;
-                const sectionDocs = docsBySection.get(section.id) || [];
+            {groups.map((groupName) => {
+                const isActive = groupName === currentGroup;
+                const groupDocs = docsByGroup.get(groupName) || [];
+
+                // Find an icon for the group (use the first doc with an icon, or default to "Book")
+                const groupIcon = groupDocs.find(doc => doc.icon)?.icon || "Book";
 
                 return (
-                    <div key={section.id} className="mb-4">
+                    <div key={groupName} className="mb-4">
                         <motion.button
-                            onClick={() => toggleSection(section.id)}
+                            onClick={() => toggleSection(groupName)}
                             className={`flex items-center justify-between w-full text-left p-2 hover:bg-zinc-800/50 rounded-lg transition-colors ${isActive ? "bg-zinc-800/30" : ""
                                 }`}
                             whileHover={{ scale: 1.01 }}
@@ -108,16 +96,16 @@ export default function DocsTree({
                             <div className="flex items-center gap-3">
                                 <div className={`p-1.5 rounded-md ${isActive ? "bg-blue-500/20" : "bg-zinc-800/50"}`}>
                                     <Icon
-                                        name={section.icon}
+                                        name={groupIcon}
                                         className={`size-4 ${isActive ? "text-blue-400" : "text-zinc-400"}`}
                                     />
                                 </div>
                                 <span className={`font-medium ${isActive ? "text-blue-300" : "text-zinc-300"}`}>
-                                    {section.title}
+                                    {groupName}
                                 </span>
                             </div>
                             <motion.div
-                                animate={{ rotate: expandedSections.includes(section.id) ? 180 : 0 }}
+                                animate={{ rotate: expandedSections.includes(groupName) ? 180 : 0 }}
                                 transition={{ duration: 0.2 }}
                             >
                                 <Icon
@@ -128,7 +116,7 @@ export default function DocsTree({
                         </motion.button>
 
                         <AnimatePresence>
-                            {expandedSections.includes(section.id) && (
+                            {expandedSections.includes(groupName) && (
                                 <motion.div
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: "auto", opacity: 1 }}
@@ -137,7 +125,7 @@ export default function DocsTree({
                                     className="overflow-hidden"
                                 >
                                     <div className="pl-8 pr-2 py-2 space-y-1">
-                                        {sectionDocs.map((doc) => {
+                                        {groupDocs.map((doc) => {
                                             const isSelected = selectedDoc === doc.id;
 
                                             return (
