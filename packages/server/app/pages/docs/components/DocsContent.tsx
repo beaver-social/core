@@ -100,7 +100,7 @@ export default function DocsContent() {
     }, [selectedDoc]);
 
     return (
-        <div className="container py-8 max-w-none" ref={contentRef}>
+        <div className="py-8" ref={contentRef}>
             {/* Progress indicator */}
             <motion.div
                 className="fixed top-0 left-0 right-0 h-1 bg-blue-500/50 z-50"

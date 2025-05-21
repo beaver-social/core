@@ -19,7 +19,7 @@ export default function Disconnect({ }: Props) {
                 beaver.wallet.disconnect();
                 setOnboardingData(null);
                 setOnboardingProgress(null);
-                window.location.href = "/";
+                window.location.href = "/app";
             }}>
             <Button variant="outline" className="rounded-sm px-[0.7rem] cursor-pointer">
                 <Icon name="LogOut" className="size-5" />

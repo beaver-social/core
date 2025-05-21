@@ -6,7 +6,6 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import DocsTree from "./components/DocsTree";
 import DocsSearch from "./components/DocsSearch";
 import DocsContent from "./components/DocsContent";
-import MobileDocsDrawer from "./components/MobileDocsDrawer";
 import { DocsNavbar } from "./components/DocsNavbar";
 import Chatbot from "./components/ChatAI";
 import { docItems } from "./data";
@@ -28,13 +27,13 @@ function DocPage() {
     const currentDoc = docItems.find(item => item.id === docId);
 
     return (
-        <>
+        <div className="flex">
             <Helmet>
                 <title>{currentDoc ? `${currentDoc.title} | Beaver Social Docs` : 'Documentation | Beaver Social'}</title>
                 <meta name="description" content="Comprehensive documentation for Beaver Social - the Web3 Social Network Layer built on Sui Blockchain" />
             </Helmet>
             <DocsContent />
-        </>
+        </div>
     );
 }
 
@@ -47,15 +46,17 @@ export default function Docs() {
                     <meta name="description" content="Comprehensive documentation for Beaver Social - the Web3 Social Network Layer built on Sui Blockchain" />
                 </Helmet>
 
-                <div className="absolute w-full inset-0 opacity-5 overflow-hidden">
+                <div className="absolute w-full inset-0 opacity-10 overflow-hidden">
                     <img src="/images/landing/15.jpg" alt="Background Effect" className="object-cover min-h-screen w-screen" />
                 </div>
 
-                <DocsNavbar />
+                <div className="sticky top-0 z-10">
+                    <DocsNavbar />
+                </div>
 
                 <div className="flex">
                     {/* Sidebar */}
-                    <div className="hidden md:flex flex-col w-64 border-r border-zinc-800 sticky top-[80px] h-[calc(100vh-80px)]">
+                    <div className="hidden lg:flex flex-col w-64 border-r border-zinc-800 sticky top-[80px] h-[calc(100vh-80px)]">
                         <DocsTree className="flex-1 mt-2" />
 
                         <div className="p-4">
@@ -64,13 +65,7 @@ export default function Docs() {
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 px-4 md:px-10">
-                        {/* Mobile View Header */}
-                        <div className="md:hidden flex items-center justify-between p-4 border-b border-zinc-800">
-                            <h1 className="text-xl font-bold text-zinc-200">Documentation</h1>
-                            <MobileDocsDrawer />
-                        </div>
-
+                    <div className="flex-1 px-4 lg:px-10">
                         {/* Routes */}
                         <Routes>
                             <Route path="/" element={<DocRedirect />} />

@@ -1,16 +1,15 @@
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router";
 import Icon from "@/shared/components/Icon";
+import MobileDocsDrawer from "./MobileDocsDrawer";
 
 export function DocsNavbar() {
     const navigate = useNavigate();
 
     const navItems = [
-        { name: "Home", href: "/" },
-        { name: "Docs", href: "/docs" },
-        { name: "Components", href: "/docs/components" },
         { name: "API", href: "/docs/api" },
-        { name: "Examples", href: "/docs/examples" },
+        { name: "TypeScript SDK", href: "/docs/typescript-sdk" },
+        { name: "React SDK", href: "/docs/react-sdk" },
     ];
 
     return (
@@ -49,13 +48,17 @@ export function DocsNavbar() {
 
                 {/* CTA Button */}
                 <motion.button
-                    className="hidden md:flex rounded-sm px-6 py-2.5 text-sm font-medium text-zinc-400 border border-zinc-800 gap-2 items-center hover:text-zinc-200 hover:border-zinc-700 transition-colors"
+                    className="hidden lg:flex rounded-sm px-6 py-2.5 text-sm font-medium text-zinc-400 border border-zinc-800 gap-2 items-center hover:text-zinc-200 hover:border-zinc-700 transition-colors"
                     whileTap={{ scale: 0.97 }}
                     onClick={() => navigate("/app")}
                 >
                     <Icon name="Github" className="w-4 h-4" />
                     <p>GitHub</p>
                 </motion.button>
+
+                <div className="lg:hidden">
+                    <MobileDocsDrawer />
+                </div>
             </div>
         </motion.div>
     );
