@@ -259,7 +259,7 @@ function YourSocialApp () {
 
     return (
         <motion.div
-            className="relative w-full max-w-lg mx-auto md:mx-0 rounded-xl bg-zinc-900/50 p-4 font-mono text-sm shadow-xl backdrop-blur-md border border-zinc-800/50"
+            className="relative w-full max-w-lg mx-auto lg:mx-0 rounded-xl bg-zinc-900/50 p-4 font-mono text-sm shadow-xl backdrop-blur-md border border-zinc-800/50"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.5 }}
@@ -326,15 +326,15 @@ export function EnhancedHero() {
     const navigate = useNavigate();
 
     return (
-        <section className="container relative mx-auto flex flex-col md:flex-row items-center justify-between gap-8 px-4 py-16 md:py-28 max-w-7xl h-[90vh]">
+        <section className="container relative mx-auto flex flex-col lg:flex-row items-center justify-between gap-8 px-4 py-16 lg:py-28 max-w-7xl h-[90vh]">
             {/* Left side - Text content */}
-            <div className="flex flex-col max-w-xl mb-12 md:mb-0">
+            <div className="flex flex-col max-w-xl mb-12 lg:mb-0">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+                    <h1 className="text-4xl lg:text-6xl font-bold tracking-tight">
                         <span className="text-zinc-100">Build your </span>
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">
                             web3

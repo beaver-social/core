@@ -7,6 +7,7 @@ export function useBeaver() {
   const follow = useFollow();
   const post = usePost();
   const profile = useProfile();
+  const docs = useDocs();
 
   return {
     user,
@@ -18,6 +19,19 @@ export function useBeaver() {
     follow,
     post,
     profile,
+    docs,
+  };
+}
+
+export function useDocs() {
+  const { client } = useBeaverContext();
+  return (options: Parameters<typeof client.docs.fetchDocs>[0]) => {
+    return useQuery({
+      queryKey: ["docs", options],
+      queryFn: async () => {
+        return await client.docs.fetchDocs(options);
+      },
+    });
   };
 }
 

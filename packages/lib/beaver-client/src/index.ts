@@ -8,6 +8,7 @@ import Logger from "./bindings/Logger";
 import Connector from "./bindings/Connector";
 import User from "./bindings/User";
 import Posts from "./bindings/Posts";
+import Docs from "./bindings/Docs";
 import { BeaverStore } from "./store";
 import ApiClient from "./bindings/ApiClient";
 import EventNotifier from "./bindings/EventHandler";
@@ -21,6 +22,7 @@ export class BeaverClient {
   connector: Connector;
   user: User;
   posts: Posts;
+  docs: Docs;
 
   constructor(config: BeaverClientConfig) {
     const logger = new Logger("Beaver Social SDK", Boolean(config.debug));
@@ -49,7 +51,7 @@ export class BeaverClient {
     this.connector = new Connector(this.defaults);
     this.user = new User(this.defaults);
     this.posts = new Posts(this.defaults);
-
+    this.docs = new Docs(this.defaults);
     this.initialize();
   }
 

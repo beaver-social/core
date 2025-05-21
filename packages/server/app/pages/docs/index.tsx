@@ -10,6 +10,7 @@ import MobileDocsDrawer from "./components/MobileDocsDrawer";
 import { DocsNavbar } from "./components/DocsNavbar";
 import Chatbot from "./components/ChatAI";
 import { docItems } from "./data";
+import { useBeaver } from "@beaver/react";
 
 function DocRedirect() {
     const navigate = useNavigate();

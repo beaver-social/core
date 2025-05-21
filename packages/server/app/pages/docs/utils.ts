@@ -1,5 +1,5 @@
+import { useBeaver } from "@beaver/react";
 import MarkdownIt from "markdown-it";
-
 // Create markdown parser instance
 const md = new MarkdownIt({
   html: true,
@@ -168,26 +168,19 @@ const docFileMap: Record<string, string> = {
 };
 
 // Helper function to load and render markdown content
-export async function generateDocContent(docId: string): Promise<string> {
+export async function generateDocContent(
+  title: string,
+  mdString: string
+): Promise<string> {
   try {
-    // Get the appropriate file for this docId
-    const fileName = docFileMap[docId] || "README";
-
-    // Get markdown content from our pre-loaded content
-    const markdownText = markdownContent[fileName];
-
-    if (!markdownText) {
-      throw new Error(`Could not find content for ${fileName}`);
-    }
-
     // Parse markdown to HTML
-    const html = md.render(markdownText);
+    const html = md.render(mdString);
     return html;
   } catch (error) {
-    console.error(`Error generating documentation for ${docId}:`, error);
+    console.error(`Error generating documentation for ${title}:`, error);
     return `
       <h2>Documentation Error</h2>
-      <p>We're sorry, but there was an error loading the documentation for "${docId}".</p>
+      <p>We're sorry, but there was an error loading the documentation for "${title}".</p>
       <p>Please try another topic from the navigation menu.</p>
     `;
   }

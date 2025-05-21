@@ -5,6 +5,7 @@ import Icon from "@/shared/components/Icon";
 import { docItems, docSections } from "../data";
 import AnimatedCodeBlock from "./AnimatedCodeBlock";
 import { generateDocContent } from "../utils";
+import { useBeaver } from "@beaver/react";
 
 export default function DocsContent() {
     const location = useLocation();
@@ -26,12 +27,22 @@ export default function DocsContent() {
     const [content, setContent] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
+    const beaver = useBeaver();
+    const { data } = beaver.docs({
+        title: "5_server_api.md",
+    });
+
     // Load documentation content when the selected doc changes
     useEffect(() => {
         setIsLoading(true);
 
+        if (!data) {
+            setIsLoading(false);
+            return;
+        }
+
         // Load the documentation
-        generateDocContent(selectedDoc)
+        generateDocContent(selectedDoc, data?.content)
             .then(htmlContent => {
                 setContent(htmlContent);
             })
@@ -46,7 +57,7 @@ export default function DocsContent() {
             .finally(() => {
                 setIsLoading(false);
             });
-    }, [selectedDoc]);
+    }, [selectedDoc, data]);
 
     // Find related documents in the same section
     const relatedDocs = docItems
