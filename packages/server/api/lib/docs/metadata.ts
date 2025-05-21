@@ -19,8 +19,8 @@ export const docsMetadata: DocMetadata[] = [
     tags: ["introduction", "getting-started", "introduction"],
     related: ["architecture", "react-sdk"],
     contentId: "introduction",
-    icon: "Book",
-    group: "Getting Started",
+    group: "Introduction",
+    icon: "Zap",
   },
 
   {
@@ -29,8 +29,9 @@ export const docsMetadata: DocMetadata[] = [
     description: "Learn how to get started with Beaver Social",
     tags: ["getting-started", "getting-started"],
     related: ["introduction", "architecture"],
-    contentId: "getting_started.md",
-    group: "Getting Started",
+    contentId: "getting-started",
+    group: "Introduction",
+    icon: "Zap",
   },
 
   {
@@ -40,18 +41,8 @@ export const docsMetadata: DocMetadata[] = [
     tags: ["architecture", "getting-started", "architecture"],
     related: ["introduction", "react-sdk"],
     contentId: "architecture",
-    group: "Getting Started",
-  },
-
-  {
-    id: "react-sdk",
-    title: "React SDK",
-    description:
-      "Learn how to use the React SDK to build your own Beaver Social client",
-    tags: ["react-sdk", "getting-started", "react-sdk"],
-    related: ["introduction", "architecture"],
-    contentId: "react_sdk",
-    group: "Integration",
+    group: "Introduction",
+    icon: "Zap",
   },
 
   {
@@ -61,28 +52,87 @@ export const docsMetadata: DocMetadata[] = [
       "Learn how to use the TypeScript SDK to build your own Beaver Social client",
     tags: ["typescript-sdk", "getting-started", "typescript-sdk"],
     related: ["introduction", "architecture"],
-    contentId: "typescript_sdk",
-    group: "Integration",
+    contentId: "typescript-sdk",
+    group: "SDK",
+    icon: "Package",
   },
 
   {
-    id: "api",
-    title: "API",
+    id: "react-sdk",
+    title: "React SDK",
     description:
-      "Learn how to use the API to build your own Beaver Social client",
-    tags: ["api", "getting-started", "api"],
-    related: ["react-sdk", "typescript-sdk"],
-    contentId: "api",
-    group: "Integration",
+      "Learn how to use the React SDK to build your own Beaver Social client",
+    tags: ["react-sdk", "getting-started", "react-sdk"],
+    related: ["introduction", "architecture"],
+    contentId: "react-sdk",
+    group: "SDK",
+    icon: "Package",
+  },
+
+  {
+    id: "api-overview",
+    title: "API Overview",
+    description: "Overview of the Beaver Social API",
+    tags: ["api", "overview", "authentication", "rate-limiting"],
+    related: ["api-endpoints", "api-reference"],
+    contentId: "api-overview",
+    group: "API",
+    icon: "Webhook",
+  },
+
+  {
+    id: "api-endpoints",
+    title: "API Endpoints",
+    description: "Detailed documentation of all API endpoints",
+    tags: ["api", "endpoints", "rest"],
+    related: ["api-overview", "api-reference"],
+    contentId: "api-endpoints",
+    group: "API",
+    icon: "Webhook",
+  },
+
+  {
+    id: "api-action-chain",
+    title: "Action Chain Verification",
+    description:
+      "How the API verifies user actions using cryptographic signatures",
+    tags: ["api", "security", "crypto", "verification"],
+    related: ["api-endpoints", "api-reference"],
+    contentId: "api-action-chain",
+    group: "API",
+    icon: "Webhook",
+  },
+
+  {
+    id: "api-database",
+    title: "Database Schema",
+    description: "Database schema used by the API",
+    tags: ["api", "database", "schema"],
+    related: ["api-endpoints", "api-development"],
+    contentId: "api-database",
+    group: "API",
+    icon: "Webhook",
+  },
+
+  {
+    id: "api-reference",
+    title: "API Reference",
+    description: "Reference documentation for error handling and pagination",
+    tags: ["api", "reference", "errors", "pagination"],
+    related: ["api-overview", "api-endpoints"],
+    contentId: "api-reference",
+    group: "API",
+    icon: "Webhook",
   },
 
   {
     id: "contracts",
-    title: "Move Contracts",
+    title: "Move",
     description: "Learn about the Move contracts of Beaver Social",
     tags: ["move-contracts", "getting-started", "move-contracts"],
     related: ["introduction", "architecture"],
-    contentId: "move_contracts",
-    group: "Integration",
+    contentId: "contracts",
+    group: "Contracts",
+    icon: "FileCode2",
   },
 ];
