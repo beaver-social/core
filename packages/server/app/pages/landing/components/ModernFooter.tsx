@@ -67,24 +67,12 @@ export function ModernFooter() {
 
     return (
         <footer className="border-t border-zinc-800/50 bg-zinc-900/50 backdrop-blur-md">
-            <div className="container mx-auto px-4 pt-16 pb-8 max-w-7xl">
+            <div className="container mx-auto px-8 pt-8 pb-8 max-w-7xl">
                 {/* Top section with logo and navigation */}
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-6 lg:grid-cols-12">
                     {/* Logo and company info */}
                     <div className="md:col-span-2 lg:col-span-4">
                         <Link to="/" className="flex items-center gap-2">
-                            <motion.div
-                                className="relative h-8 w-8 overflow-hidden rounded-lg"
-                                whileHover={{ rotate: 5, scale: 1.05 }}
-                                transition={{ type: "spring", stiffness: 300 }}
-                            >
-                                <svg viewBox="0 0 24 24" className="absolute inset-0 h-full w-full p-1.5 text-transparent bg-clip-text bg-gradient-to-br from-blue-400 via-indigo-400 to-purple-400">
-                                    <path
-                                        fill="currentColor"
-                                        d="M12 2c-.7 0-1.3.5-1.5 1.2l-1 4c-.1.5-.5.8-1 .8H5c-.8 0-1.5.5-1.8 1.2-.3.7-.1 1.5.4 2l3.1 2.8c.3.3.5.8.3 1.2l-1.2 3.9c-.2.7.1 1.5.7 1.9.6.4 1.4.4 2 0l3.5-2.5c.4-.3 1-.3 1.4 0l3.5 2.5c.6.4 1.4.4 2 0 .6-.4.9-1.2.7-1.9l-1.2-3.9c-.1-.4 0-.9.3-1.2l3.1-2.8c.5-.5.7-1.3.4-2-.3-.7-1-1.2-1.8-1.2h-3.5c-.5 0-.9-.3-1-.8l-1-4C13.3 2.5 12.7 2 12 2z"
-                                    />
-                                </svg>
-                            </motion.div>
                             <div className="flex flex-col">
                                 <span className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">Beaver</span>
                                 <span className="text-xs text-zinc-400 -mt-1">Social</span>

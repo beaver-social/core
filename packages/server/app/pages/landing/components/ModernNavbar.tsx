@@ -18,7 +18,7 @@ export function ModernNavbar() {
 
     return (
         <motion.header
-            className="sticky top-0 z-50 w-full py-4 backdrop-blur-sm bg-transparent border-b border-zinc-800/20"
+            className="sticky top-0 px-4 z-50 w-full py-4 backdrop-blur-sm bg-transparent border-b border-zinc-800/20"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -76,7 +76,7 @@ export function ModernNavbar() {
             {/* Mobile menu */}
             {mobileMenuOpen && (
                 <motion.div
-                    className="container absolute mx-auto mt-2 rounded-xl bg-zinc-900 backdrop-blur-lg p-4 md:hidden border border-zinc-800/30"
+                    className="container absolute mx-auto mt-4 rounded-xl bg-background **:p-4 md:hidden border border-zinc-800/30"
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2 }}
@@ -92,14 +92,6 @@ export function ModernNavbar() {
                                 {item.name}
                             </Link>
                         ))}
-                        <button
-                            className="mt-2 w-full rounded-lg bg-zinc-800 px-4 py-2 text-center font-medium border border-zinc-700/50"
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-                                Get Started
-                            </span>
-                        </button>
                     </nav>
                 </motion.div>
             )}

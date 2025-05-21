@@ -195,7 +195,7 @@ class _BeaverSocialAppState extends State<BeaverSocialApp> {
 
             {/* Features */}
             <motion.div
-                className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20"
+                className="grid max-w-7xl mx-auto grid-cols-1 md:grid-cols-3 gap-6 mt-20"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -203,7 +203,7 @@ class _BeaverSocialAppState extends State<BeaverSocialApp> {
             >
                 <div className="bg-zinc-900/50 backdrop-blur-sm rounded-xl p-6 border border-zinc-800/50 hover:border-zinc-700/50 transition-all">
                     <div className="h-12 w-12 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
-                        <Sparkles className="h-6 w-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400" />
+                        <Sparkles />
                     </div>
                     <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 mb-2">AI-Powered</h3>
                     <p className="text-zinc-400">Intelligent content curation and recommendation engine built right into the SDK.</p>
@@ -211,7 +211,7 @@ class _BeaverSocialAppState extends State<BeaverSocialApp> {
 
                 <div className="bg-zinc-900/50 backdrop-blur-sm rounded-xl p-6 border border-zinc-800/50 hover:border-zinc-700/50 transition-all">
                     <div className="h-12 w-12 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
-                        <Code className="h-6 w-6 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400" />
+                        <Code />
                     </div>
                     <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mb-2">Multiplatform</h3>
                     <p className="text-zinc-400">Build once, deploy anywhere with our cross-platform SDKs for web, mobile, and server.</p>
@@ -219,7 +219,7 @@ class _BeaverSocialAppState extends State<BeaverSocialApp> {
 
                 <div className="bg-zinc-900/50 backdrop-blur-sm rounded-xl p-6 border border-zinc-800/50 hover:border-zinc-700/50 transition-all">
                     <div className="h-12 w-12 rounded-lg bg-zinc-800 flex items-center justify-center mb-4">
-                        <Cpu className="h-6 w-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400" />
+                        <Cpu />
                     </div>
                     <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 mb-2">Web3 Native</h3>
                     <p className="text-zinc-400">Built for decentralized applications with full support for blockchain authentication and data.</p>

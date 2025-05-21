@@ -70,15 +70,15 @@ export default function SideNav() {
     setIsProfilePage(isOnProfilePage);
 
     // If on settings or profile page, no sidebar item should be active
-    if (currentPath.startsWith("/settings") || isOnProfilePage) {
+    if (currentPath.startsWith("/app/settings") || isOnProfilePage) {
       setActiveIndex(null);
       return;
     }
 
     const index = sidebarItems.findIndex((item) => {
-      return item.to === "/"
-        ? currentPath === "/"
-        : currentPath.startsWith(item.to || "/");
+      return item.to === "/app"
+        ? currentPath === "/app"
+        : currentPath.startsWith(item.to || "/app");
     });
 
     if (index !== -1) {

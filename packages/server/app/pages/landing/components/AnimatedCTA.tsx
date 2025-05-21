@@ -83,19 +83,11 @@ export function AnimatedCTA() {
                             transition={{ duration: 0.5, delay: 0.3 }}
                         >
                             <motion.button
-                                className="inline-flex items-center justify-center rounded-full bg-zinc-800 border border-zinc-700/50 px-6 py-3 text-sm font-medium hover:border-zinc-600/50"
+                                className="inline-flex items-center justify-center rounded-sm border border-zinc-700/50 px-6 py-3 text-sm font-medium hover:border-zinc-600/50"
                                 whileHover={{ scale: 1.03 }}
                                 whileTap={{ scale: 0.97 }}
                             >
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Get Started</span> <ArrowRight className="ml-2 h-4 w-4 text-blue-400" />
-                            </motion.button>
-
-                            <motion.button
-                                className="inline-flex items-center justify-center rounded-full border border-zinc-800/80 bg-transparent px-6 py-3 text-sm font-medium text-zinc-400 hover:text-zinc-300 hover:border-zinc-700/50"
-                                whileHover={{ scale: 1.03 }}
-                                whileTap={{ scale: 0.97 }}
-                            >
-                                View Documentation
                             </motion.button>
                         </motion.div>
                     </div>

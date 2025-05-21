@@ -3,7 +3,7 @@ import { Image } from "@/shared/components/Image";
 
 export default function Landing() {
     return (
-        <div className="relative flex min-h-screen flex-col overflow-hidden bg-zinc-950 text-zinc-200 px-8">
+        <div className="relative flex min-h-screen flex-col overflow-hidden bg-zinc-950 text-zinc-200">
             {/* <BackgroundEffect /> */}
 
             <div className="absolute w-full inset-0 opacity-40">
@@ -14,19 +14,21 @@ export default function Landing() {
                 <ModernNavbar />
                 <EnhancedHero />
             </section>
-            <section className="relative z-10">
+            <section className="relative px-4 z-10">
                 <AnimatedFeatures />
             </section>
-            <section className="relative z-10">
+            <section className="relative px-4 z-10">
                 <CodeShowcase />
             </section>
-            <section className="relative z-10">
+            <section className="relative px-4 z-10">
                 <ModernIntegrations />
             </section>
-            <section className="relative z-10">
+            <section className="relative px-4 z-10">
                 <AnimatedCTA />
             </section>
-            <ModernFooter />
+            <section className="relative z-10">
+                <ModernFooter />
+            </section>
         </div>
     );
 }
