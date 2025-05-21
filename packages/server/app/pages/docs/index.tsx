@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Routes, Route, useParams, useNavigate } from "react-router";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 
@@ -8,36 +8,51 @@ import DocsSearch from "./components/DocsSearch";
 import DocsContent from "./components/DocsContent";
 import { DocsNavbar } from "./components/DocsNavbar";
 import Chatbot from "./components/ChatAI";
-import { docItems } from "./data";
 import { useBeaver } from "@beaver/react";
 
 function DocRedirect() {
     const navigate = useNavigate();
+    const { data: docsMetadata } = useBeaver().docs.getDocs();
+    const metadata = docsMetadata?.metadata || [];
 
     useEffect(() => {
-        // Redirect to the installation page by default
-        navigate("/docs/installation", { replace: true });
-    }, [navigate]);
+        // Find a default doc to navigate to (preferably first non-parent doc)
+        const defaultDoc = metadata.find(doc => doc.parentId) || metadata[0];
+
+        if (defaultDoc) {
+            // Redirect to the first available doc
+            navigate(`/docs/${defaultDoc.id}`, { replace: true });
+        } else {
+            // Fallback if no docs are available
+            navigate("/docs/introduction", { replace: true });
+        }
+    }, [navigate, metadata]);
 
     return null;
 }
 
 function DocPage() {
+    const beaver = useBeaver();
     const { docId } = useParams<{ docId: string }>();
-    const currentDoc = docItems.find(item => item.id === docId);
+    const { data } = beaver.docs.getDocById({
+        id: docId || "",
+    });
 
     return (
         <div className="flex">
             <Helmet>
-                <title>{currentDoc ? `${currentDoc.title} | Beaver Social Docs` : 'Documentation | Beaver Social'}</title>
-                <meta name="description" content="Comprehensive documentation for Beaver Social - the Web3 Social Network Layer built on Sui Blockchain" />
+                <title>{data?.metadata?.title ? `${data?.metadata?.title} | Beaver Social Docs` : 'Documentation | Beaver Social'}</title>
+                <meta name="description" content={data?.metadata?.description} />
             </Helmet>
-            <DocsContent />
+            <DocsContent data={data} />
         </div>
     );
 }
 
 export default function Docs() {
+    const beaver = useBeaver();
+    const { data: docsMetadata } = beaver.docs.getDocs();
+
     return (
         <HelmetProvider>
             <div className="min-h-screen bg-zinc-950 text-zinc-200 relative">
@@ -57,10 +72,10 @@ export default function Docs() {
                 <div className="flex">
                     {/* Sidebar */}
                     <div className="hidden lg:flex flex-col w-64 border-r border-zinc-800 sticky top-[80px] h-[calc(100vh-80px)]">
-                        <DocsTree className="flex-1 mt-2" />
+                        <DocsTree data={docsMetadata} className="flex-1 mt-2" />
 
                         <div className="p-4">
-                            <DocsSearch />
+                            <DocsSearch data={docsMetadata} />
                         </div>
                     </div>
 

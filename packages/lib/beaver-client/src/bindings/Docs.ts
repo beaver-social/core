@@ -12,18 +12,21 @@ export default class Docs {
     this.defaults = defaults;
     this.logger = defaults.logger;
 
-    this.logger.info("User interface instantiated");
+    this.logger.info("Docs interface instantiated");
   }
 
-  async fetchDocs(options: { title: string }) {
-    const { title } = options;
-    const introduction = safeParseResponse(
-      this.defaults.apiClient.rpc.docs.$get({
-        query: {
-          title,
-        },
+  async fetchDocs() {
+    const docs = safeParseResponse(this.defaults.apiClient.rpc.docs.$get());
+    return docs;
+  }
+
+  async fetchDocById(options: { id: string }) {
+    const { id } = options;
+    const doc = safeParseResponse(
+      this.defaults.apiClient.rpc.docs[":id"].$get({
+        param: options,
       })
     );
-    return introduction;
+    return doc;
   }
 }

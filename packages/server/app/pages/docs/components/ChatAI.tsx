@@ -8,6 +8,7 @@ import { SparklesText } from "@/pages/landing/ui/text/sparkles";
 import { TextShimmer } from "@/pages/landing/ui/text/shimmer";
 import { useNavigate } from "react-router";
 import { docItems, docSections } from "../data";
+import { useBeaver } from "@beaver/react";
 
 type Message = {
     id: string;
@@ -29,6 +30,7 @@ export default function Chatbot() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const navigate = useNavigate();
+    const { data: docsMetadata } = useBeaver().docs.getDocs();
 
     // Welcome message when chat opens
     useEffect(() => {
@@ -71,14 +73,16 @@ export default function Chatbot() {
     // Simple search function to find related documentation
     const findRelatedDocumentation = (query: string) => {
         const searchTerms = query.toLowerCase().split(' ');
+        const metadata = docsMetadata?.metadata || [];
 
         // Search docs for relevant items
-        const relevantDocs = docItems
+        const relevantDocs = metadata
             .map(item => {
                 // Calculate relevance score
                 const score = searchTerms.reduce((acc, term) => {
                     if (item.title.toLowerCase().includes(term)) acc += 3;
-                    if (item.id.toLowerCase().includes(term)) acc += 2;
+                    if (item.description.toLowerCase().includes(term)) acc += 2;
+                    if (item.tags.some(tag => tag.toLowerCase().includes(term))) acc += 1;
                     return acc;
                 }, 0);
 
@@ -89,11 +93,11 @@ export default function Chatbot() {
             .slice(0, 3);
 
         return relevantDocs.map(({ item }) => {
-            const section = docSections.find(s => s.id === item.parentId);
+            const parentItem = metadata.find(doc => doc.id === item.parentId);
             return {
                 title: item.title,
                 url: `/docs/${item.id}`,
-                description: section?.title
+                description: parentItem?.title || item.description.substring(0, 50)
             };
         });
     };

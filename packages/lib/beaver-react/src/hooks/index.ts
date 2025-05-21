@@ -25,13 +25,24 @@ export function useBeaver() {
 
 export function useDocs() {
   const { client } = useBeaverContext();
-  return (options: Parameters<typeof client.docs.fetchDocs>[0]) => {
-    return useQuery({
-      queryKey: ["docs", options],
-      queryFn: async () => {
-        return await client.docs.fetchDocs(options);
-      },
-    });
+  return {
+    getDocs: () => {
+      return useQuery({
+        queryKey: ["docs"],
+        queryFn: async () => {
+          return await client.docs.fetchDocs();
+        },
+      });
+    },
+
+    getDocById: (options: Parameters<typeof client.docs.fetchDocById>[0]) => {
+      return useQuery({
+        queryKey: ["docs", options],
+        queryFn: async () => {
+          return await client.docs.fetchDocById(options);
+        },
+      });
+    },
   };
 }
 

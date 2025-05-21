@@ -1,23 +1,31 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router";
 import Icon from "@/shared/components/Icon";
-import { docItems, docSections } from "../data";
 import AnimatedCodeBlock from "./AnimatedCodeBlock";
 import { generateDocContent } from "../utils";
 import { useBeaver } from "@beaver/react";
 
-export default function DocsContent() {
+type DocsContentProps = {
+    data: ReturnType<ReturnType<typeof useBeaver>["docs"]["getDocById"]>["data"];
+}
+
+export default function DocsContent({ data }: DocsContentProps) {
     const location = useLocation();
     const navigate = useNavigate();
+    const { data: allDocsData } = useBeaver().docs.getDocs();
+    const allDocs = allDocsData?.metadata || [];
 
     // Extract the current doc ID from the URL path
     const currentPath = location.pathname;
-    const selectedDoc = currentPath.split("/").pop() || "installation";
+    const selectedDoc = currentPath.split("/").pop() || "";
 
     // Find the current document and section
-    const currentItem = docItems.find(item => item.id === selectedDoc);
-    const currentSection = docSections.find(section => section.id === currentItem?.parentId);
+    const currentDoc = useMemo(() => allDocs.find(doc => doc.id === selectedDoc), [selectedDoc, allDocs]);
+    const parentDoc = useMemo(() =>
+        currentDoc?.parentId ? allDocs.find(doc => doc.id === currentDoc.parentId) : null,
+        [currentDoc, allDocs]
+    );
 
     // Track scroll progress for a progress indicator
     const [scrollProgress, setScrollProgress] = useState(0);
@@ -27,10 +35,48 @@ export default function DocsContent() {
     const [content, setContent] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    const beaver = useBeaver();
-    const { data } = beaver.docs({
-        title: "5_server_api.md",
-    });
+    // Find related documents based on related field in metadata
+    const relatedDocs = useMemo(() => {
+        if (!currentDoc) return [];
+
+        // First try to use the related field from the API
+        if (currentDoc.related && currentDoc.related.length > 0) {
+            return currentDoc.related
+                .map(id => allDocs.find(doc => doc.id === id))
+                .filter(Boolean)
+                .slice(0, 2);
+        }
+
+        // Fallback: find docs with the same parent
+        return allDocs
+            .filter(doc =>
+                doc.id !== currentDoc.id &&
+                doc.parentId === currentDoc.parentId
+            )
+            .slice(0, 2);
+    }, [currentDoc, allDocs]);
+
+    // Find next and previous documents for navigation
+    const { prevDoc, nextDoc } = useMemo(() => {
+        // Create a flat array of all documents with parent documents first
+        const rootDocs = allDocs.filter(doc => !doc.parentId);
+        const childDocs = allDocs.filter(doc => doc.parentId);
+
+        // Sort by index
+        const allDocsFlattened = [
+            ...rootDocs,
+            ...childDocs
+        ];
+
+        const currentIndex = allDocsFlattened.findIndex(doc => doc.id === selectedDoc);
+        const prev = currentIndex > 0 ? allDocsFlattened[currentIndex - 1] : null;
+        const next = currentIndex < allDocsFlattened.length - 1 ? allDocsFlattened[currentIndex + 1] : null;
+
+        return {
+            prevDoc: prev,
+            nextDoc: next
+        };
+    }, [selectedDoc, allDocs]);
 
     // Load documentation content when the selected doc changes
     useEffect(() => {
@@ -42,7 +88,7 @@ export default function DocsContent() {
         }
 
         // Load the documentation
-        generateDocContent(selectedDoc, data?.content)
+        generateDocContent(data?.content)
             .then(htmlContent => {
                 setContent(htmlContent);
             })
@@ -58,25 +104,6 @@ export default function DocsContent() {
                 setIsLoading(false);
             });
     }, [selectedDoc, data]);
-
-    // Find related documents in the same section
-    const relatedDocs = docItems
-        .filter(item =>
-            item.id !== selectedDoc &&
-            item.parentId === currentItem?.parentId
-        )
-        .slice(0, 2);
-
-    // Find next and previous documents for navigation
-    const allDocsFlattened = docSections.flatMap(section =>
-        docItems
-            .filter(item => item.parentId === section.id)
-            .map(item => ({ ...item, sectionTitle: section.title }))
-    );
-
-    const currentIndex = allDocsFlattened.findIndex(item => item.id === selectedDoc);
-    const prevDoc = currentIndex > 0 ? allDocsFlattened[currentIndex - 1] : null;
-    const nextDoc = currentIndex < allDocsFlattened.length - 1 ? allDocsFlattened[currentIndex + 1] : null;
 
     useEffect(() => {
         const handleScroll = () => {
@@ -99,6 +126,22 @@ export default function DocsContent() {
         window.scrollTo(0, 0);
     }, [selectedDoc]);
 
+    // If no document is selected or found, show a message
+    if (!currentDoc) {
+        return (
+            <div className="py-8 text-center">
+                <h2 className="text-xl font-bold mb-4">Document Not Found</h2>
+                <p className="text-zinc-400">The requested document could not be found.</p>
+                <button
+                    onClick={() => navigate('/docs')}
+                    className="mt-4 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 rounded-md text-blue-400"
+                >
+                    Go to Documentation Home
+                </button>
+            </div>
+        );
+    }
+
     return (
         <div className="py-8" ref={contentRef}>
             {/* Progress indicator */}
@@ -108,7 +151,7 @@ export default function DocsContent() {
             />
 
             <div className="mb-8">
-                {currentItem && currentSection && (
+                {currentDoc && (
                     <>
                         <div className="flex flex-wrap gap-2 text-sm text-zinc-500 mb-4">
                             <button
@@ -118,9 +161,18 @@ export default function DocsContent() {
                                 Documentation
                             </button>
                             <span>/</span>
-                            <span className="text-zinc-400">{currentSection.title}</span>
-                            <span>/</span>
-                            <span className="text-zinc-300">{currentItem.title}</span>
+                            {parentDoc && (
+                                <>
+                                    <button
+                                        onClick={() => navigate(`/docs/${parentDoc.id}`)}
+                                        className="hover:text-zinc-300 transition-colors"
+                                    >
+                                        {parentDoc.title}
+                                    </button>
+                                    <span>/</span>
+                                </>
+                            )}
+                            <span className="text-zinc-300">{currentDoc.title}</span>
                         </div>
 
                         <motion.h1
@@ -129,7 +181,7 @@ export default function DocsContent() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3 }}
                         >
-                            {currentItem.title}
+                            {currentDoc.title}
                         </motion.h1>
                         <motion.div
                             className="text-zinc-400 flex items-center gap-2"
@@ -137,8 +189,8 @@ export default function DocsContent() {
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.3, delay: 0.1 }}
                         >
-                            <Icon name={currentSection.icon} className="h-4 w-4 text-blue-400" />
-                            {currentSection.description}
+                            <Icon name={currentDoc.icon || parentDoc?.icon || "Book"} className="h-4 w-4 text-blue-400" />
+                            {currentDoc.description}
                         </motion.div>
                     </>
                 )}
@@ -176,7 +228,11 @@ export default function DocsContent() {
                         <div>
                             <div className="text-sm text-zinc-500 mb-1">Previous</div>
                             <div className="font-medium text-zinc-300 group-hover:text-blue-400 transition-colors">{prevDoc.title}</div>
-                            <div className="text-xs text-zinc-500 mt-1">{prevDoc.sectionTitle}</div>
+                            {prevDoc.parentId && (
+                                <div className="text-xs text-zinc-500 mt-1">
+                                    {allDocs.find(doc => doc.id === prevDoc.parentId)?.title}
+                                </div>
+                            )}
                         </div>
                     </motion.button>
                 )}
@@ -190,7 +246,11 @@ export default function DocsContent() {
                         <div className="flex-1">
                             <div className="text-sm text-zinc-500 mb-1">Next</div>
                             <div className="font-medium text-zinc-300 group-hover:text-blue-400 transition-colors">{nextDoc.title}</div>
-                            <div className="text-xs text-zinc-500 mt-1">{nextDoc.sectionTitle}</div>
+                            {nextDoc.parentId && (
+                                <div className="text-xs text-zinc-500 mt-1">
+                                    {allDocs.find(doc => doc.id === nextDoc.parentId)?.title}
+                                </div>
+                            )}
                         </div>
                         <Icon name="ArrowRight" className="h-5 w-5 mt-0.5 text-zinc-500 group-hover:text-blue-400 transition-colors" />
                     </motion.button>
@@ -207,19 +267,19 @@ export default function DocsContent() {
                 >
                     <h3 className="text-xl font-bold mb-4 text-zinc-100">Related Documentation</h3>
                     <div className="grid sm:grid-cols-2 gap-4">
-                        {relatedDocs.map((item, i) => (
+                        {relatedDocs.map((doc, i) => (
                             <motion.div
-                                key={item.id}
+                                key={doc?.id}
                                 className="p-4 border border-zinc-800 hover:border-zinc-700 rounded-lg bg-zinc-900/50 hover:bg-zinc-900 cursor-pointer"
                                 whileHover={{ y: -2 }}
-                                onClick={() => navigate(`/docs/${item.id}`)}
+                                onClick={() => navigate(`/docs/${doc?.id}`)}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.3, delay: 0.4 + (i * 0.1) }}
                             >
-                                <h4 className="font-bold text-zinc-100">{item.title}</h4>
-                                <p className="text-sm text-zinc-400">
-                                    Continue your learning journey
+                                <h4 className="font-bold text-zinc-100">{doc?.title}</h4>
+                                <p className="text-sm text-zinc-400 line-clamp-2">
+                                    {doc?.description}
                                 </p>
                             </motion.div>
                         ))}

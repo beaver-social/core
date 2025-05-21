@@ -3,6 +3,7 @@ import { Drawer } from "vaul";
 import Icon from "@/shared/components/Icon";
 import DocsSearch from "./DocsSearch";
 import DocsTree from "./DocsTree";
+import { useBeaver } from "@beaver/react";
 
 type MobileDocsDrawerProps = {
     className?: string;
@@ -11,6 +12,8 @@ type MobileDocsDrawerProps = {
 export default function MobileDocsDrawer({
     className,
 }: MobileDocsDrawerProps) {
+    const { data: docsMetadata } = useBeaver().docs.getDocs();
+
     return (
         <Drawer.Root direction="left">
             <Drawer.Trigger>
@@ -24,10 +27,10 @@ export default function MobileDocsDrawer({
                         Documentation menu
                     </Drawer.Description>
                     <div className="p-4 border-b border-zinc-800">
-                        <DocsSearch />
+                        <DocsSearch data={docsMetadata} />
                     </div>
                     <div className="flex-1 overflow-auto">
-                        <DocsTree />
+                        <DocsTree data={docsMetadata} />
                     </div>
                 </Drawer.Content>
             </Drawer.Portal>

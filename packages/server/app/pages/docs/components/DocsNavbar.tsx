@@ -2,15 +2,29 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router";
 import Icon from "@/shared/components/Icon";
 import MobileDocsDrawer from "./MobileDocsDrawer";
+import { useBeaver } from "@beaver/react";
+import { useMemo } from "react";
 
 export function DocsNavbar() {
     const navigate = useNavigate();
+    const { data: docsMetadata } = useBeaver().docs.getDocs();
+    const metadata = docsMetadata?.metadata || [];
 
-    const navItems = [
-        { name: "API", href: "/docs/api" },
-        { name: "TypeScript SDK", href: "/docs/typescript-sdk" },
-        { name: "React SDK", href: "/docs/react-sdk" },
-    ];
+    // Get main section docs for the nav links
+    const navItems = useMemo(() => {
+        // Only show top-level docs without parents or with specific IDs we want to highlight
+        const topLevelDocs = metadata
+            .filter(doc =>
+                !doc.parentId ||
+                ['api', 'typescript-sdk', 'react-sdk'].includes(doc.id)
+            )
+            .slice(0, 3); // Limit to 3 items
+
+        return topLevelDocs.map(doc => ({
+            name: doc.title,
+            href: `/docs/${doc.id}`
+        }));
+    }, [metadata]);
 
     return (
         <motion.div
