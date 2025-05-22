@@ -114,13 +114,18 @@ export default function AuthDemo() {
                     <Button
                         variant="outline"
                         className="w-full"
-                        onClick={handleLogin}
+                        onClick={isAuthenticated ? handleLogout : handleLogin}
                         disabled={isLoginPending}
                     >
                         {isLoginPending ? (
                             <>
                                 <Icon name="Loader" className="mr-2 h-3.5 w-3.5 md:h-4 md:w-4 animate-spin" />
                                 Connecting...
+                            </>
+                        ) : isAuthenticated ? (
+                            <>
+                                <Icon name="LogOut" className="mr-2 h-3.5 w-3.5 md:h-4 md:w-4" />
+                                Logout
                             </>
                         ) : (
                             <>
