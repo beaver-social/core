@@ -68,13 +68,15 @@ export function useRegister() {
 }
 
 export function useWallets() {
-  const { client, isConnected, hasIdentity } = useBeaverContext();
+  const { client, isConnected, hasIdentity, isAuthenticated } =
+    useBeaverContext();
   const wallets = client.connector.getWallets();
 
   return {
     wallets,
     isConnected,
     hasIdentity,
+    isAuthenticated,
     connect: client.connector.connect.bind(client.connector),
     disconnect: client.connector.disconnect.bind(client.connector),
   };

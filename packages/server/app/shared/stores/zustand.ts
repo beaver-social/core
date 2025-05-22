@@ -56,6 +56,8 @@ interface GlobalUIStore {
   setOnboardingProgress: (progress: OnboardingProgress | null) => void;
   onboardingData: OnboardingData | null;
   setOnboardingData: (data: OnboardingData | null) => void;
+  demoTab: string;
+  setDemoTab: (tab: string) => void;
 }
 
 export const useGlobalUIStore = create<GlobalUIStore>()(
@@ -74,6 +76,8 @@ export const useGlobalUIStore = create<GlobalUIStore>()(
         set({ onboardingProgress: progress }),
       onboardingData: null,
       setOnboardingData: (data) => set({ onboardingData: data }),
+      demoTab: "wallet",
+      setDemoTab: (tab) => set({ demoTab: tab }),
     }),
     { name: "global-ui-store" }
   )
