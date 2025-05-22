@@ -13,6 +13,7 @@ import db from "../../lib/db";
 import { and, eq } from "drizzle-orm";
 import authenticated from "../../middlewares/authenticated";
 import { stringify } from "../../../utils";
+import { stream, streamText, streamSSE } from 'hono/streaming'
 
 const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
 const { pingChats, pingMessages } = db.schema;
@@ -27,7 +28,7 @@ const app = new Hono()
         chatId: zNumberString().optional(),
         intent: zPingIntents(),
         message: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const user = ctx.get("user");
@@ -61,8 +62,12 @@ const app = new Hono()
         const { data: chat, error: chatDbError } = await tryCatch(
           db
             .insert(pingChats)
-            .values({ userId: user.id, intent })
-            .returning({ id: pingChats.id })
+            .values({
+              userId: user.id,
+              intent,
+              label: message.slice(0, Math.min(8, message.length)),
+            })
+            .returning({ id: pingChats.id }),
         );
 
         if (chatDbError || !chat || !chat[0]) {
@@ -79,32 +84,42 @@ const app = new Hono()
         config: { systemInstruction: generateSystemInstruction(intent) },
       });
 
-      const res = await tryCatch(chat.sendMessage({ message: message }));
-      const content = res.data?.candidates?.[0].content;
+      const res = await tryCatch(chat.sendMessageStream({ message: message }));
 
-      if (res.error || !content) {
+      if (res.error) {
         ctx.log(res.error);
         return respond.err(ctx, "Failed to send message", 500);
       }
 
-      await db.insert(pingMessages).values({
-        chatId: dbChatId,
-        role: "user",
-        parts: stringify([{ text: message }]),
-      });
-      await db.insert(pingMessages).values({
-        chatId: dbChatId,
-        role: "model",
-        parts: stringify(content.parts),
-      });
+      let response = ""
+      return streamText(ctx, async (stream) => {
+        for await (const chunk of res.data) {
+          if (chunk.text) {
+            stream.write(chunk.text);
+            response += chunk.text
+          }
+        }
 
-      return respond.ok(
-        ctx,
-        { response: content.parts, chatId: dbChatId },
-        "Ping AI resposne",
-        200
-      );
-    }
+        await db.insert(pingMessages).values({
+          chatId: dbChatId,
+          role: "user",
+          parts: stringify([{ text: message }]),
+        });
+        await db.insert(pingMessages).values({
+          chatId: dbChatId,
+          role: "model",
+          parts: stringify([{ text: response }]),
+        });
+      })
+
+
+      // return respond.ok(
+      //   ctx,
+      //   { response: content.parts, chatId: dbChatId },
+      //   "Ping AI resposne",
+      //   200,
+      // );
+    },
   )
   .get("/chats", authenticated, async (ctx) => {
     const user = ctx.get("user");
@@ -119,6 +134,15 @@ const app = new Hono()
       .where(eq(pingChats.userId, user.id));
 
     return respond.ok(ctx, { chats }, "Ping AI chats", 200);
+  })
+  .get("/:id", authenticated, async (ctx) => {
+    const user = ctx.get("user")
+
+    const chat = await db.select().from(pingChats).where(eq(pingChats.id, user.id));
+    const messages = await db.select().from(pingMessages).where(eq(pingMessages.id, user.id));
+
+    return respond.ok(ctx, { ...chat, messages }, "Ping Chat Details", 200)
+
   });
 
 export default app;
