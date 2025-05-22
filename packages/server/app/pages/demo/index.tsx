@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import PostsDemo from './components/PostsDemo';
 import ProfileDemo from './components/ProfileDemo';
-import FollowDemo from './components/FollowDemo';
 import AuthDemo from "./components/AuthDemo";
 import DemoLayout from "./components/DemoLayout";
 import WalletDemo from "./components/WalletDemo";
@@ -23,7 +22,6 @@ export default function Demo() {
                     {demoTab === 'auth' && <AuthDemo />}
                     {demoTab === 'posts' && <PostsDemo />}
                     {demoTab === 'profile' && <ProfileDemo />}
-                    {demoTab === 'follow' && <FollowDemo />}
                 </DemoLayout>
             </div>
         </div>

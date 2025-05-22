@@ -22,7 +22,6 @@ const tabs = [
     { id: 'auth', label: 'Authentication' },
     { id: 'profile', label: 'User Profile' },
     { id: 'posts', label: 'Posts' },
-    { id: 'follow', label: 'Follow/Unfollow' },
 ];
 
 export default function DemoLayout({ title, children, activeTab, setActiveTab }: DemoLayoutProps) {
@@ -91,7 +90,7 @@ export default function DemoLayout({ title, children, activeTab, setActiveTab }:
 
                 {/* Desktop navigation (tabs) */}
                 {!isMobile && (
-                    <TabsList className="grid grid-cols-5 mb-8">
+                    <TabsList className="grid grid-cols-4 mb-8">
                         {tabs.map((tab) => (
                             <TabsTrigger
                                 key={tab.id}

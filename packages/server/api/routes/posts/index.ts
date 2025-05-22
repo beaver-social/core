@@ -616,7 +616,7 @@ const app = new Hono()
 
   // user post interaction
   .get(
-    "/:id/interacted",
+    "/:id/user-interactions",
     authenticated,
     zValidator("param", z.object({ id: zNumberString() })),
     async (ctx) => {
