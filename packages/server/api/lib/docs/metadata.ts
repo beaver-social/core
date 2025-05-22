@@ -63,10 +63,21 @@ export const docsMetadata: DocMetadata[] = [
     description:
       "Learn how to use the React SDK to build your own Beaver Social client",
     tags: ["react-sdk", "getting-started", "react-sdk"],
-    related: ["introduction", "architecture"],
+    related: ["introduction", "architecture", "react-native-sdk"],
     contentId: "react-sdk",
     group: "SDK",
     icon: "Package",
+  },
+  {
+    id: "react-native-sdk",
+    title: "React Native SDK",
+    description:
+      "Learn how to use the React Native SDK to build mobile clients for Beaver Social",
+    tags: ["react-native-sdk", "mobile", "sdk"],
+    related: ["introduction", "react-sdk", "typescript-sdk"],
+    contentId: "react-native-sdk",
+    group: "SDK",
+    icon: "Smartphone",
   },
 
   {
