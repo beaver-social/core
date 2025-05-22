@@ -4,31 +4,59 @@ import { Input } from "@/shared/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import Icon from "@/shared/components/Icon";
 import { motion } from "framer-motion";
-
+import { useBeaver } from "@beaver/react";
+import { toast } from "sonner";
 interface User {
     id: string;
     username: string;
 }
 
 export default function AuthDemo() {
-    const [activeView, setActiveView] = useState<'login' | 'register'>('login');
-    const [username, setUsername] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const beaver = useBeaver();
+
+    // States
+    const isConnected = beaver.wallet.isConnected;
+    const hasIdentity = beaver.wallet.hasIdentity;
+    const isAuthenticated = beaver.wallet.isAuthenticated;
+
+    // Mutations
+    const { mutate: login, isPending: isLoginPending, isSuccess: isLoginSuccess } = beaver.auth.login;
+    const { mutate: register, isPending: isRegisterPending, isSuccess: isRegisterSuccess } = beaver.auth.register;
+    const { mutate: logout, isPending: isLogoutPending, isSuccess: isLogoutSuccess } = beaver.auth.logout;
+
+    const [activeView, setActiveView] = useState<'register' | 'login'>(hasIdentity ? 'login' : 'register');
     const [user, setUser] = useState<User | null>(null);
 
     const handleLogin = async () => {
-        setIsLoading(true);
-        // SDK Logic Below
+        if (!isConnected) {
+            toast.error('Please connect your wallet first');
+            return;
+        }
+
+        login();
     };
 
-    const handleRegister = async () => {
-        setIsLoading(true);
+    const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.target as HTMLFormElement);
+        const username = formData.get('username') as string;
+        const fullName = formData.get('fullName') as string;
 
-        // SDK Logic Below
+        if (!isConnected) {
+            toast.error('Please connect your wallet first');
+            return;
+        }
+
+        register({ username, fullName });
     };
 
     const handleLogout = () => {
-        // SDK Logic Below
+        if (!isAuthenticated) {
+            toast.error('Not Logged In');
+            return;
+        }
+
+        logout();
     };
 
     if (user) {
@@ -68,8 +96,8 @@ export default function AuthDemo() {
                 className="w-full"
             >
                 <TabsList className="grid w-full grid-cols-2 mb-4">
-                    <TabsTrigger value="login">Login</TabsTrigger>
                     <TabsTrigger value="register">Register</TabsTrigger>
+                    <TabsTrigger value="login">Login</TabsTrigger>
                 </TabsList>
             </Tabs>
 
@@ -87,20 +115,31 @@ export default function AuthDemo() {
                         variant="outline"
                         className="w-full"
                         onClick={handleLogin}
-                        disabled={isLoading}
+                        disabled={isLoginPending}
                     >
-                        {isLoading ? (
+                        {isLoginPending ? (
                             <>
                                 <Icon name="Loader" className="mr-2 h-3.5 w-3.5 md:h-4 md:w-4 animate-spin" />
                                 Connecting...
                             </>
                         ) : (
                             <>
-                                <Icon name="Wallet" className="mr-2 h-3.5 w-3.5 md:h-4 md:w-4" />
-                                Login with Wallet
+                                <Icon name="Key" className="mr-2 h-3.5 w-3.5 md:h-4 md:w-4" />
+                                Login
                             </>
                         )}
                     </Button>
+                </motion.div>
+            ) : hasIdentity ? (
+                <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-4"
+                >
+                    <div>
+                        <h2 className="text-lg md:text-xl font-medium">You already have an account.</h2>
+                        <p className="text-xs md:text-sm text-muted-foreground mt-1">Login to your Beaver account with your wallet.</p>
+                    </div>
                 </motion.div>
             ) : (
                 <motion.div
@@ -113,35 +152,46 @@ export default function AuthDemo() {
                         <p className="text-xs md:text-sm text-muted-foreground mt-1">Create a new Beaver account with your wallet.</p>
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="block text-xs md:text-sm font-medium" htmlFor="username">Username</label>
-                        <Input
-                            id="username"
-                            type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            placeholder="Choose a username"
-                        />
-                    </div>
+                    <form className="space-y-4" onSubmit={handleRegister}>
+                        <div className="space-y-2">
+                            <label className="block text-xs md:text-sm font-medium" htmlFor="username">Username</label>
+                            <Input
+                                id="username"
+                                type="text"
+                                name="username"
+                                placeholder="Choose a username"
+                            />
+                        </div>
 
-                    <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={handleRegister}
-                        disabled={isLoading || !username}
-                    >
-                        {isLoading ? (
-                            <>
-                                <Icon name="Loader" className="mr-2 h-3.5 w-3.5 md:h-4 md:w-4 animate-spin" />
-                                Registering...
-                            </>
-                        ) : (
-                            <>
-                                <Icon name="UserPlus" className="mr-2 h-3.5 w-3.5 md:h-4 md:w-4" />
-                                Register
-                            </>
-                        )}
-                    </Button>
+                        <div className="space-y-2">
+                            <label className="block text-xs md:text-sm font-medium" htmlFor="fullName">Full Name</label>
+                            <Input
+                                id="fullName"
+                                type="text"
+                                name="fullName"
+                                placeholder="Enter your full name"
+                            />
+                        </div>
+
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            disabled={isRegisterPending}
+                            type="submit"
+                        >
+                            {isRegisterPending ? (
+                                <>
+                                    <Icon name="Loader" className="mr-2 h-3.5 w-3.5 md:h-4 md:w-4 animate-spin" />
+                                    Registering...
+                                </>
+                            ) : (
+                                <>
+                                    <Icon name="UserPlus" className="mr-2 h-3.5 w-3.5 md:h-4 md:w-4" />
+                                    Register
+                                </>
+                            )}
+                        </Button>
+                    </form>
                 </motion.div>
             )}
         </div>
