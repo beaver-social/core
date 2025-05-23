@@ -52,7 +52,7 @@ export default new Hono()
           "address",
         ]),
         value: z.string(),
-      }),
+      })
     ),
     async (ctx) => {
       const { type, value } = ctx.req.valid("query");
@@ -81,7 +81,7 @@ export default new Hono()
       }
 
       const userResponse = await tryCatch(
-        db.select().from(users).where(filter).limit(1),
+        db.select().from(users).where(filter).limit(1)
       );
 
       if (userResponse.error) {
@@ -96,7 +96,7 @@ export default new Hono()
       }
 
       return respond.ok(ctx, user, "User details", 200);
-    },
+    }
   )
 
   .get(
@@ -106,7 +106,7 @@ export default new Hono()
       z.object({
         search: z.string(),
         limit: zNumberString(),
-      }),
+      })
     ),
     async (ctx) => {
       const { search, limit } = ctx.req.valid("query");
@@ -121,7 +121,7 @@ export default new Hono()
           })
           .from(users)
           .where(like(users.username, `%${search}%`))
-          .limit(limit),
+          .limit(limit)
       );
 
       if (userResponse.error) {
@@ -133,16 +133,16 @@ export default new Hono()
         ctx,
         { users: userResponse.data },
         "User search suggestions",
-        200,
+        200
       );
-    },
+    }
   )
 
   .get(
     "/nonce",
     zValidator(
       "query",
-      z.object({ address: zSuiAddress().optional() }).optional(),
+      z.object({ address: zSuiAddress().optional() }).optional()
     ),
     async (ctx) => {
       const { address } = ctx.req.valid("query") || {};
@@ -150,7 +150,7 @@ export default new Hono()
 
       if (user) {
         const { data: pointer, error: actionHashError } = await tryCatch(
-          getPreviousActionHash(user.id),
+          getPreviousActionHash(user.id)
         );
         if (actionHashError) {
           ctx.log(actionHashError);
@@ -164,7 +164,7 @@ export default new Hono()
           ctx,
           { nonce: pointer },
           "Action Pointer fetched successfully",
-          200,
+          200
         );
       }
       if (address) {
@@ -175,9 +175,9 @@ export default new Hono()
       return respond.err(
         ctx,
         "Address is required in query [address: string]",
-        400,
+        400
       );
-    },
+    }
   )
 
   .post(
@@ -187,7 +187,7 @@ export default new Hono()
       z.object({
         address: zSuiAddress(),
         signature: zSuiSignature(),
-      }),
+      })
     ),
     async (ctx) => {
       const appId = ctx.req.header("X-Api-Key");
@@ -225,7 +225,7 @@ export default new Hono()
         verifySignature(nonce, signature, {
           address: user.address,
           intent: "PersonalMessage",
-        }),
+        })
       );
 
       if (validationError) {
@@ -248,7 +248,7 @@ export default new Hono()
       };
 
       const { data: token, error } = await tryCatch(
-        sign(payload, JWTPrivateKey, JWTalgorithm),
+        sign(payload, JWTPrivateKey, JWTalgorithm)
       );
       if (error || !token) {
         ctx.log(error || "token is undefined");
@@ -256,7 +256,7 @@ export default new Hono()
       }
 
       return respond.ok(ctx, { token }, "Login successful", 200);
-    },
+    }
   )
 
   .post(
@@ -268,15 +268,11 @@ export default new Hono()
         username: z.string().min(3).max(20).toLowerCase(),
         fullName: z.string().min(3).max(50),
         about: z.string().max(255).nullable().optional(),
-
-        image: z.instanceof(File).optional(),
-        banner: z.instanceof(File).optional(),
-
         signature: zSuiSignature(),
-      }),
+      })
     ),
     async (ctx) => {
-      const { signature, image, banner, ...user } = ctx.req.valid("form");
+      const { signature, ...user } = ctx.req.valid("form");
       const { address } = user;
 
       const nonce = nonceManager.comsumeNonceBytes(address);
@@ -288,7 +284,7 @@ export default new Hono()
         verifySignature(nonce, signature, {
           address,
           intent: "PersonalMessage",
-        }),
+        })
       );
 
       if (verificationError) {
@@ -304,9 +300,9 @@ export default new Hono()
           .select({ id: users.id })
           .from(users)
           .where(
-            or(eq(users.username, user.username), eq(users.address, address)),
+            or(eq(users.username, user.username), eq(users.address, address))
           )
-          .limit(1),
+          .limit(1)
       );
 
       if (existingResponse.error) {
@@ -319,10 +315,10 @@ export default new Hono()
       }
 
       const { data: onchainIdentity } = await tryCatch(
-        contracts.registry.read.getByOwner({ address: user.address }),
+        contracts.registry.read.getByOwner({ address: user.address })
       );
       const { data: collectionNft } = await tryCatch(
-        contracts.posts.read.getCollectionByOwner({ address: user.address }),
+        contracts.posts.read.getCollectionByOwner({ address: user.address })
       );
 
       if (onchainIdentity && collectionNft) {
@@ -359,7 +355,7 @@ export default new Hono()
       });
 
       const registration = tryCatchSync(() =>
-        findObjectIdByName(objectChanges, "IdentityRegistration"),
+        findObjectIdByName(objectChanges, "IdentityRegistration")
       );
 
       if (registration.error) {
@@ -367,12 +363,12 @@ export default new Hono()
         return respond.err(
           ctx,
           "Failed to find registration object on chain",
-          500,
+          500
         );
       }
 
       const collection = tryCatchSync(() =>
-        findObjectIdByName(objectChanges, "MY_BEAVER_POSTS"),
+        findObjectIdByName(objectChanges, "MY_BEAVER_POSTS")
       );
 
       if (collection.error) {
@@ -380,23 +376,8 @@ export default new Hono()
         return respond.err(
           ctx,
           "Failed to find collection object on chain",
-          500,
+          500
         );
-      }
-
-      let imageUrl: string | undefined = undefined;
-      let imageBlurhash: string | undefined = undefined;
-
-      if (image) {
-        const imageData = Buffer.from(await image.arrayBuffer());
-        const { imageBuffer, blurhash } = await preprocessImage(imageData);
-
-        const url = await tryCatch(s3.upload(imageBuffer));
-
-        if (url.data) {
-          imageUrl = url.data;
-          imageBlurhash = blurhash;
-        }
       }
 
       const newUserResponse = await tryCatch(
@@ -405,11 +386,9 @@ export default new Hono()
           .values({
             identity: registration.data,
             collectionNft: collection.data,
-            imageUrl,
-            imageBlurhash,
             ...user,
           })
-          .returning(),
+          .returning()
       );
 
       if (newUserResponse.error) {
@@ -417,14 +396,14 @@ export default new Hono()
         return respond.err(
           ctx,
           "Failed to create user : " + stringify(newUserResponse.error),
-          400,
+          400
         );
       }
 
       const [newUser] = newUserResponse.data;
 
       return respond.ok(ctx, newUser, "User created successfully", 201);
-    },
+    }
   )
 
   .patch(
@@ -435,14 +414,14 @@ export default new Hono()
       z.object({
         fullName: z.string().min(3).max(50).optional(),
         about: z.string().max(255).nullable().optional(),
-      }),
+      })
     ),
     async (ctx) => {
       const user = ctx.get("user");
       const data = ctx.req.valid("json");
 
       const updatedUserResponse = await tryCatch(
-        db.update(users).set(data).where(eq(users.id, user.id)).returning(),
+        db.update(users).set(data).where(eq(users.id, user.id)).returning()
       );
 
       if (updatedUserResponse.error) {
@@ -450,14 +429,14 @@ export default new Hono()
         return respond.err(
           ctx,
           "Failed to update user : " + stringify(updatedUserResponse.error),
-          500,
+          500
         );
       }
 
       const [newUser] = updatedUserResponse.data;
 
       return respond.ok(ctx, newUser, "User created successfully", 201);
-    },
+    }
   )
 
   .get(
@@ -466,7 +445,7 @@ export default new Hono()
       "param",
       z.object({
         id: zNumberString(),
-      }),
+      })
     ),
     async (ctx) => {
       const { id: userId } = ctx.req.valid("param");
@@ -477,7 +456,7 @@ export default new Hono()
             followers: count(),
           })
           .from(follows)
-          .where(eq(follows.followingId, userId)),
+          .where(eq(follows.followingId, userId))
       );
 
       if (followerCountResponse.error) {
@@ -491,7 +470,7 @@ export default new Hono()
             following: count(),
           })
           .from(follows)
-          .where(eq(follows.followerId, userId)),
+          .where(eq(follows.followerId, userId))
       );
 
       if (followingCountResponse.error) {
@@ -509,9 +488,9 @@ export default new Hono()
           following: followingCount.following,
         },
         "Follow count fetched successfully",
-        200,
+        200
       );
-    },
+    }
   )
 
   .get(
@@ -520,7 +499,7 @@ export default new Hono()
       "param",
       z.object({
         id: zNumberString(),
-      }),
+      })
     ),
     async (ctx) => {
       const { id: userId } = ctx.req.valid("param");
@@ -530,14 +509,14 @@ export default new Hono()
           .select({ pinnedPost: users.pinnedPost })
           .from(users)
           .where(eq(users.id, userId))
-          .limit(1),
+          .limit(1)
       );
 
       if (userResponse.error) {
         return respond.err(
           ctx,
           "Failed to find user:" + userResponse.error.message,
-          500,
+          500
         );
       }
 
@@ -551,9 +530,9 @@ export default new Hono()
         ctx,
         pinnedPost,
         "Pinned post fetched successfully",
-        200,
+        200
       );
-    },
+    }
   )
 
   .post(
@@ -563,13 +542,13 @@ export default new Hono()
       "json",
       z.object({
         signature: zSuiSignature(),
-      }),
+      })
     ),
     zValidator(
       "param",
       z.object({
         id: zNumberString(),
-      }),
+      })
     ),
     async (ctx) => {
       const { signature } = ctx.req.valid("json");
@@ -582,20 +561,20 @@ export default new Hono()
             userId: user.id,
             postId: id,
           },
-          signature,
-        ),
+          signature
+        )
       );
 
       if (pinError) {
         return respond.err(
           ctx,
           "Failed to follow user : " + pinError.message,
-          400,
+          400
         );
       }
 
       return respond.ok(ctx, {}, "Post pinned successfully", 200);
-    },
+    }
   )
 
   .delete(
@@ -605,7 +584,7 @@ export default new Hono()
       "json",
       z.object({
         signature: zSuiSignature(),
-      }),
+      })
     ),
     async (ctx) => {
       const { signature } = ctx.req.valid("json");
@@ -625,20 +604,20 @@ export default new Hono()
             userId: user.id,
             postId: user.pinnedPost,
           },
-          signature,
-        ),
+          signature
+        )
       );
 
       if (unpinError) {
         return respond.err(
           ctx,
           "Failed to follow user : " + unpinError.message,
-          400,
+          400
         );
       }
 
       return respond.ok(ctx, {}, "Post unpinned successfully", 200);
-    },
+    }
   )
 
   .get(
@@ -652,13 +631,13 @@ export default new Hono()
         perPage: zNumberString()
           .transform((v) => Math.min(v, 32))
           .default("8"),
-      }),
+      })
     ),
     zValidator(
       "param",
       z.object({
         id: zNumberString(),
-      }),
+      })
     ),
     async (ctx) => {
       const { page, perPage } = ctx.req.valid("query");
@@ -671,7 +650,7 @@ export default new Hono()
           .innerJoin(users, eq(follows.followerId, users.id))
           .where(eq(follows.followingId, userId))
           .limit(perPage)
-          .offset(page * perPage),
+          .offset(page * perPage)
       );
 
       if (followersResponse.error) {
@@ -688,9 +667,9 @@ export default new Hono()
           hasMore: !(followers.length < perPage),
         },
         "Followers fetched successfully",
-        200,
+        200
       );
-    },
+    }
   )
 
   .get(
@@ -704,13 +683,13 @@ export default new Hono()
         perPage: zNumberString()
           .transform((v) => Math.min(v, 32))
           .default("8"),
-      }),
+      })
     ),
     zValidator(
       "param",
       z.object({
         id: zNumberString(),
-      }),
+      })
     ),
     async (ctx) => {
       const { page, perPage } = ctx.req.valid("query");
@@ -723,7 +702,7 @@ export default new Hono()
           .innerJoin(users, eq(follows.followingId, users.id))
           .where(eq(follows.followerId, userId))
           .limit(perPage)
-          .offset(page * perPage),
+          .offset(page * perPage)
       );
 
       if (followingResponse.error) {
@@ -732,7 +711,7 @@ export default new Hono()
       }
 
       const following = followingResponse.data.map(
-        (following) => following.user,
+        (following) => following.user
       );
 
       return respond.ok(
@@ -742,9 +721,9 @@ export default new Hono()
           hasMore: !(following.length < perPage),
         },
         "Following fetched successfully",
-        200,
+        200
       );
-    },
+    }
   )
 
   .post(
@@ -754,13 +733,13 @@ export default new Hono()
       "param",
       z.object({
         id: zNumberString(),
-      }),
+      })
     ),
     zValidator(
       "json",
       z.object({
         signature: zSuiSignature(),
-      }),
+      })
     ),
     async (ctx) => {
       const { id: followingId } = ctx.req.valid("param");
@@ -772,19 +751,19 @@ export default new Hono()
       }
 
       const { error: followError } = await tryCatch(
-        followUser({ followingId, userId: user.id }, signature),
+        followUser({ followingId, userId: user.id }, signature)
       );
 
       if (followError) {
         return respond.err(
           ctx,
           "Failed to follow user : " + followError.message,
-          500,
+          500
         );
       }
 
       return respond.ok(ctx, {}, "Followed user successfully", 200);
-    },
+    }
   )
 
   .delete(
@@ -794,13 +773,13 @@ export default new Hono()
       "param",
       z.object({
         id: zNumberString(),
-      }),
+      })
     ),
     zValidator(
       "json",
       z.object({
         signature: zSuiSignature(),
-      }),
+      })
     ),
     async (ctx) => {
       const { id: followingId } = ctx.req.valid("param");
@@ -812,17 +791,17 @@ export default new Hono()
       }
 
       const { error: unfollowError } = await tryCatch(
-        unfollowUser({ followingId, userId: user.id }, signature),
+        unfollowUser({ followingId, userId: user.id }, signature)
       );
 
       if (unfollowError) {
         return respond.err(
           ctx,
           "Failed to unfollow user : " + unfollowError,
-          500,
+          500
         );
       }
 
       return respond.ok(ctx, {}, "Unfollowed user successfully", 200);
-    },
+    }
   );
