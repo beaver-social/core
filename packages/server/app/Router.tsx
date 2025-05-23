@@ -71,8 +71,6 @@ function AuthProtection({ children }: { children: React.ReactNode }) {
     beaver.wallet.isConnected,
     beaver.wallet.hasIdentity,
     beaver.user,
-    login,
-    navigate,
   ]);
 
   // Show loading while logging in
