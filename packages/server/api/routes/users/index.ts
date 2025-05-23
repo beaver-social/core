@@ -29,6 +29,7 @@ import { getPreviousActionHash } from "../../lib/actions/helpers";
 import { followUser, pinPost, unfollowUser, unpinPost } from "./actions";
 import { preprocessImage } from "./helpers";
 import s3 from "../../lib/s3/client";
+import env from "../../../env";
 
 const { users, follows, posts } = db.schema;
 
@@ -189,6 +190,17 @@ export default new Hono()
       })
     ),
     async (ctx) => {
+      const appId = ctx.req.header("X-Api-Key")
+      let app = -1
+
+      if (!appId) return respond.err(ctx, "Missing AppId / Api Key", 400)
+
+      if (appId !== env.DEFAULT_APPID) {
+        const [appIdExists] = await db.select().from(db.schema.applications).where(eq(db.schema.applications.appId, appId))
+        if (!appIdExists) return respond.err(ctx, "Invalid AppId / Api Key", 400)
+        app = appIdExists.id
+      }
+
       const { address, signature } = ctx.req.valid("json");
       const userResponse = await tryCatch(db.getUserByAddress(address));
 
@@ -223,7 +235,7 @@ export default new Hono()
       const now = Date.now() / 1000;
 
       const payload: z.infer<ReturnType<typeof zJwtPayload>> = {
-        app: 0,
+        app: app,
         iss: serverKeypair.getPublicKey().toBase64(),
         sub: user.id,
         iat: now - 2,

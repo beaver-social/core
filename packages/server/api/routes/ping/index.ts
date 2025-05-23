@@ -20,7 +20,7 @@ const { pingChats, pingMessages } = db.schema;
 
 const baseModelName = "gemini-2.0-flash-lite"
 
-const pingCaches: Record<string, string> = {}
+// const pingCaches: Record<string, string> = {}
 
 const app = new Hono()
   .post(
@@ -84,26 +84,26 @@ const app = new Hono()
 
       const systemInstruction = generateSystemInstruction(intent)
 
-      const instructionDigest = generateHash(systemInstruction)
-      let cacheName = ""
-      if (instructionDigest in pingCaches) {
-        cacheName = pingCaches[instructionDigest]
-      } else {
-        const cachedInstruction = await ai.caches.create({
-          model: baseModelName,
-          config: {
-            systemInstruction,
-          },
-        });
-        if (!cachedInstruction.name) throw "";
-        cacheName = cachedInstruction.name
-      }
+      // const instructionDigest = generateHash(systemInstruction)
+      // let cacheName = ""
+      // if (instructionDigest in pingCaches) {
+      //   cacheName = pingCaches[instructionDigest]
+      // } else {
+      //   const cachedInstruction = await ai.caches.create({
+      //     model: baseModelName,
+      //     config: {
+      //       systemInstruction,
+      //     },
+      //   });
+      //   if (!cachedInstruction.name) throw "";
+      //   cacheName = cachedInstruction.name
+      // }
 
 
       const chat = ai.chats.create({
         model: baseModelName,
         history: history,
-        config: { cachedContent: cacheName },
+        config: { systemInstruction },
       });
 
       const res = await tryCatch(chat.sendMessageStream({ message: message }));
@@ -163,7 +163,7 @@ const app = new Hono()
     const chat = await db.select().from(pingChats).where(eq(pingChats.id, user.id));
     const messages = await db.select().from(pingMessages).where(eq(pingMessages.id, user.id));
 
-    return respond.ok(ctx, { ...chat, messages }, "Ping Chat Details", 200)
+    return respond.ok(ctx, { ...chat, history: messages }, "Ping Chat Details", 200)
 
   });
 
