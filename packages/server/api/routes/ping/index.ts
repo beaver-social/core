@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { contracts } from "../../lib/sui/contracts";
 import { respond } from "../../lib/utils/respond";
 import { tryCatch } from "../../lib/tryCatch";
 import { GoogleGenAI } from "@google/genai";
@@ -14,9 +13,14 @@ import { and, eq } from "drizzle-orm";
 import authenticated from "../../middlewares/authenticated";
 import { stringify } from "../../../utils";
 import { streamText } from 'hono/streaming'
+import { generateHash } from "../../lib/utils/utils";
 
 const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
 const { pingChats, pingMessages } = db.schema;
+
+const baseModelName = "gemini-2.0-flash-lite"
+
+const pingCaches: Record<string, string> = {}
 
 const app = new Hono()
   .post(
@@ -78,10 +82,28 @@ const app = new Hono()
         dbChatId = chat[0].id;
       }
 
+      const systemInstruction = generateSystemInstruction(intent)
+
+      const instructionDigest = generateHash(systemInstruction)
+      let cacheName = ""
+      if (instructionDigest in pingCaches) {
+        cacheName = pingCaches[instructionDigest]
+      } else {
+        const cachedInstruction = await ai.caches.create({
+          model: baseModelName,
+          config: {
+            systemInstruction,
+          },
+        });
+        if (!cachedInstruction.name) throw "";
+        cacheName = cachedInstruction.name
+      }
+
+
       const chat = ai.chats.create({
-        model: "gemini-2.0-flash-lite",
+        model: baseModelName,
         history: history,
-        config: { systemInstruction: generateSystemInstruction(intent) },
+        config: { cachedContent: cacheName },
       });
 
       const res = await tryCatch(chat.sendMessageStream({ message: message }));
