@@ -31,7 +31,7 @@ export class BeaverClient {
     const rpcUrl = getFullnodeUrl(config.network || "mainnet");
     const suiClient = new SuiClient({ url: rpcUrl });
     const apiClient = new ApiClient(logger);
-    apiClient.baseUrl = config.apiBaseUrl || "https://beaver.xyz/api/v1";
+    apiClient.baseUrl = config.apiBaseUrl || "https://beaversocial.xyz/api/v1";
 
     const events = new EventNotifier();
 

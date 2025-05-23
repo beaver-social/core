@@ -8,6 +8,7 @@ export default class ApiClient {
   private logger: Logger;
   private authHeader: { Authorization: `Bearer ${string}` };
   private _baseUrl: string = "https://beaver.xyz/api/v1";
+  private _appId: string = "";
 
   constructor(logger: Logger) {
     this.logger = logger;
@@ -21,10 +22,16 @@ export default class ApiClient {
     this.client = this.createClient();
   }
 
+  set appId(appId: string) {
+    this._appId = appId;
+    this.client = this.createClient();
+  }
+
   private createClient() {
     return hc<typeof API>(this._baseUrl, {
       headers: () => ({
         ...this.authHeader,
+        "X-Api-Key": this._appId,
       }),
     });
   }

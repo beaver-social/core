@@ -12,6 +12,7 @@ export type BeaverClientConfig = {
   debug?: boolean;
   network?: Parameters<typeof getFullnodeUrl>[0];
   apiBaseUrl?: string;
+  appId: string;
   zkLoginWallets?: {
     enabled?: boolean;
     windowFeatures?: string | (() => string);
