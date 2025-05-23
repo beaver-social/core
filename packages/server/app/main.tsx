@@ -33,7 +33,7 @@ function App() {
                 config={{
                   debug: true,
                   network: "devnet",
-                  apiBaseUrl: "http://localhost:9090/api/v1",
+                  apiBaseUrl: "/api/v1",
                   zkLoginWallets: {
                     enabled: true,
                   },
