@@ -26,7 +26,7 @@ export default function PostData() {
   return (
     <>
       <div className="divide-y mx-4">
-        {postArray?.pages && postArray?.pages.length > 0 ? (
+        {postArray?.pages && postArray?.pages[0].posts.length > 0 ? (
           postArray?.pages.map((page) =>
             page.posts.map((postId, index) => (
               <FeedPost key={index} postId={postId.id} />
@@ -37,7 +37,7 @@ export default function PostData() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className="flex flex-col gap-2 border items-center text-grey-500 justify-center p-10 rounded-sm"
+            className="flex flex-col gap-2 border items-center text-grey-500 justify-center p-10 rounded-sm mb-4"
           >
             <p className="text-sm">No posts found..</p>
           </motion.div>
