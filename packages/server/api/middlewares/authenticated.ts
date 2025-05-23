@@ -19,32 +19,38 @@ const cache = new LRUCache<string, DB["user"]>({
 
 export async function getUserFromCtx(ctx: Context) {
   const token = ctx.req.header("Authorization")?.replace("Bearer ", "");
-  if (!token) throw new Error("Missing Auth Token");
+  const appId = ctx.req.header("X-Api-Key")
 
-  const cacheKey = generateHash(token);
+  if (appId !== env.DEFAULT_APPID)
+    const [appIdExists] = db.select().from(db.schema.applications).where(eq(db.schema.applications.appId, appId))
+}
 
-  const cachedUser = cache.get(cacheKey);
-  if (cachedUser) {
-    return cachedUser;
-  }
+if (!token) throw new Error("Missing Auth Token");
 
-  const decodedJwt = await tryCatch(verify(token, JWTPrivateKey, JWTalgorithm));
+const cacheKey = generateHash(token);
 
-  if (decodedJwt.error) {
-    throw new Error("Unable to verify Auth Token " + decodedJwt.error);
-  }
-  const { sub } = zJwtPayload().parse(decodedJwt.data);
+const cachedUser = cache.get(cacheKey);
+if (cachedUser) {
+  return cachedUser;
+}
 
-  // no this will not you stupid ai => this will fetch user for every request, replace with redis cache later.
-  let [user] = await db
-    .select()
-    .from(db.schema.users)
-    .where(eq(db.schema.users.id, sub))
-    .limit(1);
+const decodedJwt = await tryCatch(verify(token, JWTPrivateKey, JWTalgorithm));
 
-  if (!user) throw new Error("User not found");
+if (decodedJwt.error) {
+  throw new Error("Unable to verify Auth Token " + decodedJwt.error);
+}
+const { sub } = zJwtPayload().parse(decodedJwt.data);
 
-  return user;
+// no this will not you stupid ai => this will fetch user for every request, replace with redis cache later.
+let [user] = await db
+  .select()
+  .from(db.schema.users)
+  .where(eq(db.schema.users.id, sub))
+  .limit(1);
+
+if (!user) throw new Error("User not found");
+
+return user;
 }
 
 const authenticated = createMiddleware<{

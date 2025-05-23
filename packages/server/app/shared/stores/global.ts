@@ -37,7 +37,6 @@ export const useServerConfig = () => {
 
   useEffect(() => {
     if (serverStats.data) {
-      // globalStore.actions.setPrivyAppId(serverStats.data.privyAppId);
       globalStore.actions.initialize();
     }
   }, [serverStats.data]);
