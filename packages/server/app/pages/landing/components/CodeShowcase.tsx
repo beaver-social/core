@@ -11,87 +11,13 @@ import { Check, Code, Cpu, Copy, Sparkles } from "lucide-react";
 // Animated code tabs with examples
 export function CodeShowcase() {
   const [activeTab, setActiveTab] = React.useState("react");
-  const [copied, setCopied] = React.useState({
-    react: false,
-    node: false,
-    flutter: false,
-  });
+  const [copied, setCopied] = React.useState({ react: false, node: false, "react-native": false, }); const handleCopy = (code: string, type: "react" | "node" | "react-native") => { navigator.clipboard.writeText(code); setCopied({ ...copied, [type]: true }); setTimeout(() => setCopied({ ...copied, [type]: false }), 2000); };
 
-  const handleCopy = (code: string, type: "react" | "node" | "flutter") => {
-    navigator.clipboard.writeText(code);
-    setCopied({ ...copied, [type]: true });
-    setTimeout(() => setCopied({ ...copied, [type]: false }), 2000);
-  };
+  const reactCode = `import { BeaverProvider, useBeaver, usePost } from '@beaver/react';import { QueryClient, QueryClientProvider } from '@tanstack/react-query';const queryClient = new QueryClient();function App() {  return (    <QueryClientProvider client={queryClient}>      <BeaverProvider        config={{          network: "testnet",          apiBaseUrl: "https://testnet.api.beaver.social/v1",          zkLoginWallets: { enabled: true },          appId: "your-app-id"        }}      >        <SocialFeed />      </BeaverProvider>    </QueryClientProvider>  );}function SocialFeed() {  const { user } = useBeaver();  const { getPosts } = usePost();  const { data } = getPosts({ perPage: 10 });  return (    <div>      <h1>Welcome, {user?.username}!</h1>      {data?.pages.map(page =>         page.posts.map(post => (          <div key={post.id}>{post.content}</div>        ))      )}    </div>  );}`;
 
-  const reactCode = `import { BeaverSocial, useWeb3Profile } from '@beaver/react';
+  const nodeCode = `// Direct API integration exampleimport fetch from 'node-fetch';const API_BASE = 'https://testnet.api.beaver.social/v1';// Authenticate user with wallet signatureasync function loginUser(walletAddress, signature) {  const response = await fetch(\`\${API_BASE}/users/login\`, {    method: 'POST',    headers: { 'Content-Type': 'application/json' },    body: JSON.stringify({      walletAddress,      signature    })  });    const { data } = await response.json();  return data; // { userId, username, jwt }}// Create a social postasync function createPost(content, jwt) {  const response = await fetch(\`\${API_BASE}/posts/create\`, {    method: 'POST',    headers: {       'Content-Type': 'application/json',      'Authorization': \`Bearer \${jwt}\`    },    body: JSON.stringify({ content })  });    return await response.json();}`;
 
-// Initialize the Beaver Social SDK
-function SocialApp() {
-  const { profile, isLoading } = useWeb3Profile();
-
-  return (
-    <BeaverSocial
-      theme="dark"
-      aiEnhanced={true}
-      wallet={profile}
-    >
-      {/* Ready-to-use components */}
-      <Timeline 
-        filter="trending" 
-        layout="masonry" 
-      />
-      <ProfileCard showNFTs={true} />
-    </BeaverSocial>
-  );
-}`;
-
-  const nodeCode = `import { BeaverNode } from '@beaver/node';
-import { SuiChain } from '@mysten/sui';
-
-// Server-side implementation
-const beaver = new BeaverNode({
-  chain: SuiChain,
-  apiKey: process.env.BEAVER_API_KEY,
-});
-
-// Create a new social post with AI moderation
-async function createPost(userId, content) {
-  const result = await beaver.posts.create({
-    author: userId,
-    content,
-    enableAIModeration: true,
-    visibility: 'public',
-  });
-  
-  return result;
-}`;
-
-  const flutterCode = `import 'package:beaver_social/beaver_social.dart';
-
-class BeaverSocialApp extends StatefulWidget {
-  @override
-  _BeaverSocialAppState createState() => _BeaverSocialAppState();
-}
-
-class _BeaverSocialAppState extends State<BeaverSocialApp> {
-  final _beaverClient = BeaverClient(
-    apiKey: 'YOUR_API_KEY',
-    config: BeaverConfig(
-      theme: BeaverTheme.dark,
-      aiFeatures: true,
-    ),
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    return BeaverSocialProvider(
-      client: _beaverClient,
-      child: MaterialApp(
-        home: SocialFeed(),
-      ),
-    );
-  }
-}`;
+  const reactNativeCode = `import { BeaverProvider, useBeaver, usePost } from '@beaver/react-native';import { QueryClient, QueryClientProvider } from '@tanstack/react-query';const queryClient = new QueryClient();function App() {  return (    <QueryClientProvider client={queryClient}>      <BeaverProvider        config={{          network: "testnet",          apiBaseUrl: "https://testnet.api.beaver.social/v1",          zkLoginWallets: { enabled: true },          appId: "your-app-id"        }}      >        <SocialApp />      </BeaverProvider>    </QueryClientProvider>  );}function SocialApp() {  const { user } = useBeaver();  const { createPost } = usePost();  return (    <View>      <Text>Welcome, {user?.username}!</Text>      <Button        title="Create Post"        onPress={() => createPost.mutate({          content: "Hello from React Native!"        })}      />    </View>  );}`;
 
   return (
     <section id="code" className="container mx-auto px-4 py-24">
@@ -102,16 +28,7 @@ class _BeaverSocialAppState extends State<BeaverSocialApp> {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-zinc-100 mb-4">
-            Simple{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">
-              Implementation
-            </span>
-          </h2>
-          <p className="text-zinc-400 max-w-2xl mx-auto">
-            A few lines of code is all it takes to add powerful social features
-            to your decentralized application.
-          </p>
+          <h2 className="text-3xl md:text-4xl font-bold text-zinc-100 mb-4">            Developer{" "}            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">              Experience            </span>          </h2>          <p className="text-zinc-400 max-w-2xl mx-auto">            Integrate Beaver Social into your React, Node.js, or mobile app with our             comprehensive SDKs and RESTful API.          </p>
         </motion.div>
       </div>
 
@@ -142,9 +59,7 @@ class _BeaverSocialAppState extends State<BeaverSocialApp> {
             defaultValue="react"
             className="w-full"
             value={activeTab}
-            onValueChange={(value) =>
-              setActiveTab(value as "react" | "node" | "flutter")
-            }
+            onValueChange={(value) => setActiveTab(value as "react" | "node" | "react-native")}
           >
             <TabsList className="flex w-full bg-zinc-900 border-b border-zinc-800/50 p-0">
               <TabsTrigger
@@ -159,12 +74,7 @@ class _BeaverSocialAppState extends State<BeaverSocialApp> {
               >
                 <Cpu className="mr-2 h-4 w-4" /> Node.js
               </TabsTrigger>
-              <TabsTrigger
-                value="flutter"
-                className={`flex-1 px-4 py-3 text-sm data-[state=active]:bg-zinc-800 data-[state=active]:text-transparent data-[state=active]:bg-clip-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-400 data-[state=active]:to-blue-400 rounded-none`}
-              >
-                <Sparkles className="mr-2 h-4 w-4" /> Flutter
-              </TabsTrigger>
+              <TabsTrigger value="react-native" className={`flex-1 px-4 py-3 text-sm data-[state=active]:bg-zinc-800 data-[state=active]:text-transparent data-[state=active]:bg-clip-text data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-400 data-[state=active]:to-blue-400 rounded-none`}              >                <Sparkles className="mr-2 h-4 w-4" /> React Native              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="react" className="relative">
@@ -203,23 +113,7 @@ class _BeaverSocialAppState extends State<BeaverSocialApp> {
               </pre>
             </TabsContent>
 
-            <TabsContent value="flutter" className="relative">
-              <div className="absolute top-2 right-2 z-10">
-                <button
-                  onClick={() => handleCopy(flutterCode, "flutter")}
-                  className="p-2 rounded-md bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors"
-                >
-                  {copied.flutter ? (
-                    <Check className="h-4 w-4 text-green-400" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-              <pre className="p-4 text-sm md:text-md overflow-x-auto font-mono text-zinc-300">
-                {flutterCode}
-              </pre>
-            </TabsContent>
+            <TabsContent value="react-native" className="relative">              <div className="absolute top-2 right-2 z-10">                <button onClick={() => handleCopy(reactNativeCode, "react-native")} className="p-2 rounded-md bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors"                >                  {copied["react-native"] ? (<Check className="h-4 w-4 text-green-400" />) : (<Copy className="h-4 w-4" />)}                </button>              </div>              <pre className="p-4 text-sm md:text-md overflow-x-auto font-mono text-zinc-300">                {reactNativeCode}              </pre>            </TabsContent>
           </Tabs>
         </div>
 

@@ -9,35 +9,58 @@ const AnimatedCodeSnippet = () => {
 
   const codeSnippets = [
     {
-      title: "main.jsx",
+      title: "App.jsx",
       code: `import { BeaverProvider } from '@beaver/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-const App = () => {
+const queryClient = new QueryClient();
+
+function App() {
   return (
-    <BeaverProvider 
-      config={{
-        debug: false
-        network: "mainnet"
-        apiBaseUrl: "https://api.beaver.social"
-        zkLoginWallets: {
-          enabled: true
-        }
-      }}>
-      <YourApp />
-    </BeaverProvider>
+    <QueryClientProvider client={queryClient}>
+      <BeaverProvider
+        config={{
+          network: "testnet",
+          apiBaseUrl: "https://testnet.api.beaver.social/v1",
+          zkLoginWallets: { enabled: true },
+          appId: "your-app-id"
+        }}
+      >
+        <SocialApp />
+      </BeaverProvider>
+    </QueryClientProvider>
   );
-};`,
+}`,
     },
     {
-      title: "YourSocialApp.jsx",
-      code: `import { useBeaver } from "@beaver/react"
+      title: "SocialApp.jsx",
+      code: `import { useBeaver, usePost, useWallets } from "@beaver/react";
 
-function YourSocialApp () {
-  const beaver = useBeaver();
-  const user = beaver.user;
-  const login = beaver.auth.login;
+function SocialApp() {
+  const { user } = useBeaver();
+  const { connect } = useWallets();
+  const { createPost } = usePost();
 
-  // implement login button
+  if (!user) {
+    return (
+      <button onClick={() => connect({ wallet: "sui-wallet" })}>
+        Connect Wallet
+      </button>
+    );
+  }
+
+  return (
+    <div>
+      <h1>Welcome, {user.username}!</h1>
+      <button 
+        onClick={() => createPost.mutate({ 
+          content: "Hello, Web3 Social!" 
+        })}
+      >
+        Create Post
+      </button>
+    </div>
+  );
 }`,
     },
   ];
@@ -80,21 +103,47 @@ function YourSocialApp () {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.3 }}
-            className="block mt-4"
+            className="block"
           >
-            <span className="text-rose-400">const</span>{" "}
-            <span className="text-blue-300">App</span>{" "}
-            <span className="text-zinc-300">=</span>{" "}
-            <span className="text-amber-300">()</span>{" "}
-            <span className="text-zinc-300">=&gt;</span>{" "}
-            <span className="text-teal-300">{"{"}</span>
+            <span className="text-rose-400">import</span>{" "}
+            <span className="text-teal-300">{"{"}</span>{" "}
+            <span className="text-amber-300">QueryClient, QueryClientProvider</span>{" "}
+            <span className="text-teal-300">{"}"}</span>{" "}
+            <span className="text-rose-400">from</span>{" "}
+            <span className="text-green-300">'@tanstack/react-query'</span>;
           </motion.span>
 
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.3 }}
-            className="block ml-4"
+            className="block mt-4"
+          >
+            <span className="text-rose-400">const</span>{" "}
+            <span className="text-blue-300">queryClient</span>{" "}
+            <span className="text-zinc-300">=</span>{" "}
+            <span className="text-rose-400">new</span>{" "}
+            <span className="text-amber-300">QueryClient</span>
+            <span className="text-teal-300">()</span>;
+          </motion.span>
+
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.3 }}
+            className="block mt-4"
+          >
+            <span className="text-rose-400">function</span>{" "}
+            <span className="text-blue-300">App</span>
+            <span className="text-amber-300">()</span>{" "}
+            <span className="text-teal-300">{"{"}</span>
+          </motion.span>
+
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.3 }}
+            className="block ml-2"
           >
             <span className="text-rose-400">return</span>{" "}
             <span className="text-teal-300">(</span>
@@ -103,33 +152,15 @@ function YourSocialApp () {
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.3 }}
-            className="block ml-8"
+            transition={{ delay: 0.6, duration: 0.3 }}
+            className="block ml-4"
           >
             <span className="text-blue-400">&lt;</span>
-            <span className="text-amber-300">BeaverProvider</span> <br />
-            <span className="text-rose-400">config</span>
+            <span className="text-amber-300">QueryClientProvider</span>{" "}
+            <span className="text-rose-400">client</span>
             <span className="text-zinc-300">=</span>
             <span className="text-teal-300">{"{"}</span>
-            <span className="text-orange-300">{"{"}</span>
-            <br />
-            <span className="text-orange-300"> debug: false</span>
-            <br />
-            <span className="text-orange-300"> network: "mainnet"</span>
-            <br />
-            <span className="text-orange-300">
-              {" "}
-              apiBaseUrl: "https://api.beaver.social"
-            </span>
-            <br />
-            <span className="text-orange-300"> zkLoginWallets: </span>
-            <span className="text-purple-500">{"{"}</span>
-            <br />
-            <span className="text-orange-300"> enabled: true</span>
-            <br />
-            <span className="text-purple-500">{"  }"}</span>
-            <br />
-            <span className="text-orange-300">{"}"}</span>
+            <span className="text-blue-300">queryClient</span>
             <span className="text-teal-300">{"}"}</span>
             <span className="text-blue-400">&gt;</span>
           </motion.span>
@@ -137,41 +168,44 @@ function YourSocialApp () {
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.3 }}
-            className="block ml-12"
+            transition={{ delay: 0.7, duration: 0.3 }}
+            className="block ml-6"
           >
             <span className="text-blue-400">&lt;</span>
-            <span className="text-amber-300">YourSocialApp</span>
-            <span className="text-blue-400"> /&gt;</span>
-          </motion.span>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.3 }}
-            className="block ml-8"
-          >
-            <span className="text-blue-400">&lt;/</span>
-            <span className="text-amber-300">BeaverProvider</span>
-            <span className="text-blue-400">&gt;</span>
-          </motion.span>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7, duration: 0.3 }}
-            className="block ml-4"
-          >
-            <span className="text-teal-300">)</span>;
+            <span className="text-amber-300">BeaverProvider</span> <br />
+            <span className="ml-8 text-rose-400">config</span>
+            <span className="text-zinc-300">=</span>
+            <span className="text-teal-300">{"{"}</span>
+            <span className="text-orange-300">{"{"}</span>
+            <br />
+            <span className="ml-10 text-orange-300">network: "testnet",</span>
+            <br />
+            <span className="ml-10 text-orange-300">
+              apiBaseUrl: "https://testnet.api.beaver.social/v1",
+            </span>
+            <br />
+            <span className="ml-10 text-orange-300">zkLoginWallets: </span>
+            <span className="text-purple-500">{"{"}</span>
+            <span className="text-orange-300"> enabled: true </span>
+            <span className="text-purple-500">{"}"}</span>,
+            <br />
+            <span className="ml-10 text-orange-300">appId: "your-app-id"</span>
+            <br />
+            <span className="ml-8 text-orange-300">{"}"}</span>
+            <span className="text-teal-300">{"}"}</span>
+            <br />
+            <span className="ml-6 text-blue-400">&gt;</span>
           </motion.span>
 
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.3 }}
-            className="block"
+            className="block ml-8"
           >
-            <span className="text-teal-300">{"}"}</span>;
+            <span className="text-blue-400">&lt;</span>
+            <span className="text-amber-300">SocialApp</span>
+            <span className="text-blue-400"> /&gt;</span>
           </motion.span>
         </code>
       );
@@ -186,10 +220,10 @@ function YourSocialApp () {
           >
             <span className="text-rose-400">import</span>{" "}
             <span className="text-teal-300">{"{"}</span>{" "}
-            <span className="text-amber-300">useBeaver</span>{" "}
+            <span className="text-amber-300">useBeaver, usePost, useWallets</span>{" "}
             <span className="text-teal-300">{"}"}</span>{" "}
             <span className="text-rose-400">from</span>{" "}
-            <span className="text-green-300">"@beaver/react"</span>
+            <span className="text-green-300">"@beaver/react"</span>;
           </motion.span>
 
           <motion.span
@@ -199,7 +233,7 @@ function YourSocialApp () {
             className="block mt-4"
           >
             <span className="text-rose-400">function</span>{" "}
-            <span className="text-blue-300">YourSocialApp</span>{" "}
+            <span className="text-blue-300">SocialApp</span>
             <span className="text-amber-300">()</span>{" "}
             <span className="text-teal-300">{"{"}</span>
           </motion.span>
@@ -211,7 +245,9 @@ function YourSocialApp () {
             className="block ml-2"
           >
             <span className="text-rose-400">const</span>{" "}
-            <span className="text-blue-300">beaver</span>{" "}
+            <span className="text-teal-300">{"{"}</span>{" "}
+            <span className="text-blue-300">user</span>{" "}
+            <span className="text-teal-300">{"}"}</span>{" "}
             <span className="text-zinc-300">=</span>{" "}
             <span className="text-amber-300">useBeaver</span>
             <span className="text-teal-300">()</span>;
@@ -224,11 +260,12 @@ function YourSocialApp () {
             className="block ml-2"
           >
             <span className="text-rose-400">const</span>{" "}
-            <span className="text-blue-300">user</span>{" "}
+            <span className="text-teal-300">{"{"}</span>{" "}
+            <span className="text-blue-300">connect</span>{" "}
+            <span className="text-teal-300">{"}"}</span>{" "}
             <span className="text-zinc-300">=</span>{" "}
-            <span className="text-blue-300">beaver</span>
-            <span className="text-zinc-300">.</span>
-            <span className="text-amber-300">user</span>;
+            <span className="text-amber-300">useWallets</span>
+            <span className="text-teal-300">()</span>;
           </motion.span>
 
           <motion.span
@@ -238,13 +275,12 @@ function YourSocialApp () {
             className="block ml-2"
           >
             <span className="text-rose-400">const</span>{" "}
-            <span className="text-blue-300">login</span>{" "}
+            <span className="text-teal-300">{"{"}</span>{" "}
+            <span className="text-blue-300">createPost</span>{" "}
+            <span className="text-teal-300">{"}"}</span>{" "}
             <span className="text-zinc-300">=</span>{" "}
-            <span className="text-blue-300">beaver</span>
-            <span className="text-zinc-300">.</span>
-            <span className="text-amber-300">auth</span>
-            <span className="text-zinc-300">.</span>
-            <span className="text-amber-300">login</span>;
+            <span className="text-amber-300">usePost</span>
+            <span className="text-teal-300">()</span>;
           </motion.span>
 
           <motion.span
@@ -253,13 +289,33 @@ function YourSocialApp () {
             transition={{ delay: 0.6, duration: 0.3 }}
             className="block ml-2 mt-4"
           >
-            <span className="text-zinc-500">// implement login button</span>
+            <span className="text-rose-400">if</span>{" "}
+            <span className="text-teal-300">(</span>
+            <span className="text-zinc-300">!</span>
+            <span className="text-blue-300">user</span>
+            <span className="text-teal-300">)</span>{" "}
+            <span className="text-rose-400">return</span>{" "}
+            <span className="text-blue-400">&lt;</span>
+            <span className="text-amber-300">ConnectWallet</span>
+            <span className="text-blue-400"> /&gt;</span>;
           </motion.span>
 
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7, duration: 0.3 }}
+            className="block ml-2 mt-4"
+          >
+            <span className="text-rose-400">return</span>{" "}
+            <span className="text-blue-400">&lt;</span>
+            <span className="text-amber-300">SocialFeed</span>
+            <span className="text-blue-400"> /&gt;</span>;
+          </motion.span>
+
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.3 }}
             className="block"
           >
             <span className="text-teal-300">{"}"}</span>
@@ -349,14 +405,15 @@ export function EnhancedHero() {
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-4xl lg:text-6xl font-bold tracking-tight">
-            <span className="text-zinc-100">Build your </span>
+            <span className="text-zinc-100">Web3 </span>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">
-              web3
+              Social Network
             </span>
-            <span className="text-zinc-100"> social experience.</span>
+            <span className="text-zinc-100"> Layer</span>
           </h1>
           <p className="mt-6 text-lg text-zinc-400 leading-relaxed">
-            Build, connect, and scale — all with just a few lines of code.
+            Build decentralized social applications with blockchain authentication,
+            on-chain verification, and powerful SDKs. Deploy on Sui with just a few lines of code.
           </p>
         </motion.div>
 
@@ -375,7 +432,6 @@ export function EnhancedHero() {
             }}
           >
             <Icon name="Activity" className="w-4 h-4 text-blue-400" />
-
             <p className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
               Get Started
             </p>
@@ -390,27 +446,6 @@ export function EnhancedHero() {
             <p>See Example App</p>
           </motion.button>
         </motion.div>
-
-        {/* Stats */}
-        {/* <motion.div
-                    className="mt-12 grid grid-cols-3 gap-4"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4, duration: 0.5 }}
-                >
-                    <div className="flex flex-col">
-                        <span className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">99%</span>
-                        <span className="text-sm text-zinc-500">Performance</span>
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">10x</span>
-                        <span className="text-sm text-zinc-500">Faster Dev</span>
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">24/7</span>
-                        <span className="text-sm text-zinc-500">Support</span>
-                    </div>
-                </motion.div> */}
       </div>
 
       {/* Right side - Code snippet */}

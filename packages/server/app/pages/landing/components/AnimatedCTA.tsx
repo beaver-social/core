@@ -55,30 +55,7 @@ export function AnimatedCTA() {
         {/* Main content */}
         <div className="relative flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="max-w-2xl">
-            <motion.h2
-              className="text-3xl md:text-4xl font-bold text-zinc-100 mb-4"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              Ready to transform your{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">
-                web3 social experience
-              </span>
-              ?
-            </motion.h2>
-
-            <motion.p
-              className="text-lg text-zinc-400 mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              Join thousands of developers building the future of decentralized
-              social networks with our powerful SDK.
-            </motion.p>
+            <motion.h2 className="text-3xl md:text-4xl font-bold text-zinc-100 mb-4" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}            >              Ready to build on{" "}              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">                Beaver Social              </span>              ?            </motion.h2>            <motion.p className="text-lg text-zinc-400 mb-8" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.2 }}            >              Start building your Web3 social application today with our comprehensive               SDKs, Move smart contracts, and scalable blockchain infrastructure.            </motion.p>
 
             <motion.div
               className="flex flex-wrap gap-4"
