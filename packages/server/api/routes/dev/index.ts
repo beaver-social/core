@@ -13,6 +13,15 @@ const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
 const { applications, applicationUrls } = db.schema;
 
 const app = new Hono()
+
+  .use(async (ctx, next) => {
+    const appId = ctx.req.header("X-Api-Key");
+
+    if (appId != env.DEFAULT_APPID) {
+      return respond.err(ctx, "Very Smart but this won't work", 400);
+    }
+  })
+
   .post(
     "/applications",
     authenticated,

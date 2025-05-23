@@ -61,7 +61,6 @@ const app = new Hono()
           response?.[0].text || "AI Response",
           200
         );
-        return;
       }
 
       if (chatId) {
