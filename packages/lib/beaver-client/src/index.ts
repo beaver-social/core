@@ -32,6 +32,7 @@ export class BeaverClient {
     const suiClient = new SuiClient({ url: rpcUrl });
     const apiClient = new ApiClient(logger);
     apiClient.baseUrl = config.apiBaseUrl || "https://beaversocial.xyz/api/v1";
+    apiClient.appId = config.appId;
 
     const events = new EventNotifier();
 

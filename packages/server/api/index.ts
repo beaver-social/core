@@ -17,6 +17,8 @@ const app = new Hono<{ Variables: { applicationId: number } }>()
   .use(async (ctx, next) => {
     const appId = ctx.req.header("X-Api-Key");
 
+    ctx.log("lala", appId);
+
     if (!appId) return respond.err(ctx, "Missing AppId / Api Key", 400);
 
     let applicationId = -1;
