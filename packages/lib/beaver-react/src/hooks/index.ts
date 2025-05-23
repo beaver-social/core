@@ -8,41 +8,20 @@ export function useBeaver() {
   const post = usePost();
   const profile = useProfile();
   const docs = useDocs();
+  const auth = useAuth();
 
   return {
-    user,
-    client,
-    wallet,
     register: client.user.register.bind(client.user),
     login: client.user.login.bind(client.user),
     logout: client.user.logout.bind(client.user),
+    auth,
+    wallet,
+    user,
+    client,
     follow,
     post,
     profile,
     docs,
-  };
-}
-
-export function useDocs() {
-  const { client } = useBeaverContext();
-  return {
-    getDocs: () => {
-      return useQuery({
-        queryKey: ["docs"],
-        queryFn: async () => {
-          return await client.docs.fetchDocs();
-        },
-      });
-    },
-
-    getDocById: (options: Parameters<typeof client.docs.fetchDocById>[0]) => {
-      return useQuery({
-        queryKey: ["docs", options],
-        queryFn: async () => {
-          return await client.docs.fetchDocById(options);
-        },
-      });
-    },
   };
 }
 
@@ -67,14 +46,38 @@ export function useRegister() {
   });
 }
 
+export function useLogout() {
+  const { client } = useBeaverContext();
+  return useMutation({
+    mutationKey: ["logout"],
+    mutationFn: async () => {
+      return await client.user.logout();
+    },
+  });
+}
+
+export function useAuth() {
+  const login = useLogin();
+  const register = useRegister();
+  const logout = useLogout();
+
+  return {
+    login,
+    register,
+    logout,
+  };
+}
+
 export function useWallets() {
-  const { client, isConnected, hasIdentity } = useBeaverContext();
+  const { client, isConnected, hasIdentity, isAuthenticated } =
+    useBeaverContext();
   const wallets = client.connector.getWallets();
 
   return {
     wallets,
     isConnected,
     hasIdentity,
+    isAuthenticated,
     connect: client.connector.connect.bind(client.connector),
     disconnect: client.connector.disconnect.bind(client.connector),
   };
@@ -270,5 +273,28 @@ export function useProfile() {
           return await client.user.searchSuggestions(options);
         },
       }),
+  };
+}
+
+export function useDocs() {
+  const { client } = useBeaverContext();
+  return {
+    getDocs: () => {
+      return useQuery({
+        queryKey: ["docs"],
+        queryFn: async () => {
+          return await client.docs.fetchDocs();
+        },
+      });
+    },
+
+    getDocById: (options: Parameters<typeof client.docs.fetchDocById>[0]) => {
+      return useQuery({
+        queryKey: ["docs", options],
+        queryFn: async () => {
+          return await client.docs.fetchDocById(options);
+        },
+      });
+    },
   };
 }

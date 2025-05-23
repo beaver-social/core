@@ -141,14 +141,15 @@ export default function () {
                     </Routes>
                   </NotLoggedInProtection>}
                 />
-
-                <Route
-                  path="/demo"
-                  element={withPageErrorBoundary(Demo)({})}
-                />
               </Routes>
             </OnboardingProtection>
           }
+        />
+
+
+        <Route
+          path="/demo"
+          element={withPageErrorBoundary(Demo)({})}
         />
 
         <Route

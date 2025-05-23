@@ -290,7 +290,7 @@ export default class Posts {
     const { id } = options;
 
     return safeParseResponse(
-      this.defaults.apiClient.rpc.posts[`:id`].interacted.$get({
+      this.defaults.apiClient.rpc.posts[`:id`]["user-interactions"].$get({
         param: { id: id.toString() },
       })
     );
