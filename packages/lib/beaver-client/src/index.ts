@@ -10,6 +10,7 @@ import User from "./bindings/User";
 import Posts from "./bindings/Posts";
 import Docs from "./bindings/Docs";
 import Ping from "./bindings/Ping";
+import Application from "./bindings/Application";
 import { BeaverStore } from "./store";
 import ApiClient from "./bindings/ApiClient";
 import EventNotifier from "./bindings/EventHandler";
@@ -25,7 +26,7 @@ export class BeaverClient {
   posts: Posts;
   docs: Docs;
   ping: Ping;
-
+  application: Application;
   constructor(config: BeaverClientConfig) {
     const logger = new Logger("Beaver Social SDK", Boolean(config.debug));
     const rpcUrl = getFullnodeUrl(config.network || "mainnet");
@@ -56,6 +57,7 @@ export class BeaverClient {
     this.posts = new Posts(this.defaults);
     this.docs = new Docs(this.defaults);
     this.ping = new Ping(this.defaults);
+    this.application = new Application(this.defaults);
     this.initialize();
   }
 
