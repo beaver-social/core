@@ -5,8 +5,8 @@ import { Image } from "@/shared/components/Image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import ConnectIdentity from "@/shared/components/ConnectIdentity";
-import { useBeaver, useLogin } from "@beaver/react";
-import { User } from "@/shared/types/globalUI";
+import { useBeaver } from "@beaver/react";
+import { useTheme } from "@/shared/context/theme-provider";
 
 type sidebarItems = {
   name: string;
@@ -58,6 +58,8 @@ export default function SideNav() {
   const [activeIndex, setActiveIndex] = useState<number | null>(0);
   const [isProfilePage, setIsProfilePage] = useState(false);
   const location = useLocation();
+  const { theme } = useTheme();
+
   const beaver = useBeaver();
   const user = beaver.user;
 
@@ -88,7 +90,15 @@ export default function SideNav() {
 
   return (
     <div className="fixed bg-background glass h-screen border-r flex-col justify-between hidden sm:flex w-[14rem]">
-      <div className="flex flex-col w-full justify-center-safe h-full px-3">
+      <div className="flex items-center pl-4 pt-4 gap-[6px]">
+        <Image src={theme === "dark" ? "/icons/logo_dark.png" : "/icons/logo_light.png"} alt="logo" className="size-12" />
+        <div className="">
+          <p className="text-2xl font-bold">Beaver</p>
+          <p className="-mt-1 text-sm text-grey-300">Social</p>
+        </div>
+      </div>
+
+      <div className="flex flex-col w-full h-full px-3 justify-center-safe">
         <ul className="flex flex-col w-full gap-3 text-grey-300 text-hover">
           {sidebarItems.map((item, index) => (
             <motion.li
@@ -120,7 +130,7 @@ export default function SideNav() {
                   <AnimatePresence>
                     {activeIndex === index && (
                       <motion.div
-                        className="absolute left-0 top-0 bottom-0 w-1 h-full bg-primary rounded-r-sm"
+                        className="absolute top-0 bottom-0 left-0 w-1 h-full rounded-r-sm bg-primary"
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "100%", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
@@ -154,7 +164,7 @@ export default function SideNav() {
                   <AnimatePresence>
                     {activeIndex === index && (
                       <motion.div
-                        className="absolute left-0 top-0 bottom-0 w-1 h-full bg-primary rounded-r-sm"
+                        className="absolute top-0 bottom-0 left-0 w-1 h-full rounded-r-sm bg-primary"
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "100%", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
@@ -174,7 +184,7 @@ export default function SideNav() {
         </ul>
       </div>
 
-      <div className="my-4 mx-3">
+      <div className="mx-3 my-4">
         {beaver.wallet.isConnected ? (
           <Link
             to={`/app/profile/${user?.username}`}
@@ -206,7 +216,7 @@ export default function SideNav() {
             >
               {isProfilePage && (
                 <motion.div
-                  className="absolute inset-0 rounded-full border-2 border-primary"
+                  className="absolute inset-0 border-2 rounded-full border-primary"
                   animate={{
                     borderColor: [
                       "rgba(76, 165, 249, 0.4)",
@@ -234,7 +244,7 @@ export default function SideNav() {
             </span>
             {isProfilePage && (
               <motion.div
-                className="absolute left-0 top-0 bottom-0 w-1 h-full bg-primary rounded-r-sm"
+                className="absolute top-0 bottom-0 left-0 w-1 h-full rounded-r-sm bg-primary"
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "100%", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}

@@ -4,6 +4,7 @@ import ThemeSwitch from "@/shared/components/ThemeSwitch";
 import GlobalSearch from "@/shared/components/GlobalSearch";
 import Disconnect from "@/shared/components/Disconnect";
 import { useBeaver } from "@beaver/react";
+import TopNav from "./TopNav";
 
 type LayoutProps = {
     main: React.ReactNode;
@@ -40,6 +41,8 @@ export default function Layout({ main, secondary }: LayoutProps) {
 
             {/* Mobile Layout */}
             <div className="flex flex-col min-h-screen pb-16 sm:hidden">
+                <TopNav />
+
                 <section className="flex-1">
                     <div className="flex flex-col w-full mx-auto">
                         {main}

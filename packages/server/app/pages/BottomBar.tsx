@@ -28,9 +28,9 @@ function BottomBar() {
         }
 
         const index = bottomBarItems.findIndex(item => {
-            return item.to === "/"
-                ? currentPath === "/"
-                : currentPath.startsWith(item.to);
+            return item.to === "/app"
+                ? currentPath === "/app"
+                : currentPath.startsWith(item?.to || "/app");
         });
 
         if (index !== -1) {
@@ -73,7 +73,7 @@ function BottomBar() {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 1 }}
                 >
-                    <Link to={"/profile/ishtails"} className="flex flex-col items-center justify-center text-xs">
+                    <Link to={"/app/profile/ishtails"} className="flex flex-col items-center justify-center text-xs">
                         <motion.div
                             className="relative rounded-full p-1"
                             animate={isProfilePage ? {
