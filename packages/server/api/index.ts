@@ -4,6 +4,9 @@ import router from "./routes";
 import { respond } from "./lib/utils/respond";
 import { onchainDefinitions } from "contracts/definitions";
 import { rateLimiter } from "hono-rate-limiter";
+import env from "../env";
+import db from "./lib/db";
+import { eq } from "drizzle-orm";
 
 let servedSessions = 0;
 
@@ -31,21 +34,28 @@ const app = new Hono()
     })
   )
 
+  .use(async (ctx, next) => {
+    const appId = ctx.req.header("X-Api-Key")
+
+    if (!appId) return respond.err(ctx, "Missing AppId / Api Key", 400)
+
+    if (appId !== env.DEFAULT_APPID) {
+      const [appIdExists] = await db.select().from(db.schema.applications).where(eq(db.schema.applications.appId, appId))
+      if (!appIdExists) return respond.err(ctx, "Invalid AppId / Api Key", 400)
+    }
+
+    return await next()
+  })
+
   .use(
     rateLimiter({
       windowMs: 1,
       limit: 300,
       standardHeaders: "draft-6",
-      keyGenerator: (ctx) => {
+      keyGenerator: async (ctx) => {
+        const appId = ctx.req.header("X-Api-Key")!
 
-        const appId = ctx.req.header("X-Api-Key")
-
-        if (!appId) return respond.err(ctx, "Missing AppId / Api Key", 400)
-
-        if (appId !== env.DEFAULT_APPID) {
-          const [appIdExists] = await db.select().from(db.schema.applications).where(eq(db.schema.applications.appId, appId))
-          if (!appIdExists) return respond.err(ctx, "Invalid AppId / Api Key", 400)
-        }
+        return appId
       },
     })
   )

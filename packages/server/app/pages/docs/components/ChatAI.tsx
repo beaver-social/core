@@ -7,7 +7,6 @@ import { Textarea } from "@/shared/components/ui/textarea";
 import { SparklesText } from "@/pages/landing/ui/text/sparkles";
 import { TextShimmer } from "@/pages/landing/ui/text/shimmer";
 import { useNavigate } from "react-router";
-import { docItems, docSections } from "../data";
 import { useBeaver } from "@beaver/react";
 
 type Message = {
@@ -30,7 +29,9 @@ export default function Chatbot() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const navigate = useNavigate();
-    const { data: docsMetadata } = useBeaver().docs.getDocs();
+    const beaver = useBeaver();
+    const { data: docsMetadata } = beaver.docs.getDocs();
+    const { mutateAsync: chat, isPending: isChatPending, isSuccess: isChatSuccess } = beaver.ping.chat;
 
     // Welcome message when chat opens
     useEffect(() => {
@@ -44,12 +45,12 @@ export default function Chatbot() {
                     relatedLinks: [
                         {
                             title: "Quick Start Guide",
-                            url: "/docs/quick-start",
+                            url: "/docs/getting-started",
                             description: "Get started with Beaver Social quickly"
                         },
                         {
                             title: "SDK Reference",
-                            url: "/docs/client-api",
+                            url: "/docs/react-sdk",
                             description: "Comprehensive API documentation"
                         }
                     ]
@@ -122,31 +123,20 @@ export default function Chatbot() {
             const relatedLinks = findRelatedDocumentation(inputValue);
 
             // Simulate response generation
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            const result = await chat({
+                message: inputValue,
+                intent: "chat"
+            });
 
-            // Generate a response based on the query
-            let responseContent = "";
+            console.log(result);
 
-            if (inputValue.toLowerCase().includes("how to install") || inputValue.toLowerCase().includes("installation")) {
-                responseContent = "You can install Beaver Social SDK using npm or yarn:\n\n```\nnpm install @beaver/client @beaver/react\n```\n\nFor more details, check out our installation guide.";
-            } else if (inputValue.toLowerCase().includes("react") || inputValue.toLowerCase().includes("hooks")) {
-                responseContent = "The Beaver React SDK provides hooks for easy integration with React applications. The main hooks include useBeaver(), usePost(), useProfile(), and useWallets(). Check the React SDK documentation for more details.";
-            } else if (inputValue.toLowerCase().includes("authentication") || inputValue.toLowerCase().includes("login")) {
-                responseContent = "Beaver Social uses blockchain wallet authentication. You can authenticate users with:\n\n```jsx\nconst { login } = useLogin();\n// Then call login() when needed\n```";
-            } else {
-                responseContent = `I'll help you find information about "${inputValue}". I've provided some related documentation links that might answer your question. Feel free to ask more specific questions!`;
-            }
-
-            // Add AI response
-            const aiMessage: Message = {
-                id: `ai-${Date.now()}`,
-                content: responseContent,
-                role: "ai",
-                timestamp: new Date(),
-                relatedLinks: relatedLinks
-            };
-
-            setMessages(prev => [...prev, aiMessage]);
+            // const aiMessage: Message = {
+            //     id: `ai-${Date.now()}`,
+            //     content: result.response,
+            //     role: "ai",
+            //     timestamp: new Date(),
+            //     relatedLinks: relatedLinks
+            // };
         } catch (error) {
             console.error("Error getting AI response:", error);
             // Handle error - add error message to chat

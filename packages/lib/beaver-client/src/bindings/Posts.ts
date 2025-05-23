@@ -81,7 +81,7 @@ export default class Posts {
           perPage: perPage.toString(),
           authorId: authorId?.toString(),
           parentId: parentId?.toString(),
-          repliesOnly,
+          repliesOnly: repliesOnly ? "true" : "false",
         },
       })
     );
