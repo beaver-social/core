@@ -30,12 +30,14 @@ import { TextShimmer } from "@/pages/landing/ui/text/shimmer";
 import { useNavigate } from "react-router";
 import { useBeaver } from "@beaver/react";
 import { toast } from "sonner";
+import { generateDocContent } from "../utils";
 
 type Message = {
   id: string;
   content: string;
   role: "user" | "ai";
   timestamp: Date;
+  htmlContent?: string;
   relatedLinks?: Array<{
     title: string;
     url: string;
@@ -106,47 +108,18 @@ const MessageItem = React.memo(
 
             <div className="flex-1 min-w-0">
               {isAI ? (
-                <div className="prose prose-invert prose-sm max-w-none prose-pre:bg-zinc-900/90 prose-pre:text-xs prose-pre:border prose-pre:border-zinc-800 prose-pre:overflow-x-auto prose-pre:max-w-full">
-                  {/* Improved markdown-like rendering */}
-                  {message.content.split("\n").map((line, i) => {
-                    // Handle code blocks
-                    if (line.trim().startsWith("```") && line.trim().endsWith("```")) {
-                      const code = line.slice(3, -3).trim();
-                      return (
-                        <pre
-                          key={i}
-                          className="p-3 rounded-md my-2 overflow-x-auto max-w-full bg-zinc-900/90 border border-zinc-800 text-xs"
-                        >
-                          <code className="break-all whitespace-pre-wrap">{code}</code>
-                        </pre>
-                      );
-                    } else if (line.trim().startsWith("```")) {
-                      // Start of multi-line code block
-                      return null; // Handle this in a more sophisticated way if needed
-                    } else if (line.trim().endsWith("```")) {
-                      // End of multi-line code block
-                      return null; // Handle this in a more sophisticated way if needed
-                    } else if (line.trim().startsWith("`") && line.trim().endsWith("`")) {
-                      // Inline code
-                      const code = line.slice(1, -1);
-                      return (
-                        <p key={i} className="break-words">
-                          <code className="bg-zinc-800/60 px-1.5 py-0.5 rounded text-xs break-all">
-                            {code}
-                          </code>
-                        </p>
-                      );
-                    } else if (line.trim()) {
-                      return (
-                        <p key={i} className="break-words whitespace-pre-wrap mb-2 last:mb-0">
-                          {line}
-                        </p>
-                      );
-                    } else {
-                      return <br key={i} />;
-                    }
-                  })}
-                </div>
+                message.htmlContent ? (
+                  // Render parsed HTML for AI messages
+                  <div
+                    className="prose prose-invert prose-sm max-w-none prose-pre:bg-zinc-900/90 prose-pre:text-xs prose-pre:border prose-pre:border-zinc-800 prose-pre:overflow-x-auto prose-pre:max-w-full prose-a:text-blue-400 prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-code:text-amber-400 prose-strong:text-zinc-200 prose-em:text-zinc-300"
+                    dangerouslySetInnerHTML={{ __html: message.htmlContent }}
+                  />
+                ) : (
+                  // Fallback to plain text if HTML parsing failed
+                  <span className="text-foreground break-words whitespace-pre-wrap">
+                    {message.content}
+                  </span>
+                )
               ) : (
                 <span className="text-foreground break-words whitespace-pre-wrap">
                   {message.content}
@@ -221,27 +194,31 @@ export default function Chatbot() {
   // Welcome message when chat opens
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      setMessages([
-        {
-          id: `ai-welcome`,
-          content:
-            "Hi there! I'm Beaver AI, your documentation assistant. Ask me anything about Beaver Social, our SDKs, or how to integrate our platform.",
-          role: "ai",
-          timestamp: new Date(),
-          relatedLinks: [
-            {
-              title: "Quick Start Guide",
-              url: "/docs/getting-started",
-              description: "Get started with Beaver Social quickly",
-            },
-            {
-              title: "SDK Reference",
-              url: "/docs/react-sdk",
-              description: "Comprehensive API documentation",
-            },
-          ],
-        },
-      ]);
+      const welcomeContent = "Hi there! I'm Beaver AI, your documentation assistant. Ask me anything about Beaver Social, our SDKs, or how to integrate our platform.";
+
+      generateDocContent(welcomeContent).then((htmlContent) => {
+        setMessages([
+          {
+            id: `ai-welcome`,
+            content: welcomeContent,
+            htmlContent: htmlContent,
+            role: "ai",
+            timestamp: new Date(),
+            relatedLinks: [
+              {
+                title: "Quick Start Guide",
+                url: "/docs/getting-started",
+                description: "Get started with Beaver Social quickly",
+              },
+              {
+                title: "SDK Reference",
+                url: "/docs/react-sdk",
+                description: "Comprehensive API documentation",
+              },
+            ],
+          },
+        ]);
+      });
     }
   }, [isOpen, messages.length]);
 
@@ -326,23 +303,44 @@ export default function Chatbot() {
       // Find related documentation links
       const relatedLinks = findRelatedDocumentation(message);
 
-      // Simulate response generation
+      // Get AI response
       const result = await chat({
         message,
-        intent: "chat",
+        intent: "dev-ask",
       });
 
       const resultData = await result.json();
 
-      const aiMessage: Message = {
-        id: `ai-${Date.now()}`,
-        content: resultData.message,
-        role: "ai",
-        timestamp: new Date(),
-        relatedLinks: relatedLinks,
-      };
+      // Check if the response was successful
+      if (resultData.success && resultData.message) {
+        // Parse the markdown content to HTML
+        const htmlContent = await generateDocContent(resultData.message);
 
-      setMessages((prev) => [...prev, aiMessage]);
+        const aiMessage: Message = {
+          id: `ai-${Date.now()}`,
+          content: resultData.message,
+          htmlContent: htmlContent,
+          role: "ai",
+          timestamp: new Date(),
+          relatedLinks: relatedLinks,
+        };
+
+        setMessages((prev) => [...prev, aiMessage]);
+      } else {
+        // Handle error response
+        const errorMessage = resultData.success === false ? resultData.error : "Unknown error occurred";
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `ai-error-${Date.now()}`,
+            content: `I'm sorry, I encountered an error: ${errorMessage}. Please try again.`,
+            role: "ai",
+            timestamp: new Date(),
+          },
+        ]);
+      }
+
       setInputValue("");
     } catch (error) {
       console.error("Error getting AI response:", error);
@@ -371,7 +369,7 @@ export default function Chatbot() {
           <span className="relative z-10 flex items-center gap-2">
             <Sparkles className="h-4 w-4 transition-all duration-300 group-hover:text-blue-500" />
             <span className="group-hover:text-blue-400 transition-colors duration-300">
-              Ask AI
+              Ask Ping AI
             </span>
           </span>
           <motion.div
@@ -383,9 +381,9 @@ export default function Chatbot() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-[95vw] md:max-w-[800px] glass bg-background/50 w-[95vw] md:w-[85vw] h-[85vh] md:h-[70vh] p-0 overflow-x-hidden">
+      <DialogContent className="max-w-[95vw] glass bg-background/50 w-[95vw] md:w-[85vw] h-[95vh] p-0 overflow-x-hidden">
         <div className="sr-only">
-          <DialogTitle>Beaver AI</DialogTitle>
+          <DialogTitle>Ping AI</DialogTitle>
           <DialogDescription>
             Ask me anything about Beaver Social, our SDKs, or how to use our
             platform.
