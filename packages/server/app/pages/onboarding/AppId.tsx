@@ -10,10 +10,15 @@ import { toast } from "sonner";
 export default function AppId() {
   const [appName, setAppName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const beaver = useBeaver();
   const navigate = useNavigate();
+
+  const beaver = useBeaver();
   const { mutateAsync: createAppId, isPending: isCreatingAppId } =
     beaver.application.createAppId;
+  const { data: apps, isLoading: isLoadingApps, refetch: refetchApps } =
+    beaver.application.getApplications;
+
+  console.log({ apps });
 
   // Check if user is logged in
   const isLoggedIn = !!beaver.user;
@@ -31,9 +36,7 @@ export default function AppId() {
     try {
       const result = await createAppId({ name: appName });
       toast.success(`AppId: ${result.appId}`);
-      // Handle successful creation - redirect or show ID
-
-      console.log({ result })
+      refetchApps();
     } catch (error) {
       console.error(error);
       toast.error("Failed to create AppId");

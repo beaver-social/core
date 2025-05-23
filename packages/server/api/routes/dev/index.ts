@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { GoogleGenAI } from "@google/genai";
 import env from "../../../env";
 import db from "../../lib/db";
 import authenticated from "../../middlewares/authenticated";
@@ -19,6 +18,8 @@ const app = new Hono()
     if (appId != env.DEFAULT_APPID) {
       return respond.err(ctx, "Very Smart but this won't work", 400);
     }
+
+    await next();
   })
 
   .post(
@@ -45,6 +46,7 @@ const app = new Hono()
       return respond.ok(ctx, app, "New Application Created", 201);
     }
   )
+
   .get("/applications", authenticated, async (ctx) => {
     const { user } = ctx.var;
     const apps = await db
@@ -54,6 +56,7 @@ const app = new Hono()
 
     return respond.ok(ctx, { apps }, "Your Applications", 200);
   })
+
   .get(
     "/applications/:id",
     authenticated,
