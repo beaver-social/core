@@ -43,7 +43,7 @@ export const zSuiSignature = () =>
     .string()
     .regex(/^[A-Za-z0-9+/=]+$/, "Invalid signature: must be a Base64 string");
 
-export const zPingIntents = () => z.enum(["chat"]);
+export const zPingIntents = () => z.enum(["chat", "dev-ask"]);
 
 export const zJwtPayload = () =>
   z.object({
