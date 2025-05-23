@@ -56,7 +56,7 @@ const authenticated = createMiddleware<{
   const user = await tryCatch(getUserFromCtx(ctx));
 
   if (user.error) {
-    ctx.log(user.error);
+    // ctx.log(user.error);
     return respond.err(ctx, user.error.message, 401);
   }
 

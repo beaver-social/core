@@ -10,36 +10,56 @@ import { z } from "zod";
 import { zNumberString, zPingIntents } from "../../lib/zod/helpers";
 import db from "../../lib/db";
 import { and, eq } from "drizzle-orm";
-import authenticated from "../../middlewares/authenticated";
+import authenticated, { getUserFromCtx } from "../../middlewares/authenticated";
 import { stringify } from "../../../utils";
-import { streamText } from "hono/streaming";
-import { generateHash } from "../../lib/utils/utils";
 
 const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
 const { pingChats, pingMessages } = db.schema;
 
-const baseModelName = "gemini-2.0-flash-001";
-
-// const pingCaches: Record<string, string> = {}
+const baseModelName = "gemini-2.0-flash-lite";
 
 const app = new Hono()
   .post(
     "/",
-    authenticated,
     zValidator(
       "json",
       z.object({
         chatId: zNumberString().optional(),
         intent: zPingIntents(),
         message: z.string(),
-      }),
+      })
     ),
     async (ctx) => {
-      const user = ctx.get("user");
+      const { data: user } = await tryCatch(getUserFromCtx(ctx));
       const { chatId, intent, message } = ctx.req.valid("json");
 
       let history: CreateChatParameters["history"] = [];
       let dbChatId = -1;
+
+      const systemInstruction = generateSystemInstruction(intent);
+
+      if (!user) {
+        const res = await tryCatch(
+          ai.models.generateContent({
+            contents: message,
+            model: baseModelName,
+            config: { systemInstruction },
+          })
+        );
+
+        if (res.error) {
+          ctx.log(res.error);
+          return respond.err(ctx, "Failed to send message", 500);
+        }
+        let response = res.data.candidates?.[0].content?.parts;
+
+        return respond.ok(
+          ctx,
+          { response },
+          response?.[0].text || "AI Response",
+          200
+        );
+      }
 
       if (chatId) {
         const [{ intent }] = await db
@@ -71,7 +91,7 @@ const app = new Hono()
               intent,
               label: message.slice(0, Math.min(8, message.length)),
             })
-            .returning({ id: pingChats.id }),
+            .returning({ id: pingChats.id })
         );
 
         if (chatDbError || !chat || !chat[0]) {
@@ -81,23 +101,6 @@ const app = new Hono()
 
         dbChatId = chat[0].id;
       }
-
-      const systemInstruction = generateSystemInstruction(intent);
-
-      // const instructionDigest = generateHash(systemInstruction)
-      // let cacheName = ""
-      // if (instructionDigest in pingCaches) {
-      //   cacheName = pingCaches[instructionDigest]
-      // } else {
-      //   const cachedInstruction = await ai.caches.create({
-      //     model: baseModelName,
-      //     config: {
-      //       systemInstruction,
-      //     },
-      //   });
-      //   if (!cachedInstruction.name) throw "";
-      //   cacheName = cachedInstruction.name
-      // }
 
       const chat = ai.chats.create({
         model: baseModelName,
@@ -127,7 +130,14 @@ const app = new Hono()
         role: "model",
         parts: stringify(response),
       });
-    },
+
+      return respond.ok(
+        ctx,
+        { response },
+        response?.[0].text || "AI Response",
+        200
+      );
+    }
   )
   .get("/chats", authenticated, async (ctx) => {
     const user = ctx.get("user");
@@ -159,7 +169,7 @@ const app = new Hono()
       ctx,
       { ...chat, history: messages },
       "Ping Chat Details",
-      200,
+      200
     );
   });
 
