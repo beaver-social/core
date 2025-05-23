@@ -20,7 +20,7 @@ import Icon from "./shared/components/Icon";
 import NotLoggedInDialog from "./shared/components/NotLoggedInDialog";
 import Landing from "./pages/landing";
 import Docs from "./pages/docs";
-import AppId from "./pages/onboarding/AppId";
+import AppId from "./pages/dev/AppId";
 
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary =
@@ -110,6 +110,10 @@ export default function () {
         <Route path="/" element={withPageErrorBoundary(Landing)({})} />
         <Route path="/demo" element={withPageErrorBoundary(Demo)({})} />
         <Route path="/docs/*" element={withPageErrorBoundary(Docs)({})} />
+        <Route
+          path="/dev/appid"
+          element={withPageErrorBoundary(AppId)({})}
+        />
 
         {/* Onboarding routes - special handling for wallet setup */}
         <Route
@@ -118,10 +122,6 @@ export default function () {
             <OnboardingProtection>
               <Routes>
                 <Route index element={withPageErrorBoundary(Onboarding)({})} />
-                <Route
-                  path="appid"
-                  element={withPageErrorBoundary(AppId)({})}
-                />
               </Routes>
             </OnboardingProtection>
           }

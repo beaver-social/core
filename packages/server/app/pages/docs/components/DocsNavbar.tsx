@@ -40,7 +40,7 @@ export function DocsNavbar({ data }: Props) {
           <motion.button
             className="rounded-sm bg-zinc-800/20 px-6 py-2 text-md text-white hover:bg-zinc-800/40 border border-zinc-700/50 hover:border-purple-400/50 font-semibold flex gap-2 items-center transition-all"
             whileTap={{ scale: 0.97 }}
-            onClick={() => navigate("/onboarding/appid")}
+            onClick={() => navigate("/dev/appid")}
           >
             <Icon name="Zap" className="w-4 h-4 text-blue-400" />
 
