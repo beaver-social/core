@@ -9,6 +9,7 @@ export function useBeaver() {
   const profile = useProfile();
   const docs = useDocs();
   const auth = useAuth();
+  const ping = usePing();
 
   return {
     register: client.user.register.bind(client.user),
@@ -22,6 +23,7 @@ export function useBeaver() {
     post,
     profile,
     docs,
+    ping,
   };
 }
 
@@ -296,5 +298,33 @@ export function useDocs() {
         },
       });
     },
+  };
+}
+
+export function usePing() {
+  const { client } = useBeaverContext();
+
+  return {
+    chat: useMutation({
+      mutationKey: ["chat"],
+      mutationFn: async (options: Parameters<typeof client.ping.chat>[0]) => {
+        return await client.ping.chat(options);
+      },
+    }),
+
+    getAllChats: useQuery({
+      queryKey: ["getAllChats"],
+      queryFn: async () => {
+        return await client.ping.getAllChats();
+      },
+    }),
+
+    getChatById: (options: Parameters<typeof client.ping.getChatById>[0]) =>
+      useQuery({
+        queryKey: ["getChatById", options],
+        queryFn: async () => {
+          return await client.ping.getChatById(options);
+        },
+      }),
   };
 }
