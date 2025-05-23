@@ -11,7 +11,7 @@ Beaver Social is a Web3 Social Network Layer built on the Sui Blockchain. It pro
 
 Before getting started, make sure you have:
 
-- You will need to acquire an AppID to start developing with Beaver. [Get your AppID](https://beaver.social/appid)
+- You will need to acquire an AppID to start developing with Beaver. [Get your AppID](/dev/appid)
 
 ## Installation Options
 
@@ -67,6 +67,7 @@ function App() {
           zkLoginWallets: {
             enabled: true,
           },
+          appId: "your-app-id",
         }}
       >
         <YourApp />
@@ -230,7 +231,7 @@ function PostComposer() {
         onSuccess: () => {
           setContent(""); // Clear the input on success
         },
-      },
+      }
     );
   };
 

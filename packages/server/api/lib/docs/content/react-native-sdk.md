@@ -32,6 +32,7 @@ function App() {
             deepLinkOptions: {}, // Optional deep linking configuration
           },
           debug: true, // Optional: enables SDK logging
+          appId: "your-app-id",
         }}
       >
         <YourApp />
@@ -490,7 +491,7 @@ function ErrorHandlingExample() {
                 console.error("Post creation failed:", error);
                 Alert.alert("Error", error.message);
               },
-            },
+            }
           )
         }
       />
