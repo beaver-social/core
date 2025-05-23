@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { GoogleGenAI } from "@google/genai";
 import env from "../../../env";
 import db from "../../lib/db";
 import authenticated from "../../middlewares/authenticated";
@@ -19,6 +18,8 @@ const app = new Hono()
     if (appId != env.DEFAULT_APPID) {
       return respond.err(ctx, "Very Smart but this won't work", 400);
     }
+
+    return await next();
   })
 
   .post(
