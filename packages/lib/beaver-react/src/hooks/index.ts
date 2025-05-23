@@ -10,6 +10,7 @@ export function useBeaver() {
   const docs = useDocs();
   const auth = useAuth();
   const ping = usePing();
+  const application = useApplication();
 
   return {
     register: client.user.register.bind(client.user),
@@ -24,6 +25,7 @@ export function useBeaver() {
     profile,
     docs,
     ping,
+    application,
   };
 }
 
@@ -92,7 +94,7 @@ export function useFollow() {
     followUser: useMutation({
       mutationKey: ["followUser"],
       mutationFn: async (
-        data: Parameters<typeof client.user.followUser>[0],
+        data: Parameters<typeof client.user.followUser>[0]
       ) => {
         return await client.user.followUser(data);
       },
@@ -100,13 +102,13 @@ export function useFollow() {
     unfollowUser: useMutation({
       mutationKey: ["unfollowUser"],
       mutationFn: async (
-        data: Parameters<typeof client.user.unfollowUser>[0],
+        data: Parameters<typeof client.user.unfollowUser>[0]
       ) => {
         return await client.user.unfollowUser(data);
       },
     }),
     getFollowCount: (
-      options: Parameters<typeof client.user.getFollowCount>[0],
+      options: Parameters<typeof client.user.getFollowCount>[0]
     ) =>
       useQuery({
         queryKey: ["getFollowCount", options],
@@ -138,7 +140,7 @@ export function usePost() {
     createPost: useMutation({
       mutationKey: ["createPost"],
       mutationFn: async (
-        options: Parameters<typeof client.posts.createPost>[0],
+        options: Parameters<typeof client.posts.createPost>[0]
       ) => {
         return await client.posts.createPost(options);
       },
@@ -171,7 +173,7 @@ export function usePost() {
         },
       }),
     getFollowingPosts: (
-      options?: Parameters<typeof client.posts.getFollowingPosts>[0],
+      options?: Parameters<typeof client.posts.getFollowingPosts>[0]
     ) =>
       useQuery({
         queryKey: ["getFollowingPosts", options],
@@ -189,7 +191,7 @@ export function usePost() {
     likePost: useMutation({
       mutationKey: ["likePost"],
       mutationFn: async (
-        options: Parameters<typeof client.posts.likePost>[0],
+        options: Parameters<typeof client.posts.likePost>[0]
       ) => {
         return await client.posts.likePost(options);
       },
@@ -197,7 +199,7 @@ export function usePost() {
     unlikePost: useMutation({
       mutationKey: ["unlikePost"],
       mutationFn: async (
-        options: Parameters<typeof client.posts.unlikePost>[0],
+        options: Parameters<typeof client.posts.unlikePost>[0]
       ) => {
         return await client.posts.unlikePost(options);
       },
@@ -205,7 +207,7 @@ export function usePost() {
     bookmarkPost: useMutation({
       mutationKey: ["bookmarkPost"],
       mutationFn: async (
-        options: Parameters<typeof client.posts.bookmarkPost>[0],
+        options: Parameters<typeof client.posts.bookmarkPost>[0]
       ) => {
         return await client.posts.bookmarkPost(options);
       },
@@ -213,7 +215,7 @@ export function usePost() {
     unbookmarkPost: useMutation({
       mutationKey: ["unbookmarkPost"],
       mutationFn: async (
-        options: Parameters<typeof client.posts.unbookmarkPost>[0],
+        options: Parameters<typeof client.posts.unbookmarkPost>[0]
       ) => {
         return await client.posts.unbookmarkPost(options);
       },
@@ -226,7 +228,7 @@ export function usePost() {
         },
       }),
     getPostReplies: (
-      options: Parameters<typeof client.posts.getPostReplies>[0],
+      options: Parameters<typeof client.posts.getPostReplies>[0]
     ) =>
       useQuery({
         queryKey: ["getPostReplies", options],
@@ -235,7 +237,7 @@ export function usePost() {
         },
       }),
     getPostReposts: (
-      options: Parameters<typeof client.posts.getPostReposts>[0],
+      options: Parameters<typeof client.posts.getPostReposts>[0]
     ) =>
       useQuery({
         queryKey: ["getPostReposts", options],
@@ -244,7 +246,7 @@ export function usePost() {
         },
       }),
     getUserPostInteraction: (
-      options: Parameters<typeof client.posts.getUserPostInteraction>[0],
+      options: Parameters<typeof client.posts.getUserPostInteraction>[0]
     ) =>
       useQuery({
         queryKey: ["getPostInteracted", options],
@@ -267,7 +269,7 @@ export function useProfile() {
         },
       }),
     searchSuggestions: (
-      options: Parameters<typeof client.user.searchSuggestions>[0],
+      options: Parameters<typeof client.user.searchSuggestions>[0]
     ) =>
       useQuery({
         queryKey: ["searchSuggestions", options],
@@ -326,5 +328,48 @@ export function usePing() {
           return await client.ping.getChatById(options);
         },
       }),
+  };
+}
+
+export function useApplication() {
+  const { client } = useBeaverContext();
+
+  return {
+    createAppId: useMutation({
+      mutationKey: ["createAppId"],
+      mutationFn: async (
+        options: Parameters<typeof client.application.createAppId>[0]
+      ) => {
+        return await client.application.createAppId(options);
+      },
+    }),
+
+    getApplications: useQuery({
+      queryKey: ["getApplications"],
+      queryFn: async () => {
+        return await client.application.getApplications();
+      },
+    }),
+
+    getApplicationById: (
+      options: Parameters<typeof client.application.getApplicationById>[0]
+    ) =>
+      useQuery({
+        queryKey: ["getApplicationById", options],
+        queryFn: async () => {
+          return await client.application.getApplicationById(options);
+        },
+      }),
+
+    whitelistApplicationUrls: useMutation({
+      mutationKey: ["whitelistApplicationUrls"],
+      mutationFn: async (
+        options: Parameters<
+          typeof client.application.whitelistApplicationUrls
+        >[0]
+      ) => {
+        return await client.application.whitelistApplicationUrls(options);
+      },
+    }),
   };
 }

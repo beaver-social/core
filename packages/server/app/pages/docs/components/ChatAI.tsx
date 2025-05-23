@@ -90,62 +90,67 @@ const MessageItem = React.memo(
         transition={{ duration: 0.3 }}
       >
         <div
-          className={`relative max-w-[90%] md:max-w-[80%] p-4 rounded-2xl ${
-            isAI
-              ? "bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20"
-              : "bg-gradient-to-br from-blue-600/20 to-indigo-600/20 text-right border border-indigo-500/20"
-          }`}
+          className={`relative max-w-[85%] md:max-w-[75%] p-4 rounded-2xl ${isAI
+            ? "bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20"
+            : "bg-gradient-to-br from-blue-600/20 to-indigo-600/20 text-right border border-indigo-500/20"
+            }`}
         >
           {isAI && <MorphingBubble />}
 
           <div className="flex items-start gap-2">
             {isAI && (
-              <div className="bg-blue-500/20 p-1.5 rounded-full">
+              <div className="bg-blue-500/20 p-1.5 rounded-full flex-shrink-0">
                 <Bot size={16} className="text-blue-500" />
               </div>
             )}
 
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               {isAI ? (
-                <div className="prose prose-invert prose-sm max-w-none prose-pre:bg-zinc-900/90 prose-pre:text-xs prose-pre:border prose-pre:border-zinc-800">
-                  {/* Simple markdown-like rendering */}
+                <div className="prose prose-invert prose-sm max-w-none prose-pre:bg-zinc-900/90 prose-pre:text-xs prose-pre:border prose-pre:border-zinc-800 prose-pre:overflow-x-auto prose-pre:max-w-full">
+                  {/* Improved markdown-like rendering */}
                   {message.content.split("\n").map((line, i) => {
-                    if (line.startsWith("") && line.endsWith("")) {
+                    // Handle code blocks
+                    if (line.trim().startsWith("```") && line.trim().endsWith("```")) {
+                      const code = line.slice(3, -3).trim();
                       return (
                         <pre
                           key={i}
-                          className="p-2 rounded my-2 overflow-x-auto"
+                          className="p-3 rounded-md my-2 overflow-x-auto max-w-full bg-zinc-900/90 border border-zinc-800 text-xs"
                         >
-                          {line.slice(3, -3)}
+                          <code className="break-all whitespace-pre-wrap">{code}</code>
                         </pre>
                       );
-                    } else if (line.startsWith("")) {
-                      // Start of code block
+                    } else if (line.trim().startsWith("```")) {
+                      // Start of multi-line code block
+                      return null; // Handle this in a more sophisticated way if needed
+                    } else if (line.trim().endsWith("```")) {
+                      // End of multi-line code block
+                      return null; // Handle this in a more sophisticated way if needed
+                    } else if (line.trim().startsWith("`") && line.trim().endsWith("`")) {
+                      // Inline code
+                      const code = line.slice(1, -1);
                       return (
-                        <pre
-                          key={i}
-                          className="p-2 rounded my-2 overflow-x-auto"
-                        >
-                          {line.slice(3)}
-                        </pre>
+                        <p key={i} className="break-words">
+                          <code className="bg-zinc-800/60 px-1.5 py-0.5 rounded text-xs break-all">
+                            {code}
+                          </code>
+                        </p>
                       );
-                    } else if (line.endsWith("")) {
-                      // End of code block
+                    } else if (line.trim()) {
                       return (
-                        <pre
-                          key={i}
-                          className="p-2 rounded my-2 overflow-x-auto"
-                        >
-                          {line.slice(0, -3)}
-                        </pre>
+                        <p key={i} className="break-words whitespace-pre-wrap mb-2 last:mb-0">
+                          {line}
+                        </p>
                       );
                     } else {
-                      return <p key={i}>{line}</p>;
+                      return <br key={i} />;
                     }
                   })}
                 </div>
               ) : (
-                <span className="text-foreground">{message.content}</span>
+                <span className="text-foreground break-words whitespace-pre-wrap">
+                  {message.content}
+                </span>
               )}
 
               {isAI &&
@@ -153,7 +158,7 @@ const MessageItem = React.memo(
                 message.relatedLinks.length > 0 && (
                   <div className="mt-3 pt-3 border-t border-blue-500/10">
                     <div className="text-xs text-blue-400 mb-2 flex items-center gap-1">
-                      <BookOpen size={12} />
+                      <BookOpen size={12} className="flex-shrink-0" />
                       <span>Related Documentation</span>
                     </div>
                     <div className="flex flex-col gap-2">
@@ -161,18 +166,18 @@ const MessageItem = React.memo(
                         <button
                           key={index}
                           onClick={() => onNavigateToLink(link.url)}
-                          className="text-left text-sm p-2 rounded bg-blue-500/10 hover:bg-blue-500/20 transition-colors flex items-start gap-2"
+                          className="text-left text-sm p-2 rounded bg-blue-500/10 hover:bg-blue-500/20 transition-colors flex items-start gap-2 w-full min-w-0"
                         >
                           <FileCode
                             size={14}
-                            className="mt-0.5 text-blue-400"
+                            className="mt-0.5 text-blue-400 flex-shrink-0"
                           />
-                          <div>
-                            <div className="font-medium text-blue-300">
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-blue-300 break-words">
                               {link.title}
                             </div>
                             {link.description && (
-                              <div className="text-xs text-zinc-400">
+                              <div className="text-xs text-zinc-400 break-words">
                                 {link.description}
                               </div>
                             )}
@@ -378,7 +383,7 @@ export default function Chatbot() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-[800px] glass bg-background/50 w-[90vw] md:w-[85vw] h-[80vh] md:h-[70vh] p-0 overflow-y-scroll no-scrollbar">
+      <DialogContent className="max-w-[95vw] md:max-w-[800px] glass bg-background/50 w-[95vw] md:w-[85vw] h-[85vh] md:h-[70vh] p-0 overflow-hidden">
         <div className="sr-only">
           <DialogTitle>Beaver AI</DialogTitle>
           <DialogDescription>
@@ -390,16 +395,16 @@ export default function Chatbot() {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="p-4 sticky top-0 border-b flex items-center justify-between backdrop-blur-sm bg-background/80 z-10">
-            <div className="flex items-center gap-2">
-              <div className="bg-blue-500/20 p-1.5 rounded-full">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <div className="bg-blue-500/20 p-1.5 rounded-full flex-shrink-0">
                 <Bot size={18} className="text-blue-500" />
               </div>
-              <TextShimmer className="text-xl font-medium" duration={5}>
+              <TextShimmer className="text-xl font-medium truncate" duration={5}>
                 Beaver AI
               </TextShimmer>
             </div>
             <DialogClose asChild>
-              <Button variant="ghost" size="icon" className="rounded-full">
+              <Button variant="ghost" size="icon" className="rounded-full flex-shrink-0">
                 <X className="h-4 w-4" />
               </Button>
             </DialogClose>
@@ -436,7 +441,7 @@ export default function Chatbot() {
                   Ask me anything about Beaver Social, our SDKs, or how to use
                   our platform.
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 w-full max-w-md">
+                <div className="flex flex-col gap-2 mt-2 w-full max-w-sm px-4">
                   {[
                     "How do I install Beaver SDK?",
                     "How to authenticate users?",
@@ -444,7 +449,7 @@ export default function Chatbot() {
                   ].map((question, i) => (
                     <button
                       key={i}
-                      className="text-sm p-2 rounded-md bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors text-left flex items-center gap-2"
+                      className="text-sm p-3 rounded-md bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 transition-colors text-left flex items-center gap-2 w-full break-words"
                       onClick={() => {
                         setInputValue(question);
                         setTimeout(() => {
@@ -454,8 +459,8 @@ export default function Chatbot() {
                         }, 100);
                       }}
                     >
-                      <Search className="h-3 w-3" />
-                      {question}
+                      <Search className="h-3 w-3 flex-shrink-0" />
+                      <span className="break-words">{question}</span>
                     </button>
                   ))}
                 </div>
@@ -491,7 +496,7 @@ export default function Chatbot() {
                 name="message"
                 id="message"
                 placeholder="Ask me anything about Beaver Social..."
-                className="pr-12 min-h-[60px] max-h-[120px] resize-none bg-background/50 border-blue-500/20 focus-visible:ring-blue-500/30"
+                className="pr-12 min-h-[60px] max-h-[120px] resize-none bg-background/50 border-blue-500/20 focus-visible:ring-blue-500/30 w-full"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
               />
@@ -499,7 +504,7 @@ export default function Chatbot() {
                 type="submit"
                 size="icon"
                 disabled={isChatPending || !inputValue.trim()}
-                className="absolute right-2 bottom-2 h-8 w-8 bg-blue-500/80 hover:bg-blue-500 transition-colors"
+                className="absolute right-2 bottom-2 h-8 w-8 bg-blue-500/80 hover:bg-blue-500 transition-colors flex-shrink-0"
               >
                 {isChatPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

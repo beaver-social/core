@@ -12,6 +12,8 @@ export default function AppId() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const beaver = useBeaver();
   const navigate = useNavigate();
+  const { mutateAsync: createAppId, isPending: isCreatingAppId } =
+    beaver.application.createAppId;
 
   // Check if user is logged in
   const isLoggedIn = !!beaver.user;
@@ -19,20 +21,19 @@ export default function AppId() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!appName.trim()) {
-      toast.error("Please enter an app name");
+    if (!appName.trim() || appName.trim().length < 3) {
+      toast.error("Please enter an app name with at least 3 characters");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Placeholder for API call to request AppId
-      // Replace with actual implementation
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      toast.success("AppId created successfully!");
+      const result = await createAppId({ name: appName });
+      toast.success(`AppId: ${result.appId}`);
       // Handle successful creation - redirect or show ID
+
+      console.log({ result })
     } catch (error) {
       console.error(error);
       toast.error("Failed to create AppId");
