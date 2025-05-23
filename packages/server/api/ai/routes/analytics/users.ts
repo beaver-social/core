@@ -11,6 +11,6 @@ export default new Hono()
     const user = ctx.get("user");
 
     const result = await tryCatch(
-      db.select().from(users).where(eq(users.id, user.id))
+      db.select().from(users).where(eq(users.id, user.id)),
     );
   });

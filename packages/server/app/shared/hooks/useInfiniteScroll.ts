@@ -18,7 +18,7 @@ export default function useInfiniteScroll({
         fetchNextPage();
       }
     },
-    [fetchNextPage, hasNextPage]
+    [fetchNextPage, hasNextPage],
   );
 
   useEffect(() => {

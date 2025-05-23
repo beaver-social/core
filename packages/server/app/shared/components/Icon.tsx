@@ -4,13 +4,7 @@ import React from "react";
 interface IIconProps {
   name: keyof typeof icons;
   color?: string;
-  weight?:
-  | "thin"
-  | "light"
-  | "normal"
-  | "medium"
-  | "semibold"
-  | "bold";
+  weight?: "thin" | "light" | "normal" | "medium" | "semibold" | "bold";
   className?: string;
   fill?: string;
 }

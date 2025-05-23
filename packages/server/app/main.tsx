@@ -15,8 +15,8 @@ import { BeaverProvider } from "@beaver/react";
 
 const queryClient = new QueryClient();
 queryClient.defaultMutationOptions({
-  onError: ({ error }) => toast(error)
-})
+  onError: ({ error }) => toast(error),
+});
 const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error("Failed to find the root element");
 
@@ -36,7 +36,7 @@ function App() {
                   apiBaseUrl: "http://localhost:9090/api/v1",
                   zkLoginWallets: {
                     enabled: true,
-                  }
+                  },
                 }}
               >
                 <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">

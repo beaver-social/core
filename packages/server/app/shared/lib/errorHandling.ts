@@ -24,7 +24,7 @@ export const safeExecute = <T>(fn: () => T, fallback: T): T => {
 export const safeMap = <T, R>(
   items: T[] | undefined | null,
   mapFn: (item: T, index: number) => R,
-  fallback: R[] = []
+  fallback: R[] = [],
 ): R[] => {
   if (!items) return fallback;
 

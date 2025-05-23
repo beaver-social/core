@@ -31,7 +31,7 @@ export const likes = table(
       .on(table.contentId, table.userId, table.contentTypeId),
     t.index("content_like_idx").on(table.contentId, table.contentTypeId),
     t.index("user_like_idx").on(table.userId),
-  ]
+  ],
 );
 
 // Saves for posts and shorts
@@ -56,7 +56,7 @@ export const saves = table(
       .on(table.contentId, table.userId, table.contentTypeId),
     t.index("content_save_idx").on(table.contentId, table.contentTypeId),
     t.index("user_save_idx").on(table.userId),
-  ]
+  ],
 );
 
 // Comments for swipes only
@@ -81,7 +81,7 @@ export const comments = table(
     t.index("content_comment_idx").on(table.contentId, table.contentTypeId),
     t.index("user_comment_idx").on(table.userId),
     t.index("parent_comment_idx").on(table.parentId),
-  ]
+  ],
 );
 
 // Reposts for posts and shorts
@@ -98,5 +98,5 @@ export const reposts = table(
   (table) => [
     t.index("content_repost_idx").on(table.contentId, table.contentTypeId),
     t.index("user_repost_idx").on(table.userId),
-  ]
+  ],
 );

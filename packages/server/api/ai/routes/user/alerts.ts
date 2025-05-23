@@ -116,5 +116,5 @@ export default new Hono()
           suggestions: [],
           message: "Get mention suggestions",
         });
-      })
+      }),
   );

@@ -15,7 +15,7 @@ export const likes = t.sqliteTable(
       .references(() => posts.id)
       .notNull(),
   },
-  (table) => [t.uniqueIndex("user_post_idx").on(table.userId, table.postId)]
+  (table) => [t.uniqueIndex("user_post_idx").on(table.userId, table.postId)],
 );
 
 export const bookmarks = t.sqliteTable(
@@ -31,5 +31,7 @@ export const bookmarks = t.sqliteTable(
       .references(() => posts.id)
       .notNull(),
   },
-  (table) => [t.uniqueIndex("user_bookmark_idx").on(table.userId, table.postId)]
+  (table) => [
+    t.uniqueIndex("user_bookmark_idx").on(table.userId, table.postId),
+  ],
 );

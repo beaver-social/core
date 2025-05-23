@@ -110,7 +110,7 @@ class Contracts {
          */
         switchOwner: (
           tx: Transaction,
-          args: { identityRegistration: MoveKey; suinsRegistration: MoveKey }
+          args: { identityRegistration: MoveKey; suinsRegistration: MoveKey },
         ) => {
           const registry = tx.object(this.config.objects.registry.id);
           const identity = tx.object(args.identityRegistration.id);
@@ -191,7 +191,7 @@ class Contracts {
           args: {
             identityRegistration: MoveKey;
             suinsRegistration: MoveKey;
-          }
+          },
         ) => {
           const identity = tx.object(args.identityRegistration.id);
           const suins = tx.object(args.suinsRegistration.id);
@@ -211,7 +211,7 @@ class Contracts {
          */
         setAbout: (
           tx: Transaction,
-          args: { identityRegistration: MoveKey; about: string }
+          args: { identityRegistration: MoveKey; about: string },
         ) => {
           const identity = tx.object(args.identityRegistration.id);
 
@@ -269,7 +269,7 @@ class Contracts {
          */
         elevate: (
           tx: Transaction,
-          args: { adminCap: MoveKey; receiver: string }
+          args: { adminCap: MoveKey; receiver: string },
         ) => {
           const adminsRecord = tx.object(this.config.objects.adminsRecord.id);
           const adminCap = tx.object(args.adminCap.id);
@@ -301,7 +301,7 @@ class Contracts {
             username: string;
             about: string;
             receiver: string;
-          }
+          },
         ) => {
           const adminCap = tx.object(args.adminCap.id);
           const adminsRecord = tx.object(this.config.objects.adminsRecord.id);
@@ -335,7 +335,7 @@ class Contracts {
           args: {
             adminCap: MoveKey;
             newValidator: Uint8Array;
-          }
+          },
         ) => {
           const postsRegistry = tx.object(this.config.objects.postsRegistry.id);
           const adminCap = tx.object(args.adminCap.id);
@@ -344,7 +344,7 @@ class Contracts {
           tx.moveCall({
             target: `${this.config.packageId}::admin::set_posts_validator`,
             arguments: [
-              postsRegistry, 
+              postsRegistry,
               tx.pure(args.newValidator),
               adminCap,
               adminsRecord,
@@ -367,7 +367,7 @@ class Contracts {
             adminCap: MoveKey;
             name: string;
             cost: number;
-          }
+          },
         ) => {
           const adminCap = tx.object(args.adminCap.id);
           const adminsRecord = tx.object(this.config.objects.adminsRecord.id);
@@ -398,7 +398,7 @@ class Contracts {
           args: {
             adminCap: MoveKey;
             index: number;
-          }
+          },
         ) => {
           const adminCap = tx.object(args.adminCap.id);
           const adminsRecord = tx.object(this.config.objects.adminsRecord.id);
@@ -425,7 +425,7 @@ class Contracts {
          */
         revoke: (
           tx: Transaction,
-          args: { adminCap: MoveKey; adminCapIdToRevoke: string }
+          args: { adminCap: MoveKey; adminCapIdToRevoke: string },
         ) => {
           const adminCap = tx.object(args.adminCap.id);
           const adminsRecord = tx.object(this.config.objects.adminsRecord.id);
@@ -468,7 +468,7 @@ class Contracts {
             content: string;
             attested: Uint8Array;
             collection: MoveKey;
-          }
+          },
         ) => {
           const postsRegistry = tx.object(this.config.objects.postsRegistry.id);
           const identity = tx.object(args.identityRegistration.id);
@@ -582,7 +582,7 @@ class Contracts {
             awardType: number;
             // payment: MoveKey;
             postId: number;
-          }
+          },
         ) => {
           const awardsData = tx.object(this.config.objects.awardsData.id);
           const registry = tx.object(this.config.objects.registry.id);

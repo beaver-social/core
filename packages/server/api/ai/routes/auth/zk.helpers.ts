@@ -20,7 +20,7 @@ export function deriveUserSalt(jwt: z.infer<typeof zJwt>): Uint8Array {
 
   const OAUTH_SALT_MASTER_SEED = Buffer.from(
     process.env.OAUTH_SALT_MASTER_SEED,
-    "hex"
+    "hex",
   );
 
   // Implement HKDF-like derivation

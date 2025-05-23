@@ -51,7 +51,7 @@ export default class User {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -65,7 +65,7 @@ export default class User {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -113,14 +113,14 @@ export default class User {
     const { apiClient } = this.defaults;
 
     return safeParseResponse(
-      apiClient.user.find.$get({ query: { ...options } })
+      apiClient.user.find.$get({ query: { ...options } }),
     );
   }
 
   public async uploadImage(image: File) {
     const { apiClient } = this.defaults;
     return safeParseResponse(
-      apiClient.misc.upload.image.$post({ form: { file: image } })
+      apiClient.misc.upload.image.$post({ form: { file: image } }),
     );
   }
 
@@ -136,7 +136,7 @@ export default class User {
       | "reposts"
       | "comments"
       | "follows"
-      | "topicFollows"
+      | "topicFollows",
   >(options: { page?: number; limit?: number; type: T }) {
     const { apiClient } = this.defaults;
     const { page, limit, type } = options;
@@ -148,7 +148,7 @@ export default class User {
           page: page ? page.toString() : "1",
           limit: limit ? limit.toString() : "10",
         },
-      }) as Promise<any>
+      }) as Promise<any>,
     );
   }
 
@@ -166,7 +166,7 @@ export default class User {
           page: page ? page.toString() : "1",
           limit: limit ? limit.toString() : "10",
         },
-      })
+      }),
     );
   }
 
@@ -190,7 +190,7 @@ export default class User {
           limit: limit ? limit.toString() : "10",
           type,
         },
-      })
+      }),
     );
   }
 }

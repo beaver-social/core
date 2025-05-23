@@ -60,7 +60,10 @@ export const unfollowUser = createAction<
   await tx
     .delete(follows)
     .where(
-      and(eq(follows.followerId, user.id), eq(follows.followingId, followingId))
+      and(
+        eq(follows.followerId, user.id),
+        eq(follows.followingId, followingId),
+      ),
     );
 });
 

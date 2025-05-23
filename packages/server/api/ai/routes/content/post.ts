@@ -32,7 +32,7 @@ export default new Hono()
       z.object({
         page: zNumberString,
         limit: zNumberString,
-      })
+      }),
     ),
     async (ctx) => {
       const { page, limit } = ctx.req.valid("query");
@@ -46,14 +46,14 @@ export default new Hono()
           .orderBy(desc(posts.likesCount))
           .limit(limit)
           .offset(offset)
-          .leftJoin(media, eq(posts.id, media.contentId))
+          .leftJoin(media, eq(posts.id, media.contentId)),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to get posts feed",
-          400
+          400,
         );
       }
 
@@ -61,9 +61,9 @@ export default new Hono()
         ctx,
         { posts: result.data },
         "Posts feed fetched successfully",
-        200
+        200,
       );
-    }
+    },
   )
   // Get single post by id
   .get(
@@ -78,14 +78,14 @@ export default new Hono()
           .from(posts)
           .where(eq(posts.id, postId))
           .limit(1)
-          .leftJoin(media, eq(posts.id, media.contentId))
+          .leftJoin(media, eq(posts.id, media.contentId)),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to get post details",
-          400
+          400,
         );
       }
 
@@ -97,9 +97,9 @@ export default new Hono()
         ctx,
         result.data[0],
         "Post details fetched successfully",
-        200
+        200,
       );
-    }
+    },
   )
   // Get interaction by type for a post
   .get(
@@ -107,7 +107,7 @@ export default new Hono()
     zValidator("param", z.object({ id: zNumberString })),
     zValidator(
       "query",
-      z.object({ type: z.enum(["likes", "replies", "reposts"]) })
+      z.object({ type: z.enum(["likes", "replies", "reposts"]) }),
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
@@ -115,14 +115,14 @@ export default new Hono()
 
       if (type === "likes") {
         const result = await tryCatch(
-          db.select().from(likes).where(eq(likes.contentTypeId, postId))
+          db.select().from(likes).where(eq(likes.contentTypeId, postId)),
         );
 
         if (result.error) {
           return respond.err(
             ctx,
             result.error?.message || "Failed to get likes",
-            400
+            400,
           );
         }
 
@@ -130,18 +130,18 @@ export default new Hono()
           ctx,
           { likes: result.data },
           "Likes fetched successfully",
-          200
+          200,
         );
       } else if (type === "replies") {
         const result = await tryCatch(
-          db.select().from(posts).where(eq(posts.parentId, postId))
+          db.select().from(posts).where(eq(posts.parentId, postId)),
         );
 
         if (result.error) {
           return respond.err(
             ctx,
             result.error?.message || "Failed to get replies",
-            400
+            400,
           );
         }
 
@@ -149,7 +149,7 @@ export default new Hono()
           ctx,
           { replies: result.data },
           "Replies fetched successfully",
-          200
+          200,
         );
       } else if (type === "reposts") {
         const result = await tryCatch(
@@ -157,15 +157,15 @@ export default new Hono()
             .select()
             .from(reposts)
             .where(
-              and(eq(reposts.contentId, postId), eq(reposts.contentTypeId, 0))
-            )
+              and(eq(reposts.contentId, postId), eq(reposts.contentTypeId, 0)),
+            ),
         );
 
         if (result.error) {
           return respond.err(
             ctx,
             result.error?.message || "Failed to get reposts",
-            400
+            400,
           );
         }
 
@@ -173,10 +173,10 @@ export default new Hono()
           ctx,
           { reposts: result.data },
           "Reposts fetched successfully",
-          200
+          200,
         );
       }
-    }
+    },
   )
   // Get post awards
   .get(
@@ -187,7 +187,7 @@ export default new Hono()
       z.object({
         page: zNumberString,
         limit: zNumberString,
-      })
+      }),
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
@@ -201,14 +201,14 @@ export default new Hono()
           .where(eq(postAwards.postId, postId))
           .orderBy(desc(postAwards.createdAt))
           .limit(limit)
-          .offset(offset)
+          .offset(offset),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to get post awards",
-          400
+          400,
         );
       }
 
@@ -216,9 +216,9 @@ export default new Hono()
         ctx,
         { awards: result.data },
         "Post awards fetched successfully",
-        200
+        200,
       );
-    }
+    },
   )
 
   /**
@@ -234,7 +234,7 @@ export default new Hono()
         page: zNumberString,
         limit: zNumberString,
         type: z.enum(["following", "for_you"]),
-      })
+      }),
     ),
     async (ctx) => {
       const userId = ctx.get("user").id;
@@ -254,19 +254,19 @@ export default new Hono()
             .select()
             .from(posts)
             .where(
-              inArray(posts.authorId, followingIds) && isNull(posts.parentId)
+              inArray(posts.authorId, followingIds) && isNull(posts.parentId),
             )
             .orderBy(desc(posts.createdAt))
             .limit(limit)
             .offset(offset)
-            .leftJoin(media, eq(posts.id, media.contentId))
+            .leftJoin(media, eq(posts.id, media.contentId)),
         );
 
         if (followingPosts.error) {
           return respond.err(
             ctx,
             followingPosts.error?.message || "Failed to get posts feed",
-            400
+            400,
           );
         }
 
@@ -274,7 +274,7 @@ export default new Hono()
           ctx,
           { posts: followingPosts.data },
           "Posts feed fetched successfully",
-          200
+          200,
         );
       } else if (type === "for_you") {
         // curated for you (future implementation)
@@ -286,14 +286,14 @@ export default new Hono()
             .orderBy(sql`RAND()`)
             .limit(limit)
             .offset(offset)
-            .leftJoin(media, eq(posts.id, media.contentId))
+            .leftJoin(media, eq(posts.id, media.contentId)),
         );
 
         if (result.error) {
           return respond.err(
             ctx,
             result.error?.message || "Failed to get posts feed",
-            400
+            400,
           );
         }
 
@@ -301,10 +301,10 @@ export default new Hono()
           ctx,
           { posts: result.data },
           "Posts feed fetched successfully",
-          200
+          200,
         );
       }
-    }
+    },
   )
   // Get posts where author is the user
   .get(
@@ -321,7 +321,7 @@ export default new Hono()
           "your-saved",
           "your-pinned",
         ]),
-      })
+      }),
     ),
     async (ctx) => {
       const userId = ctx.get("user").id;
@@ -336,14 +336,14 @@ export default new Hono()
             .where(eq(posts.authorId, userId))
             .orderBy(desc(posts.createdAt))
             .limit(limit)
-            .offset(offset)
+            .offset(offset),
         );
 
         if (result.error) {
           return respond.err(
             ctx,
             result.error?.message || "Failed to get posts",
-            400
+            400,
           );
         }
 
@@ -351,7 +351,7 @@ export default new Hono()
           ctx,
           { data: result.data },
           "Posts fetched successfully",
-          200
+          200,
         );
       } else if (type === "your-replies") {
         // fetch all posts, where you have replied to (post has a parentId and you are the author)
@@ -363,14 +363,14 @@ export default new Hono()
             .orderBy(desc(posts.createdAt))
             .limit(limit)
             .offset(offset)
-            .leftJoin(media, eq(posts.id, media.contentId))
+            .leftJoin(media, eq(posts.id, media.contentId)),
         );
 
         if (result.error) {
           return respond.err(
             ctx,
             result.error?.message || "Failed to get posts",
-            400
+            400,
           );
         }
 
@@ -378,7 +378,7 @@ export default new Hono()
           ctx,
           { data: result.data },
           "Posts fetched successfully",
-          200
+          200,
         );
       } else if (type === "your-media") {
         const result = await tryCatch(
@@ -389,14 +389,14 @@ export default new Hono()
             .orderBy(desc(posts.createdAt))
             .limit(limit)
             .offset(offset)
-            .innerJoin(media, eq(posts.id, media.contentId))
+            .innerJoin(media, eq(posts.id, media.contentId)),
         );
 
         if (result.error) {
           return respond.err(
             ctx,
             result.error?.message || "Failed to get posts",
-            400
+            400,
           );
         }
 
@@ -404,7 +404,7 @@ export default new Hono()
           ctx,
           { data: result.data },
           "Posts fetched successfully",
-          200
+          200,
         );
       } else if (type === "your-saved") {
         const result = await tryCatch(
@@ -414,14 +414,14 @@ export default new Hono()
             .where(eq(posts.authorId, userId))
             .orderBy(desc(posts.createdAt))
             .limit(limit)
-            .offset(offset)
+            .offset(offset),
         );
 
         if (result.error) {
           return respond.err(
             ctx,
             result.error?.message || "Failed to get posts",
-            400
+            400,
           );
         }
 
@@ -429,7 +429,7 @@ export default new Hono()
           ctx,
           { data: result.data },
           "Posts fetched successfully",
-          200
+          200,
         );
       } else if (type === "your-pinned") {
         const result = await tryCatch(
@@ -438,14 +438,14 @@ export default new Hono()
             .from(posts)
             .where(eq(posts.authorId, userId))
             .orderBy(desc(posts.createdAt))
-            .limit(1)
+            .limit(1),
         );
 
         if (result.error) {
           return respond.err(
             ctx,
             result.error?.message || "Failed to get posts",
-            400
+            400,
           );
         }
 
@@ -453,10 +453,10 @@ export default new Hono()
           ctx,
           { data: result.data },
           "Posts fetched successfully",
-          200
+          200,
         );
       }
-    }
+    },
   )
   // Create a new post (pass parentId to reply to a post)
   .post(
@@ -471,13 +471,13 @@ export default new Hono()
           nsfw: z.boolean(),
           subscriberOnly: z.boolean().optional(),
         }),
-      })
+      }),
     ),
     zValidator(
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { content, media, parentId, flags } = ctx.req.valid("json");
@@ -493,20 +493,20 @@ export default new Hono()
       const result = await tryCatch(
         actions.createPost(
           { userId, content, media, parentId, flags },
-          signature
-        )
+          signature,
+        ),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to create post",
-          400
+          400,
         );
       }
 
       return respond.ok(ctx, {}, "Post Created Successfully", 201);
-    }
+    },
   )
   // Delete a post
   .delete(
@@ -516,26 +516,26 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
       const { signature } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
       const result = await tryCatch(
-        actions.deletePost({ postId, userId }, signature)
+        actions.deletePost({ postId, userId }, signature),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to delete post",
-          400
+          400,
         );
       }
 
       return respond.ok(ctx, {}, "Post Deleted Successfully", 201);
-    }
+    },
   )
   // Update a post
   .patch(
@@ -546,13 +546,13 @@ export default new Hono()
       z.object({
         content: z.string(),
         media: zMedia.array(),
-      })
+      }),
     ),
     zValidator(
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
@@ -565,24 +565,24 @@ export default new Hono()
         return respond.err(
           ctx,
           validation.message ?? "Invalid post content",
-          400
+          400,
         );
       }
 
       const result = await tryCatch(
-        actions.updatePost({ postId, userId, content, media }, signature)
+        actions.updatePost({ postId, userId, content, media }, signature),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to update post",
-          400
+          400,
         );
       }
 
       return respond.ok(ctx, {}, "Post updated successfully", 200);
-    }
+    },
   )
   // Like a post (optionally with an emoji)
   .post(
@@ -593,26 +593,26 @@ export default new Hono()
       z.object({
         signature: z.string(),
         reaction: zReactionType.optional(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
       const { signature, reaction } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
       const result = await tryCatch(
-        actions.likePost({ postId, userId, reaction }, signature)
+        actions.likePost({ postId, userId, reaction }, signature),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to like post",
-          400
+          400,
         );
       }
 
       return respond.ok(ctx, {}, "Post liked successfully", 200);
-    }
+    },
   )
   // Unlike a post
   .post(
@@ -622,26 +622,26 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
       const { signature } = ctx.req.valid("query");
       const userId = ctx.get("user").id;
       const result = await tryCatch(
-        actions.unlikePost({ postId, userId }, signature)
+        actions.unlikePost({ postId, userId }, signature),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to unlike post",
-          400
+          400,
         );
       }
 
       return respond.ok(ctx, {}, "Post unliked successfully", 200);
-    }
+    },
   )
   // Repost a post
   .post(
@@ -651,13 +651,13 @@ export default new Hono()
       "json",
       z.object({
         content: z.string().optional(),
-      })
+      }),
     ),
     zValidator(
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
@@ -672,7 +672,7 @@ export default new Hono()
           return respond.err(
             ctx,
             validation.message ?? "Invalid post content",
-            400
+            400,
           );
         }
       }
@@ -680,20 +680,20 @@ export default new Hono()
       const result = await tryCatch(
         actions.repostPost(
           { postId, userId, content: content || null },
-          signature
-        )
+          signature,
+        ),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to repost",
-          400
+          400,
         );
       }
 
       return respond.ok(ctx, {}, "Post reposted successfully", 200);
-    }
+    },
   )
   // Unrepost a post
   .post(
@@ -703,7 +703,7 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
@@ -711,19 +711,19 @@ export default new Hono()
       const userId = ctx.get("user").id;
 
       const result = await tryCatch(
-        actions.unrepostPost({ postId, userId }, signature)
+        actions.unrepostPost({ postId, userId }, signature),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to unrepost",
-          400
+          400,
         );
       }
 
       return respond.ok(ctx, {}, "Post unreposted successfully", 200);
-    }
+    },
   )
   // Save a post
   .post(
@@ -733,7 +733,7 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
@@ -741,19 +741,19 @@ export default new Hono()
       const userId = ctx.get("user").id;
 
       const result = await tryCatch(
-        actions.savePost({ postId, userId }, signature)
+        actions.savePost({ postId, userId }, signature),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to save post",
-          400
+          400,
         );
       }
 
       return respond.ok(ctx, {}, "Post saved successfully", 200);
-    }
+    },
   )
   // Remove post from saved posts
   .post(
@@ -763,7 +763,7 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
@@ -771,19 +771,19 @@ export default new Hono()
       const userId = ctx.get("user").id;
 
       const result = await tryCatch(
-        actions.unsavePost({ postId, userId }, signature)
+        actions.unsavePost({ postId, userId }, signature),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to unsave post",
-          400
+          400,
         );
       }
 
       return respond.ok(ctx, {}, "Post unsaved successfully", 200);
-    }
+    },
   )
   // Report a post
   .post(
@@ -794,13 +794,13 @@ export default new Hono()
       z.object({
         reason: z.string(),
         details: z.string().optional(),
-      })
+      }),
     ),
     zValidator(
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
@@ -814,19 +814,19 @@ export default new Hono()
       }
 
       const result = await tryCatch(
-        actions.reportPost({ postId, userId, reason, details }, signature)
+        actions.reportPost({ postId, userId, reason, details }, signature),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to report post",
-          400
+          400,
         );
       }
 
       return respond.ok(ctx, {}, "Post reported successfully", 200);
-    }
+    },
   )
   // Pin post to profile
   .post(
@@ -836,7 +836,7 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
@@ -844,19 +844,19 @@ export default new Hono()
       const userId = ctx.get("user").id;
 
       const result = await tryCatch(
-        actions.pinPost({ postId, userId }, signature)
+        actions.pinPost({ postId, userId }, signature),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to pin post",
-          400
+          400,
         );
       }
 
       return respond.ok(ctx, {}, "Post pinned successfully", 200);
-    }
+    },
   )
   // Unpin post from profile
   .post(
@@ -866,7 +866,7 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id: postId } = ctx.req.valid("param");
@@ -874,17 +874,17 @@ export default new Hono()
       const userId = ctx.get("user").id;
 
       const result = await tryCatch(
-        actions.unpinPost({ postId, userId }, signature)
+        actions.unpinPost({ postId, userId }, signature),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to unpin post",
-          400
+          400,
         );
       }
 
       return respond.ok(ctx, {}, "Post unpinned successfully", 200);
-    }
+    },
   );

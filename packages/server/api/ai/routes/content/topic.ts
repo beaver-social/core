@@ -14,7 +14,7 @@ export default new Hono()
       ctx,
       {},
       "get posts for this topic. use query params to filter by type like trending, following etc",
-      200
+      200,
     );
   })
   // Get related topics
@@ -27,7 +27,7 @@ export default new Hono()
       ctx,
       {},
       "search for content (posts, shorts etc) within this topic",
-      200
+      200,
     );
   })
 
@@ -50,7 +50,7 @@ export default new Hono()
       ctx,
       {},
       "mute this topic (hide from feed without unfollowing)",
-      200
+      200,
     );
   })
   // Unmute a topic
@@ -64,7 +64,7 @@ export default new Hono()
       ctx,
       {},
       "update topic details including name, description, avatar, banner, tags etc",
-      200
+      200,
     );
   })
   // Pin a post to topic
@@ -85,7 +85,7 @@ export default new Hono()
       ctx,
       {},
       "get analytics for this topic (visible to moderators)",
-      200
+      200,
     );
   })
 

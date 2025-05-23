@@ -10,14 +10,45 @@ import { eq } from "drizzle-orm";
 
 let servedSessions = 0;
 
-const app = new Hono()
+const app = new Hono<{ Variables: { applicationId: number } }>()
+
   // middlewares
+
+  .use(async (ctx, next) => {
+    const appId = ctx.req.header("X-Api-Key");
+
+    if (!appId) return respond.err(ctx, "Missing AppId / Api Key", 400);
+
+    let applicationId = -1;
+    if (appId !== env.DEFAULT_APPID) {
+      const [appIdExists] = await db
+        .select()
+        .from(db.schema.applications)
+        .where(eq(db.schema.applications.appId, appId));
+      if (!appIdExists) return respond.err(ctx, "Invalid AppId / Api Key", 400);
+      applicationId = appIdExists.id;
+    }
+
+    ctx.set("applicationId", applicationId);
+
+    return await next();
+  })
+
   .use(
     cors({
       origin: (origin, ctx) => {
+        const { applicationId } = ctx.var;
+
+        const whitelist = db
+          .select()
+          .from(db.schema.applicationUrls)
+          .where(
+            eq(db.schema.applicationUrls.applicationId, Number(applicationId))
+          )
+          .all();
+
         const selfUrl = new URL(ctx.req.url);
-        const allowedOrigins: string[] = [
-        ];
+        const allowedOrigins: string[] = [...whitelist.map((i) => i.url)];
         const selfOrigin = selfUrl.origin;
         if (
           !origin ||
@@ -34,28 +65,15 @@ const app = new Hono()
     })
   )
 
-  .use(async (ctx, next) => {
-    const appId = ctx.req.header("X-Api-Key")
-
-    if (!appId) return respond.err(ctx, "Missing AppId / Api Key", 400)
-
-    if (appId !== env.DEFAULT_APPID) {
-      const [appIdExists] = await db.select().from(db.schema.applications).where(eq(db.schema.applications.appId, appId))
-      if (!appIdExists) return respond.err(ctx, "Invalid AppId / Api Key", 400)
-    }
-
-    return await next()
-  })
-
   .use(
     rateLimiter({
       windowMs: 1,
       limit: 300,
       standardHeaders: "draft-6",
       keyGenerator: async (ctx) => {
-        const appId = ctx.req.header("X-Api-Key")!
+        const appId = ctx.req.header("X-Api-Key")!;
 
-        return appId
+        return appId;
       },
     })
   )

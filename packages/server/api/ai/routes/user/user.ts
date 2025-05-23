@@ -32,7 +32,7 @@ export default new Hono()
       z.object({
         type: z.enum(["identity", "username", "suinsDomainName", "address"]),
         value: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { type, value } = ctx.req.valid("query");
@@ -43,7 +43,7 @@ export default new Hono()
             .select({ id: users.id })
             .from(users)
             .where(eq(users.identity, value))
-            .limit(1)
+            .limit(1),
         );
 
         if (result.error) return respond.err(ctx, "User not found", 404);
@@ -55,7 +55,7 @@ export default new Hono()
             .select({ id: users.id })
             .from(users)
             .where(eq(users.username, value))
-            .limit(1)
+            .limit(1),
         );
 
         if (result.error) return respond.err(ctx, "User not found", 404);
@@ -67,7 +67,7 @@ export default new Hono()
             .select({ id: users.id })
             .from(users)
             .where(eq(users.suinsDomainName, value))
-            .limit(1)
+            .limit(1),
         );
 
         if (result.error) return respond.err(ctx, "User not found", 404);
@@ -79,7 +79,7 @@ export default new Hono()
             .select({ id: users.id })
             .from(users)
             .where(eq(users.address, value))
-            .limit(1)
+            .limit(1),
         );
 
         if (result.error) return respond.err(ctx, "User not found", 404);
@@ -87,7 +87,7 @@ export default new Hono()
       } else {
         return respond.err(ctx, "Invalid search criteria", 400);
       }
-    }
+    },
   )
   // get user details by id
   .get(
@@ -96,13 +96,13 @@ export default new Hono()
       "param",
       z.object({
         id: zNumberString,
-      })
+      }),
     ),
     async (ctx) => {
       const { id: userId } = ctx.req.valid("param");
 
       const user = await tryCatch(
-        db.select().from(users).where(eq(users.id, userId)).limit(1)
+        db.select().from(users).where(eq(users.id, userId)).limit(1),
       );
 
       if (user.error) return respond.err(ctx, "User not found", 404);
@@ -111,9 +111,9 @@ export default new Hono()
         ctx,
         user.data[0],
         "User details fetched from ID successfully",
-        200
+        200,
       );
-    }
+    },
   )
 
   // AUTHENTICATED ROUTES
@@ -125,7 +125,7 @@ export default new Hono()
       ctx,
       user,
       "Current user details fetched successfully",
-      200
+      200,
     );
   })
   // update current user details
@@ -136,7 +136,7 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const userId = ctx.get("user").id;
@@ -144,17 +144,17 @@ export default new Hono()
       const { signature } = ctx.req.valid("query");
 
       const result = await tryCatch(
-        actions.updateUser({ userId, body }, signature)
+        actions.updateUser({ userId, body }, signature),
       );
       if (result.error)
         return respond.err(
           ctx,
           result.error?.message || "Failed to update user",
-          400
+          400,
         );
 
       return respond.ok(ctx, {}, "User updated successfully", 200);
-    }
+    },
   )
   // get user's interactions (likes, saves, reposts, comments, follows, topic follows)
   .get(
@@ -164,7 +164,7 @@ export default new Hono()
       z.object({
         page: zNumberString,
         limit: zNumberString,
-      })
+      }),
     ),
     zValidator(
       "param",
@@ -177,7 +177,7 @@ export default new Hono()
           "follows",
           "topicFollows",
         ]),
-      })
+      }),
     ),
     async (ctx) => {
       const userId = ctx.get("user").id;
@@ -193,21 +193,21 @@ export default new Hono()
             .where(eq(likes.userId, userId))
             .orderBy(desc(likes.createdAt))
             .limit(limit)
-            .offset(offset)
+            .offset(offset),
         );
 
         if (result.error)
           return respond.err(
             ctx,
             result.error?.message || "Failed to get user's interactions",
-            400
+            400,
           );
 
         return respond.ok(
           ctx,
           { likes: result.data },
           "User's interactions fetched successfully",
-          200
+          200,
         );
       } else if (type === "saves") {
         const result = await tryCatch(
@@ -217,21 +217,21 @@ export default new Hono()
             .where(eq(saves.userId, userId))
             .orderBy(desc(saves.createdAt))
             .limit(limit)
-            .offset(offset)
+            .offset(offset),
         );
 
         if (result.error)
           return respond.err(
             ctx,
             result.error?.message || "Failed to get user's interactions",
-            400
+            400,
           );
 
         return respond.ok(
           ctx,
           { saves: result.data },
           "User's interactions fetched successfully",
-          200
+          200,
         );
       } else if (type === "reposts") {
         const result = await tryCatch(
@@ -241,21 +241,21 @@ export default new Hono()
             .where(eq(reposts.userId, userId))
             .orderBy(desc(reposts.createdAt))
             .limit(limit)
-            .offset(offset)
+            .offset(offset),
         );
 
         if (result.error)
           return respond.err(
             ctx,
             result.error?.message || "Failed to get user's interactions",
-            400
+            400,
           );
 
         return respond.ok(
           ctx,
           { reposts: result.data },
           "User's interactions fetched successfully",
-          200
+          200,
         );
       } else if (type === "comments") {
         const result = await tryCatch(
@@ -265,21 +265,21 @@ export default new Hono()
             .where(and(eq(comments.userId, userId), isNull(comments.parentId)))
             .orderBy(desc(comments.createdAt))
             .limit(limit)
-            .offset(offset)
+            .offset(offset),
         );
 
         if (result.error)
           return respond.err(
             ctx,
             result.error?.message || "Failed to get user's interactions",
-            400
+            400,
           );
 
         return respond.ok(
           ctx,
           { comments: result.data },
           "User's interactions fetched successfully",
-          200
+          200,
         );
       } else if (type === "follows") {
         const result = await tryCatch(
@@ -289,21 +289,21 @@ export default new Hono()
             .where(eq(follows.followerId, userId))
             .orderBy(desc(follows.createdAt))
             .limit(limit)
-            .offset(offset)
+            .offset(offset),
         );
 
         if (result.error)
           return respond.err(
             ctx,
             result.error?.message || "Failed to get user's interactions",
-            400
+            400,
           );
 
         return respond.ok(
           ctx,
           { follows: result.data },
           "User's interactions fetched successfully",
-          200
+          200,
         );
       } else if (type === "topicFollows") {
         const result = await tryCatch(
@@ -313,26 +313,26 @@ export default new Hono()
             .where(eq(topicFollows.userId, userId))
             .orderBy(desc(topicFollows.createdAt))
             .limit(limit)
-            .offset(offset)
+            .offset(offset),
         );
 
         if (result.error)
           return respond.err(
             ctx,
             result.error?.message || "Failed to get user's interactions",
-            400
+            400,
           );
 
         return respond.ok(
           ctx,
           { topicFollows: result.data },
           "User's interactions fetched successfully",
-          200
+          200,
         );
       } else {
         return respond.err(ctx, "Invalid interaction type", 400);
       }
-    }
+    },
   )
   // get suggested users to follow
   .get(
@@ -342,7 +342,7 @@ export default new Hono()
       z.object({
         limit: zNumberString,
         page: zNumberString,
-      })
+      }),
     ),
     async (ctx) => {
       const userId = ctx.get("user").id;
@@ -357,23 +357,23 @@ export default new Hono()
           .where(not(eq(users.id, userId)))
           .orderBy(sql`RANDOM()`)
           .limit(limit)
-          .offset(offset)
+          .offset(offset),
       );
 
       if (result.error)
         return respond.err(
           ctx,
           result.error?.message || "Failed to get suggested users",
-          400
+          400,
         );
 
       return respond.ok(
         ctx,
         { suggestions: result.data },
         "Suggested users fetched successfully",
-        200
+        200,
       );
-    }
+    },
   )
   // suins sync
   .get("/suins/sync", async (ctx) => {
@@ -384,7 +384,7 @@ export default new Hono()
       return respond.err(
         ctx,
         result.error?.message || "Failed to sync suins",
-        400
+        400,
       );
 
     return respond.ok(ctx, result.data, "Suins synced successfully", 200);
@@ -398,7 +398,7 @@ export default new Hono()
         page: zNumberString,
         limit: zNumberString,
         type: z.enum(["owned", "given"]),
-      })
+      }),
     ),
     async (ctx) => {
       const userId = ctx.get("user").id;
@@ -413,21 +413,21 @@ export default new Hono()
             .where(eq(postAwards.recipientId, userId))
             .orderBy(desc(postAwards.createdAt))
             .limit(limit)
-            .offset(offset)
+            .offset(offset),
         );
 
         if (result.error)
           return respond.err(
             ctx,
             result.error?.message || "Failed to get user awards",
-            400
+            400,
           );
 
         return respond.ok(
           ctx,
           { awards: result.data },
           "User awards fetched successfully",
-          200
+          200,
         );
       } else if (type === "given") {
         const result = await tryCatch(
@@ -437,24 +437,24 @@ export default new Hono()
             .where(eq(postAwards.giverId, userId))
             .orderBy(desc(postAwards.createdAt))
             .limit(limit)
-            .offset(offset)
+            .offset(offset),
         );
 
         if (result.error)
           return respond.err(
             ctx,
             result.error?.message || "Failed to get user awards",
-            400
+            400,
           );
 
         return respond.ok(
           ctx,
           { awards: result.data },
           "User awards fetched successfully",
-          200
+          200,
         );
       } else {
         return respond.err(ctx, "Invalid award type", 400);
       }
-    }
+    },
   );

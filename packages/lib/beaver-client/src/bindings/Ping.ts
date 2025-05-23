@@ -35,7 +35,7 @@ export default class Ping {
 
   async getAllChats() {
     const ping = safeParseResponse(
-      this.defaults.apiClient.rpc.ping.chats.$get()
+      this.defaults.apiClient.rpc.ping.chats.$get(),
     );
     return ping;
   }
@@ -45,7 +45,7 @@ export default class Ping {
     const ping = safeParseResponse(
       this.defaults.apiClient.rpc.ping[":id"].$get({
         param: { id },
-      })
+      }),
     );
     return ping;
   }

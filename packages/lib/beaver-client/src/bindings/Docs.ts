@@ -25,7 +25,7 @@ export default class Docs {
     const doc = safeParseResponse(
       this.defaults.apiClient.rpc.docs[":id"].$get({
         param: options,
-      })
+      }),
     );
     return doc;
   }

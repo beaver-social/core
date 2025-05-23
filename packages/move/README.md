@@ -147,7 +147,7 @@ async function updateAbout(signer, identityRegistrationId, newAbout) {
 async function attachSuins(
   signer,
   identityRegistrationId,
-  suinsRegistrationId
+  suinsRegistrationId,
 ) {
   const tx = new Transaction();
 
@@ -166,7 +166,7 @@ async function attachSuins(
 async function switchOwner(
   signer,
   identityRegistrationId,
-  suinsRegistrationId
+  suinsRegistrationId,
 ) {
   const tx = new Transaction();
 
@@ -191,7 +191,7 @@ async function adminMintFor(
   adminCapId,
   username,
   about,
-  receiverAddress
+  receiverAddress,
 ) {
   const tx = new Transaction();
 

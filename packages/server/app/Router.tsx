@@ -24,13 +24,11 @@ import AppId from "./pages/onboarding/AppId";
 
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary =
-  (Component: React.ComponentType<any>) => (props: any) =>
-  (
+  (Component: React.ComponentType<any>) => (props: any) => (
     <PageErrorBoundary>
       <Component {...props} />
     </PageErrorBoundary>
   );
-
 
 function OnboardingProtection({ children }: { children: React.ReactNode }) {
   const beaver = useBeaver();
@@ -42,17 +40,21 @@ function OnboardingProtection({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    if (beaver.wallet.isConnected && beaver.wallet.hasIdentity && !beaver.user) {
+    if (
+      beaver.wallet.isConnected &&
+      beaver.wallet.hasIdentity &&
+      !beaver.user
+    ) {
       login();
     }
-  }, [beaver.wallet.isConnected, beaver.wallet.hasIdentity, beaver.user])
+  }, [beaver.wallet.isConnected, beaver.wallet.hasIdentity, beaver.user]);
 
   if (isPending) {
     return (
       <div className="flex items-center justify-center h-screen">
         <Icon name="LoaderCircle" className="w-10 h-10 animate-spin" />
       </div>
-    )
+    );
   }
 
   return (
@@ -60,7 +62,7 @@ function OnboardingProtection({ children }: { children: React.ReactNode }) {
       {!isPending && isSuccess && <WelcomeSplash />}
       {children}
     </div>
-  )
+  );
 }
 
 function NotLoggedInProtection({ children }: { children: React.ReactNode }) {
@@ -71,7 +73,7 @@ function NotLoggedInProtection({ children }: { children: React.ReactNode }) {
       {!beaver.user && <NotLoggedInDialog />}
       {children}
     </div>
-  )
+  );
 }
 
 export default function () {
@@ -83,10 +85,7 @@ export default function () {
           element={
             <OnboardingProtection>
               <Routes>
-                <Route
-                  path="/"
-                  element={withPageErrorBoundary(Landing)({})}
-                />
+                <Route path="/" element={withPageErrorBoundary(Landing)({})} />
 
                 <Route
                   path="/onboarding/appid"
@@ -106,61 +105,57 @@ export default function () {
                 <Route path="/app" element={withPageErrorBoundary(Home)({})} />
                 <Route
                   path="/app/*"
-                  element={<NotLoggedInProtection>
-                    <Routes>
-                      <Route
-                        path="/alerts"
-                        element={withPageErrorBoundary(Notifications)({})}
-                      />
-                      <Route
-                        path="/messages"
-                        element={withPageErrorBoundary(Messages)({})}
-                      />
-                      <Route
-                        path="/message/:id"
-                        element={withPageErrorBoundary(Message)({})}
-                      />
-                      <Route
-                        path="/post/:id"
-                        element={withPageErrorBoundary(Post)({})}
-                      />
-                      <Route
-                        path="/profile/:username"
-                        element={withPageErrorBoundary(Profile)({})}
-                      />
-                      <Route
-                        path="/create"
-                        element={withPageErrorBoundary(Create)({})}
-                      />
-                      <Route
-                        path="/swipes"
-                        element={withPageErrorBoundary(Swipes)({})}
-                      />
-                      <Route
-                        path="/settings"
-                        element={withPageErrorBoundary(Settings)({})}
-                      />
-                      <Route
-                        path="/explore/search"
-                        element={withPageErrorBoundary(SearchResults)({})}
-                      />
-                    </Routes>
-                  </NotLoggedInProtection>}
+                  element={
+                    <NotLoggedInProtection>
+                      <Routes>
+                        <Route
+                          path="/alerts"
+                          element={withPageErrorBoundary(Notifications)({})}
+                        />
+                        <Route
+                          path="/messages"
+                          element={withPageErrorBoundary(Messages)({})}
+                        />
+                        <Route
+                          path="/message/:id"
+                          element={withPageErrorBoundary(Message)({})}
+                        />
+                        <Route
+                          path="/post/:id"
+                          element={withPageErrorBoundary(Post)({})}
+                        />
+                        <Route
+                          path="/profile/:username"
+                          element={withPageErrorBoundary(Profile)({})}
+                        />
+                        <Route
+                          path="/create"
+                          element={withPageErrorBoundary(Create)({})}
+                        />
+                        <Route
+                          path="/swipes"
+                          element={withPageErrorBoundary(Swipes)({})}
+                        />
+                        <Route
+                          path="/settings"
+                          element={withPageErrorBoundary(Settings)({})}
+                        />
+                        <Route
+                          path="/explore/search"
+                          element={withPageErrorBoundary(SearchResults)({})}
+                        />
+                      </Routes>
+                    </NotLoggedInProtection>
+                  }
                 />
               </Routes>
             </OnboardingProtection>
           }
         />
 
-        <Route
-          path="/demo"
-          element={withPageErrorBoundary(Demo)({})}
-        />
+        <Route path="/demo" element={withPageErrorBoundary(Demo)({})} />
 
-        <Route
-          path="*"
-          element={withPageErrorBoundary(Error404)({})}
-        />
+        <Route path="*" element={withPageErrorBoundary(Error404)({})} />
       </Routes>
     </BrowserRouter>
   );

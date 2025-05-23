@@ -12,7 +12,7 @@ const envKeys = [
   "JWT_SECRET",
   "GEMINI_API_KEY",
   "REFERRAL_DOMAIN",
-  "DEFAULT_APPID"
+  "DEFAULT_APPID",
 ] as const;
 
 type ENV = Record<(typeof envKeys)[number], string>;

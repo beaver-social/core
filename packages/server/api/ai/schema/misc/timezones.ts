@@ -224,7 +224,7 @@ export const timezones = table(
   (table) => [
     t.uniqueIndex("timezone_value_idx").on(table.value),
     t.index("timezone_offset_idx").on(table.offset),
-  ]
+  ],
 );
 
 // Export enum of valid timezone IDs

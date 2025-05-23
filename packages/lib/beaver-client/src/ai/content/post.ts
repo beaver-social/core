@@ -32,7 +32,7 @@ export default class Post {
     return safeParseResponse(
       apiClient.content.posts[":id"].$get({
         param: { id: id.toString() },
-      })
+      }),
     );
   }
 
@@ -47,7 +47,7 @@ export default class Post {
     return safeParseResponse(
       apiClient.content.posts.$get({
         query: { page: page.toString(), limit: limit.toString() },
-      })
+      }),
     );
   }
 
@@ -66,7 +66,7 @@ export default class Post {
       apiClient.content.posts[":id"].interaction.$get({
         param: { id: id.toString() },
         query: { type },
-      })
+      }),
     );
   }
 
@@ -85,7 +85,7 @@ export default class Post {
     return safeParseResponse(
       apiClient.content.posts.user.feed.$get({
         query: { page: page.toString(), limit: limit.toString(), type },
-      })
+      }),
     );
   }
 
@@ -109,7 +109,7 @@ export default class Post {
     return safeParseResponse(
       apiClient.content.posts.user.profile.$get({
         query: { page: page.toString(), limit: limit.toString(), type },
-      })
+      }),
     );
   }
 
@@ -125,7 +125,7 @@ export default class Post {
       apiClient.content.posts[":id"].awards.$get({
         param: { id: id.toString() },
         query: { page: page.toString(), limit: limit.toString() },
-      })
+      }),
     );
   }
 
@@ -153,7 +153,7 @@ export default class Post {
     });
 
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -172,7 +172,7 @@ export default class Post {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -189,7 +189,7 @@ export default class Post {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -203,7 +203,7 @@ export default class Post {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -224,7 +224,7 @@ export default class Post {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -242,7 +242,7 @@ export default class Post {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -262,7 +262,7 @@ export default class Post {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -277,7 +277,7 @@ export default class Post {
           signature: signatureResult.data.signature,
           reaction: reaction || "like",
         },
-      })
+      }),
     );
 
     return apiResponse;
@@ -296,7 +296,7 @@ export default class Post {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -310,7 +310,7 @@ export default class Post {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -331,7 +331,7 @@ export default class Post {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -344,7 +344,7 @@ export default class Post {
         param: { id: postId.toString() },
         json: { content },
         query: { signature: signatureResult.data.signature },
-      })
+      }),
     );
   }
 
@@ -361,7 +361,7 @@ export default class Post {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -373,7 +373,7 @@ export default class Post {
       apiClient.content.posts[":id"].unrepost.$post({
         param: { id: postId.toString() },
         query: { signature: signatureResult.data.signature },
-      })
+      }),
     );
   }
 
@@ -390,7 +390,7 @@ export default class Post {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -402,7 +402,7 @@ export default class Post {
       apiClient.content.posts[":id"].save.$post({
         param: { id: postId.toString() },
         query: { signature: signatureResult.data.signature },
-      })
+      }),
     );
   }
 
@@ -419,7 +419,7 @@ export default class Post {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -431,7 +431,7 @@ export default class Post {
       apiClient.content.posts[":id"].unsave.$post({
         param: { id: postId.toString() },
         query: { signature: signatureResult.data.signature },
-      })
+      }),
     );
   }
 
@@ -452,7 +452,7 @@ export default class Post {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -470,7 +470,7 @@ export default class Post {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -487,7 +487,7 @@ export default class Post {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -501,7 +501,7 @@ export default class Post {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -518,7 +518,7 @@ export default class Post {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -532,7 +532,7 @@ export default class Post {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 }

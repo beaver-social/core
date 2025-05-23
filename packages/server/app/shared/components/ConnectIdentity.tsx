@@ -23,20 +23,32 @@ type Props = {
 export default function ConnectIdentity({ open, onOpenChange }: Props) {
   const beaver = useBeaver();
   const [isOpen, setIsOpen] = useState(open || false);
-  const [isConnectIdentitySelected, setisConnectIdentitySelected] = useState(false);
+  const [isConnectIdentitySelected, setisConnectIdentitySelected] =
+    useState(false);
 
   return (
-    <Dialog open={isOpen} onOpenChange={(newOpen: boolean) => {
-      setIsOpen(newOpen);
-      onOpenChange?.(newOpen);
-      setisConnectIdentitySelected(newOpen);
-    }}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(newOpen: boolean) => {
+        setIsOpen(newOpen);
+        onOpenChange?.(newOpen);
+        setisConnectIdentitySelected(newOpen);
+      }}
+    >
       <DialogTrigger asChild>
         <div
-          className={`relative flex items-center gap-3 px-4 py-3 cursor-pointer rounded-md transition-colors mt-3 ${isConnectIdentitySelected ? 'bg-primary/5' : 'hover:bg-muted'}`}
+          className={`relative flex items-center gap-3 px-4 py-3 cursor-pointer rounded-md transition-colors mt-3 ${isConnectIdentitySelected ? "bg-primary/5" : "hover:bg-muted"}`}
         >
           <Icon name="User" />
-          <span className={isConnectIdentitySelected ? "text-primary font-stretch-semi-condensed" : ""}>Connect</span>
+          <span
+            className={
+              isConnectIdentitySelected
+                ? "text-primary font-stretch-semi-condensed"
+                : ""
+            }
+          >
+            Connect
+          </span>
           {isConnectIdentitySelected && (
             <motion.div
               className="absolute left-0 top-0 bottom-0 w-1 h-full bg-primary rounded-r-sm"
@@ -69,7 +81,7 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
                   className="w-full flex py-10"
                   onClick={() => {
                     beaver.wallet.connect(index);
-                    console.log(beaver.wallet)
+                    console.log(beaver.wallet);
                   }}
                 >
                   <>

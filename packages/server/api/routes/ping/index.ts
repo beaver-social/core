@@ -32,7 +32,7 @@ const app = new Hono()
         chatId: zNumberString().optional(),
         intent: zPingIntents(),
         message: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const user = ctx.get("user");
@@ -71,7 +71,7 @@ const app = new Hono()
               intent,
               label: message.slice(0, Math.min(8, message.length)),
             })
-            .returning({ id: pingChats.id })
+            .returning({ id: pingChats.id }),
         );
 
         if (chatDbError || !chat || !chat[0]) {
@@ -114,9 +114,8 @@ const app = new Hono()
       let response = res.data.candidates?.[0].content?.parts;
 
       if (!response) {
-        return respond.err(ctx, "AI Failed to respond", 500)
+        return respond.err(ctx, "AI Failed to respond", 500);
       }
-
 
       await db.insert(pingMessages).values({
         chatId: dbChatId,
@@ -128,7 +127,7 @@ const app = new Hono()
         role: "model",
         parts: stringify(response),
       });
-    }
+    },
   )
   .get("/chats", authenticated, async (ctx) => {
     const user = ctx.get("user");
@@ -147,10 +146,21 @@ const app = new Hono()
   .get("/:id", authenticated, async (ctx) => {
     const user = ctx.get("user");
 
-    const chat = await db.select().from(pingChats).where(eq(pingChats.id, user.id));
-    const messages = await db.select().from(pingMessages).where(eq(pingMessages.id, user.id));
+    const chat = await db
+      .select()
+      .from(pingChats)
+      .where(eq(pingChats.id, user.id));
+    const messages = await db
+      .select()
+      .from(pingMessages)
+      .where(eq(pingMessages.id, user.id));
 
-    return respond.ok(ctx, { ...chat, history: messages }, "Ping Chat Details", 200)
+    return respond.ok(
+      ctx,
+      { ...chat, history: messages },
+      "Ping Chat Details",
+      200,
+    );
   });
 
 export default app;

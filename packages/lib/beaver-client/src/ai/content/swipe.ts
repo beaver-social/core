@@ -32,7 +32,7 @@ export default class Swipe {
     return safeParseResponse(
       apiClient.content.swipes[":id"].$get({
         param: { id: id.toString() },
-      })
+      }),
     );
   }
 
@@ -47,7 +47,7 @@ export default class Swipe {
     return safeParseResponse(
       apiClient.content.swipes.$get({
         query: { page: page.toString(), limit: limit.toString() },
-      })
+      }),
     );
   }
 
@@ -72,7 +72,7 @@ export default class Swipe {
           page: page.toString(),
           limit: limit.toString(),
         },
-      })
+      }),
     );
   }
 
@@ -95,7 +95,7 @@ export default class Swipe {
           limit: limit.toString(),
           type,
         },
-      })
+      }),
     );
   }
 
@@ -113,7 +113,7 @@ export default class Swipe {
           page: page.toString(),
           limit: limit.toString(),
         },
-      })
+      }),
     );
   }
 
@@ -148,7 +148,7 @@ export default class Swipe {
     });
 
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -167,7 +167,7 @@ export default class Swipe {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -184,7 +184,7 @@ export default class Swipe {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -198,7 +198,7 @@ export default class Swipe {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -222,7 +222,7 @@ export default class Swipe {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -240,7 +240,7 @@ export default class Swipe {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -257,7 +257,7 @@ export default class Swipe {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -271,7 +271,7 @@ export default class Swipe {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -288,7 +288,7 @@ export default class Swipe {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -302,7 +302,7 @@ export default class Swipe {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -319,7 +319,7 @@ export default class Swipe {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -336,7 +336,7 @@ export default class Swipe {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -353,7 +353,7 @@ export default class Swipe {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -367,7 +367,7 @@ export default class Swipe {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -384,7 +384,7 @@ export default class Swipe {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -398,7 +398,7 @@ export default class Swipe {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -415,7 +415,7 @@ export default class Swipe {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -429,7 +429,7 @@ export default class Swipe {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -458,7 +458,7 @@ export default class Swipe {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -476,7 +476,7 @@ export default class Swipe {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -493,7 +493,7 @@ export default class Swipe {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -507,7 +507,7 @@ export default class Swipe {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 
@@ -524,7 +524,7 @@ export default class Swipe {
 
     // Sign the payload using tryCatch
     const signatureResult = await tryCatch(
-      surface.signPersonalMessage(payload)
+      surface.signPersonalMessage(payload),
     );
 
     if (signatureResult.error) {
@@ -538,7 +538,7 @@ export default class Swipe {
         query: {
           signature: signatureResult.data.signature,
         },
-      })
+      }),
     );
   }
 }

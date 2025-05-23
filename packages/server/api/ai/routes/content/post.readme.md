@@ -369,7 +369,7 @@ const result = await actions.createPost(
     parentId: null,
     flags: { nsfw: false },
   },
-  signature
+  signature,
 );
 ```
 
@@ -393,7 +393,7 @@ const result = await actions.deletePost(
     postId: 123,
     userId: 456,
   },
-  signature
+  signature,
 );
 ```
 
@@ -416,7 +416,7 @@ const result = await actions.likePost(
     postId: 123,
     userId: 456,
   },
-  signature
+  signature,
 );
 ```
 
@@ -438,7 +438,7 @@ const result = await actions.unlikePost(
     postId: 123,
     userId: 456,
   },
-  signature
+  signature,
 );
 ```
 
@@ -461,7 +461,7 @@ const result = await actions.pinPost(
     postId: 123,
     userId: 456,
   },
-  signature
+  signature,
 );
 ```
 
@@ -482,7 +482,7 @@ const result = await actions.unpinPost(
     postId: 123,
     userId: 456,
   },
-  signature
+  signature,
 );
 ```
 
@@ -509,7 +509,7 @@ const result = await actions.updatePost(
     content: "Updated content",
     media: [],
   },
-  signature
+  signature,
 );
 ```
 
@@ -531,7 +531,7 @@ const result = await actions.viewPost(
     postId: 123,
     viewerId: 456,
   },
-  signature
+  signature,
 );
 ```
 
@@ -556,7 +556,7 @@ const result = await actions.repostPost(
     userId: 456,
     content: "Check this out!",
   },
-  signature
+  signature,
 );
 ```
 
@@ -580,7 +580,7 @@ const result = await actions.unrepostPost(
     repostId: 789,
     userId: 456,
   },
-  signature
+  signature,
 );
 ```
 
@@ -602,7 +602,7 @@ const result = await actions.savePost(
     postId: 123,
     userId: 456,
   },
-  signature
+  signature,
 );
 ```
 
@@ -623,7 +623,7 @@ const result = await actions.unsavePost(
     postId: 123,
     userId: 456,
   },
-  signature
+  signature,
 );
 ```
 
@@ -647,7 +647,7 @@ const result = await actions.reportPost(
     reason: "Inappropriate content",
     details: "Contains offensive language",
   },
-  signature
+  signature,
 );
 ```
 

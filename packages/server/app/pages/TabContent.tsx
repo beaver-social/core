@@ -14,46 +14,46 @@ export const tabs: Record<Screen, Tab[]> = {
     {
       id: "default",
       label: "For you",
-      content: (<ForYou />),
+      content: <ForYou />,
     },
     {
       id: "following",
       label: "Following",
-      content: (<Following />),
+      content: <Following />,
     },
   ],
   profile: [
     {
       id: "default",
       label: "Posts",
-      content: (<Posts />),
+      content: <Posts />,
     },
     {
       id: "replies",
       label: "Replies",
-      content: (<Replies />),
+      content: <Replies />,
     },
     {
       id: "media",
       label: "Media",
-      content: (<Media />),
+      content: <Media />,
     },
     {
       id: "activity",
       label: "Activity",
-      content: (<Activity />),
+      content: <Activity />,
     },
   ],
   alerts: [
     {
       id: "default",
       label: "All",
-      content: (<AllAlerts />),
+      content: <AllAlerts />,
     },
     {
       id: "mentioned",
       label: "Mentioned",
-      content: (<Mentioned />),
+      content: <Mentioned />,
     },
   ],
   messages: [],
@@ -62,12 +62,12 @@ export const tabs: Record<Screen, Tab[]> = {
     {
       id: "default",
       label: "For you",
-      content: (<ShortsFeed />),
+      content: <ShortsFeed />,
     },
     {
       id: "following",
       label: "Following",
-      content: (<ShortsFeed />),
+      content: <ShortsFeed />,
     },
   ],
   onboarding: [],

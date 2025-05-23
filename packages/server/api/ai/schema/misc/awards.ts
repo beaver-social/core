@@ -42,5 +42,5 @@ export const postAwards = table(
     t
       .uniqueIndex("recipient_post_award_idx")
       .on(table.recipientId, table.postId),
-  ]
+  ],
 );

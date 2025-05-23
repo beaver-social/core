@@ -21,6 +21,6 @@ const keypair = Ed25519Keypair.deriveKeypair(passphrase);
 console.log("Keypair: ", keypair.getPublicKey().toSuiAddress());
 console.log(
   await keypair.signPersonalMessage(
-    new TextEncoder().encode("23f46168-e392-4590-ab1c-9c6b448575c9")
-  )
+    new TextEncoder().encode("23f46168-e392-4590-ab1c-9c6b448575c9"),
+  ),
 );

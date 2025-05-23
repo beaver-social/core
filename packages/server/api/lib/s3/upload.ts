@@ -4,7 +4,7 @@ import { randomUUID } from "crypto";
 
 export async function uploadToS3(
   buffer: Buffer,
-  folder: string = "media"
+  folder: string = "media",
 ): Promise<string> {
   try {
     const key = `${folder}/${randomUUID()}`;

@@ -30,13 +30,13 @@ export async function createSwipe(
   options: {
     userId: number;
     signature: string;
-  }
+  },
 ): Promise<number> {
   // verify challenge
   await verifyChallenge(
     JSON.stringify(data),
     options.userId,
-    options.signature
+    options.signature,
   );
 
   // create swipe
@@ -54,7 +54,7 @@ export async function createSwipe(
     .returning({ id: contentSchema.swipes.id });
 
   const { videoUrl, thumbnailUrl } = await processAndUploadVideo(
-    data.media.buffer
+    data.media.buffer,
   );
 
   // create media
@@ -90,12 +90,12 @@ export async function updateSwipe(
   options: {
     userId: number;
     signature: string;
-  }
+  },
 ): Promise<boolean> {
   await verifyChallenge(
     JSON.stringify(data),
     options.userId,
-    options.signature
+    options.signature,
   );
 
   // Check if swipe exists and belongs to user
@@ -154,12 +154,12 @@ export async function deleteSwipe(
   options: {
     userId: number;
     signature: string;
-  }
+  },
 ): Promise<boolean> {
   await verifyChallenge(
     JSON.stringify({ id }),
     options.userId,
-    options.signature
+    options.signature,
   );
 
   // Check if swipe exists and belongs to user
@@ -191,12 +191,12 @@ export async function likeSwipe(
   options: {
     userId: number;
     signature: string;
-  }
+  },
 ): Promise<boolean> {
   await verifyChallenge(
     JSON.stringify({ id }),
     options.userId,
-    options.signature
+    options.signature,
   );
 
   // Check if swipe exists
@@ -217,7 +217,7 @@ export async function likeSwipe(
     .where(
       eq(likes.userId, options.userId) &&
         eq(likes.contentId, id) &&
-        eq(likes.contentTypeId, contentTypeId)
+        eq(likes.contentTypeId, contentTypeId),
     );
 
   if (existingLike.length > 0) {
@@ -251,12 +251,12 @@ export async function unlikeSwipe(
   options: {
     userId: number;
     signature: string;
-  }
+  },
 ): Promise<boolean> {
   await verifyChallenge(
     JSON.stringify({ id }),
     options.userId,
-    options.signature
+    options.signature,
   );
 
   // Check if swipe exists
@@ -277,7 +277,7 @@ export async function unlikeSwipe(
     .where(
       eq(likes.userId, options.userId) &&
         eq(likes.contentId, id) &&
-        eq(likes.contentTypeId, contentTypeId)
+        eq(likes.contentTypeId, contentTypeId),
     );
 
   if (existingLike.length === 0) {
@@ -290,7 +290,7 @@ export async function unlikeSwipe(
     .where(
       eq(likes.userId, options.userId) &&
         eq(likes.contentId, id) &&
-        eq(likes.contentTypeId, contentTypeId)
+        eq(likes.contentTypeId, contentTypeId),
     );
 
   // Decrement likes count on swipe
@@ -313,12 +313,12 @@ export async function repostSwipe(
   options: {
     userId: number;
     signature: string;
-  }
+  },
 ): Promise<boolean> {
   await verifyChallenge(
     JSON.stringify({ id, quote }),
     options.userId,
-    options.signature
+    options.signature,
   );
 
   // Check if swipe exists
@@ -339,7 +339,7 @@ export async function repostSwipe(
     .where(
       eq(reposts.userId, options.userId) &&
         eq(reposts.contentId, id) &&
-        eq(reposts.contentTypeId, contentTypeId)
+        eq(reposts.contentTypeId, contentTypeId),
     );
 
   if (existingRepost.length > 0) {
@@ -373,12 +373,12 @@ export async function unrepostSwipe(
   options: {
     userId: number;
     signature: string;
-  }
+  },
 ): Promise<boolean> {
   await verifyChallenge(
     JSON.stringify({ id }),
     options.userId,
-    options.signature
+    options.signature,
   );
 
   // Check if swipe exists
@@ -399,7 +399,7 @@ export async function unrepostSwipe(
     .where(
       eq(reposts.userId, options.userId) &&
         eq(reposts.contentId, id) &&
-        eq(reposts.contentTypeId, contentTypeId)
+        eq(reposts.contentTypeId, contentTypeId),
     );
 
   if (existingRepost.length === 0) {
@@ -412,7 +412,7 @@ export async function unrepostSwipe(
     .where(
       eq(reposts.userId, options.userId) &&
         eq(reposts.contentId, id) &&
-        eq(reposts.contentTypeId, contentTypeId)
+        eq(reposts.contentTypeId, contentTypeId),
     );
 
   // Decrement reposts count on swipe
@@ -434,12 +434,12 @@ export async function saveSwipe(
   options: {
     userId: number;
     signature: string;
-  }
+  },
 ): Promise<boolean> {
   await verifyChallenge(
     JSON.stringify({ id }),
     options.userId,
-    options.signature
+    options.signature,
   );
 
   // Check if swipe exists
@@ -460,7 +460,7 @@ export async function saveSwipe(
     .where(
       eq(saves.userId, options.userId) &&
         eq(saves.contentId, id) &&
-        eq(saves.contentTypeId, contentTypeId)
+        eq(saves.contentTypeId, contentTypeId),
     );
 
   if (existingSave.length > 0) {
@@ -485,12 +485,12 @@ export async function unsaveSwipe(
   options: {
     userId: number;
     signature: string;
-  }
+  },
 ): Promise<boolean> {
   await verifyChallenge(
     JSON.stringify({ id }),
     options.userId,
-    options.signature
+    options.signature,
   );
 
   // Check if swipe exists
@@ -511,7 +511,7 @@ export async function unsaveSwipe(
     .where(
       eq(saves.userId, options.userId) &&
         eq(saves.contentId, id) &&
-        eq(saves.contentTypeId, contentTypeId)
+        eq(saves.contentTypeId, contentTypeId),
     );
 
   if (existingSave.length === 0) {
@@ -524,7 +524,7 @@ export async function unsaveSwipe(
     .where(
       eq(saves.userId, options.userId) &&
         eq(saves.contentId, id) &&
-        eq(saves.contentTypeId, contentTypeId)
+        eq(saves.contentTypeId, contentTypeId),
     );
 
   return true;
@@ -540,12 +540,12 @@ export async function reportSwipe(
   options: {
     userId: number;
     signature: string;
-  }
+  },
 ): Promise<boolean> {
   await verifyChallenge(
     JSON.stringify({ id, reason, details }),
     options.userId,
-    options.signature
+    options.signature,
   );
 
   // Check if swipe exists
@@ -562,7 +562,7 @@ export async function reportSwipe(
   console.log(
     `User ${options.userId} reported swipe ${id} for ${reason}: ${
       details || "No details provided"
-    }`
+    }`,
   );
 
   return true;
@@ -576,12 +576,12 @@ export async function pinSwipe(
   options: {
     userId: number;
     signature: string;
-  }
+  },
 ): Promise<boolean> {
   await verifyChallenge(
     JSON.stringify({ id }),
     options.userId,
-    options.signature
+    options.signature,
   );
 
   // Check if swipe exists
@@ -613,12 +613,12 @@ export async function unpinSwipe(
   options: {
     userId: number;
     signature: string;
-  }
+  },
 ): Promise<boolean> {
   await verifyChallenge(
     JSON.stringify({ id }),
     options.userId,
-    options.signature
+    options.signature,
   );
 
   // Check if swipe exists

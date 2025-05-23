@@ -230,7 +230,7 @@ function PostComposer() {
         onSuccess: () => {
           setContent(""); // Clear the input on success
         },
-      }
+      },
     );
   };
 

@@ -13,18 +13,28 @@ import MediaCarousel from "@/shared/components/MediaCarousel";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { FeedPostMenu } from "./FeedPostMenu";
 
-function FeedPost({
-  postId
-}: {
-  postId: number;
-}) {
+function FeedPost({ postId }: { postId: number }) {
   const navigate = useNavigate();
   const [showMore, setShowMore] = useState(false);
   const [reply, setReply] = useState("");
 
   const beaver = useBeaver();
-  const { data: post, isLoading: postLoading, isError: postError, isSuccess: postSuccess, refetch: refetchPost } = beaver.post.getPostById({ id: postId });
-  const { data: author, isLoading: userLoading, isError: userError, isSuccess: userSuccess } = beaver.profile.getProfile({ value: post?.authorId.toString() || "", type: "id" });
+  const {
+    data: post,
+    isLoading: postLoading,
+    isError: postError,
+    isSuccess: postSuccess,
+    refetch: refetchPost,
+  } = beaver.post.getPostById({ id: postId });
+  const {
+    data: author,
+    isLoading: userLoading,
+    isError: userError,
+    isSuccess: userSuccess,
+  } = beaver.profile.getProfile({
+    value: post?.authorId.toString() || "",
+    type: "id",
+  });
 
   const isLoading = postLoading || userLoading;
 
@@ -88,7 +98,10 @@ function FeedPost({
                 whileHover={{ scale: 1.05 }}
                 className="flex-shrink-0"
               >
-                <Link to={`/profile/${author?.username}`} onClick={(e) => e.stopPropagation()}>
+                <Link
+                  to={`/profile/${author?.username}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <Image
                     src={author?.imageUrl}
                     alt={author?.username}
@@ -106,9 +119,13 @@ function FeedPost({
                   >
                     {author?.username}
                   </Link>
-                  <span className="text-muted-foreground text-sm">@{author?.username}</span>
+                  <span className="text-muted-foreground text-sm">
+                    @{author?.username}
+                  </span>
                   <span className="text-muted-foreground mx-1">·</span>
-                  <time className="text-muted-foreground text-sm hover:underline">{moment(post?.createdAt).fromNow()}</time>
+                  <time className="text-muted-foreground text-sm hover:underline">
+                    {moment(post?.createdAt).fromNow()}
+                  </time>
                 </div>
                 {post?.location && (
                   <div className="flex items-center gap-1 text-muted-foreground ">
@@ -136,11 +153,12 @@ function FeedPost({
 
           {/* Post Actions */}
           <div className="mt-2">
-            <motion.div
-              initial={{ opacity: 0.8 }}
-              whileHover={{ opacity: 1 }}
-            >
-              <Reactions postId={postId} analytics={post?.analytics} refetchPost={refetchPost} />
+            <motion.div initial={{ opacity: 0.8 }} whileHover={{ opacity: 1 }}>
+              <Reactions
+                postId={postId}
+                analytics={post?.analytics}
+                refetchPost={refetchPost}
+              />
             </motion.div>
           </div>
 
@@ -148,10 +166,17 @@ function FeedPost({
           <div className="mt-2">
             <p className="text-sm">
               <span className="font-semibold">{author?.username} </span>
-              <span>{showMore ? post?.content : truncateText(post?.content, 50)} </span>
+              <span>
+                {showMore
+                  ? post?.content
+                  : truncateText(post?.content, 50)}{" "}
+              </span>
               {post?.content.length > 50 && (
                 <span>
-                  <button className="text-muted-foreground text-sm hover:text-primary transition-colors" onClick={() => setShowMore(!showMore)}>
+                  <button
+                    className="text-muted-foreground text-sm hover:text-primary transition-colors"
+                    onClick={() => setShowMore(!showMore)}
+                  >
                     {showMore ? "See less" : "more"}
                   </button>
                 </span>
@@ -169,25 +194,36 @@ function FeedPost({
               </button>
             )} */}
             <br />
-            <button onClick={() => {
-              navigate(`/app/post/${postId}`, { state: { postId: postId } });
-            }
-            } className="text-sm hover:text-primary transition-colors text-muted-foreground">
+            <button
+              onClick={() => {
+                navigate(`/app/post/${postId}`, { state: { postId: postId } });
+              }}
+              className="text-sm hover:text-primary transition-colors text-muted-foreground"
+            >
               View all {post?.analytics.comments} replies
             </button>
 
             {/* add a comment box */}
-            <form onSubmit={(e) => {
-              e.preventDefault();
-            }} className="mt-2 relative">
-              <Input placeholder="Reply to post" value={reply} onChange={(e) => setReply(e.target.value)} />
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+              }}
+              className="mt-2 relative"
+            >
+              <Input
+                placeholder="Reply to post"
+                value={reply}
+                onChange={(e) => setReply(e.target.value)}
+              />
               {reply.length > 0 && (
-                <Button variant="ghost" className="absolute right-0 top-0 hover:bg-transparent hover:text-primary">
+                <Button
+                  variant="ghost"
+                  className="absolute right-0 top-0 hover:bg-transparent hover:text-primary"
+                >
                   <Icon name="SendHorizontal" className="size-4" />
                 </Button>
               )}
             </form>
-
           </div>
         </motion.article>
       ) : (
@@ -199,17 +235,22 @@ function FeedPost({
           }}
         >
           {/* Header with Avatar */}
-          <div className="flex items-center justify-between p-4 pb-2"
+          <div
+            className="flex items-center justify-between p-4 pb-2"
             onClick={(e) => {
-              e.stopPropagation()
-              e.preventDefault()
-            }}>
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+          >
             <div className="flex items-center gap-3">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 className="flex-shrink-0"
               >
-                <Link to={`/profile/${author?.username}`} onClick={(e) => e.stopPropagation()}>
+                <Link
+                  to={`/profile/${author?.username}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <Image
                     src={author?.imageUrl}
                     alt={author?.username}
@@ -227,9 +268,13 @@ function FeedPost({
                   >
                     {author?.username}
                   </Link>
-                  <span className="text-muted-foreground text-sm">@{author?.username}</span>
+                  <span className="text-muted-foreground text-sm">
+                    @{author?.username}
+                  </span>
                   <span className="text-muted-foreground mx-1">·</span>
-                  <time className="text-muted-foreground text-sm hover:underline">{moment(post?.createdAt).fromNow()}</time>
+                  <time className="text-muted-foreground text-sm hover:underline">
+                    {moment(post?.createdAt).fromNow()}
+                  </time>
                 </div>
               </div>
             </div>
@@ -244,17 +289,17 @@ function FeedPost({
 
           {/* Post Actions */}
           <div className="px-4 py-3 border-t border-border">
-            <motion.div
-              initial={{ opacity: 0.8 }}
-              whileHover={{ opacity: 1 }}
-            >
-              <Reactions postId={postId} analytics={post?.analytics} refetchPost={refetchPost} />
+            <motion.div initial={{ opacity: 0.8 }} whileHover={{ opacity: 1 }}>
+              <Reactions
+                postId={postId}
+                analytics={post?.analytics}
+                refetchPost={refetchPost}
+              />
             </motion.div>
           </div>
         </motion.article>
-      )
-      }
-    </motion.div >
+      )}
+    </motion.div>
   );
 }
 

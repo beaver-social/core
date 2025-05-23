@@ -9,7 +9,7 @@ import { verifyUserSignature } from "../../lib/actions/helpers";
 export async function checkUsernameAvailability(username: string) {
   // check if username is available
   const result = await tryCatch(
-    db.select().from(users).where(eq(users.username, username))
+    db.select().from(users).where(eq(users.username, username)),
   );
 
   if (result.error) {
@@ -21,7 +21,7 @@ export async function checkUsernameAvailability(username: string) {
 
 export async function isAddressRegistered(address: string) {
   const result = await tryCatch(
-    db.select().from(users).where(eq(users.address, address))
+    db.select().from(users).where(eq(users.address, address)),
   );
 
   if (result.error) {
@@ -37,7 +37,7 @@ export function generateNonce() {
 
 export async function getUser(userId: number) {
   const result = await tryCatch(
-    db.select().from(users).where(eq(users.id, userId)).limit(1)
+    db.select().from(users).where(eq(users.id, userId)).limit(1),
   );
 
   if (result.error) {
@@ -54,7 +54,7 @@ export async function getUser(userId: number) {
 export async function verifyChallenge(
   message: string,
   userId: number,
-  signature: string
+  signature: string,
 ): Promise<void> {
   // fetch user from db
   const user = await getUser(userId);
@@ -77,7 +77,7 @@ export async function verifyChallenge(
     challengeMessageBytes,
     signature,
     user.loginType,
-    user.address
+    user.address,
   );
 
   // delete challenge from db

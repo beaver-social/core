@@ -17,27 +17,33 @@ function Tabs({ className, tabClassName }: TabsProps) {
       {/* Tabs Header */}
       <div className="sticky glass top-0 z-10 bg-background/50">
         <div className="flex">
-          {tabs && tabs.length > 0 && tabs.map((tab) => (
-            <button
-              key={tab.id}
-              className={cn(
-                "flex-1 py-4 text-center font-semibold",
-                activeTab === tab.id
-                  ? "text-foreground border-b border-foreground"
-                  : "text-foreground/50 hover:text-foreground",
-                tabClassName
-              )}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              {tab.label}
-            </button>
-          ))}
+          {tabs &&
+            tabs.length > 0 &&
+            tabs.map((tab) => (
+              <button
+                key={tab.id}
+                className={cn(
+                  "flex-1 py-4 text-center font-semibold",
+                  activeTab === tab.id
+                    ? "text-foreground border-b border-foreground"
+                    : "text-foreground/50 hover:text-foreground",
+                  tabClassName,
+                )}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                {tab.label}
+              </button>
+            ))}
         </div>
       </div>
 
       {/* Tab Content */}
       <div className="mt-6">
-        {tabs && tabs.length > 0 && tabs.find((tab) => tab.id === activeTab)?.content ? tabs.find((tab) => tab.id === activeTab)?.content : tabs.find((tab) => tab.id === tabs[0].id)?.content}
+        {tabs &&
+        tabs.length > 0 &&
+        tabs.find((tab) => tab.id === activeTab)?.content
+          ? tabs.find((tab) => tab.id === activeTab)?.content
+          : tabs.find((tab) => tab.id === tabs[0].id)?.content}
       </div>
     </div>
   );

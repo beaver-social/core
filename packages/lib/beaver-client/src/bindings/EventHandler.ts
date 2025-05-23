@@ -44,7 +44,7 @@ export default class EventNotifier {
 }
 
 type EventHandler<T extends EventKey> = (
-  data: EventEmissions[T]
+  data: EventEmissions[T],
 ) => void | Promise<void>;
 
 type EventKey = keyof EventEmissions;

@@ -1,6 +1,6 @@
 export function findObjectIdByName(objectChanges: any, name: string) {
   const object = objectChanges.find((obj: any) =>
-    obj.objectType?.endsWith(`::${name}`)
+    obj.objectType?.endsWith(`::${name}`),
   );
 
   const objectId = object?.objectId;

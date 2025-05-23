@@ -91,7 +91,13 @@ export default function SideNav() {
   return (
     <div className="fixed bg-background glass h-screen border-r flex-col justify-between hidden sm:flex w-[14rem]">
       <div className="flex items-center pl-4 pt-4 gap-[6px]">
-        <Image src={theme === "dark" ? "/icons/logo_dark.png" : "/icons/logo_light.png"} alt="logo" className="size-12" />
+        <Image
+          src={
+            theme === "dark" ? "/icons/logo_dark.png" : "/icons/logo_light.png"
+          }
+          alt="logo"
+          className="size-12"
+        />
         <div className="">
           <p className="text-2xl font-bold">Beaver</p>
           <p className="-mt-1 text-sm text-grey-300">Social</p>
@@ -112,8 +118,9 @@ export default function SideNav() {
             >
               {item.to ? (
                 <Link
-                  className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${activeIndex === index ? "bg-primary/5" : "hover:bg-muted"
-                    }`}
+                  className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${
+                    activeIndex === index ? "bg-primary/5" : "hover:bg-muted"
+                  }`}
                   to={item.to}
                 >
                   <Icon
@@ -146,8 +153,9 @@ export default function SideNav() {
                 </Link>
               ) : (
                 <button
-                  className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${activeIndex === index ? "bg-primary/5" : "hover:bg-muted"
-                    }`}
+                  className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${
+                    activeIndex === index ? "bg-primary/5" : "hover:bg-muted"
+                  }`}
                   onClick={item.onClick}
                 >
                   <Icon
@@ -188,29 +196,30 @@ export default function SideNav() {
         {beaver.wallet.isConnected ? (
           <Link
             to={`/app/profile/${user?.username}`}
-            className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors mt-3 ${isProfilePage ? "bg-primary/5" : "hover:bg-muted"
-              }`}
+            className={`relative flex items-center gap-3 px-4 py-3 rounded-md transition-colors mt-3 ${
+              isProfilePage ? "bg-primary/5" : "hover:bg-muted"
+            }`}
           >
             <motion.div
               className="relative rounded-full"
               animate={
                 isProfilePage
                   ? {
-                    boxShadow: [
-                      "0 0 0px rgba(76, 165, 249, 0)",
-                      "0 0 12px rgba(76, 165, 249, 0.7)",
-                      "0 0 0px rgba(76, 165, 249, 0)",
-                    ],
-                  }
+                      boxShadow: [
+                        "0 0 0px rgba(76, 165, 249, 0)",
+                        "0 0 12px rgba(76, 165, 249, 0.7)",
+                        "0 0 0px rgba(76, 165, 249, 0)",
+                      ],
+                    }
                   : {}
               }
               transition={
                 isProfilePage
                   ? {
-                    duration: 4,
-                    repeat: Infinity,
-                    repeatType: "mirror",
-                  }
+                      duration: 4,
+                      repeat: Infinity,
+                      repeatType: "mirror",
+                    }
                   : {}
               }
             >
@@ -235,8 +244,9 @@ export default function SideNav() {
               <Image
                 src={beaver.user?.imageUrl || "/images/user.webp"}
                 alt="user"
-                className={`w-[2rem] border rounded-full ${isProfilePage ? "border-primary" : ""
-                  }`}
+                className={`w-[2rem] border rounded-full ${
+                  isProfilePage ? "border-primary" : ""
+                }`}
               />
             </motion.div>
             <span className={isProfilePage ? "text-primary font-medium" : ""}>

@@ -27,14 +27,14 @@ export default new Hono()
           })
           .from(posts)
           .where(eq(posts.id, postId))
-          .limit(1)
+          .limit(1),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to get post interactions",
-          400
+          400,
         );
       }
 
@@ -47,7 +47,7 @@ export default new Hono()
           data: result.data[0],
           message: "Post interactions fetched successfully",
         },
-        200
+        200,
       );
-    }
+    },
   );

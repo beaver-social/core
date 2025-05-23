@@ -29,7 +29,7 @@ export const useGlobalUI = () => {
   const setScreenHandler = (screen: Screen) => {
     setScreen(screen);
     setActiveTab(
-      getTabs().find((tab) => tab.id === getTabs()[0].id)?.id ?? "default"
+      getTabs().find((tab) => tab.id === getTabs()[0].id)?.id ?? "default",
     );
   };
 

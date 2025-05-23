@@ -13,7 +13,7 @@ const app = new Hono()
         metadata: docsMetadata,
       },
       "Documentation metadata",
-      200
+      200,
     );
   })
 
@@ -24,7 +24,7 @@ const app = new Hono()
       const { id } = ctx.req.valid("param");
 
       const result = await tryCatch(
-        Bun.file(`./api/lib/docs/content/${id}.md`).text()
+        Bun.file(`./api/lib/docs/content/${id}.md`).text(),
       );
 
       if (result.error) {
@@ -40,9 +40,9 @@ const app = new Hono()
           metadata,
         },
         "Documentation fetched successfully.",
-        200
+        200,
       );
-    }
+    },
   );
 
 export default app;

@@ -31,7 +31,7 @@ export const follows = table(
       .on(table.followerId, table.followingId),
     t.index("follower_idx").on(table.followerId),
     t.index("following_idx").on(table.followingId),
-  ]
+  ],
 );
 
 // Topic follows
@@ -54,5 +54,5 @@ export const topicFollows = table(
     t.uniqueIndex("user_topic_follow_idx").on(table.userId, table.topicId),
     t.index("user_follow_idx").on(table.userId),
     t.index("topic_follow_idx").on(table.topicId),
-  ]
+  ],
 );

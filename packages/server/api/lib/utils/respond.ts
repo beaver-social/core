@@ -12,7 +12,7 @@ export const respond = {
   ok: function <
     C extends Context,
     T extends JSONObject,
-    U extends 200 | 201 | 202
+    U extends 200 | 201 | 202,
   >(ctx: C, data: T, message: string, status: U, headers?: HeaderRecord) {
     ctx.status(status);
     for (const [name, value] of Object.entries(headers || {})) {
@@ -23,7 +23,7 @@ export const respond = {
 
   err: function <
     C extends Context,
-    U extends ClientErrorStatusCode | ServerErrorStatusCode
+    U extends ClientErrorStatusCode | ServerErrorStatusCode,
   >(ctx: C, message: string, status: U, headers?: HeaderRecord) {
     ctx.status(status);
     for (const [name, value] of Object.entries(headers || {})) {

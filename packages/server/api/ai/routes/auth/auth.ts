@@ -28,13 +28,13 @@ export default new Hono()
         imageUrl: z.string(),
         about: z.string(),
         loginType: z.enum(["wallet", "zk"]),
-      })
+      }),
     ),
     zValidator(
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { username, fullName, address, imageUrl, about, loginType } =
@@ -51,15 +51,15 @@ export default new Hono()
             receiver: address,
             loginType,
           },
-          signature
-        )
+          signature,
+        ),
       );
 
       if (resp.error) {
         return respond.err(
           ctx,
           resp.error?.message || "Failed to create identity",
-          400
+          400,
         );
       }
 
@@ -67,9 +67,9 @@ export default new Hono()
         ctx,
         { data: {} },
         "Identity Created Successfully",
-        201
+        201,
       );
-    }
+    },
   )
 
   .get(
@@ -78,7 +78,7 @@ export default new Hono()
       "query",
       z.object({
         address: zSuiAddress,
-      })
+      }),
     ),
     async (ctx) => {
       const { address } = ctx.req.valid("query");
@@ -89,14 +89,14 @@ export default new Hono()
         db.insert(challenges).values({
           nonce,
           address,
-        })
+        }),
       );
 
       if (resp.error) {
         return respond.err(
           ctx,
           resp.error?.message || "Failed to generate challenge",
-          400
+          400,
         );
       }
 
@@ -104,9 +104,9 @@ export default new Hono()
         ctx,
         { data: { nonce } },
         "Challenge Generated Successfully",
-        200
+        200,
       );
-    }
+    },
   )
 
   .post(
@@ -117,7 +117,7 @@ export default new Hono()
         address: zSuiAddress,
         message: z.string(),
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { message, signature, address } = ctx.req.valid("json");
@@ -128,14 +128,14 @@ export default new Hono()
           .select()
           .from(challenges)
           .where(eq(challenges.address, address))
-          .limit(1)
+          .limit(1),
       );
 
       if (resp.error) {
         return respond.err(
           ctx,
           resp.error?.message || "Failed to fetch nonce",
-          400
+          400,
         );
       }
 
@@ -153,7 +153,7 @@ export default new Hono()
         signature,
         {
           address,
-        }
+        },
       );
 
       if (!isValid) {
@@ -171,14 +171,14 @@ export default new Hono()
           })
           .from(users)
           .where(eq(users.address, address))
-          .limit(1)
+          .limit(1),
       );
 
       if (userResp.error) {
         return respond.err(
           ctx,
           userResp.error?.message || "Failed to fetch user",
-          400
+          400,
         );
       }
 
@@ -194,19 +194,19 @@ export default new Hono()
 
       // delete nonce from db
       const resp2 = await tryCatch(
-        db.delete(challenges).where(eq(challenges.address, address))
+        db.delete(challenges).where(eq(challenges.address, address)),
       );
 
       if (resp2.error) {
         return respond.err(
           ctx,
           resp2.error?.message || "Failed to delete nonce",
-          400
+          400,
         );
       }
 
       return respond.ok(ctx, { jwt: token }, "JWT Created Successfully", 200);
-    }
+    },
   )
 
   .post(
@@ -222,14 +222,14 @@ export default new Hono()
           })
           .from(users)
           .where(eq(users.address, userAddress))
-          .limit(1)
+          .limit(1),
       );
 
       if (userResp.error) {
         return respond.err(
           ctx,
           userResp.error?.message || "Failed to fetch user",
-          400
+          400,
         );
       }
 
@@ -243,5 +243,5 @@ export default new Hono()
       const token = await sign(payload, env.JWT_SECRET, JWTalgorithm);
 
       return respond.ok(ctx, { jwt: token }, "JWT Created Successfully", 200);
-    }
+    },
   );

@@ -490,7 +490,7 @@ function ErrorHandlingExample() {
                 console.error("Post creation failed:", error);
                 Alert.alert("Error", error.message);
               },
-            }
+            },
           )
         }
       />

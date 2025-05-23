@@ -14,8 +14,8 @@ export function createAction<T>() {
     callback?: (
       tx: Transaction,
       result: R,
-      action: DB["action"]
-    ) => void | Promise<void>
+      action: DB["action"],
+    ) => void | Promise<void>,
   ) {
     return async function (options: ActionOptions<T>, signature: string) {
       // Prepare action request
@@ -48,7 +48,7 @@ export function createAction<T>() {
             ...options,
             user: user,
           },
-          actionType
+          actionType,
         );
 
         // Store action metadata
@@ -66,7 +66,7 @@ export function createAction<T>() {
           hash,
           prevHash,
           actionType,
-          signature
+          signature,
         );
 
         // Execute optional callback

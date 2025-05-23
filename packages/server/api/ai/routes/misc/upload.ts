@@ -15,7 +15,7 @@ export default new Hono()
       "form",
       z.object({
         file: z.instanceof(File),
-      })
+      }),
     ),
     async (ctx) => {
       const { file } = ctx.req.valid("form");
@@ -27,7 +27,7 @@ export default new Hono()
         return respond.err(
           ctx,
           result.error.message || "Failed to upload image",
-          500
+          500,
         );
       }
 
@@ -35,9 +35,9 @@ export default new Hono()
         ctx,
         { url: result.data },
         "Image uploaded successfully",
-        200
+        200,
       );
-    }
+    },
   )
   .post(
     "/video",
@@ -45,7 +45,7 @@ export default new Hono()
       "form",
       z.object({
         file: z.instanceof(File),
-      })
+      }),
     ),
     async (ctx) => {
       const { file } = ctx.req.valid("form");
@@ -57,7 +57,7 @@ export default new Hono()
         return respond.err(
           ctx,
           result.error.message || "Failed to upload video",
-          500
+          500,
         );
       }
 
@@ -65,7 +65,7 @@ export default new Hono()
         ctx,
         { url: result.data.videoUrl, thumbnailUrl: result.data.thumbnailUrl },
         "Video uploaded successfully",
-        200
+        200,
       );
-    }
+    },
   );

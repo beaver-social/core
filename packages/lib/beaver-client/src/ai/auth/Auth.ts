@@ -21,7 +21,7 @@ export default class Auth {
         query: {
           address,
         },
-      })
+      }),
     );
 
     if (result.error) {
@@ -34,7 +34,7 @@ export default class Auth {
   public async verifyChallenge(
     address: string,
     message: string,
-    signature: string
+    signature: string,
   ) {
     const { apiClient } = this.defaults;
 
@@ -45,7 +45,7 @@ export default class Auth {
           message,
           signature,
         },
-      })
+      }),
     );
 
     if (result.error) {

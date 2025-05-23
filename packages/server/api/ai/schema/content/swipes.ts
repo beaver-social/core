@@ -26,5 +26,5 @@ export const swipes = table(
       .int("subscriber_only", { mode: "boolean" })
       .default(false),
   },
-  (table) => [t.index("author_short_idx").on(table.authorId)]
+  (table) => [t.index("author_short_idx").on(table.authorId)],
 );

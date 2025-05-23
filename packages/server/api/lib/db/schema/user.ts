@@ -32,7 +32,7 @@ export const users = t.sqliteTable(
     t.uniqueIndex("address_idx").on(table.address),
     t.uniqueIndex("identity_idx").on(table.identity),
     t.uniqueIndex("suins_idx").on(table.suinsDomainName),
-  ]
+  ],
 );
 
 export const follows = t.sqliteTable(
@@ -51,5 +51,5 @@ export const follows = t.sqliteTable(
   },
   (table) => [
     t.uniqueIndex("follows_idx").on(table.followerId, table.followingId),
-  ]
+  ],
 );

@@ -15,7 +15,7 @@ export const topics = table(
     ...timestamps,
     followerCount: t.int("follower_count").default(0),
   },
-  (table) => [t.index("topic_name_idx").on(table.name)]
+  (table) => [t.index("topic_name_idx").on(table.name)],
 );
 
 export const contentTopics = table(
@@ -39,5 +39,5 @@ export const contentTopics = table(
       .on(table.contentId, table.contentTypeId, table.topicId),
     t.index("content_idx").on(table.contentId, table.contentTypeId),
     t.index("topic_idx").on(table.topicId),
-  ]
+  ],
 );

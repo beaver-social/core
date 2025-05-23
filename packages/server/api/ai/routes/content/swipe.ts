@@ -33,7 +33,7 @@ export default new Hono()
       z.object({
         page: zNumberString,
         limit: zNumberString,
-      })
+      }),
     ),
     async (ctx) => {
       const { page, limit } = ctx.req.valid("query");
@@ -47,14 +47,14 @@ export default new Hono()
           .orderBy(desc(swipes.likesCount))
           .limit(limit)
           .offset(offset)
-          .leftJoin(media, eq(swipes.id, media.contentId))
+          .leftJoin(media, eq(swipes.id, media.contentId)),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error?.message || "Failed to get swipes feed",
-          400
+          400,
         );
       }
 
@@ -64,9 +64,9 @@ export default new Hono()
           data: result.data,
         },
         "Swipes feed fetched successfully",
-        200
+        200,
       );
-    }
+    },
   )
   // get swipe data by ID
   .get(
@@ -80,14 +80,14 @@ export default new Hono()
           .select()
           .from(swipes)
           .where(eq(swipes.id, id))
-          .leftJoin(media, eq(swipes.id, media.contentId))
+          .leftJoin(media, eq(swipes.id, media.contentId)),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error.message || "Failed to fetch swipe",
-          400
+          400,
         );
       }
 
@@ -99,9 +99,9 @@ export default new Hono()
         ctx,
         { data: result.data[0] },
         "Swipe fetched successfully",
-        200
+        200,
       );
-    }
+    },
   )
   // get swipe interaction data by type
   .get(
@@ -113,7 +113,7 @@ export default new Hono()
         type: z.enum(["likes", "reposts", "saves", "comments"]),
         page: zNumberString,
         limit: zNumberString,
-      })
+      }),
     ),
     async (ctx) => {
       const { id } = ctx.req.valid("param");
@@ -123,7 +123,7 @@ export default new Hono()
       let result;
       // Check if swipe exists
       const swipeExists = await tryCatch(
-        db.select().from(swipes).where(eq(swipes.id, id))
+        db.select().from(swipes).where(eq(swipes.id, id)),
       );
 
       if (swipeExists.error || swipeExists.data.length === 0) {
@@ -144,11 +144,11 @@ export default new Hono()
               .from(likes)
               .where(
                 eq(likes.contentId, id) &&
-                  eq(likes.contentTypeId, contentTypeId)
+                  eq(likes.contentTypeId, contentTypeId),
               )
               .innerJoin(users, eq(likes.userId, users.id))
               .limit(limit)
-              .offset(offset)
+              .offset(offset),
           );
           break;
         case "reposts":
@@ -161,11 +161,11 @@ export default new Hono()
               .from(reposts)
               .where(
                 eq(reposts.contentId, id) &&
-                  eq(reposts.contentTypeId, contentTypeId)
+                  eq(reposts.contentTypeId, contentTypeId),
               )
               .innerJoin(users, eq(reposts.userId, users.id))
               .limit(limit)
-              .offset(offset)
+              .offset(offset),
           );
           break;
         case "saves":
@@ -178,11 +178,11 @@ export default new Hono()
               .from(saves)
               .where(
                 eq(saves.contentId, id) &&
-                  eq(saves.contentTypeId, contentTypeId)
+                  eq(saves.contentTypeId, contentTypeId),
               )
               .innerJoin(users, eq(saves.userId, users.id))
               .limit(limit)
-              .offset(offset)
+              .offset(offset),
           );
           break;
         case "comments":
@@ -195,11 +195,11 @@ export default new Hono()
               .from(comments)
               .where(
                 eq(comments.contentId, id) &&
-                  eq(comments.contentTypeId, contentTypeId)
+                  eq(comments.contentTypeId, contentTypeId),
               )
               .innerJoin(users, eq(comments.userId, users.id))
               .limit(limit)
-              .offset(offset)
+              .offset(offset),
           );
           break;
       }
@@ -208,7 +208,7 @@ export default new Hono()
         return respond.err(
           ctx,
           result.error.message || `Failed to fetch ${type}`,
-          400
+          400,
         );
       }
 
@@ -216,9 +216,9 @@ export default new Hono()
         ctx,
         { data: result.data },
         `${type} fetched successfully`,
-        200
+        200,
       );
-    }
+    },
   )
   // get user's personal swipes feed
   .get(
@@ -229,7 +229,7 @@ export default new Hono()
         page: zNumberString,
         limit: zNumberString,
         type: z.enum(["following", "for_you"]),
-      })
+      }),
     ),
     async (ctx) => {
       const userId = ctx.get("user").id;
@@ -249,19 +249,19 @@ export default new Hono()
             .select()
             .from(swipes)
             .where(
-              inArray(swipes.authorId, followingIds) && isNull(swipes.parentId)
+              inArray(swipes.authorId, followingIds) && isNull(swipes.parentId),
             )
             .orderBy(desc(swipes.createdAt))
             .limit(limit)
             .offset(offset)
-            .leftJoin(media, eq(swipes.id, media.contentId))
+            .leftJoin(media, eq(swipes.id, media.contentId)),
         );
 
         if (followingPosts.error) {
           return respond.err(
             ctx,
             followingPosts.error?.message || "Failed to get posts feed",
-            400
+            400,
           );
         }
 
@@ -272,7 +272,7 @@ export default new Hono()
             message: "Posts feed fetched successfully",
           },
           "Posts feed fetched successfully",
-          200
+          200,
         );
       } else if (type === "for_you") {
         const result = await tryCatch(
@@ -283,14 +283,14 @@ export default new Hono()
             .orderBy(sql`RAND()`)
             .limit(limit)
             .offset(offset)
-            .leftJoin(media, eq(swipes.id, media.contentId))
+            .leftJoin(media, eq(swipes.id, media.contentId)),
         );
 
         if (result.error) {
           return respond.err(
             ctx,
             result.error.message || "Failed to get swipes feed",
-            400
+            400,
           );
         }
 
@@ -298,10 +298,10 @@ export default new Hono()
           ctx,
           { data: result.data, message: "Posts feed fetched successfully" },
           "Posts feed fetched successfully",
-          200
+          200,
         );
       }
-    }
+    },
   )
   // get user's own swipes
   .get(
@@ -311,7 +311,7 @@ export default new Hono()
       z.object({
         page: zNumberString,
         limit: zNumberString,
-      })
+      }),
     ),
     async (ctx) => {
       const userId = ctx.get("user").id;
@@ -326,14 +326,14 @@ export default new Hono()
           .orderBy(desc(swipes.createdAt))
           .limit(limit)
           .offset(offset)
-          .leftJoin(media, eq(swipes.id, media.contentId))
+          .leftJoin(media, eq(swipes.id, media.contentId)),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error.message || "Failed to get user's swipes",
-          400
+          400,
         );
       }
 
@@ -341,9 +341,9 @@ export default new Hono()
         ctx,
         { data: result.data, message: "User's swipes fetched successfully" },
         "User's swipes fetched successfully",
-        200
+        200,
       );
-    }
+    },
   )
 
   /**
@@ -362,13 +362,13 @@ export default new Hono()
           nsfw: z.boolean(),
           subscriberOnly: z.boolean().optional(),
         }),
-      })
+      }),
     ),
     zValidator(
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const body = ctx.req.valid("json");
@@ -389,14 +389,14 @@ export default new Hono()
         actions.createSwipe(processedBody, {
           userId,
           signature,
-        })
+        }),
       );
 
       if (resp.error) {
         return respond.err(
           ctx,
           resp.error.message || "Failed to create swipe",
-          400
+          400,
         );
       }
 
@@ -404,9 +404,9 @@ export default new Hono()
         ctx,
         { data: { swipeId: resp.data }, message: "Post Created Successfully" },
         "Post Created Successfully",
-        201
+        201,
       );
-    }
+    },
   )
   // delete swipe by ID
   .delete(
@@ -416,7 +416,7 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id } = ctx.req.valid("param");
@@ -424,14 +424,14 @@ export default new Hono()
       const { signature } = ctx.req.valid("query");
 
       const result = await tryCatch(
-        actions.deleteSwipe(id, { userId, signature })
+        actions.deleteSwipe(id, { userId, signature }),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error.message || "Failed to delete swipe",
-          400
+          400,
         );
       }
 
@@ -439,9 +439,9 @@ export default new Hono()
         ctx,
         { data: null, message: "Swipe deleted successfully" },
         "Swipe deleted successfully",
-        200
+        200,
       );
-    }
+    },
   )
   // update swipe by ID
   .patch(
@@ -457,13 +457,13 @@ export default new Hono()
             subscriberOnly: z.boolean().optional(),
           })
           .optional(),
-      })
+      }),
     ),
     zValidator(
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id } = ctx.req.valid("param");
@@ -489,15 +489,15 @@ export default new Hono()
             mentions,
             flags: body.flags,
           },
-          { userId, signature }
-        )
+          { userId, signature },
+        ),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error.message || "Failed to update swipe",
-          400
+          400,
         );
       }
 
@@ -505,9 +505,9 @@ export default new Hono()
         ctx,
         { data: null, message: "Swipe updated successfully" },
         "Swipe updated successfully",
-        200
+        200,
       );
-    }
+    },
   )
   // like swipe by ID
   .post(
@@ -517,7 +517,7 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id } = ctx.req.valid("param");
@@ -525,14 +525,14 @@ export default new Hono()
       const { signature } = ctx.req.valid("query");
 
       const result = await tryCatch(
-        actions.likeSwipe(id, { userId, signature })
+        actions.likeSwipe(id, { userId, signature }),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error.message || "Failed to like swipe",
-          400
+          400,
         );
       }
 
@@ -540,9 +540,9 @@ export default new Hono()
         ctx,
         { data: null, message: "Swipe liked successfully" },
         "Swipe liked successfully",
-        200
+        200,
       );
-    }
+    },
   )
   // unlike swipe by ID
   .post(
@@ -552,7 +552,7 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id } = ctx.req.valid("param");
@@ -560,14 +560,14 @@ export default new Hono()
       const { signature } = ctx.req.valid("query");
 
       const result = await tryCatch(
-        actions.unlikeSwipe(id, { userId, signature })
+        actions.unlikeSwipe(id, { userId, signature }),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error.message || "Failed to unlike swipe",
-          400
+          400,
         );
       }
 
@@ -575,9 +575,9 @@ export default new Hono()
         ctx,
         { data: null, message: "Swipe unliked successfully" },
         "Swipe unliked successfully",
-        200
+        200,
       );
-    }
+    },
   )
   // repost swipe by ID
   .post(
@@ -587,13 +587,13 @@ export default new Hono()
       "json",
       z.object({
         quote: z.string().optional(),
-      })
+      }),
     ),
     zValidator(
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id } = ctx.req.valid("param");
@@ -602,14 +602,14 @@ export default new Hono()
       const { signature } = ctx.req.valid("query");
 
       const result = await tryCatch(
-        actions.repostSwipe(id, quote, { userId, signature })
+        actions.repostSwipe(id, quote, { userId, signature }),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error.message || "Failed to repost swipe",
-          400
+          400,
         );
       }
 
@@ -617,9 +617,9 @@ export default new Hono()
         ctx,
         { data: null, message: "Swipe reposted successfully" },
         "Swipe reposted successfully",
-        200
+        200,
       );
-    }
+    },
   )
   // unrepost swipe by ID
   .post(
@@ -629,7 +629,7 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id } = ctx.req.valid("param");
@@ -637,14 +637,14 @@ export default new Hono()
       const { signature } = ctx.req.valid("query");
 
       const result = await tryCatch(
-        actions.unrepostSwipe(id, { userId, signature })
+        actions.unrepostSwipe(id, { userId, signature }),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error.message || "Failed to unrepost swipe",
-          400
+          400,
         );
       }
 
@@ -652,9 +652,9 @@ export default new Hono()
         ctx,
         { data: null, message: "Swipe unreposted successfully" },
         "Swipe unreposted successfully",
-        200
+        200,
       );
-    }
+    },
   )
   // save swipe by ID
   .post(
@@ -664,7 +664,7 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id } = ctx.req.valid("param");
@@ -672,14 +672,14 @@ export default new Hono()
       const { signature } = ctx.req.valid("query");
 
       const result = await tryCatch(
-        actions.saveSwipe(id, { userId, signature })
+        actions.saveSwipe(id, { userId, signature }),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error.message || "Failed to save swipe",
-          400
+          400,
         );
       }
 
@@ -687,9 +687,9 @@ export default new Hono()
         ctx,
         { data: null, message: "Swipe saved successfully" },
         "Swipe saved successfully",
-        200
+        200,
       );
-    }
+    },
   )
   // unsave swipe by ID
   .post(
@@ -699,7 +699,7 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id } = ctx.req.valid("param");
@@ -707,14 +707,14 @@ export default new Hono()
       const { signature } = ctx.req.valid("query");
 
       const result = await tryCatch(
-        actions.unsaveSwipe(id, { userId, signature })
+        actions.unsaveSwipe(id, { userId, signature }),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error.message || "Failed to unsave swipe",
-          400
+          400,
         );
       }
 
@@ -722,9 +722,9 @@ export default new Hono()
         ctx,
         { data: null, message: "Swipe unsaved successfully" },
         "Swipe unsaved successfully",
-        200
+        200,
       );
-    }
+    },
   )
   // report swipe by ID
   .post(
@@ -744,13 +744,13 @@ export default new Hono()
           "other",
         ]),
         details: z.string().optional(),
-      })
+      }),
     ),
     zValidator(
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id } = ctx.req.valid("param");
@@ -759,14 +759,14 @@ export default new Hono()
       const { signature } = ctx.req.valid("query");
 
       const result = await tryCatch(
-        actions.reportSwipe(id, reason, details, { userId, signature })
+        actions.reportSwipe(id, reason, details, { userId, signature }),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error.message || "Failed to report swipe",
-          400
+          400,
         );
       }
 
@@ -774,9 +774,9 @@ export default new Hono()
         ctx,
         { data: null, message: "Report submitted successfully" },
         "Report submitted successfully",
-        200
+        200,
       );
-    }
+    },
   )
   // pin swipe by ID
   .post(
@@ -786,7 +786,7 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id } = ctx.req.valid("param");
@@ -794,14 +794,14 @@ export default new Hono()
       const { signature } = ctx.req.valid("query");
 
       const result = await tryCatch(
-        actions.pinSwipe(id, { userId, signature })
+        actions.pinSwipe(id, { userId, signature }),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error.message || "Failed to pin swipe",
-          400
+          400,
         );
       }
 
@@ -809,9 +809,9 @@ export default new Hono()
         ctx,
         { data: null, message: "Swipe pinned successfully" },
         "Swipe pinned successfully",
-        200
+        200,
       );
-    }
+    },
   )
   // unpin swipe by ID
   .post(
@@ -821,7 +821,7 @@ export default new Hono()
       "query",
       z.object({
         signature: z.string(),
-      })
+      }),
     ),
     async (ctx) => {
       const { id } = ctx.req.valid("param");
@@ -829,14 +829,14 @@ export default new Hono()
       const { signature } = ctx.req.valid("query");
 
       const result = await tryCatch(
-        actions.unpinSwipe(id, { userId, signature })
+        actions.unpinSwipe(id, { userId, signature }),
       );
 
       if (result.error) {
         return respond.err(
           ctx,
           result.error.message || "Failed to unpin swipe",
-          400
+          400,
         );
       }
 
@@ -844,7 +844,7 @@ export default new Hono()
         ctx,
         { data: null, message: "Swipe unpinned successfully" },
         "Swipe unpinned successfully",
-        200
+        200,
       );
-    }
+    },
   );

@@ -34,5 +34,5 @@ export const reports = table(
     t.index("reporter_idx").on(table.reporterId),
     t.index("content_report_idx").on(table.contentId, table.contentTypeId),
     t.index("status_idx").on(table.status),
-  ]
+  ],
 );

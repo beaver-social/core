@@ -5,7 +5,7 @@ export abstract class Singleton {
     const ctor = this.constructor;
     if (Singleton._instances.has(ctor)) {
       throw new Error(
-        `Instance of ${ctor.name} already exists. Use getInstance().`
+        `Instance of ${ctor.name} already exists. Use getInstance().`,
       );
     }
     Singleton._instances.set(ctor, this);

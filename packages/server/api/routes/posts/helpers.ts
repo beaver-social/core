@@ -48,7 +48,7 @@ export async function preprocessPostContent(content: string): Promise<{
 }> {
   return new Promise((resolve, reject) => {
     const { data: sanitized, error } = tryCatchSync(() =>
-      sanitizePostContent(content)
+      sanitizePostContent(content),
     );
 
     if (error) {
@@ -124,7 +124,7 @@ export async function preprocessImageMedia(imageBuffer: Buffer) {
   if (!isValidFormat) {
     throw new Error(
       "Unsupported image format. Supported formats are: " +
-        SUPPORTED_IMAGE_FORMATS.join(", ")
+        SUPPORTED_IMAGE_FORMATS.join(", "),
     );
   }
 
@@ -152,18 +152,18 @@ async function validateVideoFormat(videoBuffer: Buffer): Promise<boolean> {
         }
 
         const hasVideoStream = metadata.streams.some(
-          (stream: FfprobeStream) => stream.codec_type === "video"
+          (stream: FfprobeStream) => stream.codec_type === "video",
         );
 
         const hasValidCodec = metadata.streams.some(
           (stream: FfprobeStream) =>
             stream.codec_type === "video" &&
             stream.codec_name &&
-            SUPPORTED_VIDEO_CODECS.includes(stream.codec_name)
+            SUPPORTED_VIDEO_CODECS.includes(stream.codec_name),
         );
 
         resolve(hasVideoStream && hasValidCodec);
-      }
+      },
     );
   });
 }
@@ -252,7 +252,7 @@ export async function preprocessVideoMedia(videoBuffer: Buffer) {
   if (!isValidFormat) {
     throw new Error(
       "Unsupported video format. Supported formats are: " +
-        SUPPORTED_VIDEO_CODECS.join(", ")
+        SUPPORTED_VIDEO_CODECS.join(", "),
     );
   }
 
@@ -276,12 +276,12 @@ async function cleanupTempFile(filePath: string): Promise<void> {
 
 async function bufferToTempFile(
   buffer: Buffer,
-  extension: string
+  extension: string,
 ): Promise<string> {
   const tempFilePath = path.join(
     process.cwd(),
     "tmp",
-    `${randomUUID()}.${extension}`
+    `${randomUUID()}.${extension}`,
   );
   return new Promise((resolve, reject) => {
     const writeStream = createWriteStream(tempFilePath);

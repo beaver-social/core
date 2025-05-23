@@ -6,7 +6,7 @@ interface UseInViewOptions {
 }
 
 export function useInView<T extends HTMLElement>(
-  options: UseInViewOptions = {}
+  options: UseInViewOptions = {},
 ): [RefObject<T>, boolean] {
   const [isInView, setIsInView] = useState(false);
   const ref = useRef<T>(null);
@@ -20,7 +20,7 @@ export function useInView<T extends HTMLElement>(
       ([entry]) => {
         setIsInView(entry.isIntersecting);
       },
-      { threshold, rootMargin }
+      { threshold, rootMargin },
     );
 
     observer.observe(element);

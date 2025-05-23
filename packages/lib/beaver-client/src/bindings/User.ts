@@ -38,7 +38,7 @@ export default class User {
     options: Pick<
       ApiParams<Api["users"]["$post"]>["form"],
       "username" | "fullName" | "about" | "image"
-    >
+    >,
   ) {
     const { features, address } = this.defaults.store;
     if (!features || !address) {
@@ -48,7 +48,7 @@ export default class User {
     const { nonce } = await safeParseResponse(
       this.defaults.apiClient.rpc.users.nonce.$get({
         query: { address },
-      })
+      }),
     );
 
     const { signature } = await features.signPersonalMessage(nonce);
@@ -60,7 +60,7 @@ export default class User {
           address: address,
           signature,
         },
-      })
+      }),
     );
 
     this.defaults.store.syncUserAndActionPointer();
@@ -78,7 +78,7 @@ export default class User {
     const { nonce } = await safeParseResponse(
       this.defaults.apiClient.rpc.users.nonce.$get({
         query: { address },
-      })
+      }),
     );
 
     const { signature } = await features.signPersonalMessage(nonce);
@@ -89,7 +89,7 @@ export default class User {
           address,
           signature,
         },
-      })
+      }),
     );
 
     // await sleep(1500); // Wait for the jwt token to be valid
@@ -100,7 +100,7 @@ export default class User {
     if (!user) {
       this.logout();
       return console.log(
-        "BEAVER FATAL : Unable to fetch user data. Logging out."
+        "BEAVER FATAL : Unable to fetch user data. Logging out.",
       );
     }
 
@@ -131,7 +131,7 @@ export default class User {
     return safeParseResponse(
       this.defaults.apiClient.rpc.users.$patch({
         json: options,
-      })
+      }),
     );
   }
 
@@ -144,7 +144,7 @@ export default class User {
     return safeParseResponse(
       this.defaults.apiClient.rpc.users.find.$get({
         query: { type, value },
-      })
+      }),
     );
   }
 
@@ -154,7 +154,7 @@ export default class User {
     return safeParseResponse(
       this.defaults.apiClient.rpc.users["search-suggestions"].$get({
         query: { search, limit: limit.toString() },
-      })
+      }),
     );
   }
 
@@ -168,7 +168,7 @@ export default class User {
       this.defaults.apiClient.rpc.users[":id"].followers.$get({
         query: { page: page.toString(), perPage: perPage.toString() },
         param: { id: userId.toString() },
-      })
+      }),
     );
   }
 
@@ -182,7 +182,7 @@ export default class User {
       this.defaults.apiClient.rpc.users[":id"].following.$get({
         query: { page: page.toString(), perPage: perPage.toString() },
         param: { id: userId.toString() },
-      })
+      }),
     );
   }
 
@@ -191,7 +191,7 @@ export default class User {
     return safeParseResponse(
       this.defaults.apiClient.rpc.users[":id"]["follow-count"].$get({
         param: { id: userId.toString() },
-      })
+      }),
     );
   }
 
@@ -208,14 +208,14 @@ export default class User {
         userId: user.id,
         type: "v1.user.follow.user",
         previous: actionPointer,
-      })
+      }),
     );
 
     const followUser = safeParseResponse(
       this.defaults.apiClient.rpc.users[":id"].follow.$post({
         json: { signature },
         param: { id: followingId.toString() },
-      })
+      }),
     );
 
     this.defaults.store.syncUserAndActionPointer();
@@ -234,14 +234,14 @@ export default class User {
         userId: user.id,
         type: "v1.user.unfollow.user",
         previous: actionPointer,
-      })
+      }),
     );
 
     const unfollowUser = safeParseResponse(
       this.defaults.apiClient.rpc.users[":id"].follow.$delete({
         json: { signature },
         param: { id: followingId.toString() },
-      })
+      }),
     );
 
     this.defaults.store.syncUserAndActionPointer();
@@ -253,7 +253,7 @@ export default class User {
     const pinnedPost = safeParseResponse(
       this.defaults.apiClient.rpc.users[":id"].pin.$get({
         param: { id: userId.toString() },
-      })
+      }),
     );
     return pinnedPost;
   }
@@ -272,14 +272,14 @@ export default class User {
         userId: user.id,
         type: "v1.user.pin.post",
         previous: actionPointer,
-      })
+      }),
     );
 
     const pinPost = safeParseResponse(
       this.defaults.apiClient.rpc.users[":id"].pin.$post({
         json: { signature },
         param: { id: user.id.toString() },
-      })
+      }),
     );
     return pinPost;
   }
@@ -296,13 +296,13 @@ export default class User {
         userId: user.id,
         type: "v1.user.pin.post",
         previous: actionPointer,
-      })
+      }),
     );
 
     const unpinPost = safeParseResponse(
       this.defaults.apiClient.rpc.users.pin.$delete({
         json: { signature },
-      })
+      }),
     );
     return unpinPost;
   }

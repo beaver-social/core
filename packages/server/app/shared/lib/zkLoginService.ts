@@ -47,7 +47,7 @@ class zkLoginService {
           | "localnet"
           | "testnet"
           | "mainnet"
-          | "devnet"
+          | "devnet",
       ),
     });
   }
@@ -66,7 +66,7 @@ class zkLoginService {
     const nonce = generateNonce(
       ephemeralKeyPair.getPublicKey(),
       maxEpoch,
-      randomness
+      randomness,
     );
 
     return {
@@ -155,13 +155,13 @@ class zkLoginService {
   async getZkProof(
     jwt: string,
     ephemeralKeyPair: EphemeralKeyPair,
-    userSalt: bigint
+    userSalt: bigint,
   ): Promise<any> {
     try {
       const keyPair = Ed25519Keypair.fromSecretKey(ephemeralKeyPair.secretKey);
 
       const extendedEphemeralPublicKey = getExtendedEphemeralPublicKey(
-        keyPair.getPublicKey()
+        keyPair.getPublicKey(),
       );
 
       // Prepare data for the ZK proving request
@@ -200,7 +200,7 @@ class zkLoginService {
    */
   async completeZkLoginFlow(
     ephemeralKeyPair: EphemeralKeyPair,
-    redirectUrl: string
+    redirectUrl: string,
   ): Promise<ZkLoginData> {
     // Deserialize the ephemeral key pair
     const { jwt, decodedJwt } = this.extractAndDecodeJwt(redirectUrl);
@@ -214,7 +214,7 @@ class zkLoginService {
     const partialZkLoginSignature = await this.getZkProof(
       jwt,
       ephemeralKeyPair,
-      userSalt
+      userSalt,
     );
 
     if (partialZkLoginSignature.error) {
@@ -235,7 +235,7 @@ class zkLoginService {
   // Create a zkLogin signature that can be used to submit personal messages
   async zkSignPersonalMessage(
     zkLoginData: StoredZkLoginData,
-    message: string
+    message: string,
   ): Promise<{ zkLoginSignature: string }> {
     const ephemeralKeyPair = zkLoginData.ephemeralKeyPair;
     const aud = zkLoginData.decodedJwt.aud;
@@ -246,7 +246,7 @@ class zkLoginService {
       BigInt(zkLoginData.userSalt),
       "sub",
       subString,
-      audienceString
+      audienceString,
     ).toString();
 
     // convert string to Uint8Array
@@ -256,9 +256,8 @@ class zkLoginService {
     const keypair = Ed25519Keypair.fromSecretKey(ephemeralKeyPair.secretKey);
 
     // Sign the transaction with the ephemeral key
-    const { signature: userSignature } = await keypair.signPersonalMessage(
-      messageBytes
-    );
+    const { signature: userSignature } =
+      await keypair.signPersonalMessage(messageBytes);
 
     // Create the zkLogin signature
     const zkLoginSignature = getZkLoginSignature({
@@ -288,7 +287,7 @@ class zkLoginService {
   // Create a zkLogin signature that can be used to submit transactions
   async zkSignTransaction(
     zkLoginData: StoredZkLoginData,
-    tx: Transaction
+    tx: Transaction,
   ): Promise<{ zkLoginSignature: string; txBytes: Uint8Array }> {
     const ephemeralKeyPair = zkLoginData.ephemeralKeyPair;
 
@@ -309,7 +308,7 @@ class zkLoginService {
       BigInt(zkLoginData.userSalt),
       "sub",
       subString,
-      audienceString
+      audienceString,
     ).toString();
 
     const zkLoginSignature = getZkLoginSignature({
@@ -329,7 +328,7 @@ class zkLoginService {
         client: new SuiGraphQLClient({
           url: fullnodeUrl,
         }),
-      }
+      },
     );
 
     const verified = publicKey.toSuiAddress() === zkLoginData.userAddress;
@@ -343,12 +342,12 @@ class zkLoginService {
   // Execute a transaction with zkLogin
   async executeTransactionWithZkLogin(
     zkLoginData: StoredZkLoginData,
-    tx: Transaction
+    tx: Transaction,
   ): Promise<{ success: boolean; digest?: string; error?: string }> {
     try {
       const { txBytes, zkLoginSignature } = await this.zkSignTransaction(
         zkLoginData,
-        tx
+        tx,
       );
 
       // Execute the transaction

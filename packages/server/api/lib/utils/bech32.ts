@@ -49,7 +49,7 @@ export function convertBits(
   data: number[],
   fromBits: number,
   toBits: number,
-  pad = true
+  pad = true,
 ): Uint8Array {
   let acc = 0,
     bits = 0,

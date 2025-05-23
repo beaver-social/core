@@ -59,7 +59,7 @@ export async function preprocessImage(imageBuffer: Buffer) {
   if (!isValidFormat) {
     throw new Error(
       "Unsupported image format. Supported formats are: " +
-        SUPPORTED_IMAGE_FORMATS.join(", ")
+        SUPPORTED_IMAGE_FORMATS.join(", "),
     );
   }
 

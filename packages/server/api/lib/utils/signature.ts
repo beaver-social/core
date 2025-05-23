@@ -35,7 +35,7 @@ export async function verifySignature(
   options: {
     address: string;
     intent: Intent;
-  }
+  },
 ): Promise<boolean> {
   const address = normalizeSuiAddress(options.address);
   const intent = options.intent;

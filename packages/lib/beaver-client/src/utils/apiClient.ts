@@ -7,7 +7,7 @@ type ErrorResponse = { success: false; error: string };
 type SuccessResponse<T> = { success: true; data: T; message: string };
 
 export async function safeParseResponse<T>(
-  raw: Promise<ClientResponse<SuccessResponse<T> | ErrorResponse>>
+  raw: Promise<ClientResponse<SuccessResponse<T> | ErrorResponse>>,
 ) {
   const { error: awaitedError, data: response } = await tryCatch(raw);
 

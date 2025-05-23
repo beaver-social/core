@@ -110,7 +110,7 @@ export class BeaverStore {
             account,
             transaction: tx,
             chain: "sui:testnet",
-          }
+          },
         );
 
         return response;
@@ -131,7 +131,7 @@ export class BeaverStore {
 
     if (!this.isAuthenticated()) return false;
     const { nonce } = await safeParseResponse(
-      this.apiClient.rpc.users.nonce.$get()
+      this.apiClient.rpc.users.nonce.$get(),
     );
 
     this._actionPointer = nonce;

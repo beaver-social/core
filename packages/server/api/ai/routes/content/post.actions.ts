@@ -62,8 +62,8 @@ export const createPost = createAction<{
           .where(
             and(
               eq(interactionSchema.follows.followerId, userId),
-              eq(interactionSchema.follows.followingId, parentAuthorId)
-            )
+              eq(interactionSchema.follows.followingId, parentAuthorId),
+            ),
           )
           .limit(1);
 
@@ -104,7 +104,7 @@ export const createPost = createAction<{
             // Convert Base64 to Buffer
             const imageData = Buffer.from(
               mediaItem.url.split(",")[1] || mediaItem.url,
-              "base64"
+              "base64",
             );
 
             // Process and upload to S3, get back the URL
@@ -125,7 +125,7 @@ export const createPost = createAction<{
             // Convert Base64 to Buffer
             const videoData = Buffer.from(
               mediaItem.url.split(",")[1] || mediaItem.url,
-              "base64"
+              "base64",
             );
 
             // Process and upload to S3, get back both video URL and thumbnail URL
@@ -174,7 +174,7 @@ export const createPost = createAction<{
         })
         .where(eq(contentSchema.posts.id, post.parentId));
     }
-  }
+  },
 );
 
 // Deletes a post if the user has permission
@@ -217,7 +217,7 @@ export const deletePost = createAction<{ postId: number }>()(
       .update(interactionSchema.contentActions)
       .set({ deleted: true })
       .where(eq(interactionSchema.contentActions.contentId, post.id));
-  }
+  },
 );
 
 // Likes a post if it exists and hasn't been liked by the user yet
@@ -247,8 +247,8 @@ export const likePost = createAction<{
       .where(
         and(
           eq(interactionSchema.likes.userId, userId),
-          eq(interactionSchema.likes.contentId, postId)
-        )
+          eq(interactionSchema.likes.contentId, postId),
+        ),
       )
       .limit(1);
 
@@ -277,7 +277,7 @@ export const likePost = createAction<{
 // Unlikes a post if it has been liked by the user
 export const unlikePost = createAction<{ postId: number }>()(function (
   tx,
-  { postId, userId }
+  { postId, userId },
 ) {
   return (async () => {
     // Check if like exists
@@ -287,8 +287,8 @@ export const unlikePost = createAction<{ postId: number }>()(function (
       .where(
         and(
           eq(interactionSchema.likes.userId, userId),
-          eq(interactionSchema.likes.contentId, postId)
-        )
+          eq(interactionSchema.likes.contentId, postId),
+        ),
       )
       .limit(1);
 
@@ -301,8 +301,8 @@ export const unlikePost = createAction<{ postId: number }>()(function (
       .where(
         and(
           eq(interactionSchema.likes.userId, userId),
-          eq(interactionSchema.likes.contentId, postId)
-        )
+          eq(interactionSchema.likes.contentId, postId),
+        ),
       );
 
     await tx
@@ -319,7 +319,7 @@ export const unlikePost = createAction<{ postId: number }>()(function (
 // Pins a post for the user if they have permission
 export const pinPost = createAction<{ postId: number }>()(function (
   tx,
-  { postId, userId }
+  { postId, userId },
 ) {
   return (async () => {
     const [post] = await tx
@@ -331,8 +331,8 @@ export const pinPost = createAction<{ postId: number }>()(function (
       .where(
         and(
           eq(contentSchema.posts.id, postId),
-          eq(contentSchema.posts.authorId, userId)
-        )
+          eq(contentSchema.posts.authorId, userId),
+        ),
       )
       .limit(1);
 
@@ -416,8 +416,8 @@ export const updatePost = createAction<{
     .where(
       and(
         eq(contentSchema.posts.id, postId),
-        eq(contentSchema.posts.authorId, userId)
-      )
+        eq(contentSchema.posts.authorId, userId),
+      ),
     )
     .limit(1);
 
@@ -442,8 +442,8 @@ export const updatePost = createAction<{
     .where(
       and(
         eq(contentSchema.media.contentId, postId),
-        eq(contentSchema.media.contentTypeId, 1)
-      )
+        eq(contentSchema.media.contentTypeId, 1),
+      ),
     );
 
   // Add new media
@@ -454,7 +454,7 @@ export const updatePost = createAction<{
         // Convert Base64 to Buffer
         const imageData = Buffer.from(
           mediaItem.url.split(",")[1] || mediaItem.url,
-          "base64"
+          "base64",
         );
 
         // Process and upload to S3, get back the URL
@@ -475,13 +475,12 @@ export const updatePost = createAction<{
         // Convert Base64 to Buffer
         const videoData = Buffer.from(
           mediaItem.url.split(",")[1] || mediaItem.url,
-          "base64"
+          "base64",
         );
 
         // Process and upload to S3, get back URLs
-        const { videoUrl, thumbnailUrl } = await helpers.processAndUploadVideo(
-          videoData
-        );
+        const { videoUrl, thumbnailUrl } =
+          await helpers.processAndUploadVideo(videoData);
 
         // Store the video URL in the database
         await tx.insert(contentSchema.media).values({
@@ -568,7 +567,7 @@ export const repostPost = createAction<{
       actionId: action.id,
       contentId: repost.id,
     });
-  }
+  },
 );
 
 // Deletes a repost if the user has permission
@@ -583,8 +582,8 @@ export const unrepostPost = createAction<{
       and(
         eq(contentSchema.posts.id, postId),
         eq(contentSchema.posts.authorId, userId),
-        isNotNull(contentSchema.posts.parentId)
-      )
+        isNotNull(contentSchema.posts.parentId),
+      ),
     )
     .limit(1);
 
@@ -644,8 +643,8 @@ export const savePost = createAction<{
       and(
         eq(interactionSchema.saves.contentId, postId),
         eq(interactionSchema.saves.userId, userId),
-        eq(interactionSchema.saves.contentTypeId, 1)
-      )
+        eq(interactionSchema.saves.contentTypeId, 1),
+      ),
     )
     .limit(1);
 
@@ -675,8 +674,8 @@ export const unsavePost = createAction<{
       and(
         eq(interactionSchema.saves.contentId, postId),
         eq(interactionSchema.saves.userId, userId),
-        eq(interactionSchema.saves.contentTypeId, 1)
-      )
+        eq(interactionSchema.saves.contentTypeId, 1),
+      ),
     )
     .limit(1);
 
@@ -691,8 +690,8 @@ export const unsavePost = createAction<{
       and(
         eq(interactionSchema.saves.contentId, postId),
         eq(interactionSchema.saves.userId, userId),
-        eq(interactionSchema.saves.contentTypeId, 1)
-      )
+        eq(interactionSchema.saves.contentTypeId, 1),
+      ),
     );
 
   return { success: true, postId };

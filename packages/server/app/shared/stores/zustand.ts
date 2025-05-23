@@ -7,7 +7,7 @@ interface ZkAuthStore {
   setZkEphemeralKeyPair: (zkEphemeralKeyPair: string | null) => void;
   partialZkLoginSignature: partialZkLoginSignature | null;
   setPartialZkLoginSignature: (
-    partialZkLoginSignature: partialZkLoginSignature | null
+    partialZkLoginSignature: partialZkLoginSignature | null,
   ) => void;
   zkLoginData: StoredZkLoginData | null;
   setZkLoginData: (zkLoginData: StoredZkLoginData | null) => void;
@@ -25,8 +25,8 @@ export const useZkAuthStore = create<ZkAuthStore>()(
       zkLoginData: null,
       setZkLoginData: (zkLoginData) => set({ zkLoginData }),
     }),
-    { name: "zk-auth-store" }
-  )
+    { name: "zk-auth-store" },
+  ),
 );
 
 interface OnboardingProgress {
@@ -79,6 +79,6 @@ export const useGlobalUIStore = create<GlobalUIStore>()(
       demoTab: "wallet",
       setDemoTab: (tab) => set({ demoTab: tab }),
     }),
-    { name: "global-ui-store" }
-  )
+    { name: "global-ui-store" },
+  ),
 );

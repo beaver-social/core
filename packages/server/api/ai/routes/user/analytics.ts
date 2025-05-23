@@ -88,7 +88,7 @@ export default new Hono()
           success: true,
           message: "Delete report schedule",
         });
-      })
+      }),
   )
 
   // Content Analytics
@@ -142,7 +142,7 @@ export default new Hono()
           effectiveness: {},
           message: "Get hashtag performance",
         });
-      })
+      }),
   )
 
   // Audience Analytics
@@ -199,5 +199,5 @@ export default new Hono()
           reasons: {},
           message: "Get lost follower analytics",
         });
-      })
+      }),
   );

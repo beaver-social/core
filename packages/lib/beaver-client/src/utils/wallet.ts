@@ -11,22 +11,22 @@ import {
 import { z } from "zod";
 
 export function getRegisteredWallets<
-  AdditionalFeatures extends Wallet["features"]
+  AdditionalFeatures extends Wallet["features"],
 >(
   preferredWallets: string[],
-  walletFilter?: (wallet: WalletWithRequiredFeatures) => boolean
+  walletFilter?: (wallet: WalletWithRequiredFeatures) => boolean,
 ) {
   const walletsApi = getWallets();
   const wallets = walletsApi.get();
 
   const suiWallets = wallets.filter(
     (
-      wallet
+      wallet,
     ): wallet is WalletWithFeatures<
       MinimallyRequiredFeatures & AdditionalFeatures
     > =>
       isWalletWithRequiredFeatureSet(wallet) &&
-      (!walletFilter || walletFilter(wallet))
+      (!walletFilter || walletFilter(wallet)),
   );
 
   return [

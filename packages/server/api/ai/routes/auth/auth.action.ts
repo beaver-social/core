@@ -13,62 +13,63 @@ export const createIdentity = createAction<{
   fullName: string;
   imageUrl: string;
   loginType: "wallet" | "zk";
-}>()(
-  async (tx, { username, about, receiver, fullName, imageUrl, loginType }) => {
-    const suiTx = new Transaction();
-    contracts.admin.mint_for(suiTx, {
-      username: username,
-      about: about,
-      receiver: receiver,
-      adminCap: { id: defaultAdminCapId },
+}>()(async (
+  tx,
+  { username, about, receiver, fullName, imageUrl, loginType },
+) => {
+  const suiTx = new Transaction();
+  contracts.admin.mint_for(suiTx, {
+    username: username,
+    about: about,
+    receiver: receiver,
+    adminCap: { id: defaultAdminCapId },
+  });
+
+  const suiTxResp = await tryCatch(
+    suiClient.signAndExecuteTransaction({
+      signer: serverKeypair,
+      transaction: suiTx,
+    }),
+  );
+
+  if (suiTxResp.error) {
+    throw new Error("Failed to create identity on-chain", {
+      cause: suiTxResp.error.message,
     });
+  }
 
-    const suiTxResp = await tryCatch(
-      suiClient.signAndExecuteTransaction({
-        signer: serverKeypair,
-        transaction: suiTx,
-      })
-    );
+  const { objectChanges } = suiTxResp.data;
 
-    if (suiTxResp.error) {
-      throw new Error("Failed to create identity on-chain", {
-        cause: suiTxResp.error.message,
-      });
-    }
+  if (!objectChanges) {
+    return tx.rollback();
+  }
 
-    const { objectChanges } = suiTxResp.data;
-
-    if (!objectChanges) {
-      return tx.rollback();
-    }
-
-    let identityAddress = "";
-    for (const change of objectChanges) {
-      if (
-        change.type === "created" &&
-        change.objectType === "0x2::identity::Identity"
-      ) {
-        identityAddress = change.objectId;
-        break;
-      }
-    }
-
-    const addUser = await tryCatch(
-      tx.insert(userSchema.users).values({
-        identity: identityAddress,
-        username: username,
-        fullName: fullName,
-        imageUrl: imageUrl,
-        about: about,
-        address: receiver,
-        loginType: loginType,
-      })
-    );
-
-    if (addUser.error) {
-      throw new Error("Failed to insert user into database", {
-        cause: addUser.error.message,
-      });
+  let identityAddress = "";
+  for (const change of objectChanges) {
+    if (
+      change.type === "created" &&
+      change.objectType === "0x2::identity::Identity"
+    ) {
+      identityAddress = change.objectId;
+      break;
     }
   }
-);
+
+  const addUser = await tryCatch(
+    tx.insert(userSchema.users).values({
+      identity: identityAddress,
+      username: username,
+      fullName: fullName,
+      imageUrl: imageUrl,
+      about: about,
+      address: receiver,
+      loginType: loginType,
+    }),
+  );
+
+  if (addUser.error) {
+    throw new Error("Failed to insert user into database", {
+      cause: addUser.error.message,
+    });
+  }
+});

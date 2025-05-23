@@ -205,7 +205,7 @@ function PostFeed() {
   return (
     <div>
       {data?.pages.map((page) =>
-        page.posts.map((post) => <div key={post.id}>{post.content}</div>)
+        page.posts.map((post) => <div key={post.id}>{post.content}</div>),
       )}
 
       {hasNextPage && (
@@ -325,11 +325,7 @@ function UserSearch({ query }) {
   return (
     <div>
       <h3>Search Results</h3>
-      <ul>
-        {results?.map((user) => (
-          <li key={user.id}>{user.username}</li>
-        ))}
-      </ul>
+      <ul>{results?.map((user) => <li key={user.id}>{user.username}</li>)}</ul>
     </div>
   );
 }
@@ -370,7 +366,7 @@ function UserProfileWithPosts({ username }) {
 
       {/* User's posts */}
       {postsData?.pages.map((page) =>
-        page.posts.map((post) => <div key={post.id}>{post.content}</div>)
+        page.posts.map((post) => <div key={post.id}>{post.content}</div>),
       )}
     </div>
   );
@@ -396,7 +392,7 @@ function ErrorHandlingExample() {
                 console.error("Post creation failed:", error);
                 alert(`Error: ${error.message}`);
               },
-            }
+            },
           )
         }
       >

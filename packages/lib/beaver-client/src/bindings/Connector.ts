@@ -37,7 +37,10 @@ export default class Connector {
   }
 
   async enableZkLoginWallets(
-    options?: Pick<Parameters<typeof registerEnokiWallets>[0], "windowFeatures">
+    options?: Pick<
+      Parameters<typeof registerEnokiWallets>[0],
+      "windowFeatures"
+    >,
   ) {
     const serverStats = await this.defaults.apiClient.rpc.stats.$get();
     const stats = await serverStats.json();
@@ -125,7 +128,7 @@ export default class Connector {
     try {
       const parsed = zStoredConnection().parse(JSON.parse(raw));
       const wallet = this.getWallets().find(
-        (w) => getWalletUniqueIdentifier(w) === parsed.walletName
+        (w) => getWalletUniqueIdentifier(w) === parsed.walletName,
       ) as BeaverProvidedWallet;
 
       if (!wallet) {
@@ -137,7 +140,7 @@ export default class Connector {
       await wallet.features["standard:connect"].connect();
 
       const account = wallet.accounts.find(
-        (acc) => acc.address === parsed.address
+        (acc) => acc.address === parsed.address,
       );
 
       if (!account) {
@@ -159,8 +162,8 @@ export default class Connector {
                 type: "address",
                 value: this.store.connection.account.address,
               },
-            })
-          )
+            }),
+          ),
         );
         this.defaults.events.emit("connection:change", {
           connection: this.store.connection,

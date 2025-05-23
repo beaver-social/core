@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 type Props = {};
 
-export default function GoogleOAuth({ }: Props) {
+export default function GoogleOAuth({}: Props) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   // const { zkLoginCallback } = useAuth();
 

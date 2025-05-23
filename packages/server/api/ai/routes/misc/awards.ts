@@ -17,7 +17,7 @@ export default new Hono()
       z.object({
         page: zNumberString,
         limit: zNumberString,
-      })
+      }),
     ),
     async (ctx) => {
       const { page, limit } = ctx.req.valid("query");
@@ -29,7 +29,7 @@ export default new Hono()
           .from(awards)
           .limit(limit)
           .offset(offset)
-          .orderBy(desc(awards.createdAt))
+          .orderBy(desc(awards.createdAt)),
       );
 
       if (result.error) {
@@ -37,12 +37,12 @@ export default new Hono()
           {
             message: "Failed to get awards",
           },
-          500
+          500,
         );
       }
 
       return ctx.json(result.data, 200);
-    }
+    },
   )
   // get award details by id
   .get(
@@ -52,7 +52,7 @@ export default new Hono()
       const { id } = ctx.req.valid("param");
 
       const result = await tryCatch(
-        db.select().from(awards).where(eq(awards.id, id))
+        db.select().from(awards).where(eq(awards.id, id)),
       );
 
       if (result.error) {
@@ -60,10 +60,10 @@ export default new Hono()
           {
             message: "Failed to get award details",
           },
-          500
+          500,
         );
       }
 
       return ctx.json(result.data, 200);
-    }
+    },
   );

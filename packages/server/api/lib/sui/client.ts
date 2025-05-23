@@ -10,7 +10,7 @@ const suiClient = new SuiClient({
 });
 
 export const serverKeypair = Ed25519Keypair.deriveKeypair(
-  env.SERVER_PASSPHRASE
+  env.SERVER_PASSPHRASE,
 );
 
 export async function executeTransaction(tx: Transaction) {
@@ -18,7 +18,7 @@ export async function executeTransaction(tx: Transaction) {
     suiClient.signAndExecuteTransaction({
       signer: serverKeypair,
       transaction: tx,
-    })
+    }),
   );
 
   if (response.error) {

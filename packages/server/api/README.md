@@ -143,7 +143,7 @@ export const createPost = createAction<{
   async (tx, post, action) => {
     // Additional operations after main transaction succeeds
     // Often used for analytics or linking action records
-  }
+  },
 );
 ```
 
@@ -168,7 +168,7 @@ export function extractHashtags(content: string): string[] {
 }
 
 export async function processAndUploadImage(
-  imageBuffer: Buffer
+  imageBuffer: Buffer,
 ): Promise<UploadResult> {
   // Complex image processing and upload logic
 }
@@ -194,7 +194,7 @@ export default new Hono()
     async (ctx) => {
       // Handler implementation
       // Often calls a function from a .action.ts file
-    }
+    },
   )
   .post("/create", zValidator("json", PostCreateSchema), async (ctx) => {
     // Handler implementation
@@ -232,7 +232,7 @@ export const posts = table(
     // Indexes
     t.index("author_idx").on(table.authorId),
     // Additional indexes...
-  ]
+  ],
 );
 ```
 

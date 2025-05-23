@@ -20,9 +20,13 @@ export default function Onboarding() {
   const { onboardingProgress, setOnboardingProgress } = useGlobalUIStore();
   const { setScreen } = useGlobalUI();
   const beaver = useBeaver();
-  const [step, setStep] = useState(beaver.wallet.hasIdentity ? onboardingProgress?.currentStep || 4 : onboardingProgress?.currentStep || 1);
+  const [step, setStep] = useState(
+    beaver.wallet.hasIdentity
+      ? onboardingProgress?.currentStep || 4
+      : onboardingProgress?.currentStep || 1,
+  );
   const [completedSteps, setCompletedSteps] = useState<number[]>(
-    onboardingProgress?.completed || []
+    onboardingProgress?.completed || [],
   );
   const navigate = useNavigate();
 
@@ -36,19 +40,25 @@ export default function Onboarding() {
       currentStep: step,
       completed: completedSteps,
       lastUpdated: new Date().toISOString(),
-      checkpoint: getCheckpointName(step)
+      checkpoint: getCheckpointName(step),
     });
   }, [step, completedSteps, setOnboardingProgress]);
 
   // Helper function to get checkpoint name based on step
   const getCheckpointName = (stepNum: number): string => {
     switch (stepNum) {
-      case 1: return "introduction";
-      case 2: return "choose-username";
-      case 3: return "update-profile";
-      case 4: return "connect-suins";
-      case 5: return "complete";
-      default: return "introduction";
+      case 1:
+        return "introduction";
+      case 2:
+        return "choose-username";
+      case 3:
+        return "update-profile";
+      case 4:
+        return "connect-suins";
+      case 5:
+        return "complete";
+      default:
+        return "introduction";
     }
   };
 
@@ -101,11 +111,21 @@ export default function Onboarding() {
       case 1:
         return <Introduction onComplete={handleNext} />;
       case 2:
-        return <ChooseUsername onComplete={handleNext} handleBack={handleBack} />;
+        return (
+          <ChooseUsername onComplete={handleNext} handleBack={handleBack} />
+        );
       case 3:
-        return <UpdateProfile onComplete={handleNext} handleBack={handleBack} />;
+        return (
+          <UpdateProfile onComplete={handleNext} handleBack={handleBack} />
+        );
       case 4:
-        return <ConnectSuiNS onComplete={handleNext} handleBack={handleBack} handleSkip={handleSkip} />;
+        return (
+          <ConnectSuiNS
+            onComplete={handleNext}
+            handleBack={handleBack}
+            handleSkip={handleSkip}
+          />
+        );
       case 5:
         return <CompleteOnboarding onComplete={() => navigate("/app/")} />;
       default:
@@ -113,7 +133,7 @@ export default function Onboarding() {
     }
   };
 
-  if ((onboardingProgress?.completed.length === TOTAL_STEPS && step !== 6)) {
+  if (onboardingProgress?.completed.length === TOTAL_STEPS && step !== 6) {
     navigate("/app/");
   }
 
@@ -128,8 +148,12 @@ export default function Onboarding() {
         {step <= TOTAL_STEPS && (
           <div className="px-6 pt-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-muted-foreground">Step {step} of {TOTAL_STEPS}</span>
-              <span className="text-sm font-medium">{Math.round(progressPercentage)}%</span>
+              <span className="text-sm text-muted-foreground">
+                Step {step} of {TOTAL_STEPS}
+              </span>
+              <span className="text-sm font-medium">
+                {Math.round(progressPercentage)}%
+              </span>
             </div>
             <Progress value={progressPercentage} className="h-2" />
           </div>
