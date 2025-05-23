@@ -3,6 +3,7 @@ import { ApiParams } from "../types/api";
 import { stringify } from "../utils/utils";
 import Logger from "./Logger";
 import { safeParseResponse } from "../utils/apiClient";
+import { Transaction } from "@mysten/sui/transactions";
 
 export default class Posts {
   private defaults: Defaults;
@@ -29,7 +30,7 @@ export default class Posts {
           | "wide"
           | "custom";
       }[];
-    },
+    }
   ) {
     const { features, user, actionPointer } = this.defaults.store;
     if (!features || !user) {
@@ -44,7 +45,7 @@ export default class Posts {
         userId: user.id,
         type: "v1.user.create.post",
         previous: actionPointer,
-      }),
+      })
     );
 
     const { post } = await safeParseResponse(
@@ -56,7 +57,7 @@ export default class Posts {
         form: {
           media,
         },
-      }),
+      })
     );
 
     this.defaults.store.syncUserAndActionPointer();
@@ -70,7 +71,7 @@ export default class Posts {
       authorId?: number;
       parentId?: number;
       repliesOnly?: boolean;
-    } = {},
+    } = {}
   ) {
     const { page = 1, perPage = 8, authorId, parentId, repliesOnly } = options;
 
@@ -83,7 +84,7 @@ export default class Posts {
           parentId: parentId?.toString(),
           repliesOnly: repliesOnly ? "true" : "false",
         },
-      }),
+      })
     );
   }
 
@@ -93,7 +94,7 @@ export default class Posts {
     return safeParseResponse(
       this.defaults.apiClient.rpc.posts.following.$get({
         query: { page: page.toString(), perPage: perPage.toString() },
-      }),
+      })
     );
   }
   async getPostById(options: { id: number | string }) {
@@ -102,7 +103,7 @@ export default class Posts {
     return safeParseResponse(
       this.defaults.apiClient.rpc.posts[`:id`].$get({
         param: { id: id.toString() },
-      }),
+      })
     );
   }
 
@@ -120,7 +121,7 @@ export default class Posts {
           page: page.toString(),
           perPage: perPage.toString(),
         },
-      }),
+      })
     );
   }
 
@@ -138,7 +139,7 @@ export default class Posts {
         userId: user.id,
         type: "v1.user.like.post",
         previous: actionPointer,
-      }),
+      })
     );
 
     const result = await safeParseResponse(
@@ -147,7 +148,7 @@ export default class Posts {
           postId,
           signature,
         },
-      }),
+      })
     );
 
     this.defaults.store.syncUserAndActionPointer();
@@ -168,7 +169,7 @@ export default class Posts {
         userId: user.id,
         type: "v1.user.unlike.post",
         previous: actionPointer,
-      }),
+      })
     );
 
     const result = await safeParseResponse(
@@ -177,7 +178,7 @@ export default class Posts {
           postId,
           signature,
         },
-      }),
+      })
     );
 
     this.defaults.store.syncUserAndActionPointer();
@@ -198,7 +199,7 @@ export default class Posts {
         userId: user.id,
         type: "v1.user.bookmark.post",
         previous: actionPointer,
-      }),
+      })
     );
 
     const result = await safeParseResponse(
@@ -207,7 +208,7 @@ export default class Posts {
           postId,
           signature,
         },
-      }),
+      })
     );
 
     this.defaults.store.syncUserAndActionPointer();
@@ -228,7 +229,7 @@ export default class Posts {
         userId: user.id,
         type: "v1.user.unbookmark.post",
         previous: actionPointer,
-      }),
+      })
     );
 
     const result = await safeParseResponse(
@@ -237,7 +238,7 @@ export default class Posts {
           postId,
           signature,
         },
-      }),
+      })
     );
 
     this.defaults.store.syncUserAndActionPointer();
@@ -262,7 +263,7 @@ export default class Posts {
           page: page.toString(),
           perPage: perPage.toString(),
         },
-      }),
+      })
     );
   }
 
@@ -282,7 +283,7 @@ export default class Posts {
           perPage: perPage.toString(),
           quotesOnly: quotesOnly ? "true" : "false",
         },
-      }),
+      })
     );
   }
 
@@ -292,7 +293,31 @@ export default class Posts {
     return safeParseResponse(
       this.defaults.apiClient.rpc.posts[`:id`]["user-interactions"].$get({
         param: { id: id.toString() },
-      }),
+      })
     );
+  }
+
+  async upgrade(options: { id: number }) {
+    const { id } = options;
+    const { features, user, actionPointer } = this.defaults.store;
+
+    if (!features || !user || !this.defaults.store.isAuthenticated()) {
+      throw new Error("Login before unbookmarking a post.");
+    }
+
+    const post = await safeParseResponse(
+      this.defaults.apiClient.rpc.posts[`:id`].$get({
+        param: { id: id.toString() },
+      })
+    );
+
+    const tx = new Transaction();
+    await this.defaults.contracts.posts.write.push(tx, {
+      postId: post.id,
+      identityRegistration: { id: user.identity },
+      collection: { id: user.collectionNft },
+      content: post.content,
+      attested: new Uint8Array([0, 0]),
+    });
   }
 }
