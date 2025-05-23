@@ -132,13 +132,6 @@ const app = new Hono()
           parts: stringify([{ text: response }]),
         });
       });
-
-      // return respond.ok(
-      //   ctx,
-      //   { response: content.parts, chatId: dbChatId },
-      //   "Ping AI resposne",
-      //   200,
-      // );
     }
   )
   .get("/chats", authenticated, async (ctx) => {

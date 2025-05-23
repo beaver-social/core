@@ -31,9 +31,7 @@ export default function Chatbot() {
     const navigate = useNavigate();
     const beaver = useBeaver();
     const { data: docsMetadata } = beaver.docs.getDocs();
-    const { mutate: chat, data: chatResponse, isPending: isChatPending, isSuccess: isChatSuccess } = beaver.ping.chat;
-
-    console.log(chatResponse);
+    const { mutateAsync: chat, isPending: isChatPending, isSuccess: isChatSuccess } = beaver.ping.chat;
 
     // Welcome message when chat opens
     useEffect(() => {
@@ -125,10 +123,20 @@ export default function Chatbot() {
             const relatedLinks = findRelatedDocumentation(inputValue);
 
             // Simulate response generation
-            chat({
+            const result = await chat({
                 message: inputValue,
                 intent: "chat"
             });
+
+            console.log(result);
+
+            // const aiMessage: Message = {
+            //     id: `ai-${Date.now()}`,
+            //     content: result.response,
+            //     role: "ai",
+            //     timestamp: new Date(),
+            //     relatedLinks: relatedLinks
+            // };
         } catch (error) {
             console.error("Error getting AI response:", error);
             // Handle error - add error message to chat
