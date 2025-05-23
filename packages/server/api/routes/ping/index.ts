@@ -13,7 +13,7 @@ import db from "../../lib/db";
 import { and, eq } from "drizzle-orm";
 import authenticated from "../../middlewares/authenticated";
 import { stringify } from "../../../utils";
-import { stream, streamText, streamSSE } from 'hono/streaming'
+import { streamText } from 'hono/streaming'
 
 const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
 const { pingChats, pingMessages } = db.schema;
