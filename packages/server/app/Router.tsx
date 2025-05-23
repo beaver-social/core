@@ -51,6 +51,10 @@ function AuthProtection({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { mutate: login, isSuccess, isPending } = useLogin();
 
+  console.log({
+    wallet: beaver.wallet,
+  });
+
   useEffect(() => {
     // If wallet is connected but no identity, go to onboarding
     if (beaver.wallet.isConnected && !beaver.wallet.hasIdentity) {
@@ -61,12 +65,6 @@ function AuthProtection({ children }: { children: React.ReactNode }) {
     // If wallet is connected with identity but no user, try to login
     if (beaver.wallet.isConnected && beaver.wallet.hasIdentity && !beaver.user) {
       login();
-      return;
-    }
-
-    // If no wallet connection, redirect to landing
-    if (!beaver.wallet.isConnected) {
-      navigate("/");
       return;
     }
   }, [
@@ -129,13 +127,15 @@ export default function () {
           }
         />
 
+        {/* App root route - no authentication required */}
+        <Route path="/app" element={withPageErrorBoundary(Home)({})} />
+
         {/* App routes - requires authentication */}
         <Route
           path="/app/*"
           element={
             <AuthProtection>
               <Routes>
-                <Route index element={withPageErrorBoundary(Home)({})} />
                 <Route
                   path="alerts"
                   element={withPageErrorBoundary(Notifications)({})}

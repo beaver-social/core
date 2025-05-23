@@ -127,18 +127,18 @@ export default function Onboarding() {
           />
         );
       case 5:
-        return <CompleteOnboarding onComplete={() => navigate("/app/")} />;
+        return <CompleteOnboarding onComplete={() => navigate("/app")} />;
       default:
         return <Introduction onComplete={handleNext} />;
     }
   };
 
   if (onboardingProgress?.completed.length === TOTAL_STEPS && step !== 6) {
-    navigate("/app/");
+    navigate("/app");
   }
 
   // if (!isConnected || userId) {
-  //   navigate("/app/");
+  //   navigate("/app");
   // }
 
   return (

@@ -141,7 +141,7 @@ export default function AppId() {
             </p>
           </motion.div>
 
-          <Button className="w-full max-w-xs" onClick={() => navigate("/app/")}>
+          <Button className="w-full max-w-xs" onClick={() => navigate("/app")}>
             Sign in or Create Account
           </Button>
         </div>

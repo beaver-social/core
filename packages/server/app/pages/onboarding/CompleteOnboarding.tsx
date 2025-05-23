@@ -14,7 +14,7 @@ export default function CompleteOnboarding({
   const { mutate: login, isPending, isSuccess, isError, error } = useLogin();
   const beaver = useBeaver();
 
-  beaver.user && navigate("/app/");
+  beaver.user && navigate("/app");
 
   return (
     <div className="flex flex-col items-center justify-center space-y-8 text-center">
