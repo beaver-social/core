@@ -37,6 +37,7 @@ function App() {
                   zkLoginWallets: {
                     enabled: true,
                   },
+                  appId: import.meta.env.VITE_APPID || "",
                 }}
               >
                 <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
