@@ -19,7 +19,7 @@ const app = new Hono()
       return respond.err(ctx, "Very Smart but this won't work", 400);
     }
 
-    await next();
+    return await next();
   })
 
   .post(
@@ -34,6 +34,15 @@ const app = new Hono()
     async (ctx) => {
       const { user } = ctx.var;
       const { name } = ctx.req.valid("json");
+
+      const apps = await db
+        .select()
+        .from(applications)
+        .where(eq(applications.userId, user.id));
+
+      if (apps.length >= 5) {
+        return respond.err(ctx, "Maximum number of applications reached", 429);
+      }
 
       const [app] = await db
         .insert(applications)
