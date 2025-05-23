@@ -1,14 +1,13 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { Card, CardContent } from "@/shared/components/ui/card";
-import { Image } from "@/shared/components/Image";
 import { useGlobalUIStore } from "@/shared/stores/zustand";
-import { useBeaver, useRegister } from "@beaver/react";
+import { useRegister, useLogin } from "@beaver/react";
 import { toast } from "sonner";
-import Icon from "@/shared/components/Icon";
+
 // import { useAuth } from "@beaver/react";
 type Props = {
   onComplete: () => void;
@@ -20,7 +19,18 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
   const [about, setAbout] = useState("");
   const { onboardingData, setOnboardingData } = useGlobalUIStore();
   const { mutateAsync: register, isPending } = useRegister();
-  const beaver = useBeaver();
+  const { mutate: login, isPending: isLoginPending, isSuccess: isLoginSuccess } = useLogin();
+
+  console.log({
+    isLoginSuccess,
+    isLoginPending,
+  })
+
+  useEffect(() => {
+    if (isLoginSuccess) {
+      window.location.href = "/app";
+    }
+  }, [isLoginSuccess]);
 
   async function handleSubmit() {
     if (!name || name.length < 3) {
@@ -40,12 +50,8 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
         onComplete();
       })
       .catch((error) => {
-        if (error.message.includes("Error: User already exists")) {
-          onComplete();
-        }
-
-        console.log(error);
-        toast.error("Error saving profile");
+        toast.error(error.message);
+        error.message.includes("User already exists") && login();
       });
   }
 
@@ -116,9 +122,9 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
             <Button
               className="w-full"
               onClick={handleSubmit}
-              disabled={!canSubmit || isPending}
+              disabled={!canSubmit || isPending || isLoginPending}
             >
-              {isPending ? (
+              {isPending || isLoginPending ? (
                 <>
                   <svg
                     className="animate-spin -ml-1 mr-2 h-4 w-4"

@@ -36,7 +36,7 @@ function OnboardingProtection({ children }: { children: React.ReactNode }) {
   const { mutate: login, isSuccess, isPending } = useLogin();
 
   if (beaver.wallet.isConnected && !beaver.wallet.hasIdentity) {
-    navigate("/app/onboarding");
+    navigate("/onboarding");
   }
 
   useEffect(() => {
@@ -47,7 +47,11 @@ function OnboardingProtection({ children }: { children: React.ReactNode }) {
     ) {
       login();
     }
-  }, [beaver.wallet.isConnected, beaver.wallet.hasIdentity, beaver.user]);
+
+    if (beaver.wallet.isAuthenticated) {
+      navigate("/app");
+    }
+  }, [beaver.wallet.isConnected, beaver.wallet.hasIdentity, beaver.user, beaver.wallet.isAuthenticated]);
 
   if (isPending) {
     return (

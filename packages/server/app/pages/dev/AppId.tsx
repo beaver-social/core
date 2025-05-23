@@ -24,6 +24,7 @@ import { Copy, Eye, AlertTriangle } from "lucide-react";
 import { useBeaver } from "@beaver/react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
+import { Image } from "@/shared/components/Image";
 
 export default function AppId() {
   const [appName, setAppName] = useState("");
@@ -150,7 +151,15 @@ export default function AppId() {
   }
 
   return (
-    <div className="bg-cover bg-[url(/images/landing/4.jpg)] bg-center min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+        <Image
+          src="/images/landing/4.jpg"
+          alt="Background"
+          className="w-full h-full object-cover opacity-50"
+        />
+      </div>
+
       <div className="flex flex-col items-center w-full max-w-xl p-8 mx-10 space-y-8 overflow-hidden text-center border shadow-lg bg-background/80 glass rounded-xl">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}

@@ -13,7 +13,8 @@ import { useNavigate } from "react-router";
 import CompleteOnboarding from "./CompleteOnboarding";
 import Disconnect from "@/shared/components/Disconnect";
 import { useBeaver } from "@beaver/react";
-// import { useAuth } from "@beaver/react";
+import { Image } from "@/shared/components/Image";
+
 const TOTAL_STEPS = 5;
 
 export default function Onboarding() {
@@ -142,7 +143,15 @@ export default function Onboarding() {
   // }
 
   return (
-    <div className="min-h-screen bg-[url(/images/landing/4.jpg)] flex flex-col items-center justify-center p-8 bg-no-repeat bg-cover">
+    <div className="min-h-screen flex flex-col items-center justify-center p-8">
+      <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+        <Image
+          src="/images/landing/4.jpg"
+          alt="Background"
+          className="w-full h-full object-cover opacity-50"
+        />
+      </div>
+
       <Card className="w-full max-w-2xl overflow-hidden border shadow-lg bg-background/80 glass rounded-xl">
         {/* Progress Bar - Hide on completion screen */}
         {step <= TOTAL_STEPS && (

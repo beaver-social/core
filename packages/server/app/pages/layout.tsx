@@ -32,7 +32,7 @@ export default function Layout({ main, secondary }: LayoutProps) {
         </section>
 
         <div className="fixed bottom-0 right-0 z-50 flex gap-4 p-5">
-          {beaver.user && <Disconnect />}
+          {<Disconnect />}
           <ThemeSwitch />
         </div>
       </div>

@@ -11,10 +11,10 @@ interface CompleteOnboardingProps {
 export default function CompleteOnboarding({
   onComplete,
 }: CompleteOnboardingProps) {
-  const navigate = useNavigate();
-  const { mutate: login, isPending, isSuccess, isError, error } = useLogin();
-  const beaver = useBeaver();
   const { setOnboardingProgress, setOnboardingData } = useGlobalUIStore();
+  const { mutate: login, isPending, isSuccess, isError, error } = useLogin();
+  const navigate = useNavigate();
+  const beaver = useBeaver();
 
   beaver.user && navigate("/app");
 
@@ -54,9 +54,6 @@ export default function CompleteOnboarding({
           className="px-8"
           onClick={() => {
             // clear onboarding state
-            setOnboardingProgress(null);
-            setOnboardingData(null);
-
             login();
           }}
         >
