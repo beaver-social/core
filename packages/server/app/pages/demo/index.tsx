@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import PostsDemo from './components/PostsDemo';
 import ProfileDemo from './components/ProfileDemo';
 import AuthDemo from "./components/AuthDemo";

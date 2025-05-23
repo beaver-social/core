@@ -342,7 +342,6 @@ export function EnhancedHero() {
                         <span className="text-zinc-100"> social experience.</span>
                     </h1>
                     <p className="mt-6 text-lg text-zinc-400 leading-relaxed">
-                        AI-driven SDK that streamlines your decentralized social applications.
                         Build, connect, and scale — all with just a few lines of code.
                     </p>
                 </motion.div>
@@ -363,9 +362,9 @@ export function EnhancedHero() {
                     >
                         <Icon name="Activity" className="w-4 h-4 text-blue-400" />
 
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                        <p className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
                             Get Started
-                        </span>
+                        </p>
                     </motion.button>
                 </motion.div>
 

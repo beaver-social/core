@@ -11,10 +11,7 @@ Beaver Social is a Web3 Social Network Layer built on the Sui Blockchain. It pro
 
 Before getting started, make sure you have:
 
-- Node.js (v16 or later)
-- npm or yarn
-- Basic knowledge of React (for React-based integrations)
-- Basic understanding of blockchains and Web3 concepts
+- You will need to acquire an AppID to start developing with Beaver. [Get your AppID](https://beaver.social/appid)
 
 ## Installation Options
 
