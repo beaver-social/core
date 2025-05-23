@@ -9,7 +9,6 @@ import { respond } from "../../lib/utils/respond";
 import { and, eq } from "drizzle-orm";
 import { zNumberString } from "../../lib/zod/helpers";
 
-const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
 const { applications, applicationUrls } = db.schema;
 
 const app = new Hono()

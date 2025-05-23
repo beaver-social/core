@@ -12,8 +12,6 @@ import db from "../../lib/db";
 import { and, eq } from "drizzle-orm";
 import authenticated, { getUserFromCtx } from "../../middlewares/authenticated";
 import { stringify } from "../../../utils";
-import { streamText } from "hono/streaming";
-import { generateHash } from "../../lib/utils/utils";
 
 const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
 const { pingChats, pingMessages } = db.schema;
