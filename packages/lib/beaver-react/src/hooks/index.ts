@@ -254,6 +254,14 @@ export function usePost() {
           return await client.posts.getUserPostInteraction(options);
         },
       }),
+    upgradePost: useMutation({
+      mutationKey: ["upgradePost"],
+      mutationFn: async (
+        options: Parameters<typeof client.posts.upgrade>[0]
+      ) => {
+        return await client.posts.upgrade(options);
+      },
+    }),
   };
 }
 

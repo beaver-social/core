@@ -84,26 +84,26 @@ export default function () {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={withPageErrorBoundary(Landing)({})} />
+
+        <Route
+          path="/dev/appid"
+          element={withPageErrorBoundary(AppId)({})}
+        />
+
+        <Route
+          path="/docs/*"
+          element={withPageErrorBoundary(Docs)({})}
+        />
+
         <Route
           path="/*"
           element={
             <OnboardingProtection>
               <Routes>
-                <Route path="/" element={withPageErrorBoundary(Landing)({})} />
-
-                <Route
-                  path="/dev/appid"
-                  element={withPageErrorBoundary(AppId)({})}
-                />
-
                 <Route
                   path="/onboarding"
                   element={withPageErrorBoundary(Onboarding)({})}
-                />
-
-                <Route
-                  path="/docs/*"
-                  element={withPageErrorBoundary(Docs)({})}
                 />
 
                 <Route path="/app" element={withPageErrorBoundary(Home)({})} />
