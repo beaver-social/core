@@ -122,12 +122,12 @@ export default function Onboarding() {
   // }
 
   return (
-    <div className="min-h-screen bg-[url(/images/tailwind-gradient-light.png)] dark:bg-[url(/images/tailwind-gradient-dark.png)] flex flex-col items-center justify-center p-4 bg-no-repeat bg-cover">
-      <Card className="w-full max-w-2xl bg-background/30 glass border rounded-xl overflow-hidden shadow-lg">
+    <div className="min-h-screen bg-[url(/images/landing/4.jpg)] flex flex-col items-center justify-center p-8 bg-no-repeat bg-cover">
+      <Card className="w-full max-w-2xl overflow-hidden border shadow-lg bg-background/80 glass rounded-xl">
         {/* Progress Bar - Hide on completion screen */}
         {step <= TOTAL_STEPS && (
           <div className="px-6 pt-6">
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">Step {step} of {TOTAL_STEPS}</span>
               <span className="text-sm font-medium">{Math.round(progressPercentage)}%</span>
             </div>
@@ -136,7 +136,7 @@ export default function Onboarding() {
         )}
 
         {/* Step Content */}
-        <div className="p-6 relative">
+        <div className="relative p-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
@@ -152,7 +152,7 @@ export default function Onboarding() {
         </div>
       </Card>
 
-      <div className="flex gap-2 absolute bottom-4 right-4">
+      <div className="absolute flex gap-2 bottom-4 right-4">
         <Disconnect />
         <ThemeSwitch />
       </div>

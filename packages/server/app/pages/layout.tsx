@@ -24,7 +24,7 @@ export default function Layout({ main, secondary }: LayoutProps) {
                 <SideNav />
 
                 <section className="flex justify-center flex-col px-10 ml-[14rem] xl:mr-[28rem] lg:mr-[24rem] items-center bg-background">
-                    <div className="w-full max-w-xl mt-8 rounded-xl">
+                    <div className="w-full max-w-xl mt-8 rounded-xl ">
                         {main}
                     </div>
                 </section>

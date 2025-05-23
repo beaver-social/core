@@ -50,7 +50,7 @@ function BottomBar() {
                         whileTap={{ scale: 1 }}
                     >
                         <Link
-                            to={item.to}
+                            to={item.to || "/app"}
                             className="flex flex-col items-center justify-center text-xs relative"
                         >
                             <AnimatePresence>

@@ -1,5 +1,4 @@
 import { useTheme } from "../context/theme-provider"
-import { cn } from "../lib/utils";
 import { Image } from "./Image"
 
 type Props = {

@@ -14,12 +14,13 @@ import Demo from "./pages/demo";
 import Onboarding from "./pages/onboarding";
 import Create from "./pages/create";
 import { useBeaver, useLogin } from "@beaver/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import WelcomeSplash from "./shared/components/animations/WelcomeSplash";
 import Icon from "./shared/components/Icon";
 import NotLoggedInDialog from "./shared/components/NotLoggedInDialog";
 import Landing from "./pages/landing";
 import Docs from "./pages/docs";
+import AppId from "./pages/onboarding/AppId";
 
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary =
@@ -88,6 +89,11 @@ export default function () {
                 />
 
                 <Route
+                  path="/onboarding/appid"
+                  element={withPageErrorBoundary(AppId)({})}
+                />
+
+                <Route
                   path="/onboarding"
                   element={withPageErrorBoundary(Onboarding)({})}
                 />
@@ -145,7 +151,6 @@ export default function () {
             </OnboardingProtection>
           }
         />
-
 
         <Route
           path="/demo"
