@@ -3,6 +3,24 @@ import { useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Card, CardContent } from "@/shared/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/shared/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/shared/components/ui/table";
+import { Badge } from "@/shared/components/ui/badge";
+import { Copy, Eye, AlertTriangle } from "lucide-react";
 import { useBeaver } from "@beaver/react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
@@ -10,18 +28,25 @@ import { toast } from "sonner";
 export default function AppId() {
   const [appName, setAppName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [existingAppsDialogOpen, setExistingAppsDialogOpen] = useState(false);
+  const [createdAppData, setCreatedAppData] = useState<any>(null);
   const navigate = useNavigate();
 
   const beaver = useBeaver();
-  const { mutateAsync: createAppId, isPending: isCreatingAppId } =
+  const { mutateAsync: createAppId, isPending: isCreatingAppId, isSuccess: isCreatingAppIdSuccess } =
     beaver.application.createAppId;
-  const { data: apps, isLoading: isLoadingApps, refetch: refetchApps } =
+  const { data: appData, isLoading: isLoadingApps, refetch: refetchApps } =
     beaver.application.getApplications;
-
-  console.log({ apps });
 
   // Check if user is logged in
   const isLoggedIn = !!beaver.user;
+  const hasReachedLimit = appData?.apps?.length >= 5 || false;
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard!");
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,11 +56,20 @@ export default function AppId() {
       return;
     }
 
+    // Check app limit before creating
+    if (hasReachedLimit) {
+      toast.error("You have reached the maximum limit of 5 applications. Please delete an existing app to create a new one.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const result = await createAppId({ name: appName });
-      toast.success(`AppId: ${result.appId}`);
+      setCreatedAppData(result);
+      setSuccessDialogOpen(true);
+      setAppName(""); // Clear the form
+      toast.success("AppId created successfully!");
       refetchApps();
     } catch (error) {
       console.error(error);
@@ -206,6 +240,14 @@ export default function AppId() {
         >
           <Card className="border bg-card/60 backdrop-blur-sm border-border/60">
             <CardContent className="p-6 space-y-6">
+              {/* App Quota Display */}
+              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                <span className="text-sm text-muted-foreground">Applications created:</span>
+                <Badge variant={hasReachedLimit ? "destructive" : "secondary"}>
+                  {appData?.apps?.length || 0} / 5
+                </Badge>
+              </div>
+
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-4">
                   <div className="space-y-2 text-left">
@@ -217,6 +259,7 @@ export default function AppId() {
                       value={appName}
                       onChange={(e) => setAppName(e.target.value)}
                       required
+                      disabled={hasReachedLimit}
                     />
                     <p className="mt-1 ml-1 text-xs text-muted-foreground">
                       This name will be associated with your developer
@@ -225,11 +268,11 @@ export default function AppId() {
                   </div>
                 </div>
 
-                <div className="pt-2">
+                <div className="pt-2 space-y-3">
                   <Button
                     className="relative w-full overflow-hidden"
                     type="submit"
-                    disabled={isSubmitting || !appName.trim()}
+                    disabled={isSubmitting || !appName.trim() || hasReachedLimit}
                   >
                     {isSubmitting ? (
                       <>
@@ -259,11 +302,170 @@ export default function AppId() {
                       "Generate AppId"
                     )}
                   </Button>
+
+                  {/* View Existing Apps Button */}
+                  {appData?.apps && appData?.apps?.length > 0 && (
+                    <Dialog open={existingAppsDialogOpen} onOpenChange={setExistingAppsDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="w-full">
+                          <Eye className="w-4 h-4 mr-2" />
+                          View My Applications ({appData?.apps?.length})
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl">
+                        <DialogHeader>
+                          <DialogTitle>My Applications</DialogTitle>
+                          <DialogDescription>
+                            Here are all your created applications. You can create up to 5 applications total.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="mt-4">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>App Name</TableHead>
+                                <TableHead>App ID</TableHead>
+                                <TableHead>Created Date</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Actions</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {appData?.apps?.map((app, index: number) => (
+                                <TableRow key={app.appId || index}>
+                                  <TableCell className="font-medium">{app.name || `App ${index + 1}`}</TableCell>
+                                  <TableCell className="font-mono text-sm">
+                                    <div className="flex items-center space-x-2">
+                                      <span className="truncate max-w-xs">{app.appId}</span>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => copyToClipboard(app.appId)}
+                                        className="h-6 w-6 p-0"
+                                      >
+                                        <Copy className="h-3 w-3" />
+                                      </Button>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell>
+                                    {app.createdAt ? new Date(app.createdAt).toLocaleDateString() : 'N/A'}
+                                  </TableCell>
+                                  <TableCell>
+                                    <Badge variant="secondary">Active</Badge>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => copyToClipboard(app.appId)}
+                                    >
+                                      Copy ID
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  )}
                 </div>
               </form>
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Success Dialog */}
+        <Dialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center space-x-2">
+                <div className="p-2 bg-green-100 rounded-full">
+                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span>AppId Created Successfully!</span>
+              </DialogTitle>
+              <DialogDescription>
+                Your new application has been created. Save these details securely.
+              </DialogDescription>
+            </DialogHeader>
+            {createdAppData && (
+              <div className="mt-4 space-y-4">
+                <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">App Name</label>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="font-medium">{createdAppData.name}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">App ID</label>
+                    <div className="flex items-center justify-between mt-1 p-2 bg-background rounded border">
+                      <code className="font-mono text-sm break-all">{createdAppData.appId}</code>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard(createdAppData.appId)}
+                        className="ml-2 flex-shrink-0"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  {createdAppData.apiKey && (
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">API Key</label>
+                      <div className="flex items-center justify-between mt-1 p-2 bg-background rounded border">
+                        <code className="font-mono text-sm break-all">{createdAppData.apiKey}</code>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyToClipboard(createdAppData.apiKey)}
+                          className="ml-2 flex-shrink-0"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  {createdAppData.createdAt && (
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Created At</label>
+                      <div className="mt-1">
+                        <span className="text-sm">{new Date(createdAppData.createdAt).toLocaleString()}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div className="flex items-start space-x-2">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-amber-800">
+                      <p className="font-medium">Important:</p>
+                      <p>Store these credentials securely. You won't be able to view the API key again.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex space-x-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => copyToClipboard(JSON.stringify(createdAppData, null, 2))}
+                    className="flex-1"
+                  >
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copy All Data
+                  </Button>
+                  <Button onClick={() => setSuccessDialogOpen(false)} className="flex-1">
+                    Done
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
 
         <motion.div
           className="max-w-md mt-2 text-xs text-muted-foreground"
