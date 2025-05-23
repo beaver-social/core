@@ -1,7 +1,3 @@
-## Overview
-
-Beaver Social is a Web3 Social Network Layer built on the Sui Blockchain. It's designed as a headless logic layer that provides developers with the tools to create customized social network UI clients. The platform consists of several modular components that work together to deliver a complete social networking experience with blockchain integration.
-
 ## Component Architecture
 
 The platform follows a layered architecture pattern with the following levels:

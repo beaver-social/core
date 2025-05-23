@@ -50,6 +50,15 @@ export default function NotLoggedInDialog({ open, onOpenChange }: Props) {
           {/* Background gradient */}
           <div className="absolute inset-0 bg-gradient-to-b from-primary/20 to-background/80 opacity-50"></div>
 
+          <button
+            onClick={() => {
+              navigate("/app");
+            }}
+            className="absolute top-4 right-4 z-50"
+          >
+            <Icon name="X" className="size-4" />
+          </button>
+
           <div className="p-6 relative z-10">
             <DialogHeader className="pb-4">
               <DialogTitle className="text-2xl font-bold text-center">
@@ -94,33 +103,8 @@ export default function NotLoggedInDialog({ open, onOpenChange }: Props) {
                     interact with the Beaver Social community.
                   </p>
                 </div>
-
-                <div className="flex justify-center w-full">
-                  <ConnectIdentity
-                    open={animationStep === 1}
-                    onOpenChange={(open) => {
-                      if (!open) {
-                        handleOpenChange(false);
-                      }
-                    }}
-                  />
-                </div>
               </motion.div>
             </AnimatePresence>
-          </div>
-
-          <div className="bg-muted/30 p-4 border-t flex justify-between items-center">
-            <p className="text-xs text-muted-foreground">
-              Explore the platform as a guest
-            </p>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleOpenChange(false)}
-              className="text-xs"
-            >
-              Maybe Later
-            </Button>
           </div>
         </div>
       </DialogContent>

@@ -22,8 +22,13 @@ export function DocsNavbar({ data }: Props) {
       <div className="flex items-center py-4 px-8 glass border-b justify-between w-full">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
+          <img
+            src="/icons/logo_dark.png"
+            alt="logo"
+            className="size-12"
+          />
           <div className="flex flex-col">
-            <span className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">
+            <span className="text-xl font-bold text-transparent bg-clip-text bg-zinc-200">
               Beaver
             </span>
             <span className="text-sm text-zinc-400 -mt-1">Social</span>
@@ -40,7 +45,7 @@ export function DocsNavbar({ data }: Props) {
           <motion.button
             className="rounded-sm bg-zinc-800/20 px-6 py-2 text-md text-white hover:bg-zinc-800/40 border border-zinc-700/50 hover:border-purple-400/50 font-semibold flex gap-2 items-center transition-all"
             whileTap={{ scale: 0.97 }}
-            onClick={() => navigate("/onboarding/appid")}
+            onClick={() => navigate("/dev/appid")}
           >
             <Icon name="Zap" className="w-4 h-4 text-blue-400" />
 

@@ -46,7 +46,7 @@ export default function CreatePostSuccessDialog({
     if (postId) {
       navigate(`/app/post/${postId}`);
     } else {
-      navigate("/app/");
+      navigate("/app");
     }
   };
 

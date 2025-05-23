@@ -23,6 +23,7 @@ const client = new BeaverClient({
     enabled: true,
     windowFeatures: {}, // Optional window features for wallet connections
   },
+  appId: "your-app-id",
 });
 
 // Wait for the client to be ready

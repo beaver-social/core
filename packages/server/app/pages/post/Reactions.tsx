@@ -21,8 +21,6 @@ export default function Reactions(props: Props) {
   const user = beaver.user;
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
 
-  console.log({ user });
-
   // like post
   const {
     data: userPostInteraction,
@@ -40,8 +38,6 @@ export default function Reactions(props: Props) {
     isSuccess: isUnlikeSuccess,
     isError: isUnlikeError,
   } = beaver.post.unlikePost;
-
-  console.log(userPostInteraction);
 
   useEffect(() => {
     if (isLikeSuccess || isUnlikeSuccess) {

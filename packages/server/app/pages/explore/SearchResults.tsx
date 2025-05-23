@@ -103,7 +103,7 @@ export default function SearchResults() {
 
           {/* Search Results */}
           <div className="divide-y my-6">
-            {postArray?.pages && postArray?.pages.length > 0 ? (
+            {postArray?.pages && postArray?.pages[0].posts.length > 0 ? (
               postArray?.pages.map((page) =>
                 page.posts.map((postId, index) => (
                   <FeedPost key={index} postId={postId.id} />

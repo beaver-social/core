@@ -380,6 +380,15 @@ export function EnhancedHero() {
               Get Started
             </p>
           </motion.button>
+
+          <motion.button
+            className="hidden md:flex rounded-sm px-6 py-2.5 text-sm font-medium text-zinc-400 border border-zinc-800 gap-2 items-center hover:text-zinc-200 hover:border-zinc-700"
+            whileTap={{ scale: 0.97 }}
+            onClick={() => navigate("/app")}
+          >
+            <Icon name="AppWindowMac" className="w-4 h-4" />
+            <p>See Example App</p>
+          </motion.button>
         </motion.div>
 
         {/* Stats */}

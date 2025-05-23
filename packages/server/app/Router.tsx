@@ -20,7 +20,7 @@ import Icon from "./shared/components/Icon";
 import NotLoggedInDialog from "./shared/components/NotLoggedInDialog";
 import Landing from "./pages/landing";
 import Docs from "./pages/docs";
-import AppId from "./pages/onboarding/AppId";
+import AppId from "./pages/dev/AppId";
 
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary =
@@ -30,54 +30,25 @@ const withPageErrorBoundary =
     </PageErrorBoundary>
   );
 
-// Protection for onboarding routes - handles wallet connection and identity creation
 function OnboardingProtection({ children }: { children: React.ReactNode }) {
-  const beaver = useBeaver();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // If wallet is connected and has identity, redirect to app
-    if (beaver.wallet.isConnected && beaver.wallet.hasIdentity && beaver.user) {
-      navigate("/app");
-    }
-  }, [beaver.wallet.isConnected, beaver.wallet.hasIdentity, beaver.user, navigate]);
-
-  return <div>{children}</div>;
-}
-
-// Protection for app routes - requires user to be logged in
-function AuthProtection({ children }: { children: React.ReactNode }) {
   const beaver = useBeaver();
   const navigate = useNavigate();
   const { mutate: login, isSuccess, isPending } = useLogin();
 
+  if (beaver.wallet.isConnected && !beaver.wallet.hasIdentity) {
+    navigate("/app/onboarding");
+  }
+
   useEffect(() => {
-    // If wallet is connected but no identity, go to onboarding
-    if (beaver.wallet.isConnected && !beaver.wallet.hasIdentity) {
-      navigate("/onboarding");
-      return;
-    }
-
-    // If wallet is connected with identity but no user, try to login
-    if (beaver.wallet.isConnected && beaver.wallet.hasIdentity && !beaver.user) {
+    if (
+      beaver.wallet.isConnected &&
+      beaver.wallet.hasIdentity &&
+      !beaver.user
+    ) {
       login();
-      return;
     }
+  }, [beaver.wallet.isConnected, beaver.wallet.hasIdentity, beaver.user]);
 
-    // If no wallet connection, redirect to landing
-    if (!beaver.wallet.isConnected) {
-      navigate("/");
-      return;
-    }
-  }, [
-    beaver.wallet.isConnected,
-    beaver.wallet.hasIdentity,
-    beaver.user,
-    login,
-    navigate,
-  ]);
-
-  // Show loading while logging in
   if (isPending) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -86,19 +57,20 @@ function AuthProtection({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Show not logged in dialog if user is not authenticated
-  if (!beaver.user) {
-    return (
-      <div>
-        <NotLoggedInDialog />
-        {children}
-      </div>
-    );
-  }
-
   return (
     <div className="relative">
-      {isSuccess && <WelcomeSplash />}
+      {!isPending && isSuccess && <WelcomeSplash />}
+      {children}
+    </div>
+  );
+}
+
+function NotLoggedInProtection({ children }: { children: React.ReactNode }) {
+  const beaver = useBeaver();
+
+  return (
+    <div>
+      {!beaver.user && <NotLoggedInDialog />}
       {children}
     </div>
   );
@@ -108,76 +80,81 @@ export default function () {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public routes - no authentication required */}
-        <Route path="/" element={withPageErrorBoundary(Landing)({})} />
-        <Route path="/demo" element={withPageErrorBoundary(Demo)({})} />
-        <Route path="/docs/*" element={withPageErrorBoundary(Docs)({})} />
-
-        {/* Onboarding routes - special handling for wallet setup */}
         <Route
-          path="/onboarding/*"
+          path="/*"
           element={
             <OnboardingProtection>
               <Routes>
-                <Route index element={withPageErrorBoundary(Onboarding)({})} />
+                <Route path="/" element={withPageErrorBoundary(Landing)({})} />
+
                 <Route
-                  path="appid"
+                  path="/dev/appid"
                   element={withPageErrorBoundary(AppId)({})}
+                />
+
+                <Route
+                  path="/onboarding"
+                  element={withPageErrorBoundary(Onboarding)({})}
+                />
+
+                <Route
+                  path="/docs/*"
+                  element={withPageErrorBoundary(Docs)({})}
+                />
+
+                <Route path="/app" element={withPageErrorBoundary(Home)({})} />
+                <Route
+                  path="/app/*"
+                  element={
+                    <NotLoggedInProtection>
+                      <Routes>
+                        <Route
+                          path="/alerts"
+                          element={withPageErrorBoundary(Notifications)({})}
+                        />
+                        <Route
+                          path="/messages"
+                          element={withPageErrorBoundary(Messages)({})}
+                        />
+                        <Route
+                          path="/message/:id"
+                          element={withPageErrorBoundary(Message)({})}
+                        />
+                        <Route
+                          path="/post/:id"
+                          element={withPageErrorBoundary(Post)({})}
+                        />
+                        <Route
+                          path="/profile/:username"
+                          element={withPageErrorBoundary(Profile)({})}
+                        />
+                        <Route
+                          path="/create"
+                          element={withPageErrorBoundary(Create)({})}
+                        />
+                        <Route
+                          path="/swipes"
+                          element={withPageErrorBoundary(Swipes)({})}
+                        />
+                        <Route
+                          path="/settings"
+                          element={withPageErrorBoundary(Settings)({})}
+                        />
+                        <Route
+                          path="/explore/search"
+                          element={withPageErrorBoundary(SearchResults)({})}
+                        />
+                      </Routes>
+                    </NotLoggedInProtection>
+                  }
                 />
               </Routes>
             </OnboardingProtection>
           }
         />
 
-        {/* App routes - requires authentication */}
-        <Route
-          path="/app/*"
-          element={
-            <AuthProtection>
-              <Routes>
-                <Route index element={withPageErrorBoundary(Home)({})} />
-                <Route
-                  path="alerts"
-                  element={withPageErrorBoundary(Notifications)({})}
-                />
-                <Route
-                  path="messages"
-                  element={withPageErrorBoundary(Messages)({})}
-                />
-                <Route
-                  path="messages/:id"
-                  element={withPageErrorBoundary(Message)({})}
-                />
-                <Route
-                  path="post/:id"
-                  element={withPageErrorBoundary(Post)({})}
-                />
-                <Route
-                  path="profile/:username"
-                  element={withPageErrorBoundary(Profile)({})}
-                />
-                <Route
-                  path="create"
-                  element={withPageErrorBoundary(Create)({})}
-                />
-                <Route
-                  path="swipes"
-                  element={withPageErrorBoundary(Swipes)({})}
-                />
-                <Route
-                  path="settings"
-                  element={withPageErrorBoundary(Settings)({})}
-                />
-                <Route
-                  path="explore/search"
-                  element={withPageErrorBoundary(SearchResults)({})}
-                />
-              </Routes>
-            </AuthProtection>
-          }
-        />
+        <Route path="/demo" element={withPageErrorBoundary(Demo)({})} />
 
-        {/* 404 route */}
         <Route path="*" element={withPageErrorBoundary(Error404)({})} />
       </Routes>
     </BrowserRouter>
