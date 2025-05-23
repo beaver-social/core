@@ -332,18 +332,18 @@ export default function Chatbot() {
         intent: "chat",
       });
 
-      console.log(result);
+      const resultData = await result.json();
 
       const aiMessage: Message = {
         id: `ai-${Date.now()}`,
-        content:
-          "I apologize, but I couldn't generate a response at this time. Please try again.",
+        content: resultData.message,
         role: "ai",
         timestamp: new Date(),
         relatedLinks: relatedLinks,
       };
 
       setMessages((prev) => [...prev, aiMessage]);
+      setInputValue("");
     } catch (error) {
       console.error("Error getting AI response:", error);
       setMessages((prev) => [
@@ -383,7 +383,7 @@ export default function Chatbot() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-[95vw] md:max-w-[800px] glass bg-background/50 w-[95vw] md:w-[85vw] h-[85vh] md:h-[70vh] p-0 overflow-hidden">
+      <DialogContent className="max-w-[95vw] md:max-w-[800px] glass bg-background/50 w-[95vw] md:w-[85vw] h-[85vh] md:h-[70vh] p-0 overflow-x-hidden">
         <div className="sr-only">
           <DialogTitle>Beaver AI</DialogTitle>
           <DialogDescription>

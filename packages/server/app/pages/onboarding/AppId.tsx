@@ -41,7 +41,7 @@ export default function AppId() {
 
   // Check if user is logged in
   const isLoggedIn = !!beaver.user;
-  const hasReachedLimit = appData?.apps?.length >= 5 || false;
+  const hasReachedLimit = (appData && appData?.apps?.length >= 5) || false;
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
