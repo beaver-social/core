@@ -26,6 +26,11 @@ export function ModernNavbar() {
       <div className="container flex items-center justify-between px-4 max-w-7xl mx-auto">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
+          <img
+            src="/icons/logo_dark.png"
+            alt="logo"
+            className="size-12"
+          />
           <div className="flex flex-col">
             <span className="text-xl font-bold text-transparent bg-clip-text bg-zinc-200">
               Beaver
