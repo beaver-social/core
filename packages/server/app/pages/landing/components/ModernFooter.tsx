@@ -68,9 +68,13 @@ export function ModernFooter() {
 
   return (
     <footer className="border-t border-zinc-800/50 bg-zinc-900 backdrop-blur-md relative">
-      <div className="absolute w-full -top-[12rem] md:-top-[18rem] lg:-top-[24rem] xl:-top-[32rem] left-1/2 -translate-x-1/2 -z-10">
+      <motion.div className="absolute w-full -top-[12rem] md:-top-[18rem] lg:-top-[24rem] xl:-top-[32rem] left-1/2 -translate-x-1/2 -z-10"
+        initial={{ opacity: 0, y: 100, scale: 0.8 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94], delay: 0 }}>
         <Image src="/images/landing/macbook.png" alt="Macbook" className="w-[95%] sm:w-[90%] md:w-[85%] lg:w-[80%] xl:w-[75%] mx-auto" />
-      </div>
+      </motion.div>
 
       <div className="container mx-auto px-8 pt-8 pb-8 max-w-7xl bg-zinc-900 border-t z-10">
         {/* Top section with logo and navigation */}
