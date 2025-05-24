@@ -482,6 +482,17 @@ export default function AppId() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.5 }}
         >
+          <Button variant="link" className="w-full" onClick={() => navigate("/docs/introduction")}>
+            Go Back
+          </Button>
+        </motion.div>
+
+        <motion.div
+          className="max-w-md mt-2 text-xs text-muted-foreground"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7, duration: 0.5 }}
+        >
           Your AppId gives you access to Beaver SDK features. Keep it secure and
           don't share it publicly.
         </motion.div>
