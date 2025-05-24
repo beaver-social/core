@@ -46,6 +46,6 @@ Pagination responses include these standard fields:
 
 ## Further Resources
 
-- [API Reference (OpenAPI Specification)](https://api.beaver.social/docs)
+- [API Reference (OpenAPI Specification)](https://beaversocial.xyz/api/v1)
 - [SDK Documentation](./typescript-sdk.md)
 - [Server API Architecture](./architecture.md)

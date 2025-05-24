@@ -1,4 +1,10 @@
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router";
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router";
 import Error404 from "./pages/_404";
 import Home from "./pages/home";
 import Post from "./pages/post";
@@ -24,18 +30,24 @@ import AppId from "./pages/dev/AppId";
 
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary =
-  (Component: React.ComponentType<any>) => (props: any) => (
-    <PageErrorBoundary>
-      <Component {...props} />
-    </PageErrorBoundary>
-  );
+  (Component: React.ComponentType<any>) => (props: any) =>
+    (
+      <PageErrorBoundary>
+        <Component {...props} />
+      </PageErrorBoundary>
+    );
 
 function OnboardingProtection({ children }: { children: React.ReactNode }) {
   const beaver = useBeaver();
   const navigate = useNavigate();
   const { mutate: login, isSuccess, isPending } = useLogin();
+  const location = useLocation();
 
-  if (beaver.wallet.isConnected && !beaver.wallet.hasIdentity) {
+  if (
+    beaver.wallet.isConnected &&
+    !beaver.wallet.hasIdentity &&
+    location.pathname != "/onboarding"
+  ) {
     navigate("/onboarding");
   }
 
@@ -51,7 +63,12 @@ function OnboardingProtection({ children }: { children: React.ReactNode }) {
     if (beaver.wallet.isAuthenticated) {
       navigate("/app");
     }
-  }, [beaver.wallet.isConnected, beaver.wallet.hasIdentity, beaver.user, beaver.wallet.isAuthenticated]);
+  }, [
+    beaver.wallet.isConnected,
+    beaver.wallet.hasIdentity,
+    beaver.user,
+    beaver.wallet.isAuthenticated,
+  ]);
 
   if (isPending) {
     return (
@@ -86,15 +103,9 @@ export default function () {
       <Routes>
         <Route path="/" element={withPageErrorBoundary(Landing)({})} />
 
-        <Route
-          path="/dev/appid"
-          element={withPageErrorBoundary(AppId)({})}
-        />
+        <Route path="/dev/appid" element={withPageErrorBoundary(AppId)({})} />
 
-        <Route
-          path="/docs/*"
-          element={withPageErrorBoundary(Docs)({})}
-        />
+        <Route path="/docs/*" element={withPageErrorBoundary(Docs)({})} />
 
         <Route
           path="/*"

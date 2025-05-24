@@ -61,7 +61,7 @@ function App() {
       <BeaverProvider
         config={{
           network: "testnet", // Use 'testnet' for development
-          apiBaseUrl: "https://testnet.api.beaver.social/v1",
+          apiBaseUrl: "https://beaversocial.xyz/api/v1",
           debug: true, // Enable logging during development
           // Optional: Configure zkLogin wallets
           zkLoginWallets: {
@@ -363,7 +363,7 @@ import { BeaverClient } from "@beaver/client";
 // Initialize the client
 const client = new BeaverClient({
   network: "testnet",
-  apiBaseUrl: "https://testnet.api.beaver.social/v1",
+  apiBaseUrl: "https://beaversocial.xyz/api/v1",
   debug: true,
 });
 

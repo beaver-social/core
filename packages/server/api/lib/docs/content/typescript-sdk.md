@@ -16,7 +16,7 @@ import { BeaverClient } from "@beaver/client";
 // Initialize the client
 const client = new BeaverClient({
   network: "testnet", // or 'mainnet', 'devnet'
-  apiBaseUrl: "https://api.beaver.social/v1",
+  apiBaseUrl: "https://beaversocial.xyz/api/v1",
   debug: true, // Optional: enables SDK logging
   // Optional: enable zkLogin wallet support
   zkLoginWallets: {
@@ -219,7 +219,7 @@ import { BeaverClient } from "@beaver/client";
 async function registerAndPost() {
   const client = new BeaverClient({
     network: "testnet",
-    apiBaseUrl: "https://api.beaver.social/v1",
+    apiBaseUrl: "https://beaversocial.xyz/api/v1",
   });
 
   // Wait for client to be ready
@@ -272,7 +272,7 @@ import { BeaverClient } from "@beaver/client";
 async function searchAndFollow(query: string) {
   const client = new BeaverClient({
     network: "testnet",
-    apiBaseUrl: "https://api.beaver.social/v1",
+    apiBaseUrl: "https://beaversocial.xyz/api/v1",
   });
 
   // Wait for client to be ready

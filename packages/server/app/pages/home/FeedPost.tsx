@@ -19,7 +19,11 @@ function FeedPost({ postId }: { postId: number }) {
   const [reply, setReply] = useState("");
 
   const beaver = useBeaver();
-  const { mutate: upgradePost, isPending: isUpgrading, isSuccess: isUpgraded } = beaver.post.upgradePost;
+  const {
+    mutate: upgradePost,
+    isPending: isUpgrading,
+    isSuccess: isUpgraded,
+  } = beaver.post.upgradePost;
   const {
     data: post,
     isLoading: postLoading,
@@ -168,9 +172,7 @@ function FeedPost({ postId }: { postId: number }) {
             <p className="text-sm">
               <span className="font-semibold">{author?.username} </span>
               <span>
-                {showMore
-                  ? post?.content
-                  : truncateText(post?.content, 50)}{" "}
+                {showMore ? post?.content : truncateText(post?.content, 50)}{" "}
               </span>
               {post?.content.length > 50 && (
                 <span>
@@ -281,22 +283,31 @@ function FeedPost({ postId }: { postId: number }) {
             </div>
 
             <div className="flex items-center gap-2">
-              <motion.button
-                className="rounded-sm bg-zinc-800/20 p-2 text-md text-white hover:bg-zinc-800/40 border border-zinc-700/50 hover:border-purple-400/50 font-semibold flex gap-2 items-center transition-all"
-                whileTap={{ scale: 0.97 }}
-                onClick={() => {
-                  upgradePost({ id: postId });
-                }}
-                disabled={isUpgrading}
-              >
-                {isUpgraded ? (
-                  <Icon name="Check" className="size-4 text-blue-400" />
-                ) : (
-                  <p className="text-transparent text-sm bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-                    {isUpgrading ? <Icon name="LoaderCircle" className="size-4 animate-spin" /> : "Upgrade"}
-                  </p>
-                )}
-              </motion.button>
+              {beaver.user?.id === author?.id && (
+                <motion.button
+                  className="rounded-sm bg-zinc-800/20 p-2 text-md text-white hover:bg-zinc-800/40 border border-zinc-700/50 hover:border-purple-400/50 font-semibold flex gap-2 items-center transition-all"
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => {
+                    upgradePost({ id: postId });
+                  }}
+                  disabled={isUpgrading}
+                >
+                  {isUpgraded ? (
+                    <Icon name="Check" className="size-4 text-blue-400" />
+                  ) : (
+                    <p className="text-transparent text-sm bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                      {isUpgrading ? (
+                        <Icon
+                          name="LoaderCircle"
+                          className="size-4 animate-spin"
+                        />
+                      ) : (
+                        "Upgrade"
+                      )}
+                    </p>
+                  )}
+                </motion.button>
+              )}
               <FeedPostMenu post={post} author={author} />
             </div>
           </div>
@@ -317,9 +328,8 @@ function FeedPost({ postId }: { postId: number }) {
             </motion.div>
           </div>
         </motion.article>
-      )
-      }
-    </motion.div >
+      )}
+    </motion.div>
   );
 }
 

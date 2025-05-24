@@ -1,7 +1,10 @@
 import Icon from "@/shared/components/Icon";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router";
-import { CodeSnippet, type CodeSnippet as CodeSnippetType } from "../../../shared/components/CodeSnippet";
+import {
+  CodeSnippet,
+  type CodeSnippet as CodeSnippetType,
+} from "../../../shared/components/CodeSnippet";
 import { Image } from "@/shared/components/Image";
 
 const codeSnippets: CodeSnippetType[] = [
@@ -15,7 +18,7 @@ function App() {
     <BeaverProvider
       config={{
         network: "mainnet",
-        apiBaseUrl: "https://api.beaver.social/v1",
+        apiBaseUrl: "https://beaversocial.xyz/api/v1",
         appId: "your-app-id"
       }}
     >
@@ -71,7 +74,8 @@ export function EnhancedHero() {
           </h1>
 
           <p className="max-w-xl mt-4 text-lg text-zinc-500">
-            Connectors, Authentication, Profiles, Posts, Shorts, Social Graph APIs, and much more.
+            Connectors, Authentication, Profiles, Posts, Shorts, Social Graph
+            APIs, and much more.
           </p>
 
           {/* Key Beaver benefits highlights */}
@@ -106,7 +110,10 @@ export function EnhancedHero() {
               navigate("/docs/getting-started");
             }}
           >
-            <Icon name="Zap" className="w-5 h-5 text-blue-400 transition-colors group-hover:text-blue-300" />
+            <Icon
+              name="Zap"
+              className="w-5 h-5 text-blue-400 transition-colors group-hover:text-blue-300"
+            />
             <span>Start Building</span>
           </motion.button>
 

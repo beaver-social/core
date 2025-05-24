@@ -25,7 +25,7 @@ function App() {
       <BeaverProvider
         config={{
           network: "testnet", // or 'mainnet', 'devnet'
-          apiBaseUrl: "https://api.beaver.social/v1",
+          apiBaseUrl: "https://beaversocial.xyz/api/v1",
           // Optional: enable zkLogin wallet support
           zkLoginWallets: {
             enabled: true,

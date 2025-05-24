@@ -1,7 +1,10 @@
 import * as React from "react";
 import { motion } from "framer-motion";
 import { Code, Cpu, Sparkles } from "lucide-react";
-import { CodeSnippet, type CodeSnippet as CodeSnippetType } from "../../../shared/components/CodeSnippet";
+import {
+  CodeSnippet,
+  type CodeSnippet as CodeSnippetType,
+} from "../../../shared/components/CodeSnippet";
 
 const codeSnippets: CodeSnippetType[] = [
   {
@@ -18,7 +21,7 @@ function App() {
       <BeaverProvider
         config={{
           network: "testnet",
-          apiBaseUrl: "https://testnet.api.beaver.social/v1",
+          apiBaseUrl: "https://beaversocial.xyz/api/v1/",
           zkLoginWallets: { enabled: true },
           appId: "your-app-id"
         }}
@@ -54,7 +57,7 @@ function SocialFeed() {
 // Initialize Beaver SDK for server-side usage
 const beaver = new BeaverClient({
   network: "testnet",
-  apiBaseUrl: "https://testnet.api.beaver.social/v1",
+  apiBaseUrl: "https://beaversocial.xyz/api/v1/",
   apiKey: process.env.BEAVER_API_KEY,
 });
 
@@ -105,7 +108,7 @@ function App() {
       <BeaverProvider
         config={{
           network: "testnet",
-          apiBaseUrl: "https://testnet.api.beaver.social/v1",
+          apiBaseUrl: "https://beaversocial.xyz/api/v1/",
           zkLoginWallets: { enabled: true },
           appId: "your-app-id"
         }}
@@ -157,8 +160,8 @@ export function CodeShowcase() {
             </span>
           </h2>
           <p className="text-zinc-400 max-w-2xl mx-auto">
-            Integrate Beaver Social into your React, TypeScript, or mobile app with our
-            comprehensive SDKs and type-safe APIs.
+            Integrate Beaver Social into your React, TypeScript, or mobile app
+            with our comprehensive SDKs and type-safe APIs.
           </p>
         </motion.div>
       </div>

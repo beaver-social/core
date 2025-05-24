@@ -6,8 +6,8 @@ The Beaver Server API is a RESTful API service that powers the social network fu
 
 The API is available at:
 
-- Production: `https://api.beaver.social/v1`
-- Testnet: `https://testnet.api.beaver.social/v1`
+- Production: `https://beaversocial.xyz/api/v1`
+- Testnet: `https://beaversocial.xyz/api/v1`
 
 ## Authentication
 

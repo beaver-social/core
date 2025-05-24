@@ -30,7 +30,7 @@ import { MySurfaceImplementation } from "./my-wallet-surface";
 function App() {
   const surface = new MySurfaceImplementation();
   const config = {
-    apiBaseUrl: "https://api.beaversocial.com/api",
+    apiBaseUrl: "https://beaversocial.xyz/api/v1",
     network: "mainnet",
     debug: true,
   };
