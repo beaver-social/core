@@ -1,4 +1,3 @@
-import { Image } from "@/shared/components/Image";
 import {
   ModernNavbar,
   EnhancedHero,
@@ -6,9 +5,7 @@ import {
   HowItWorks,
   UseCases,
   ModernIntegrations,
-  SocialProof,
   FAQ,
-  AnimatedCTA,
   ModernFooter,
 } from "./components";
 

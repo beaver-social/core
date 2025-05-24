@@ -180,15 +180,13 @@ export function FAQ() {
 
             {/* CTA Button */}
             <motion.button
-                className="flex items-center gap-3 px-6 py-3 text-lg font-semibold text-transparent transition-all duration-300 hover:border group bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 hover:from-blue-300 hover:via-purple-300 hover:to-cyan-300 hover:border-blue-400/50 rounded-xl"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                className="flex items-center gap-3 px-6 py-3 text-lg font-semibold text-transparent transition-all hover:border group bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 hover:from-blue-300 hover:via-purple-300 hover:to-cyan-300 hover:border-blue-400/50 rounded-xl"
                 onClick={() => {
                     navigate("/docs/getting-started");
                 }}
             >
-                <span>Start Building</span>
-                <Icon name="ArrowRight" className="w-5 h-5 text-blue-400 transition-colors group-hover:text-blue-300" />
+                <span>Get Started</span>
+                <Icon name="ArrowRight" className="w-5 h-5 text-blue-400 group-hover:text-blue-300 group-hover:translate-x-1 transition-all" />
             </motion.button>
         </div>
     );
