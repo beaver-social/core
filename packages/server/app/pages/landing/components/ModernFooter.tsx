@@ -9,6 +9,7 @@ import {
   MessageCircle,
   ArrowUpRight,
 } from "lucide-react";
+import { Image } from "@/shared/components/Image";
 
 export function ModernFooter() {
   const currentYear = new Date().getFullYear();
@@ -66,8 +67,12 @@ export function ModernFooter() {
   ];
 
   return (
-    <footer className="border-t border-zinc-800/50 bg-zinc-900/50 backdrop-blur-md">
-      <div className="container mx-auto px-8 pt-8 pb-8 max-w-7xl">
+    <footer className="border-t border-zinc-800/50 bg-zinc-900 backdrop-blur-md relative">
+      <div className="absolute w-full -top-[12rem] md:-top-[18rem] lg:-top-[24rem] xl:-top-[32rem] left-1/2 -translate-x-1/2 -z-10">
+        <Image src="/images/landing/macbook.png" alt="Macbook" className="w-[95%] sm:w-[90%] md:w-[85%] lg:w-[80%] xl:w-[75%] mx-auto" />
+      </div>
+
+      <div className="container mx-auto px-8 pt-8 pb-8 max-w-7xl bg-zinc-900 border-t z-10">
         {/* Top section with logo and navigation */}
         <div className="grid grid-cols-1 gap-8 md:grid-cols-6 lg:grid-cols-12">
           {/* Logo and company info */}

@@ -128,7 +128,7 @@ export function EnhancedHero() {
 
         {/* Abstract floating element placeholder */}
         <motion.div
-          className="absolute flex items-center justify-center w-16 h-16 border -bottom-20 -right-20 rounded-2xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border-blue-400/30"
+          className="absolute flex items-center justify-center w-16 h-16 border -top-20 -left-20 rounded-2xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border-blue-400/30"
           animate={{
             y: [0, -10, 0],
             rotate: [0, 5, 0],

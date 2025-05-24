@@ -2,6 +2,7 @@ import * as React from "react";
 import { motion } from "framer-motion";
 import Icon from "@/shared/components/Icon";
 import { icons } from "lucide-react";
+import { Image } from "@/shared/components/Image";
 
 // Developer-focused Integration showcase
 const IntegrationCard = ({

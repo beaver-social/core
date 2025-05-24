@@ -1,3 +1,4 @@
+import { Image } from "@/shared/components/Image";
 import {
   ModernNavbar,
   EnhancedHero,
@@ -46,7 +47,7 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <section className="relative z-10 mt-20">
+      <section className="relative z-10 mt-[16rem] sm:mt-[18rem] md:mt-[24rem] lg:mt-[32rem] xl:mt-[40rem]">
         <ModernFooter />
       </section>
     </div>
