@@ -6,20 +6,17 @@ import { Image } from "@/shared/components/Image";
 
 const codeSnippets: CodeSnippetType[] = [
   {
-    title: "zkLogin Integration",
+    title: "Simple Social Integration",
     language: "javascript",
-    code: `import { BeaverProvider, useZkLogin } from '@beaver/react';
+    code: `import { BeaverProvider, useBeaver } from '@beaver/react';
 
 function App() {
   return (
     <BeaverProvider
       config={{
         network: "mainnet",
-        suiRpcUrl: "https://fullnode.mainnet.sui.io",
-        zkLogin: {
-          enabled: true,
-          providers: ["google", "facebook", "apple"]
-        }
+        apiBaseUrl: "https://api.beaver.social/v1",
+        appId: "your-app-id"
       }}
     >
       <SocialApp />
@@ -28,26 +25,22 @@ function App() {
 }`,
   },
   {
-    title: "Sui-Powered Social",
+    title: "Social Features in Minutes",
     language: "javascript",
-    code: `import { useSuiAccount, usePost } from "@beaver/react";
+    code: `import { useWallets, usePost, useProfile } from "@beaver/react";
 
 function SocialApp() {
-  const { account, zkLogin } = useSuiAccount();
-  const { createPost, posts } = usePost();
-
-  const handleZkLogin = async () => {
-    await zkLogin.authenticate("google");
-  };
+  const { connect } = useWallets();
+  const { createPost, getPosts } = usePost();
+  const { getProfile } = useProfile();
 
   return (
-    <div className="sui-social-app">
-      <button onClick={handleZkLogin}>
-        Login with zkLogin ⚡
+    <div className="social-app">
+      <button onClick={() => connect()}>
+        Connect Wallet
       </button>
-      {account && (
-        <PostCreator onPost={createPost} />
-      )}
+      <PostFeed posts={getPosts().data} />
+      <PostComposer onPost={createPost} />
     </div>
   );
 }`,
@@ -59,108 +52,86 @@ export function EnhancedHero() {
 
   return (
     <section className="container px-8 relative mx-auto flex flex-col lg:flex-row items-center justify-between gap-12 py-16 lg:py-32 max-w-7xl min-h-[90vh]">
-      {/* Sui zkLogin Badge */}
-      <motion.div
-        className="absolute top-8 left-2/3 transform -translate-x-1/2 lg:left-8 lg:transform-none"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="hidden xl:flex items-center gap-3 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-400/30 backdrop-blur-sm">
-          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center">
-            <span className="text-xs font-bold text-white">S</span>
-          </div>
-          <span className="text-blue-300 text-sm font-medium">Powered by Sui zkLogin</span>
-        </div>
-      </motion.div>
-
       {/* Left side - Text content */}
-      <div className="flex flex-col max-w-2xl mb-12 lg:mb-0">
+      <div className="relative z-10 flex flex-col max-w-2xl mb-12 lg:mb-0">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          {/* Main heading with Sui emphasis */}
-          <h1 className="text-5xl lg:text-7xl font-bold tracking-tight leading-tight">
+          {/* Main heading focused on Beaver Social */}
+          <h1 className="text-5xl font-bold tracking-tight lg:text-7xl">
             <span className="text-zinc-100">Headless Web3</span>
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-500">
-              Social Network
+              Social Layer
             </span>
             <br />
-            <span className="text-zinc-200">on </span>
-            <span className="text-sky-500 font-extrabold">
-              Sui.
-            </span>
+            <span className="text-zinc-200">on Sui.</span>
           </h1>
 
-          <p className="mt-8 text-xl text-zinc-300 leading-relaxed max-w-xl">
-            Leverage <span className="text-blue-400 font-semibold">Sui's zkLogin</span> and
-            lightning-fast blockchain to create the next generation of social applications.
-            <span className="text-purple-400 font-medium"> Familiar UX, Web3 benefits.</span>
+          <p className="max-w-xl mt-4 text-lg text-zinc-500">
+            Connectors, Authentication, Profiles, Posts, Shorts, Social Graph APIs, and much more.
           </p>
 
-          {/* Sui benefits highlights */}
-          <div className="mt-6 flex flex-wrap gap-4">
-            <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20">
-              <div className="w-2 h-2 rounded-full bg-blue-400"></div>
-              <span className="text-blue-300 text-sm">zkLogin Authentication</span>
+          {/* Key Beaver benefits highlights */}
+          <div className="flex flex-wrap gap-4 mt-6">
+            <div className="flex items-center gap-2 px-3 py-1 border rounded-lg bg-blue-500/10 border-blue-500/20">
+              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+              <span className="text-sm text-blue-300">Simple</span>
             </div>
-            <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20">
-              <div className="w-2 h-2 rounded-full bg-purple-400"></div>
-              <span className="text-purple-300 text-sm">Object-Centric Storage</span>
+            <div className="flex items-center gap-2 px-3 py-1 border rounded-lg bg-purple-500/10 border-purple-500/20">
+              <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+              <span className="text-sm text-purple-300">Secure</span>
             </div>
-            <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+            <div className="flex items-center gap-2 px-3 py-1 border rounded-lg bg-cyan-500/10 border-cyan-500/20">
               <div className="w-2 h-2 rounded-full bg-cyan-400"></div>
-              <span className="text-cyan-300 text-sm">Parallel Execution</span>
+              <span className="text-sm text-cyan-300">Customizable</span>
             </div>
           </div>
         </motion.div>
 
         {/* CTA Buttons */}
         <motion.div
-          className="mt-10 flex flex-wrap gap-4"
+          className="flex flex-wrap gap-4 mt-10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.6 }}
         >
           <motion.button
-            className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600 px-8 py-4 text-lg font-bold text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300"
+            className="flex items-center gap-3 px-6 py-3 text-lg font-semibold text-transparent transition-all duration-300 border group bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 hover:from-blue-300 hover:via-purple-300 hover:to-cyan-300 hover:border-blue-400/50 rounded-xl"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => {
               navigate("/docs/getting-started");
             }}
           >
-            <span className="relative z-10 flex items-center gap-3">
-              <Icon name="Zap" className="w-5 h-5" />
-              Start Building on Sui
-            </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <Icon name="Zap" className="w-5 h-5 text-blue-400 transition-colors group-hover:text-blue-300" />
+            <span>Start Building</span>
           </motion.button>
 
           <motion.button
-            className="flex items-center gap-3 rounded-xl px-6 py-4 text-lg font-medium text-zinc-300 border-2 border-zinc-700 hover:border-blue-400/50 hover:text-zinc-100 hover:bg-blue-500/5 transition-all duration-300"
+            className="flex items-center gap-3 px-6 py-4 text-lg font-medium transition-all duration-300 border rounded-xl text-zinc-300 hover:text-zinc-100 hover:bg-blue-500/5"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate("/app")}
           >
-            <Icon name="Play" className="w-5 h-5" />             <span>See Live Demo</span>
+            <Icon name="Play" className="w-5 h-5" />
+            <span>Try Demo</span>
           </motion.button>
         </motion.div>
       </div>
 
-      {/* Right side - Code snippet with Sui emphasis */}
+      {/* Right side - Code snippet */}
       <div className="relative">
         <CodeSnippet snippets={codeSnippets} />
 
-        {/* Floating Sui logo effect */}
+        {/* Abstract floating element placeholder */}
         <motion.div
-          className="absolute -bottom-20 -right-20 w-16 h-16 rounded-2xl bg-white flex items-center justify-center shadow-lg shadow-blue-500/25"
+          className="absolute flex items-center justify-center w-16 h-16 border -bottom-20 -right-20 rounded-2xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border-blue-400/30"
           animate={{
             y: [0, -10, 0],
-            rotateY: [0, 15, 0],
+            rotate: [0, 5, 0],
           }}
           transition={{
             duration: 4,
@@ -168,16 +139,17 @@ export function EnhancedHero() {
             ease: "easeInOut",
           }}
         >
-          <Image src="/icons/sui.png" alt="Sui Logo" className="w-10" />
+          {/* Placeholder for logo or abstract icon */}
+          <Image src="/icons/sui.png" alt="Beaver Social" className="w-6" />
         </motion.div>
       </div>
 
-      {/* Enhanced floating graphic elements with Sui colors */}
+      {/* Minimalistic floating graphic elements */}
       <motion.div
-        className="absolute -top-32 right-1/4 h-64 w-64 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-3xl"
+        className="absolute w-64 h-64 rounded-full -top-32 right-1/4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 blur-3xl"
         animate={{
           y: [0, 25, 0],
-          opacity: [0.3, 0.6, 0.3],
+          opacity: [0.2, 0.4, 0.2],
           scale: [1, 1.1, 1],
         }}
         transition={{
@@ -188,27 +160,14 @@ export function EnhancedHero() {
       />
 
       <motion.div
-        className="absolute bottom-20 left-1/6 h-32 w-32 rounded-full bg-gradient-to-r from-cyan-500/30 to-blue-500/30 blur-2xl"
+        className="absolute w-32 h-32 rounded-full bottom-20 left-1/6 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 blur-2xl"
         animate={{
           scale: [1, 1.3, 1],
-          opacity: [0.4, 0.7, 0.4],
+          opacity: [0.3, 0.5, 0.3],
           x: [0, 15, 0],
         }}
         transition={{
           duration: 6,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-
-      <motion.div
-        className="absolute top-1/2 left-10 h-20 w-20 rounded-full bg-purple-500/20 blur-xl"
-        animate={{
-          y: [0, -20, 0],
-          opacity: [0.2, 0.5, 0.2],
-        }}
-        transition={{
-          duration: 5,
           repeat: Infinity,
           ease: "easeInOut",
         }}

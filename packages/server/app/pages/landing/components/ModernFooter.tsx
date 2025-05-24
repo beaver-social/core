@@ -82,8 +82,8 @@ export function ModernFooter() {
             </Link>
 
             <p className="mt-4 text-sm text-zinc-400 max-w-xs">
-              Build powerful decentralized social experiences with our AI-driven
-              SDK designed for web3 developers.
+              Headless social network layer for Web3 developers. Complete social infrastructure
+              with authentication, profiles, and social graphs.
             </p>
 
             {/* Social links */}

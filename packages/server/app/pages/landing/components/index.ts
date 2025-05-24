@@ -1,7 +1,11 @@
 export { ModernNavbar } from "./ModernNavbar";
 export { EnhancedHero } from "./EnhancedHero";
 export { AnimatedFeatures } from "./AnimatedFeatures";
+export { HowItWorks } from "./HowItWorks";
+export { UseCases } from "./UseCases";
 export { ModernIntegrations } from "./ModernIntegrations";
+export { FAQ } from "./FAQ";
+export { SocialProof } from "./SocialProof";
 export { AnimatedCTA } from "./AnimatedCTA";
 export { ModernFooter } from "./ModernFooter";
 export { BackgroundEffect } from "./BackgroundEffect";
