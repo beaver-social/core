@@ -11,14 +11,6 @@ import { Image } from "@/shared/components/Image";
 export default function Landing() {
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-zinc-950 text-zinc-200">
-      <div className="absolute w-full inset-0 opacity-40">
-        <Image
-          src="/images/landing/15.jpg"
-          alt="Background Effect"
-          className="object-cover min-h-screen w-screen"
-        />
-      </div>
-
       <section className="relative z-10 min-h-screen">
         <ModernNavbar />
         <EnhancedHero />
