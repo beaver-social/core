@@ -1,16 +1,13 @@
 import Icon from "@/shared/components/Icon";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router";
+import { CodeSnippet, type CodeSnippet as CodeSnippetType } from "../../../shared/components/CodeSnippet";
 
-const AnimatedCodeSnippet = () => {
-  const [copied, setCopied] = useState(false);
-  const [activeSnippet, setActiveSnippet] = useState(0);
-
-  const codeSnippets = [
-    {
-      title: "App.jsx",
-      code: `import { BeaverProvider } from '@beaver/react';
+const codeSnippets: CodeSnippetType[] = [
+  {
+    title: "App.jsx",
+    language: "javascript",
+    code: `import { BeaverProvider } from '@beaver/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient();
@@ -31,372 +28,34 @@ function App() {
     </QueryClientProvider>
   );
 }`,
-    },
-    {
-      title: "SocialApp.jsx",
-      code: `import { useBeaver, usePost, useWallets } from "@beaver/react";
+  },
+  {
+    title: "SocialApp.jsx",
+    language: "javascript",
+    code: `import { useBeaver, usePost, useWallets } from "@beaver/react";
 
 function SocialApp() {
-  const { user } = useBeaver();
-  const { connect } = useWallets();
+  const beaver = useBeaver();
   const { createPost } = usePost();
 
-  if (!user) {
-    return (
-      <button onClick={() => connect({ wallet: "sui-wallet" })}>
-        Connect Wallet
-      </button>
-    );
-  }
-
   return (
-    <div>
-      <h1>Welcome, {user.username}!</h1>
-      <button 
-        onClick={() => createPost.mutate({ 
-          content: "Hello, Web3 Social!" 
-        })}
-      >
-        Create Post
-      </button>
-    </div>
-  );
-}`,
-    },
-  ];
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(codeSnippets[activeSnippet].code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const nextSnippet = () => {
-    setActiveSnippet((prev) => (prev + 1) % codeSnippets.length);
-  };
-
-  const prevSnippet = () => {
-    setActiveSnippet(
-      (prev) => (prev - 1 + codeSnippets.length) % codeSnippets.length,
-    );
-  };
-
-  const renderCodeContent = (index: number) => {
-    if (index === 0) {
-      return (
-        <code className="language-javascript text-zinc-300">
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.1, duration: 0.3 }}
-            className="block"
-          >
-            <span className="text-rose-400">import</span>{" "}
-            <span className="text-teal-300">{"{"}</span>{" "}
-            <span className="text-amber-300">BeaverProvider</span>{" "}
-            <span className="text-teal-300">{"}"}</span>{" "}
-            <span className="text-rose-400">from</span>{" "}
-            <span className="text-green-300">'@beaver/react'</span>;
-          </motion.span>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.3 }}
-            className="block"
-          >
-            <span className="text-rose-400">import</span>{" "}
-            <span className="text-teal-300">{"{"}</span>{" "}
-            <span className="text-amber-300">QueryClient, QueryClientProvider</span>{" "}
-            <span className="text-teal-300">{"}"}</span>{" "}
-            <span className="text-rose-400">from</span>{" "}
-            <span className="text-green-300">'@tanstack/react-query'</span>;
-          </motion.span>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.3 }}
-            className="block mt-4"
-          >
-            <span className="text-rose-400">const</span>{" "}
-            <span className="text-blue-300">queryClient</span>{" "}
-            <span className="text-zinc-300">=</span>{" "}
-            <span className="text-rose-400">new</span>{" "}
-            <span className="text-amber-300">QueryClient</span>
-            <span className="text-teal-300">()</span>;
-          </motion.span>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.3 }}
-            className="block mt-4"
-          >
-            <span className="text-rose-400">function</span>{" "}
-            <span className="text-blue-300">App</span>
-            <span className="text-amber-300">()</span>{" "}
-            <span className="text-teal-300">{"{"}</span>
-          </motion.span>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.3 }}
-            className="block ml-2"
-          >
-            <span className="text-rose-400">return</span>{" "}
-            <span className="text-teal-300">(</span>
-          </motion.span>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.3 }}
-            className="block ml-4"
-          >
-            <span className="text-blue-400">&lt;</span>
-            <span className="text-amber-300">QueryClientProvider</span>{" "}
-            <span className="text-rose-400">client</span>
-            <span className="text-zinc-300">=</span>
-            <span className="text-teal-300">{"{"}</span>
-            <span className="text-blue-300">queryClient</span>
-            <span className="text-teal-300">{"}"}</span>
-            <span className="text-blue-400">&gt;</span>
-          </motion.span>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7, duration: 0.3 }}
-            className="block ml-6"
-          >
-            <span className="text-blue-400">&lt;</span>
-            <span className="text-amber-300">BeaverProvider</span> <br />
-            <span className="ml-8 text-rose-400">config</span>
-            <span className="text-zinc-300">=</span>
-            <span className="text-teal-300">{"{"}</span>
-            <span className="text-orange-300">{"{"}</span>
-            <br />
-            <span className="ml-10 text-orange-300">network: "testnet",</span>
-            <br />
-            <span className="ml-10 text-orange-300">
-              apiBaseUrl: "https://testnet.api.beaver.social/v1",
-            </span>
-            <br />
-            <span className="ml-10 text-orange-300">zkLoginWallets: </span>
-            <span className="text-purple-500">{"{"}</span>
-            <span className="text-orange-300"> enabled: true </span>
-            <span className="text-purple-500">{"}"}</span>,
-            <br />
-            <span className="ml-10 text-orange-300">appId: "your-app-id"</span>
-            <br />
-            <span className="ml-8 text-orange-300">{"}"}</span>
-            <span className="text-teal-300">{"}"}</span>
-            <br />
-            <span className="ml-6 text-blue-400">&gt;</span>
-          </motion.span>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.3 }}
-            className="block ml-8"
-          >
-            <span className="text-blue-400">&lt;</span>
-            <span className="text-amber-300">SocialApp</span>
-            <span className="text-blue-400"> /&gt;</span>
-          </motion.span>
-        </code>
-      );
-    } else {
-      return (
-        <code className="language-javascript text-zinc-300">
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.1, duration: 0.3 }}
-            className="block"
-          >
-            <span className="text-rose-400">import</span>{" "}
-            <span className="text-teal-300">{"{"}</span>{" "}
-            <span className="text-amber-300">useBeaver, usePost, useWallets</span>{" "}
-            <span className="text-teal-300">{"}"}</span>{" "}
-            <span className="text-rose-400">from</span>{" "}
-            <span className="text-green-300">"@beaver/react"</span>;
-          </motion.span>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.3 }}
-            className="block mt-4"
-          >
-            <span className="text-rose-400">function</span>{" "}
-            <span className="text-blue-300">SocialApp</span>
-            <span className="text-amber-300">()</span>{" "}
-            <span className="text-teal-300">{"{"}</span>
-          </motion.span>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.3 }}
-            className="block ml-2"
-          >
-            <span className="text-rose-400">const</span>{" "}
-            <span className="text-teal-300">{"{"}</span>{" "}
-            <span className="text-blue-300">user</span>{" "}
-            <span className="text-teal-300">{"}"}</span>{" "}
-            <span className="text-zinc-300">=</span>{" "}
-            <span className="text-amber-300">useBeaver</span>
-            <span className="text-teal-300">()</span>;
-          </motion.span>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.3 }}
-            className="block ml-2"
-          >
-            <span className="text-rose-400">const</span>{" "}
-            <span className="text-teal-300">{"{"}</span>{" "}
-            <span className="text-blue-300">connect</span>{" "}
-            <span className="text-teal-300">{"}"}</span>{" "}
-            <span className="text-zinc-300">=</span>{" "}
-            <span className="text-amber-300">useWallets</span>
-            <span className="text-teal-300">()</span>;
-          </motion.span>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.3 }}
-            className="block ml-2"
-          >
-            <span className="text-rose-400">const</span>{" "}
-            <span className="text-teal-300">{"{"}</span>{" "}
-            <span className="text-blue-300">createPost</span>{" "}
-            <span className="text-teal-300">{"}"}</span>{" "}
-            <span className="text-zinc-300">=</span>{" "}
-            <span className="text-amber-300">usePost</span>
-            <span className="text-teal-300">()</span>;
-          </motion.span>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.3 }}
-            className="block ml-2 mt-4"
-          >
-            <span className="text-rose-400">if</span>{" "}
-            <span className="text-teal-300">(</span>
-            <span className="text-zinc-300">!</span>
-            <span className="text-blue-300">user</span>
-            <span className="text-teal-300">)</span>{" "}
-            <span className="text-rose-400">return</span>{" "}
-            <span className="text-blue-400">&lt;</span>
-            <span className="text-amber-300">ConnectWallet</span>
-            <span className="text-blue-400"> /&gt;</span>;
-          </motion.span>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7, duration: 0.3 }}
-            className="block ml-2 mt-4"
-          >
-            <span className="text-rose-400">return</span>{" "}
-            <span className="text-blue-400">&lt;</span>
-            <span className="text-amber-300">SocialFeed</span>
-            <span className="text-blue-400"> /&gt;</span>;
-          </motion.span>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.3 }}
-            className="block"
-          >
-            <span className="text-teal-300">{"}"}</span>
-          </motion.span>
-        </code>
-      );
-    }
-  };
-
-  return (
-    <motion.div
-      className="relative w-full max-w-lg mx-auto lg:mx-0 rounded-xl bg-zinc-900/50 p-4 font-mono text-sm shadow-xl backdrop-blur-md border border-zinc-800/50"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5, duration: 0.5 }}
-      layout
-    >
-      <div className="mb-2 flex items-center justify-between">
-        <div className="flex items-center gap-1">
-          <div className="h-2.5 w-2.5 rounded-full bg-red-500"></div>
-          <div className="h-2.5 w-2.5 rounded-full bg-yellow-500"></div>
-          <div className="h-2.5 w-2.5 rounded-full bg-green-500"></div>
-          <div className="ml-2 text-xs text-zinc-500">
-            {codeSnippets[activeSnippet].title}
-          </div>
-        </div>
-        <button
-          onClick={handleCopy}
-          className="text-xs p-2 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-400 transition-colors font-sans"
-        >
-          {copied ? "Copied" : <Icon name="Clipboard" className="w-4 h-4" />}
-        </button>
-      </div>
-      <AnimatePresence mode="wait">
-        <motion.pre
-          key={activeSnippet}
-          className="text-xs sm:text-sm overflow-x-auto"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.3 }}
-        >
-          {renderCodeContent(activeSnippet)}
-        </motion.pre>
-      </AnimatePresence>
-
-      {/* Navigation controls */}
-      <div className="mt-4 flex justify-center items-center gap-3">
-        <button
-          onClick={prevSnippet}
-          className="p-1 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 transition-colors"
-          disabled={activeSnippet === 0}
-        >
-          <Icon name="ChevronLeft" className="w-4 h-4" />
-        </button>
-
-        {codeSnippets.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setActiveSnippet(index)}
-            className={`w-2 h-2 rounded-full ${activeSnippet === index ? "bg-blue-400" : "bg-zinc-600"}`}
-          />
+      <div>
+        {beaver.wallet.wallets.map((wallet, index) => (
+          <button key={index} onClick={() => beaver.wallet.connect(index)}>
+          Connect {wallet}
+          </button>
         ))}
-
-        <button
-          onClick={nextSnippet}
-          className="p-1 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 transition-colors"
-          disabled={activeSnippet === codeSnippets.length - 1}
-        >
-          <Icon name="ChevronRight" className="w-4 h-4" />
-        </button>
       </div>
-    </motion.div>
-  );
-};
+    );
+}`,
+  },
+];
 
 export function EnhancedHero() {
   const navigate = useNavigate();
 
   return (
-    <section className="container px-8 relative mx-auto flex flex-col lg:flex-row items-center justify-between gap-8 py-16 lg:py-28 max-w-7xl h-[90vh]">
+    <section className="container px-8 relative mx-auto flex flex-col lg:flex-row items-center justify-between gap-8 py-16 lg:py-28 max-w-7xl min-h-[90vh]">
       {/* Left side - Text content */}
       <div className="flex flex-col max-w-xl mb-12 lg:mb-0">
         <motion.div
@@ -449,7 +108,7 @@ export function EnhancedHero() {
       </div>
 
       {/* Right side - Code snippet */}
-      <AnimatedCodeSnippet />
+      <CodeSnippet snippets={codeSnippets} />
 
       {/* Floating graphic elements */}
       <motion.div

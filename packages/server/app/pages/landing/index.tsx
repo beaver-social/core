@@ -2,7 +2,6 @@ import {
   ModernNavbar,
   EnhancedHero,
   AnimatedFeatures,
-  CodeShowcase,
   ModernIntegrations,
   AnimatedCTA,
   ModernFooter,
@@ -20,15 +19,12 @@ export default function Landing() {
         />
       </div>
 
-      <section className="relative z-10 md:h-screen">
+      <section className="relative z-10 min-h-screen">
         <ModernNavbar />
         <EnhancedHero />
       </section>
       <section className="relative px-4 z-10">
         <AnimatedFeatures />
-      </section>
-      <section className="relative px-4 z-10">
-        <CodeShowcase />
       </section>
       <section className="relative px-4 z-10">
         <ModernIntegrations />

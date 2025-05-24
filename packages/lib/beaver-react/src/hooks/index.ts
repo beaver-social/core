@@ -4,7 +4,7 @@ import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 export function useBeaver() {
   const { client, user } = useBeaverContext();
   const wallet = useWallets();
-  const follow = useFollow();
+  const social = useSocial();
   const post = usePost();
   const profile = useProfile();
   const docs = useDocs();
@@ -20,7 +20,7 @@ export function useBeaver() {
     wallet,
     user,
     client,
-    follow,
+    social,
     post,
     profile,
     docs,
@@ -87,7 +87,7 @@ export function useWallets() {
   };
 }
 
-export function useFollow() {
+export function useSocial() {
   const { client } = useBeaverContext();
 
   return {

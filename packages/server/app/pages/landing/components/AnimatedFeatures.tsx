@@ -56,7 +56,7 @@ export function AnimatedFeatures() {
   return (
     <section
       id="features"
-      className="container relative mx-auto px-4 py-24 max-w-7xl"
+      className="container relative mx-auto px-4 max-w-7xl"
     >
       {/* Section header */}
       <div className="mb-16 max-w-3xl">
@@ -83,11 +83,19 @@ export function AnimatedFeatures() {
       {/* Features grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <FeatureCard
-          title="Blockchain Authentication"
-          description="Secure Web3 authentication using wallet connections with support for Sui wallets and zkLogin technology."
+          title="Frictionless Authentication"
+          description="Secure Web3 authentication using wallet connections and Sui ZkLogin."
           icon={Wallet}
           gradient="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400"
           delay={0.1}
+        />
+
+        <FeatureCard
+          title="On-chain Identity"
+          description="A secure and decentralized identity system built on the Sui blockchain."
+          icon={Shield}
+          gradient="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400"
+          delay={0.3}
         />
 
         <FeatureCard
@@ -96,14 +104,6 @@ export function AnimatedFeatures() {
           icon={Users}
           gradient="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400"
           delay={0.2}
-        />
-
-        <FeatureCard
-          title="On-chain Verification"
-          description="Critical data secured and verified by the Sui blockchain using Move smart contracts for permanence."
-          icon={Shield}
-          gradient="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400"
-          delay={0.3}
         />
 
         <FeatureCard
@@ -124,7 +124,7 @@ export function AnimatedFeatures() {
 
         <FeatureCard
           title="Scalable Infrastructure"
-          description="Built for millions of users with optimized APIs, efficient data structures, and edge distribution."
+          description="Built for thousands of users with optimized APIs, efficient data structures, and edge distribution."
           icon={Zap}
           gradient="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-orange-400"
           delay={0.6}
