@@ -104,7 +104,7 @@ function FeedPost({ postId }: { postId: number }) {
                 className="flex-shrink-0"
               >
                 <Link
-                  to={`/profile/${author?.username}`}
+                  to={`/app/profile/${author?.username}`}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Image
@@ -118,7 +118,7 @@ function FeedPost({ postId }: { postId: number }) {
               <div className="flex flex-col">
                 <div className="flex items-center gap-1 flex-wrap">
                   <Link
-                    to={`/profile/${author?.id}`}
+                    to={`/app/profile/${author?.id}`}
                     className="font-semibold hover:text-primary transition-colors"
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -251,7 +251,7 @@ function FeedPost({ postId }: { postId: number }) {
                 className="flex-shrink-0"
               >
                 <Link
-                  to={`/profile/${author?.username}`}
+                  to={`/app/profile/${author?.username}`}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Image

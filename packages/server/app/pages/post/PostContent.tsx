@@ -53,7 +53,7 @@ export default function PostContent({
           return (
             <React.Fragment key={index}>
               <Link
-                to={`/profile/${mentionedUser.username}`}
+                to={`/app/profile/${mentionedUser.username}`}
                 className="text-sky-500 font-medium hover:underline"
               >
                 {word}
@@ -75,7 +75,7 @@ export default function PostContent({
       className="mb-2"
     >
       <div className="flex gap-3 p-4 pb-2">
-        <Link to={`/profile/${author?.username}`}>
+        <Link to={`/app/profile/${author?.username}`}>
           <motion.div whileHover={{ scale: 1.05 }}>
             <Image
               src={author?.imageUrl || "/images/user.webp"}
@@ -87,7 +87,7 @@ export default function PostContent({
         <div className="flex-1">
           <div className="flex items-center gap-1 flex-wrap">
             <Link
-              to={`/profile/${author?.username}`}
+              to={`/app/profile/${author?.username}`}
               className="font-semibold hover:text-primary transition-colors"
             >
               {author?.fullName}

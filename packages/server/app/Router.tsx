@@ -27,15 +27,16 @@ import NotLoggedInDialog from "./shared/components/NotLoggedInDialog";
 import Landing from "./pages/landing";
 import Docs from "./pages/docs";
 import AppId from "./pages/dev/AppId";
+import Image from "./pages/demo/Image";
 
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary =
   (Component: React.ComponentType<any>) => (props: any) =>
-    (
-      <PageErrorBoundary>
-        <Component {...props} />
-      </PageErrorBoundary>
-    );
+  (
+    <PageErrorBoundary>
+      <Component {...props} />
+    </PageErrorBoundary>
+  );
 
 function OnboardingProtection({ children }: { children: React.ReactNode }) {
   const beaver = useBeaver();
@@ -107,6 +108,14 @@ export default function () {
 
         <Route path="/docs/*" element={withPageErrorBoundary(Docs)({})} />
 
+
+        <Route path="/demo" element={withPageErrorBoundary(Demo)({})} />
+
+        <Route
+          path="/image"
+          element={withPageErrorBoundary(Image)({})}
+        />
+
         <Route
           path="/*"
           element={
@@ -116,6 +125,7 @@ export default function () {
                   path="/onboarding"
                   element={withPageErrorBoundary(Onboarding)({})}
                 />
+
 
                 <Route path="/app" element={withPageErrorBoundary(Home)({})} />
                 <Route
@@ -167,8 +177,6 @@ export default function () {
             </OnboardingProtection>
           }
         />
-
-        <Route path="/demo" element={withPageErrorBoundary(Demo)({})} />
 
         <Route path="*" element={withPageErrorBoundary(Error404)({})} />
       </Routes>

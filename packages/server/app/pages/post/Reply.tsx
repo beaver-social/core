@@ -33,7 +33,7 @@ export default function Reply({ id }: { id: number }) {
       className="p-4 hover:bg-secondary/40 transition-colors cursor-pointer"
     >
       <div className="flex gap-3">
-        <Link to={`/profile/${author?.username}`}>
+        <Link to={`/app/profile/${author?.username}`}>
           <Image
             src={author?.imageUrl}
             alt={`${author?.username}'s avatar`}
@@ -43,7 +43,7 @@ export default function Reply({ id }: { id: number }) {
         <div className="flex-1">
           <div className="flex items-center gap-1 flex-wrap">
             <Link
-              to={`/profile/${author?.username}`}
+              to={`/app/profile/${author?.username}`}
               className="font-semibold hover:text-primary transition-colors"
             >
               {author?.fullName}

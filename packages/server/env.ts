@@ -13,6 +13,10 @@ const envKeys = [
   "GEMINI_API_KEY",
   "REFERRAL_DOMAIN",
   "DEFAULT_APPID",
+
+  "IMAGEKIT_PUBLIC_KEY",
+  "IMAGEKIT_PRIVATE_KEY",
+  "IMAGEKIT_URL_ENDPOINT",
 ] as const;
 
 type ENV = Record<(typeof envKeys)[number], string>;

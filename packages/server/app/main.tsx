@@ -31,7 +31,7 @@ function App() {
             <Providers>
               <BeaverProvider
                 config={{
-                  debug: true,
+                  debug: false,
                   network: "devnet",
                   apiBaseUrl: "/api/v1",
                   zkLoginWallets: {

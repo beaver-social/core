@@ -18,7 +18,7 @@ function BottomBar() {
     const currentPath = location.pathname;
 
     // Check if on profile page
-    const isOnProfilePage = currentPath.startsWith("/profile");
+    const isOnProfilePage = currentPath.startsWith("/app/profile");
     setIsProfilePage(isOnProfilePage);
 
     // If on settings or profile page, no sidebar item should be active
@@ -82,22 +82,22 @@ function BottomBar() {
               animate={
                 isProfilePage
                   ? {
-                      boxShadow: [
-                        "0 0 0px rgba(76, 165, 249, 0)",
-                        "0 0 12px rgba(76, 165, 249, 0.7)",
-                        "0 0 0px rgba(76, 165, 249, 0)",
-                      ],
-                      scale: [1, 1.05, 1],
-                    }
+                    boxShadow: [
+                      "0 0 0px rgba(76, 165, 249, 0)",
+                      "0 0 12px rgba(76, 165, 249, 0.7)",
+                      "0 0 0px rgba(76, 165, 249, 0)",
+                    ],
+                    scale: [1, 1.05, 1],
+                  }
                   : {}
               }
               transition={
                 isProfilePage
                   ? {
-                      duration: 4,
-                      repeat: Infinity,
-                      repeatType: "mirror",
-                    }
+                    duration: 4,
+                    repeat: Infinity,
+                    repeatType: "mirror",
+                  }
                   : {}
               }
             >

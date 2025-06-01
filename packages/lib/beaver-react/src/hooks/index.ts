@@ -11,6 +11,7 @@ export function useBeaver() {
   const auth = useAuth();
   const ping = usePing();
   const application = useApplication();
+  const media = useMedia();
 
   return {
     register: client.user.register.bind(client.user),
@@ -26,6 +27,7 @@ export function useBeaver() {
     docs,
     ping,
     application,
+    media,
   };
 }
 
@@ -377,6 +379,21 @@ export function useApplication() {
         >[0]
       ) => {
         return await client.application.whitelistApplicationUrls(options);
+      },
+    }),
+  };
+}
+
+export function useMedia() {
+  const { client } = useBeaverContext();
+
+  return {
+    uploadMedia: useMutation({
+      mutationKey: ["uploadMedia"],
+      mutationFn: async (
+        options: Parameters<typeof client.media.uploadMedia>[0]
+      ) => {
+        return await client.media.uploadMedia(options);
       },
     }),
   };

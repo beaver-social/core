@@ -208,14 +208,14 @@ function ActivityListItem({ activity }: { activity: ActivityItem }) {
         return (
           <span>
             <Link
-              to={`/profile/${activity.sourceUser?.handle}`}
+              to={`/app/profile/${activity.sourceUser?.handle}`}
               className="font-bold hover:underline"
             >
               {activity.sourceUser?.name}
             </Link>
             {" liked "}
             <Link
-              to={`/profile/${activity.targetPost?.author.handle}`}
+              to={`/app/profile/${activity.targetPost?.author.handle}`}
               className="hover:underline"
             >
               {activity.targetPost?.author.name}'s
@@ -227,14 +227,14 @@ function ActivityListItem({ activity }: { activity: ActivityItem }) {
         return (
           <span>
             <Link
-              to={`/profile/${activity.sourceUser?.handle}`}
+              to={`/app/profile/${activity.sourceUser?.handle}`}
               className="font-bold hover:underline"
             >
               {activity.sourceUser?.name}
             </Link>
             {" reposted "}
             <Link
-              to={`/profile/${activity.targetPost?.author.handle}`}
+              to={`/app/profile/${activity.targetPost?.author.handle}`}
               className="hover:underline"
             >
               {activity.targetPost?.author.name}'s
@@ -246,14 +246,14 @@ function ActivityListItem({ activity }: { activity: ActivityItem }) {
         return (
           <span>
             <Link
-              to={`/profile/${activity.sourceUser?.handle}`}
+              to={`/app/profile/${activity.sourceUser?.handle}`}
               className="font-bold hover:underline"
             >
               {activity.sourceUser?.name}
             </Link>
             {" followed "}
             <Link
-              to={`/profile/${activity.targetUser?.handle}`}
+              to={`/app/profile/${activity.targetUser?.handle}`}
               className="hover:underline"
             >
               {activity.targetUser?.name}
@@ -264,14 +264,14 @@ function ActivityListItem({ activity }: { activity: ActivityItem }) {
         return (
           <span>
             <Link
-              to={`/profile/${activity.sourceUser?.handle}`}
+              to={`/app/profile/${activity.sourceUser?.handle}`}
               className="font-bold hover:underline"
             >
               {activity.sourceUser?.name}
             </Link>
             {" replied to "}
             <Link
-              to={`/profile/${activity.targetPost?.author.handle}`}
+              to={`/app/profile/${activity.targetPost?.author.handle}`}
               className="hover:underline"
             >
               {activity.targetPost?.author.name}'s
@@ -283,7 +283,7 @@ function ActivityListItem({ activity }: { activity: ActivityItem }) {
         return (
           <span>
             <Link
-              to={`/profile/${activity.sourceUser?.handle}`}
+              to={`/app/profile/${activity.sourceUser?.handle}`}
               className="font-bold hover:underline"
             >
               {activity.sourceUser?.name}
@@ -301,7 +301,7 @@ function ActivityListItem({ activity }: { activity: ActivityItem }) {
         return (
           <span>
             <Link
-              to={`/profile/${activity.sourceUser?.handle}`}
+              to={`/app/profile/${activity.sourceUser?.handle}`}
               className="font-bold hover:underline"
             >
               {activity.sourceUser?.name}

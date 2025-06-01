@@ -58,6 +58,7 @@
     "framer-motion": "^12.6.2",
     "hono": "^4.7.4",
     "hono-rate-limiter": "^0.4.2",
+    "imagekit": "^6.0.0",
     "input-otp": "^1.4.2",
     "jwt-decode": "^4.0.0",
     "lru-cache": "^11.1.0",

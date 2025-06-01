@@ -27,7 +27,7 @@ export default function NotificationBody({
       <article className="flex gap-4 p-4 border-b hover:bg-secondary/50 transition-colors">
         {/* Avatar */}
         <div className="flex-shrink-0 mt-3">
-          <Link to={`/profile/${handle}`} onClick={(e) => e.stopPropagation()}>
+          <Link to={`/app/profile/${handle}`} onClick={(e) => e.stopPropagation()}>
             {type === "reply" ? (
               <Icon name="Reply" className="text-primary-500" />
             ) : type === "like" ? (
@@ -55,7 +55,7 @@ export default function NotificationBody({
                 className="size-12 rounded-full"
               />
               <Link
-                to={`/profile/${handle}`}
+                to={`/app/profile/${handle}`}
                 className="font-semibold hover:underline"
                 onClick={(e) => e.stopPropagation()}
               >

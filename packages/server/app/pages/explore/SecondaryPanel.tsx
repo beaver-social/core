@@ -179,7 +179,7 @@ export default function SecondaryPanel() {
                     )
                   }
                 >
-                  <Link to={`/profile/${profile.handle}`}>
+                  <Link to={`/app/profile/${profile.handle}`}>
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       className="relative"

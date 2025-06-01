@@ -232,7 +232,7 @@ const SwipeVideo = memo(function SwipeVideo({
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
             <Link
-              to={`/profile/${handle}`}
+              to={`/app/profile/${handle}`}
               onClick={(e) => e.stopPropagation()}
               className="block"
             >
@@ -244,7 +244,7 @@ const SwipeVideo = memo(function SwipeVideo({
             </Link>
             <div className="flex items-center gap-3">
               <Link
-                to={`/profile/${handle}`}
+                to={`/app/profile/${handle}`}
                 onClick={(e) => e.stopPropagation()}
                 className="font-semibold text-white hover:underline flex items-center gap-1"
               >

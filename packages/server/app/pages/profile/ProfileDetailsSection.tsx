@@ -97,14 +97,14 @@ export default function ProfileDetailsSection({ data }: Props) {
         {/* Followers/Following Stats */}
         <div className="flex gap-4 text-sm">
           <Link
-            to={`/profile/${data.username}/following`}
+            to={`/app/profile/${data.username}/following`}
             className="hover:underline"
           >
             <span className="font-semibold">{data.following}</span>{" "}
             <span className="text-grey-500">Following</span>
           </Link>
           <Link
-            to={`/profile/${data.username}/followers`}
+            to={`/app/profile/${data.username}/followers`}
             className="hover:underline"
           >
             <span className="font-semibold">{data.followers}</span>{" "}

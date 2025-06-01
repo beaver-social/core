@@ -27,8 +27,6 @@ import { JWTalgorithm, JWTexpiration, JWTPrivateKey } from "../../constants";
 import { stringify } from "../../../utils";
 import { getPreviousActionHash } from "../../lib/actions/helpers";
 import { followUser, pinPost, unfollowUser, unpinPost } from "./actions";
-import { preprocessImage } from "./helpers";
-import s3 from "../../lib/s3/client";
 import env from "../../../env";
 
 const { users, follows, posts } = db.schema;

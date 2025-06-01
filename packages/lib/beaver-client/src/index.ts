@@ -14,6 +14,7 @@ import Application from "./bindings/Application";
 import { BeaverStore } from "./store";
 import ApiClient from "./bindings/ApiClient";
 import EventNotifier from "./bindings/EventHandler";
+import Media from "./bindings/Media";
 
 export class BeaverClient {
   private config: BeaverClientConfig;
@@ -27,6 +28,7 @@ export class BeaverClient {
   docs: Docs;
   ping: Ping;
   application: Application;
+  media: Media;
   constructor(config: BeaverClientConfig) {
     const logger = new Logger("Beaver Social SDK", Boolean(config.debug));
     const rpcUrl = getFullnodeUrl(config.network || "mainnet");
@@ -58,6 +60,7 @@ export class BeaverClient {
     this.docs = new Docs(this.defaults);
     this.ping = new Ping(this.defaults);
     this.application = new Application(this.defaults);
+    this.media = new Media(this.defaults);
     this.initialize();
   }
 

@@ -37,7 +37,7 @@ export default function FeedItem({
             <div className="ml-3 flex-1 text-sm">
               <div className="flex items-center gap-2">
                 <Link
-                  to={`/profile/${handle}`}
+                  to={`/app/profile/${handle}`}
                   className="font-semibold hover:underline text-base"
                   onClick={(e) => e.stopPropagation()}
                 >
