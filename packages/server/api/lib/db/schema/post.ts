@@ -25,6 +25,7 @@ export const posts = t.sqliteTable(
     repliesCount: t.int().default(0),
     repostsCount: t.int().default(0),
     sharesCount: t.int().default(0),
+    swipe: t.int({ mode: "boolean" }).default(false),
 
     actionId: t
       .int()
@@ -38,7 +39,7 @@ export const posts = t.sqliteTable(
     t.index("parent_idx").on(table.parentId),
     t.index("repost_idx").on(table.reposting),
     t.uniqueIndex("repost_user_idx").on(table.reposting, table.authorId),
-  ],
+  ]
 );
 
 export const post_media = t.sqliteTable(
@@ -48,10 +49,8 @@ export const post_media = t.sqliteTable(
     postId: t.int().notNull(),
     url: t.text().notNull(),
     blurhash: t.text(),
-    aspectRatio: t.text({ enum: ["square", "portrait", "custom"] }).notNull(),
-    type: t.text({ enum: ["image", "video"] }).notNull(),
   },
-  (table) => [t.index("media_post_id_idx").on(table.postId)],
+  (table) => [t.index("media_post_id_idx").on(table.postId)]
 );
 
 export const topics = t.sqliteTable("topics", {
@@ -66,7 +65,7 @@ export const post_topics = t.sqliteTable(
     postId: t.int().notNull(),
     topicId: t.int().notNull(),
   },
-  (table) => [t.index("topic_post_id_idx").on(table.postId)],
+  (table) => [t.index("topic_post_id_idx").on(table.postId)]
 );
 
 export const post_mentions = t.sqliteTable(
@@ -76,5 +75,5 @@ export const post_mentions = t.sqliteTable(
     postId: t.int().notNull(),
     userId: t.int().notNull(),
   },
-  (table) => [t.index("mention_post_id_idx").on(table.postId)],
+  (table) => [t.index("mention_post_id_idx").on(table.postId)]
 );

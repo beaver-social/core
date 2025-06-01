@@ -17,11 +17,11 @@ export default class Media {
   async uploadMedia(
     options: ApiParams<Api["media"]["upload"]["$post"]>["form"]
   ) {
-    const uploadImage = safeParseResponse(
+    const uploadMedia = safeParseResponse(
       this.defaults.apiClient.rpc.media.upload.$post({
         form: options,
       })
     );
-    return uploadImage;
+    return uploadMedia;
   }
 }

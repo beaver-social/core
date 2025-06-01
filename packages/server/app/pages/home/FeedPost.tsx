@@ -146,7 +146,7 @@ function FeedPost({ postId }: { postId: number }) {
           {/* Images if present */}
           {post?.media && post?.media.length > 0 && (
             <div
-              className="w-full rounded-sm overflow-hidden"
+              className="w-full rounded-sm overflow-hidden mt-4"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -196,7 +196,6 @@ function FeedPost({ postId }: { postId: number }) {
                 <span className="font-semibold">{topReply.handle}</span> {truncateText(topReply.content, 50)}
               </button>
             )} */}
-            <br />
             <button
               onClick={() => {
                 navigate(`/app/post/${postId}`, { state: { postId: postId } });
@@ -218,14 +217,13 @@ function FeedPost({ postId }: { postId: number }) {
                 value={reply}
                 onChange={(e) => setReply(e.target.value)}
               />
-              {reply.length > 0 && (
-                <Button
-                  variant="ghost"
-                  className="absolute right-0 top-0 hover:bg-transparent hover:text-primary"
-                >
-                  <Icon name="SendHorizontal" className="size-4" />
-                </Button>
-              )}
+              <Button
+                variant="ghost"
+                className="absolute right-0 top-0 hover:bg-transparent hover:text-primary"
+                disabled={reply.length === 0}
+              >
+                <Icon name="SendHorizontal" className="size-4" />
+              </Button>
             </form>
           </div>
         </motion.article>

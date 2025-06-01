@@ -21,7 +21,7 @@ export default function Image() {
         });
 
         console.log({
-            result
+            url: result.url
         });
     }
 

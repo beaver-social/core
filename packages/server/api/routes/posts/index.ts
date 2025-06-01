@@ -31,6 +31,7 @@ import { and, eq, inArray, isNotNull, desc, sql, isNull } from "drizzle-orm";
 import { bookmarks } from "../../lib/db/schema/interaction";
 import { follows } from "../../lib/db/schema/user";
 import env from "../../../env";
+import { media } from "../../lib/db/schema/media";
 
 const { posts, post_media, post_topics, post_mentions, likes, users } =
   db.schema;
@@ -53,7 +54,7 @@ const app = new Hono()
         parentId: zNumberString().optional(),
         repliesOnly: zBooleanString().optional(),
         mediaOnly: zBooleanString().optional(),
-      }),
+      })
     ),
     async (ctx) => {
       const { page, perPage, authorId, parentId, repliesOnly, mediaOnly } =
@@ -78,7 +79,7 @@ const app = new Hono()
           .where(filter)
           .limit(perPage)
           .offset(page * perPage)
-          .orderBy(desc(posts.createdAt)),
+          .orderBy(desc(posts.createdAt))
       );
 
       if (postsResponse.error) {
@@ -95,9 +96,9 @@ const app = new Hono()
           hasMore: !(postsData.length < perPage),
         },
         "Posts fetched successfully",
-        200,
+        200
       );
-    },
+    }
   )
 
   // Get all following posts
@@ -112,7 +113,7 @@ const app = new Hono()
         perPage: zNumberString()
           .transform((v) => Math.min(v, 32))
           .default("8"),
-      }),
+      })
     ),
     authenticated,
     async (ctx) => {
@@ -126,7 +127,7 @@ const app = new Hono()
             id: follows.followingId,
           })
           .from(follows)
-          .where(eq(follows.followerId, user.id)),
+          .where(eq(follows.followerId, user.id))
       );
 
       if (followingResponse.error) {
@@ -145,7 +146,7 @@ const app = new Hono()
           .from(posts)
           .where(inArray(posts.authorId, followingIds))
           .limit(perPage)
-          .offset(page * perPage),
+          .offset(page * perPage)
       );
 
       if (postsResponse.error) {
@@ -159,9 +160,9 @@ const app = new Hono()
         ctx,
         { posts: postsData, hasMore: !(postsData.length < perPage) },
         "Following posts fetched successfully",
-        200,
+        200
       );
-    },
+    }
   )
 
   // Get post data by ID
@@ -171,13 +172,13 @@ const app = new Hono()
       "param",
       z.object({
         id: zNumberString(),
-      }),
+      })
     ),
     async (ctx) => {
       const { id } = ctx.req.valid("param");
 
       const postResponse = await tryCatch(
-        db.select().from(posts).where(eq(posts.id, id)).limit(1),
+        db.select().from(posts).where(eq(posts.id, id)).limit(1)
       );
 
       const mentions = await tryCatch(
@@ -190,11 +191,11 @@ const app = new Hono()
           })
           .from(users)
           .innerJoin(post_mentions, eq(users.id, post_mentions.userId))
-          .where(eq(post_mentions.postId, id)),
+          .where(eq(post_mentions.postId, id))
       );
 
       const postMedia = await tryCatch(
-        db.select().from(post_media).where(eq(post_media.postId, id)),
+        db.select().from(media).where(eq(media.postId, id))
       );
 
       if (postResponse.error) {
@@ -230,7 +231,7 @@ const app = new Hono()
       };
 
       return respond.ok(ctx, parsedPost, "Post fetched successfully", 200);
-    },
+    }
   )
 
   // Create post
@@ -241,28 +242,21 @@ const app = new Hono()
       "json",
       zCreatePostAction().merge(
         z.object({
+          mediaURLs: z.array(z.string()).optional(),
           signature: zSuiSignature(),
-        }),
-      ),
+        })
+      )
     ),
-    zValidator("form", z.any()),
     async (ctx) => {
       const user = ctx.get("user");
-      const { signature, ...postData } = ctx.req.valid("json");
-      const { media, type, previewUrl, aspectRatio } = ctx.req.valid("form");
-      ctx.log({
-        media,
-        type,
-        previewUrl,
-        aspectRatio,
-      });
+      const { mediaURLs, signature, ...postData } = ctx.req.valid("json");
 
       if (!(postData.content.length > 0) && !postData.reposting) {
         return respond.err(ctx, "Content is required", 400);
       }
 
       const { data: actionResponse, error: actionError } = await tryCatch(
-        createPost({ ...postData, userId: user.id }, signature),
+        createPost({ ...postData, userId: user.id }, signature)
       );
 
       if (actionError) {
@@ -281,7 +275,7 @@ const app = new Hono()
           db.insert(post_mentions).values({
             userId: mentionedUser.id,
             postId: post.id,
-          }),
+          })
         );
 
         if (error) {
@@ -295,7 +289,7 @@ const app = new Hono()
           db.insert(post_topics).values({
             postId: post.id,
             topicId: await db.ensureTopicId(topic),
-          }),
+          })
         );
 
         if (error) {
@@ -304,66 +298,85 @@ const app = new Hono()
         }
       }
 
-      if (media) {
-        for (const item of media) {
-          const mimeType = item.file.type.split("/")[0];
-
-          if (mimeType === "image") {
-            const imageData = Buffer.from(await item.file.arrayBuffer());
-            const { imageBuffer, blurhash } =
-              await preprocessImageMedia(imageData);
-
-            const imageUrl = await tryCatch(s3.upload(imageBuffer));
-
-            if (imageUrl.error) {
-              ctx.log(imageUrl.error);
-              continue;
-            }
-
-            const { error } = await tryCatch(
-              db.insert(post_media).values({
+      if (mediaURLs) {
+        for (const url of mediaURLs) {
+          const { error } = await tryCatch(
+            db
+              .update(media)
+              .set({
                 postId: post.id,
-                url: imageUrl.data,
-                blurhash,
-                aspectRatio: item.aspectRatio || "square",
-                type: "image",
-              }),
-            );
+                url,
+              })
+              .where(eq(media.url, url))
+          );
 
-            if (error) {
-              ctx.log(error);
-              continue;
-            }
-          }
-
-          if (mimeType === "video") {
-            const videoData = Buffer.from(await item.file.arrayBuffer());
-            const videoUrl = await tryCatch(s3.upload(videoData));
-
-            if (videoUrl.error) {
-              ctx.log(videoUrl.error);
-              continue;
-            }
-
-            const { error } = await tryCatch(
-              db.insert(post_media).values({
-                postId: post.id,
-                url: videoUrl.data,
-                aspectRatio: item.aspectRatio || "square",
-                type: "video",
-              }),
-            );
-
-            if (error) {
-              ctx.log(error);
-              continue;
-            }
+          if (error) {
+            ctx.log(error);
+            continue;
           }
         }
       }
 
+      // if (mediaURL) {
+      //   for (const item of mediaURL) {
+      //     const mimeType = item.file.type.split("/")[0];
+
+      //     if (mimeType === "image") {
+      //       const imageData = Buffer.from(await item.file.arrayBuffer());
+      //       const { imageBuffer, blurhash } =
+      //         await preprocessImageMedia(imageData);
+
+      //       const imageUrl = await tryCatch(s3.upload(imageBuffer));
+
+      //       if (imageUrl.error) {
+      //         ctx.log(imageUrl.error);
+      //         continue;
+      //       }
+
+      //       const { error } = await tryCatch(
+      //         db.insert(post_media).values({
+      //           postId: post.id,
+      //           url: imageUrl.data,
+      //           blurhash,
+      //           aspectRatio: item.aspectRatio || "square",
+      //           type: "image",
+      //         }),
+      //       );
+
+      //       if (error) {
+      //         ctx.log(error);
+      //         continue;
+      //       }
+      //     }
+
+      //     if (mimeType === "video") {
+      //       const videoData = Buffer.from(await item.file.arrayBuffer());
+      //       const videoUrl = await tryCatch(s3.upload(videoData));
+
+      //       if (videoUrl.error) {
+      //         ctx.log(videoUrl.error);
+      //         continue;
+      //       }
+
+      //       const { error } = await tryCatch(
+      //         db.insert(post_media).values({
+      //           postId: post.id,
+      //           url: videoUrl.data,
+      //           aspectRatio: item.aspectRatio || "square",
+      //           type: "video",
+      //         }),
+      //       );
+
+      //       if (error) {
+      //         ctx.log(error);
+      //         continue;
+      //       }
+      //     }
+      //   }
+      // }
+
       return respond.ok(ctx, { post }, "Post created successfully", 201);
-    },
+    }
   )
 
   // Like post
@@ -375,8 +388,8 @@ const app = new Hono()
       zLikePostAction().merge(
         z.object({
           signature: zSuiSignature(),
-        }),
-      ),
+        })
+      )
     ),
     async (ctx) => {
       const { signature, postId } = ctx.req.valid("json");
@@ -384,7 +397,7 @@ const app = new Hono()
       const user = ctx.get("user");
 
       const { error: actionError } = await tryCatch(
-        likePost({ postId: postId, userId: user.id }, signature),
+        likePost({ postId: postId, userId: user.id }, signature)
       );
 
       if (actionError) {
@@ -393,7 +406,7 @@ const app = new Hono()
       }
 
       return respond.ok(ctx, {}, "Post liked successfully", 201);
-    },
+    }
   )
 
   // Unlike post
@@ -405,8 +418,8 @@ const app = new Hono()
       zUnlikePostAction().merge(
         z.object({
           signature: zSuiSignature(),
-        }),
-      ),
+        })
+      )
     ),
     async (ctx) => {
       const { signature, postId } = ctx.req.valid("json");
@@ -414,7 +427,7 @@ const app = new Hono()
       const user = ctx.get("user");
 
       const { error: actionError } = await tryCatch(
-        unlikePost({ postId: postId, userId: user.id }, signature),
+        unlikePost({ postId: postId, userId: user.id }, signature)
       );
 
       if (actionError) {
@@ -423,7 +436,7 @@ const app = new Hono()
       }
 
       return respond.ok(ctx, {}, "Post unliked successfully", 201);
-    },
+    }
   )
 
   // Bookmark post
@@ -435,8 +448,8 @@ const app = new Hono()
       zBookmarkPostAction().merge(
         z.object({
           signature: zSuiSignature(),
-        }),
-      ),
+        })
+      )
     ),
     async (ctx) => {
       const { postId, signature } = ctx.req.valid("json");
@@ -444,7 +457,7 @@ const app = new Hono()
       const user = ctx.get("user");
 
       const { error: actionError } = await tryCatch(
-        bookmarkPost({ postId: postId, userId: user.id }, signature),
+        bookmarkPost({ postId: postId, userId: user.id }, signature)
       );
 
       if (actionError) {
@@ -453,7 +466,7 @@ const app = new Hono()
       }
 
       return respond.ok(ctx, {}, "Post bookmarked successfully", 201);
-    },
+    }
   )
 
   // Unbookmark post
@@ -465,8 +478,8 @@ const app = new Hono()
       zUnbookmarkPostAction().merge(
         z.object({
           signature: zSuiSignature(),
-        }),
-      ),
+        })
+      )
     ),
     async (ctx) => {
       const { postId, signature } = ctx.req.valid("json");
@@ -474,7 +487,7 @@ const app = new Hono()
       const user = ctx.get("user");
 
       const { error: actionError } = await tryCatch(
-        unbookmarkPost({ postId: postId, userId: user.id }, signature),
+        unbookmarkPost({ postId: postId, userId: user.id }, signature)
       );
 
       if (actionError) {
@@ -483,7 +496,7 @@ const app = new Hono()
       }
 
       return respond.ok(ctx, {}, "Post unbookmarked successfully", 201);
-    },
+    }
   )
 
   // Get likes
@@ -502,7 +515,7 @@ const app = new Hono()
           .from(likes)
           .where(eq(likes.postId, id))
           .limit(perPage)
-          .offset(page * perPage),
+          .offset(page * perPage)
       );
 
       if (likesResponse.error) {
@@ -519,9 +532,9 @@ const app = new Hono()
           hasMore: !(likesData.length < perPage),
         },
         "Likes fetched successfully",
-        200,
+        200
       );
-    },
+    }
   )
 
   // Get replies
@@ -543,7 +556,7 @@ const app = new Hono()
           .where(eq(posts.parentId, id))
           .limit(perPage)
           .offset(page * perPage)
-          .orderBy(desc(posts.createdAt)),
+          .orderBy(desc(posts.createdAt))
       );
 
       if (repliesResponse.error) {
@@ -560,9 +573,9 @@ const app = new Hono()
           hasMore: !(repliesData.length < perPage),
         },
         "Replies fetched successfully",
-        200,
+        200
       );
-    },
+    }
   )
 
   // Get reposts
@@ -572,11 +585,11 @@ const app = new Hono()
       "param",
       z.object({
         id: zNumberString(),
-      }),
+      })
     ),
     zValidator(
       "query",
-      zPaginatedRequest().merge(z.object({ quotesOnly: zBooleanString() })),
+      zPaginatedRequest().merge(z.object({ quotesOnly: zBooleanString() }))
     ),
     async (ctx) => {
       const { id } = ctx.req.valid("param");
@@ -593,7 +606,7 @@ const app = new Hono()
           .from(posts)
           .where(filter)
           .limit(perPage)
-          .offset(page * perPage),
+          .offset(page * perPage)
       );
 
       if (repostsResponse.error) {
@@ -608,9 +621,9 @@ const app = new Hono()
         ctx,
         { reposts: repostsData, hasMore },
         "Reposts fetched successfully",
-        200,
+        200
       );
-    },
+    }
   )
 
   // user post interaction
@@ -629,7 +642,7 @@ const app = new Hono()
           .select()
           .from(likes)
           .where(and(eq(likes.postId, postId), eq(likes.userId, user.id)))
-          .limit(1),
+          .limit(1)
       );
 
       if (hasLikedResponse.error) {
@@ -644,9 +657,9 @@ const app = new Hono()
           .select()
           .from(bookmarks)
           .where(
-            and(eq(bookmarks.postId, postId), eq(bookmarks.userId, user.id)),
+            and(eq(bookmarks.postId, postId), eq(bookmarks.userId, user.id))
           )
-          .limit(1),
+          .limit(1)
       );
 
       if (hasBookmarkedResponse.error) {
@@ -660,9 +673,9 @@ const app = new Hono()
         ctx,
         { hasLiked, hasBookmarked },
         "User post interaction fetched successfully",
-        200,
+        200
       );
-    },
+    }
   );
 
 //   .get(

@@ -8,11 +8,9 @@ import { Button } from "./ui/button";
 interface MediaCarouselProps {
   media: {
     id: number;
-    postId: number;
+    postId: number | null;
     url: string;
-    blurhash: string | null;
-    aspectRatio: "square" | "portrait" | "custom";
-    type: "image" | "video";
+    type: string;
   }[];
   className?: string;
 }
@@ -52,11 +50,7 @@ export default function MediaCarousel({
 
   return (
     <div className={`relative max-w-2xl mx-auto ${className}`}>
-      <div
-        className={`relative bg-secondary overflow-hidden ${
-          media[0].aspectRatio === "square" ? "aspect-square" : "aspect-[3/4]"
-        }`}
-      >
+      <div className={`relative bg-secondary overflow-hidden aspect-auto`}>
         <Swiper
           modules={[Navigation, EffectFade, Pagination]}
           spaceBetween={0}
@@ -87,7 +81,7 @@ export default function MediaCarousel({
         >
           {media.map((item, index) => (
             <SwiperSlide key={index} className="w-full h-full">
-              {item.type === "image" ? (
+              {item.type.includes("image") ? (
                 errorImages.has(index) ? (
                   <button
                     onClick={() => retryImage(index)}
@@ -112,7 +106,7 @@ export default function MediaCarousel({
                     className="w-full h-full object-cover"
                     onClick={(e) => toggleVideoPlay(index, e.currentTarget)}
                     loop
-                    muted
+                    controls
                   />
 
                   {!isPlaying[index] && (

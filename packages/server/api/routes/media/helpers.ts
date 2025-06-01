@@ -7,20 +7,13 @@ const imageKit = new ImageKit({
   urlEndpoint: env.IMAGEKIT_URL_ENDPOINT,
 });
 
-export async function uploadImageToImageKit(
-  media: File | string,
-  tags?: string[]
-) {
-  if (typeof media === "string") {
-    return media;
-  }
-
+export async function uploadMedia(media: File, tags?: string[]) {
   const arrayBuffer = await media.arrayBuffer();
   const fileBuffer = Buffer.from(arrayBuffer);
 
   const result = imageKit.upload({
     file: fileBuffer,
-    fileName: media.name,
+    fileName: media.name || "beaver-social-asset",
     tags,
   });
 

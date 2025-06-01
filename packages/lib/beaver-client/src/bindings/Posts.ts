@@ -18,18 +18,8 @@ export default class Posts {
 
   async createPost(
     options: Omit<ApiParams<Api["posts"]["$post"]>["json"], "signature"> & {
-      media?: {
-        file: File;
-        type: "image" | "video";
-        previewUrl: string;
-        aspectRatio:
-          | "square"
-          | "portrait"
-          | "landscape"
-          | "banner"
-          | "wide"
-          | "custom";
-      }[];
+      media?: File[];
+      tags?: string[];
     }
   ) {
     const { features, user, actionPointer } = this.defaults.store;
@@ -37,7 +27,17 @@ export default class Posts {
       throw new Error("Login before posting.");
     }
 
-    const { media, ...data } = options;
+    const { media, tags, ...data } = options;
+    const mediaURLs: string[] = [];
+
+    if (media && media.length > 0) {
+      const { url } = await safeParseResponse(
+        this.defaults.apiClient.rpc.media.upload.$post({
+          form: { media, tags: tags || [] },
+        })
+      );
+      mediaURLs.push(...url);
+    }
 
     const { signature } = await features.signPersonalMessage(
       stringify({
@@ -52,10 +52,8 @@ export default class Posts {
       this.defaults.apiClient.rpc.posts.$post({
         json: {
           ...data,
+          mediaURLs,
           signature,
-        },
-        form: {
-          media,
         },
       })
     );

@@ -16,6 +16,7 @@ export const zCreatePostAction = () =>
     parentId: true,
     subscriberOnly: true,
     location: true,
+    swipe: true,
   });
 
 export const createPost = createAction<
@@ -23,11 +24,20 @@ export const createPost = createAction<
 >()(
   async function createPost(
     tx,
-    { user, content, nsfw, parentId, reposting, subscriberOnly, location },
+    {
+      user,
+      content,
+      nsfw,
+      parentId,
+      reposting,
+      subscriberOnly,
+      location,
+      swipe,
+    }
   ) {
     if (!!parentId && !!reposting) {
       throw new Error(
-        "Cannot repost and reply at the same time you dumbass! Get your act together.",
+        "Cannot repost and reply at the same time you dumbass! Get your act together."
       );
     }
 
@@ -63,6 +73,7 @@ export const createPost = createAction<
         location: location,
         nsfw: nsfw,
         subscriberOnly: subscriberOnly,
+        swipe: swipe,
       })
       .returning({
         id: posts.id,
@@ -78,7 +89,7 @@ export const createPost = createAction<
     if (!!post.reposting && !!post.parentId) {
       tx.rollback();
       throw new Error(
-        "You should not have reached this point. Please report this bug.",
+        "You should not have reached this point. Please report this bug."
       );
     }
 
@@ -120,7 +131,7 @@ export const createPost = createAction<
         })
         .where(eq(posts.id, post.reposting));
     }
-  },
+  }
 );
 
 export const zLikePostAction = () =>

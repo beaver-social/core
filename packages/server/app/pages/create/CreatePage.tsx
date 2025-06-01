@@ -43,12 +43,12 @@ type MediaFile = {
   type: "image" | "video";
   previewUrl: string;
   aspectRatio:
-    | "square"
-    | "portrait"
-    | "landscape"
-    | "banner"
-    | "wide"
-    | "custom";
+  | "square"
+  | "portrait"
+  | "landscape"
+  | "banner"
+  | "wide"
+  | "custom";
 };
 
 // Compression options
@@ -429,12 +429,13 @@ export default function CreatePage() {
 
         const result = await createPost({
           content,
-          media: mediaFiles,
+          media: mediaFiles.map((item) => item.file),
           location,
           parentId: null,
           reposting: null,
           nsfw: false,
           subscriberOnly: false,
+          swipe: activeTab === "swipe" ? true : false,
         });
 
         setUploadProgress(Math.floor((totalSteps / totalSteps) * 100));
