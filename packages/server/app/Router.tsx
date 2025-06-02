@@ -128,6 +128,11 @@ export default function () {
                 />
 
                 <Route path="/app" element={withPageErrorBoundary(Home)({})} />
+
+                <Route
+                  path="/app/post/:id"
+                  element={withPageErrorBoundary(Post)({})}
+                />
                 <Route
                   path="/app/*"
                   element={
@@ -144,10 +149,6 @@ export default function () {
                         <Route
                           path="/message/:id"
                           element={withPageErrorBoundary(Message)({})}
-                        />
-                        <Route
-                          path="/post/:id"
-                          element={withPageErrorBoundary(Post)({})}
                         />
                         <Route
                           path="/profile/:username"

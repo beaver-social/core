@@ -99,7 +99,7 @@ export default new Hono()
 
   // Check if current user follows another user
   .get(
-    "/following/:id",
+    "/is-following/:id",
     authenticated,
     zValidator(
       "param",
@@ -194,110 +194,6 @@ export default new Hono()
     }
   )
 
-  // Get all follower IDs for a user
-  .get(
-    "/followers/:id/ids",
-    zValidator(
-      "param",
-      z.object({
-        id: zNumberString(),
-      })
-    ),
-    zValidator(
-      "query",
-      z.object({
-        limit: zNumberString()
-          .transform((v) => Math.min(v, 1000))
-          .default("100"),
-        offset: zNumberString().default("0"),
-      })
-    ),
-    async (ctx) => {
-      const { id: userId } = ctx.req.valid("param");
-      const { limit, offset } = ctx.req.valid("query");
-
-      const followersResponse = await tryCatch(
-        db
-          .select({ followerId: follows.followerId })
-          .from(follows)
-          .where(eq(follows.followingId, userId))
-          .limit(limit)
-          .offset(offset)
-      );
-
-      if (followersResponse.error) {
-        ctx.log(followersResponse.error);
-        return respond.err(ctx, "Failed to fetch followers", 500);
-      }
-
-      const followerIds = followersResponse.data.map(
-        (follow) => follow.followerId
-      );
-
-      return respond.ok(
-        ctx,
-        {
-          followerIds,
-          hasMore: followerIds.length === limit,
-        },
-        "Follower IDs retrieved successfully",
-        200
-      );
-    }
-  )
-
-  // Get all following IDs for a user
-  .get(
-    "/following/:id/ids",
-    zValidator(
-      "param",
-      z.object({
-        id: zNumberString(),
-      })
-    ),
-    zValidator(
-      "query",
-      z.object({
-        limit: zNumberString()
-          .transform((v) => Math.min(v, 1000))
-          .default("100"),
-        offset: zNumberString().default("0"),
-      })
-    ),
-    async (ctx) => {
-      const { id: userId } = ctx.req.valid("param");
-      const { limit, offset } = ctx.req.valid("query");
-
-      const followingResponse = await tryCatch(
-        db
-          .select({ followingId: follows.followingId })
-          .from(follows)
-          .where(eq(follows.followerId, userId))
-          .limit(limit)
-          .offset(offset)
-      );
-
-      if (followingResponse.error) {
-        ctx.log(followingResponse.error);
-        return respond.err(ctx, "Failed to fetch following", 500);
-      }
-
-      const followingIds = followingResponse.data.map(
-        (follow) => follow.followingId
-      );
-
-      return respond.ok(
-        ctx,
-        {
-          followingIds,
-          hasMore: followingIds.length === limit,
-        },
-        "Following IDs retrieved successfully",
-        200
-      );
-    }
-  )
-
   // Get detailed followers (with user info) - paginated
   .get(
     "/followers/:id",
@@ -324,9 +220,8 @@ export default new Hono()
 
       const followersResponse = await tryCatch(
         db
-          .select({ user: users })
+          .select()
           .from(follows)
-          .innerJoin(users, eq(follows.followerId, users.id))
           .where(eq(follows.followingId, userId))
           .limit(perPage)
           .offset(page * perPage)
@@ -337,7 +232,9 @@ export default new Hono()
         return respond.err(ctx, "Failed to fetch followers", 500);
       }
 
-      const followers = followersResponse.data.map((follower) => follower.user);
+      const followers = followersResponse.data.map(
+        (follow) => follow.followerId
+      );
 
       return respond.ok(
         ctx,
@@ -379,9 +276,8 @@ export default new Hono()
 
       const followingResponse = await tryCatch(
         db
-          .select({ user: users })
+          .select()
           .from(follows)
-          .innerJoin(users, eq(follows.followingId, users.id))
           .where(eq(follows.followerId, userId))
           .limit(perPage)
           .offset(page * perPage)
@@ -392,7 +288,9 @@ export default new Hono()
         return respond.err(ctx, "Failed to fetch following", 500);
       }
 
-      const following = followingResponse.data.map((follow) => follow.user);
+      const following = followingResponse.data.map(
+        (follow) => follow.followingId
+      );
 
       return respond.ok(
         ctx,

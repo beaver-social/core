@@ -93,7 +93,7 @@ export default class Social {
     }
 
     return safeParseResponse(
-      this.defaults.apiClient.rpc.social.following[":id"].$get({
+      this.defaults.apiClient.rpc.social["is-following"][":id"].$get({
         param: { id: userId.toString() },
       })
     );
@@ -103,35 +103,7 @@ export default class Social {
     const { userId } = options;
     return safeParseResponse(
       this.defaults.apiClient.rpc.social.counts[":id"].$get({
-        param: { id: userId.toString() },
-      })
-    );
-  }
-
-  async getFollowerIds(options: {
-    userId: number;
-    limit?: number;
-    offset?: number;
-  }) {
-    const { userId, limit = 100, offset = 0 } = options;
-    return safeParseResponse(
-      this.defaults.apiClient.rpc.social.followers[":id"].ids.$get({
-        param: { id: userId.toString() },
-        query: { limit: limit.toString(), offset: offset.toString() },
-      })
-    );
-  }
-
-  async getFollowingIds(options: {
-    userId: number;
-    limit?: number;
-    offset?: number;
-  }) {
-    const { userId, limit = 100, offset = 0 } = options;
-    return safeParseResponse(
-      this.defaults.apiClient.rpc.social.following[":id"].ids.$get({
-        param: { id: userId.toString() },
-        query: { limit: limit.toString(), offset: offset.toString() },
+        param: { id: userId },
       })
     );
   }
@@ -183,24 +155,6 @@ export default class Social {
         json: { userIds },
       })
     );
-  }
-
-  // Convenience methods that combine multiple operations
-  async getFullSocialProfile(options: { userId: number }) {
-    const { userId } = options;
-
-    const [counts, isFollowing] = await Promise.all([
-      this.getFollowCounts({ userId }),
-      this.defaults.store.isAuthenticated()
-        ? this.isFollowing({ userId }).catch(() => ({ following: false }))
-        : Promise.resolve({ following: false }),
-    ]);
-
-    return {
-      userId,
-      ...counts,
-      isFollowing: isFollowing.following,
-    };
   }
 
   async getRecommendedUsers(options: {

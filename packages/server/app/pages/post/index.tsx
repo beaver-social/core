@@ -39,7 +39,7 @@ export default function Post() {
   return (
     <Layout
       main={
-        <div className="flex-1 border rounded-sm max-w-2xl mx-auto mb-10">
+        <div className="flex-1 border rounded-sm mb-10">
           {/* Post Header */}
           <motion.div
             className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b rounded-t-sm"

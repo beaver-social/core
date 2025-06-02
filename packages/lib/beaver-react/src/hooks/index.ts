@@ -110,15 +110,10 @@ export function useSocial() {
       onSuccess: (_, variables) => {
         // Invalidate follow-related queries
         queryClient.invalidateQueries({ queryKey: ["getFollowCounts"] });
+        queryClient.invalidateQueries({ queryKey: ["isFollowing"] });
         queryClient.invalidateQueries({ queryKey: ["getFollowers"] });
         queryClient.invalidateQueries({ queryKey: ["getFollowing"] });
-        queryClient.invalidateQueries({ queryKey: ["getFollowerIds"] });
-        queryClient.invalidateQueries({ queryKey: ["getFollowingIds"] });
-        queryClient.invalidateQueries({ queryKey: ["isFollowing"] });
-        queryClient.invalidateQueries({ queryKey: ["getFullSocialProfile"] });
         queryClient.invalidateQueries({ queryKey: ["bulkCheckFollowStatus"] });
-        // Also invalidate profile data to update follow counts
-        queryClient.invalidateQueries({ queryKey: ["getProfile"] });
       },
     }),
 
@@ -130,17 +125,11 @@ export function useSocial() {
         return await client.social.unfollowUser(data);
       },
       onSuccess: (_, variables) => {
-        // Invalidate follow-related queries
         queryClient.invalidateQueries({ queryKey: ["getFollowCounts"] });
+        queryClient.invalidateQueries({ queryKey: ["isFollowing"] });
         queryClient.invalidateQueries({ queryKey: ["getFollowers"] });
         queryClient.invalidateQueries({ queryKey: ["getFollowing"] });
-        queryClient.invalidateQueries({ queryKey: ["getFollowerIds"] });
-        queryClient.invalidateQueries({ queryKey: ["getFollowingIds"] });
-        queryClient.invalidateQueries({ queryKey: ["isFollowing"] });
-        queryClient.invalidateQueries({ queryKey: ["getFullSocialProfile"] });
         queryClient.invalidateQueries({ queryKey: ["bulkCheckFollowStatus"] });
-        // Also invalidate profile data to update follow counts
-        queryClient.invalidateQueries({ queryKey: ["getProfile"] });
       },
     }),
 
@@ -165,46 +154,6 @@ export function useSocial() {
         enabled: !!options.userId,
       }),
 
-    getFollowerIds: (
-      options: Parameters<typeof client.social.getFollowerIds>[0]
-    ) =>
-      useQuery({
-        queryKey: ["getFollowerIds", options],
-        queryFn: async () => {
-          return await client.social.getFollowerIds(options);
-        },
-        enabled: !!options.userId,
-      }),
-
-    getFollowingIds: (
-      options: Parameters<typeof client.social.getFollowingIds>[0]
-    ) =>
-      useQuery({
-        queryKey: ["getFollowingIds", options],
-        queryFn: async () => {
-          return await client.social.getFollowingIds(options);
-        },
-        enabled: !!options.userId,
-      }),
-
-    getFollowers: (options: Parameters<typeof client.social.getFollowers>[0]) =>
-      useQuery({
-        queryKey: ["getFollowers", options],
-        queryFn: async () => {
-          return await client.social.getFollowers(options);
-        },
-        enabled: !!options.userId,
-      }),
-
-    getFollowing: (options: Parameters<typeof client.social.getFollowing>[0]) =>
-      useQuery({
-        queryKey: ["getFollowing", options],
-        queryFn: async () => {
-          return await client.social.getFollowing(options);
-        },
-        enabled: !!options.userId,
-      }),
-
     bulkCheckFollowStatus: (
       options: Parameters<typeof client.social.bulkCheckFollowStatus>[0]
     ) =>
@@ -216,30 +165,7 @@ export function useSocial() {
         enabled: !!options.userIds && options.userIds.length > 0,
       }),
 
-    getFullSocialProfile: (
-      options: Parameters<typeof client.social.getFullSocialProfile>[0]
-    ) =>
-      useQuery({
-        queryKey: ["getFullSocialProfile", options],
-        queryFn: async () => {
-          return await client.social.getFullSocialProfile(options);
-        },
-        enabled: !!options.userId,
-      }),
-
-    getMutualFollowers: (
-      options: Parameters<typeof client.social.getMutualFollowers>[0]
-    ) =>
-      useQuery({
-        queryKey: ["getMutualFollowers", options],
-        queryFn: async () => {
-          return await client.social.getMutualFollowers(options);
-        },
-        enabled: !!options.userId,
-      }),
-
-    // Infinite query for paginated followers
-    getFollowersInfinite: (options: { userId: number; perPage?: number }) =>
+    getFollowers: (options: { userId: number; perPage?: number }) =>
       useInfiniteQuery({
         queryKey: ["getFollowersInfinite", options],
         queryFn: async ({ pageParam = 1 }) => {
@@ -256,8 +182,7 @@ export function useSocial() {
         enabled: !!options.userId,
       }),
 
-    // Infinite query for paginated following
-    getFollowingInfinite: (options: { userId: number; perPage?: number }) =>
+    getFollowing: (options: { userId: number; perPage?: number }) =>
       useInfiniteQuery({
         queryKey: ["getFollowingInfinite", options],
         queryFn: async ({ pageParam = 1 }) => {
@@ -270,6 +195,17 @@ export function useSocial() {
         initialPageParam: 1,
         getNextPageParam: (lastPage: any, pages) => {
           return lastPage.hasMore ? pages.length + 1 : undefined;
+        },
+        enabled: !!options.userId,
+      }),
+
+    getMutualFollowers: (
+      options: Parameters<typeof client.social.getMutualFollowers>[0]
+    ) =>
+      useQuery({
+        queryKey: ["getMutualFollowers", options],
+        queryFn: async () => {
+          return await client.social.getMutualFollowers(options);
         },
         enabled: !!options.userId,
       }),

@@ -20,13 +20,9 @@ export default function BasicInfo({ data: user }: Props) {
 
   const followerData = beaver.social.getFollowers({
     userId: Number(user?.id),
-    page: 1,
-    perPage: 10,
   });
   const followingData = beaver.social.getFollowing({
     userId: Number(user?.id),
-    page: 1,
-    perPage: 10,
   });
   const count = beaver.social.getFollowCounts({
     userId: Number(user?.id),
