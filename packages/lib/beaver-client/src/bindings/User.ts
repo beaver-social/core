@@ -228,8 +228,12 @@ export default class User {
     );
   }
 
-  async followUser(options: { followingId: number }) {
-    const { followingId } = options;
+  async followUser(options: { id: number }) {
+    const { id: followingId } = options;
+    if (!followingId) {
+      throw new Error("User ID is required");
+    }
+
     const { features, user, actionPointer } = this.defaults.store;
     if (!features || !user || !this.defaults.store.isAuthenticated()) {
       throw new Error("User not authenticated or wallet not connected");

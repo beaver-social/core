@@ -3,7 +3,7 @@ import { Image } from "@/shared/components/Image";
 import Reactions from "@/pages/post/Reactions";
 import { motion } from "framer-motion";
 import { truncateText } from "@/shared/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
 import Icon from "@/shared/components/Icon";
@@ -21,11 +21,6 @@ function FeedPost({ postId }: { postId: number }) {
 
   const beaver = useBeaver();
   const {
-    mutate: upgradePost,
-    isPending: isUpgrading,
-    isSuccess: isUpgraded,
-  } = beaver.post.upgradePost;
-  const {
     data: post,
     isLoading: postLoading,
   } = beaver.post.getPostById({ id: postId });
@@ -37,6 +32,14 @@ function FeedPost({ postId }: { postId: number }) {
     type: "id",
   });
   const { mutateAsync: replyToPost, isPending: isReplyPending } = beaver.post.createPost;
+  const { mutate: followUser, isPending: isFollowing, error: followError, isSuccess: followSuccess } = beaver.social.followUser;
+
+  useEffect(() => {
+    if (followError) {
+      console.error(followError);
+      toast.error("Failed to follow user.");
+    }
+  }, [followError]);
 
   const isLoading = postLoading || userLoading;
 
@@ -125,6 +128,13 @@ function FeedPost({ postId }: { postId: number }) {
                   <time className="text-muted-foreground text-sm hover:underline">
                     {moment(post?.createdAt).fromNow()}
                   </time>
+                  {post?.authorId !== beaver.user?.id && (
+                    <Button variant="outline" size="sm" className="ml-2" onClick={() => followUser({ id: author?.id })} disabled={isFollowing}>
+                      {isFollowing ? "Following" : "Follow"}
+                      {isFollowing && <Icon name="LoaderCircle" className="size-4 animate-spin" />}
+                      {followSuccess && <Icon name="Check" className="size-4 text-green-500" />}
+                    </Button>
+                  )}
                 </div>
                 {post?.location && (
                   <div className="flex items-center gap-1 text-muted-foreground ">

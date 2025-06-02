@@ -13,8 +13,8 @@ export const posts = t.sqliteTable(
       .references(() => users.id, { onDelete: "cascade" }),
     content: t.text().notNull(),
     nsfw: t.int({ mode: "boolean" }).default(false),
-    suiAddress: suiAddressType(), // for upgrading to suins
     location: t.text(),
+    suiAddress: suiAddressType(), // for upgrading
 
     // Either one exists or neither
     parentId: t.int().references((): t.AnySQLiteColumn => posts.id),
