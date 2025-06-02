@@ -6,7 +6,23 @@ import { preprocessPostContent } from "./helpers";
 import db from "../../lib/db";
 import { and, eq, sql } from "drizzle-orm";
 
-const { posts, likes, bookmarks } = db.schema;
+const { posts, likes, bookmarks, users } = db.schema;
+
+export const zUserUpdate = () =>
+  createUpdateSchema(users).pick({
+    fullName: true,
+    username: true,
+    about: true,
+    imageUrl: true,
+    bannerUrl: true,
+    timezone: true,
+    location: true,
+    birthday: true,
+    twitter: true,
+    youtube: true,
+    instagram: true,
+    website: true,
+  });
 
 export const zCreatePostAction = () =>
   createInsertSchema(posts).pick({

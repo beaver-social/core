@@ -28,6 +28,7 @@ import { stringify } from "../../../utils";
 import { getPreviousActionHash } from "../../lib/actions/helpers";
 import { followUser, pinPost, unfollowUser, unpinPost } from "./actions";
 import env from "../../../env";
+import { zUserUpdate } from "../posts/actions";
 
 const { users, follows, posts } = db.schema;
 
@@ -404,38 +405,27 @@ export default new Hono()
     }
   )
 
-  .patch(
-    "/",
-    authenticated,
-    zValidator(
-      "json",
-      z.object({
-        fullName: z.string().min(3).max(50).optional(),
-        about: z.string().max(255).nullable().optional(),
-      })
-    ),
-    async (ctx) => {
-      const user = ctx.get("user");
-      const data = ctx.req.valid("json");
+  .patch("/", authenticated, zValidator("json", zUserUpdate()), async (ctx) => {
+    const user = ctx.get("user");
+    const data = ctx.req.valid("json");
 
-      const updatedUserResponse = await tryCatch(
-        db.update(users).set(data).where(eq(users.id, user.id)).returning()
+    const updatedUserResponse = await tryCatch(
+      db.update(users).set(data).where(eq(users.id, user.id)).returning()
+    );
+
+    if (updatedUserResponse.error) {
+      ctx.log(updatedUserResponse.error);
+      return respond.err(
+        ctx,
+        "Failed to update user : " + stringify(updatedUserResponse.error),
+        500
       );
-
-      if (updatedUserResponse.error) {
-        ctx.log(updatedUserResponse.error);
-        return respond.err(
-          ctx,
-          "Failed to update user : " + stringify(updatedUserResponse.error),
-          500
-        );
-      }
-
-      const [newUser] = updatedUserResponse.data;
-
-      return respond.ok(ctx, newUser, "User created successfully", 201);
     }
-  )
+
+    const [newUser] = updatedUserResponse.data;
+
+    return respond.ok(ctx, newUser, "User updated successfully", 200);
+  })
 
   .get(
     "/:id/follow-count",

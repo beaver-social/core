@@ -44,7 +44,7 @@ export default class EventNotifier {
 }
 
 type EventHandler<T extends EventKey> = (
-  data: EventEmissions[T],
+  data: EventEmissions[T]
 ) => void | Promise<void>;
 
 type EventKey = keyof EventEmissions;
@@ -60,6 +60,10 @@ type EventEmissions = {
   };
 
   "user:logout": {};
+
+  "user:update": {
+    user: UserInfo | null;
+  };
 
   "beaver:ready": {};
 

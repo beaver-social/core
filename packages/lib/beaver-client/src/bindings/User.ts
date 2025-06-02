@@ -118,21 +118,54 @@ export default class User {
     this.defaults.events.emit("user:logout", {});
   }
 
-  async updateProfile(options: {
-    fullName?: string;
-    imageUrl?: string;
-    bannerUrl?: string;
-    about?: string | null;
-  }) {
+  async updateProfile(
+    options: Omit<
+      ApiParams<Api["users"]["$patch"]>["json"],
+      "imageUrl" | "bannerUrl"
+    > & {
+      image?: File | null;
+      banner?: File | null;
+    }
+  ) {
     if (!this.defaults.store.isAuthenticated()) {
       throw new Error("User not authenticated");
     }
 
-    return safeParseResponse(
+    const { image, banner, ...data } = options;
+    let imageUrl: string | undefined;
+    let bannerUrl: string | undefined;
+
+    if (image) {
+      const { url } = await safeParseResponse(
+        this.defaults.apiClient.rpc.media.upload.$post({
+          form: { media: [image], tags: [] },
+        })
+      );
+      imageUrl = url[0];
+    }
+
+    if (banner) {
+      const { url } = await safeParseResponse(
+        this.defaults.apiClient.rpc.media.upload.$post({
+          form: { media: [banner], tags: [] },
+        })
+      );
+      bannerUrl = url[0];
+    }
+
+    const result = await safeParseResponse(
       this.defaults.apiClient.rpc.users.$patch({
-        json: options,
+        json: { ...data, imageUrl, bannerUrl },
       })
     );
+
+    // Sync user data and emit event after successful update
+    await this.defaults.store.syncUserAndActionPointer();
+    this.defaults.events.emit("user:update", {
+      user: this.defaults.store.user,
+    });
+
+    return result;
   }
 
   async getProfile(options: {

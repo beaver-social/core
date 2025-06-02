@@ -12,6 +12,7 @@ import Notifications from "./pages/alerts";
 import Messages from "./pages/messages";
 import Message from "./pages/messages/message";
 import Profile from "./pages/profile";
+import EditProfile from "./pages/profile/edit";
 import { PageErrorBoundary } from "./shared/lib/errorHandling";
 import Swipes from "./pages/swipes";
 import Settings from "./pages/settings";
@@ -61,7 +62,7 @@ function OnboardingProtection({ children }: { children: React.ReactNode }) {
       login();
     }
 
-    if (beaver.wallet.isAuthenticated) {
+    if (beaver.wallet.isAuthenticated && !location.pathname.startsWith("/app")) {
       navigate("/app");
     }
   }, [
@@ -69,6 +70,7 @@ function OnboardingProtection({ children }: { children: React.ReactNode }) {
     beaver.wallet.hasIdentity,
     beaver.user,
     beaver.wallet.isAuthenticated,
+    location.pathname,
   ]);
 
   if (isPending) {
@@ -152,6 +154,10 @@ export default function () {
                         <Route
                           path="/profile/:username"
                           element={withPageErrorBoundary(Profile)({})}
+                        />
+                        <Route
+                          path="/profile/edit"
+                          element={withPageErrorBoundary(EditProfile)({})}
                         />
                         <Route
                           path="/create"

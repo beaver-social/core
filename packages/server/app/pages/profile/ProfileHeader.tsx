@@ -6,8 +6,6 @@ import { Image } from "@/shared/components/Image";
 import Icon from "@/shared/components/Icon";
 import { useBeaver } from "@beaver/react";
 import Disconnect from "@/shared/components/Disconnect";
-import { useState } from "react";
-import EditProfileDialog from "./EditProfileDialog";
 
 // for now
 import { User } from "@/shared/types/globalUI";
@@ -21,7 +19,6 @@ export default function ProfileHeader({ data, isCurrentUser = false }: Props) {
   const navigate = useNavigate();
   const beaver = useBeaver();
   const user = beaver.user as User;
-  const [showEditDialog, setShowEditDialog] = useState(false);
 
   return (
     <div>
@@ -67,7 +64,7 @@ export default function ProfileHeader({ data, isCurrentUser = false }: Props) {
             <Button
               variant="outline"
               className="rounded-full font-semibold"
-              onClick={() => setShowEditDialog(true)}
+              onClick={() => navigate(`/app/profile/edit`)}
             >
               Edit profile
             </Button>
@@ -79,11 +76,7 @@ export default function ProfileHeader({ data, isCurrentUser = false }: Props) {
         </div>
       </div>
 
-      {/* Edit Profile Dialog */}
-      <EditProfileDialog
-        isOpen={showEditDialog}
-        onClose={() => setShowEditDialog(false)}
-      />
+
     </div>
   );
 }

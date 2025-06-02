@@ -49,6 +49,9 @@ export function BeaverProvider(props: BeaverConfig) {
     beaver.on("user:logout", () => {
       setUser(null);
     });
+    beaver.on("user:update", ({ user }) => {
+      setUser(user);
+    });
     beaver.on("connection:change", ({ connection, hasIdentity }) => {
       setConnection(connection);
       setHasIdentity(hasIdentity);
