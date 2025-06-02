@@ -110,13 +110,12 @@ export default function () {
 
         <Route path="/docs/*" element={withPageErrorBoundary(Docs)({})} />
 
-
         <Route path="/demo" element={withPageErrorBoundary(Demo)({})} />
 
-        <Route
+        {/* <Route
           path="/image"
           element={withPageErrorBoundary(Image)({})}
-        />
+        /> */}
 
         <Route
           path="/*"
@@ -127,7 +126,6 @@ export default function () {
                   path="/onboarding"
                   element={withPageErrorBoundary(Onboarding)({})}
                 />
-
 
                 <Route path="/app" element={withPageErrorBoundary(Home)({})} />
                 <Route
