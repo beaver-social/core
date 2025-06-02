@@ -10,10 +10,8 @@ import { toast } from "sonner";
 
 export default function ReplyForm({
   postId,
-  refetchReplies,
 }: {
   postId: string | undefined;
-  refetchReplies: () => void;
 }) {
   const [content, setContent] = useState("");
   const beaver = useBeaver();
@@ -27,7 +25,6 @@ export default function ReplyForm({
 
   useEffect(() => {
     if (isSuccess) {
-      refetchReplies();
       setContent("");
     }
 

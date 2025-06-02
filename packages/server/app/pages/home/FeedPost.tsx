@@ -29,7 +29,6 @@ function FeedPost({ postId }: { postId: number }) {
     isLoading: postLoading,
     isError: postError,
     isSuccess: postSuccess,
-    refetch: refetchPost,
   } = beaver.post.getPostById({ id: postId });
   const {
     data: author,
@@ -162,7 +161,6 @@ function FeedPost({ postId }: { postId: number }) {
               <Reactions
                 postId={postId}
                 analytics={post?.analytics}
-                refetchPost={refetchPost}
               />
             </motion.div>
           </div>
@@ -321,7 +319,6 @@ function FeedPost({ postId }: { postId: number }) {
               <Reactions
                 postId={postId}
                 analytics={post?.analytics}
-                refetchPost={refetchPost}
               />
             </motion.div>
           </div>

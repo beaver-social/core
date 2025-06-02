@@ -12,11 +12,10 @@ type Props = {
     reposts: number | null;
     shares: number | null;
   };
-  refetchPost: () => void;
 };
 
 export default function Reactions(props: Props) {
-  const { postId, refetchPost } = props;
+  const { postId } = props;
   const beaver = useBeaver();
   const user = beaver.user;
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
@@ -24,30 +23,14 @@ export default function Reactions(props: Props) {
   // like post
   const {
     data: userPostInteraction,
-    status: userPostInteractionStatus,
-    refetch: refetchUserPostInteraction,
   } = beaver.post.getUserPostInteraction({ id: postId });
   const {
     mutate: likePost,
     isPending: isLikePending,
-    isSuccess: isLikeSuccess,
-    isError: isLikeError,
   } = beaver.post.likePost;
   const {
     mutate: unlikePost,
-    isSuccess: isUnlikeSuccess,
-    isError: isUnlikeError,
   } = beaver.post.unlikePost;
-
-  useEffect(() => {
-    if (isLikeSuccess || isUnlikeSuccess) {
-      refetchPost();
-      refetchUserPostInteraction();
-    }
-
-    if (isLikeError || isUnlikeError) {
-    }
-  }, [isLikeSuccess, isUnlikeSuccess, isLikeError, isUnlikeError]);
 
   return (
     <div className="flex items-center justify-between">

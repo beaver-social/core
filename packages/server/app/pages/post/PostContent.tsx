@@ -11,13 +11,9 @@ import moment from "moment";
 export default function PostContent({
   post,
   author,
-  refetchPost,
 }: {
   post: ReturnType<ReturnType<typeof useBeaver>["post"]["getPostById"]>["data"];
   author: ReturnType<typeof useBeaver>["user"];
-  refetchPost: ReturnType<
-    ReturnType<typeof useBeaver>["post"]["getPostById"]
-  >["refetch"];
 }) {
   const [showMore, setShowMore] = useState(false);
 
@@ -118,7 +114,6 @@ export default function PostContent({
             <div className="w-full mt-3 rounded-lg overflow-hidden">
               <ImageCarousel
                 media={post.media || []}
-                aspectRatio={post.media[0].aspectRatio}
               />
             </div>
           )}
@@ -128,7 +123,6 @@ export default function PostContent({
             <Reactions
               analytics={analytics}
               postId={post?.id || 0}
-              refetchPost={refetchPost}
             />
           </div>
         </div>

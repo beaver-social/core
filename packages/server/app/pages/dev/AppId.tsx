@@ -37,7 +37,7 @@ export default function AppId() {
   const beaver = useBeaver();
   const { mutateAsync: createAppId, isPending: isCreatingAppId, isSuccess: isCreatingAppIdSuccess } =
     beaver.application.createAppId;
-  const { data: appData, isLoading: isLoadingApps, refetch: refetchApps } =
+  const { data: appData, isLoading: isLoadingApps } =
     beaver.application.getApplications;
 
   // Check if user is logged in
@@ -71,7 +71,6 @@ export default function AppId() {
       setSuccessDialogOpen(true);
       setAppName(""); // Clear the form
       toast.success("AppId created successfully!");
-      refetchApps();
     } catch (error) {
       console.error(error);
       toast.error("Failed to create AppId");

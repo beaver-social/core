@@ -81,12 +81,11 @@ export default function Post() {
                 <PostContent
                   post={post}
                   author={author}
-                  refetchPost={refetchPost}
                 />
               )}
 
               {/* Reply Form */}
-              <ReplyForm postId={postId} refetchReplies={refetchReplies} />
+              <ReplyForm postId={postId} />
 
               {/* Replies Section */}
               <div className="pt-2">

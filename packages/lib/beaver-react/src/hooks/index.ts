@@ -1,5 +1,10 @@
 import { useBeaverContext } from "../context/beaver";
-import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 export function useBeaver() {
   const { client, user } = useBeaverContext();
@@ -91,6 +96,7 @@ export function useWallets() {
 
 export function useSocial() {
   const { client } = useBeaverContext();
+  const queryClient = useQueryClient();
 
   return {
     followUser: useMutation({
@@ -100,6 +106,14 @@ export function useSocial() {
       ) => {
         return await client.user.followUser(data);
       },
+      onSuccess: () => {
+        // Invalidate follow-related queries
+        queryClient.invalidateQueries({ queryKey: ["getFollowCount"] });
+        queryClient.invalidateQueries({ queryKey: ["getFollowers"] });
+        queryClient.invalidateQueries({ queryKey: ["getFollowing"] });
+        // Also invalidate profile data to update follow counts
+        queryClient.invalidateQueries({ queryKey: ["getProfile"] });
+      },
     }),
     unfollowUser: useMutation({
       mutationKey: ["unfollowUser"],
@@ -107,6 +121,14 @@ export function useSocial() {
         data: Parameters<typeof client.user.unfollowUser>[0]
       ) => {
         return await client.user.unfollowUser(data);
+      },
+      onSuccess: () => {
+        // Invalidate follow-related queries
+        queryClient.invalidateQueries({ queryKey: ["getFollowCount"] });
+        queryClient.invalidateQueries({ queryKey: ["getFollowers"] });
+        queryClient.invalidateQueries({ queryKey: ["getFollowing"] });
+        // Also invalidate profile data to update follow counts
+        queryClient.invalidateQueries({ queryKey: ["getProfile"] });
       },
     }),
     getFollowCount: (
@@ -137,6 +159,7 @@ export function useSocial() {
 
 export function usePost() {
   const { client } = useBeaverContext();
+  const queryClient = useQueryClient();
 
   return {
     createPost: useMutation({
@@ -145,6 +168,14 @@ export function usePost() {
         options: Parameters<typeof client.posts.createPost>[0]
       ) => {
         return await client.posts.createPost(options);
+      },
+      onSuccess: () => {
+        // Invalidate all post lists to show the new post
+        queryClient.invalidateQueries({ queryKey: ["getPosts"] });
+        queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
+        // If it's a reply, invalidate the parent post to update reply count
+        queryClient.invalidateQueries({ queryKey: ["getPostById"] });
+        queryClient.invalidateQueries({ queryKey: ["getPostReplies"] });
       },
     }),
     getPosts: ({
@@ -197,6 +228,14 @@ export function usePost() {
       ) => {
         return await client.posts.likePost(options);
       },
+      onSuccess: () => {
+        // Invalidate post data to update like counts and interactions
+        queryClient.invalidateQueries({ queryKey: ["getPostById"] });
+        queryClient.invalidateQueries({ queryKey: ["getPosts"] });
+        queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
+        queryClient.invalidateQueries({ queryKey: ["getPostInteracted"] });
+        queryClient.invalidateQueries({ queryKey: ["getPostLikes"] });
+      },
     }),
     unlikePost: useMutation({
       mutationKey: ["unlikePost"],
@@ -204,6 +243,14 @@ export function usePost() {
         options: Parameters<typeof client.posts.unlikePost>[0]
       ) => {
         return await client.posts.unlikePost(options);
+      },
+      onSuccess: () => {
+        // Invalidate post data to update like counts and interactions
+        queryClient.invalidateQueries({ queryKey: ["getPostById"] });
+        queryClient.invalidateQueries({ queryKey: ["getPosts"] });
+        queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
+        queryClient.invalidateQueries({ queryKey: ["getPostInteracted"] });
+        queryClient.invalidateQueries({ queryKey: ["getPostLikes"] });
       },
     }),
     bookmarkPost: useMutation({
@@ -213,6 +260,10 @@ export function usePost() {
       ) => {
         return await client.posts.bookmarkPost(options);
       },
+      onSuccess: () => {
+        // Invalidate interaction data to update bookmark status
+        queryClient.invalidateQueries({ queryKey: ["getPostInteracted"] });
+      },
     }),
     unbookmarkPost: useMutation({
       mutationKey: ["unbookmarkPost"],
@@ -220,6 +271,10 @@ export function usePost() {
         options: Parameters<typeof client.posts.unbookmarkPost>[0]
       ) => {
         return await client.posts.unbookmarkPost(options);
+      },
+      onSuccess: () => {
+        // Invalidate interaction data to update bookmark status
+        queryClient.invalidateQueries({ queryKey: ["getPostInteracted"] });
       },
     }),
     getPostLikes: (options: Parameters<typeof client.posts.getPostLikes>[0]) =>
@@ -263,12 +318,19 @@ export function usePost() {
       ) => {
         return await client.posts.upgrade(options);
       },
+      onSuccess: () => {
+        // Invalidate post data to reflect upgrade status
+        queryClient.invalidateQueries({ queryKey: ["getPostById"] });
+        queryClient.invalidateQueries({ queryKey: ["getPosts"] });
+        queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
+      },
     }),
   };
 }
 
 export function useProfile() {
   const { client } = useBeaverContext();
+  const queryClient = useQueryClient();
 
   return {
     getProfile: (options: Parameters<typeof client.user.getProfile>[0]) =>
@@ -287,6 +349,22 @@ export function useProfile() {
           return await client.user.searchSuggestions(options);
         },
       }),
+    updateProfile: useMutation({
+      mutationKey: ["updateProfile"],
+      mutationFn: async (
+        options: Parameters<typeof client.user.updateProfile>[0]
+      ) => {
+        return await client.user.updateProfile(options);
+      },
+      onSuccess: () => {
+        // Invalidate all profile-related queries to ensure fresh data
+        queryClient.invalidateQueries({ queryKey: ["getProfile"] });
+        // Also invalidate any posts queries to refresh author info
+        queryClient.invalidateQueries({ queryKey: ["getPosts"] });
+        queryClient.invalidateQueries({ queryKey: ["getPostById"] });
+        queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
+      },
+    }),
   };
 }
 
@@ -315,12 +393,18 @@ export function useDocs() {
 
 export function usePing() {
   const { client } = useBeaverContext();
+  const queryClient = useQueryClient();
 
   return {
     chat: useMutation({
       mutationKey: ["chat"],
       mutationFn: async (options: Parameters<typeof client.ping.chat>[0]) => {
         return await client.ping.chat(options);
+      },
+      onSuccess: () => {
+        // Invalidate chat lists to show the new message
+        queryClient.invalidateQueries({ queryKey: ["getAllChats"] });
+        queryClient.invalidateQueries({ queryKey: ["getChatById"] });
       },
     }),
 
@@ -343,6 +427,7 @@ export function usePing() {
 
 export function useApplication() {
   const { client } = useBeaverContext();
+  const queryClient = useQueryClient();
 
   return {
     createAppId: useMutation({
@@ -351,6 +436,10 @@ export function useApplication() {
         options: Parameters<typeof client.application.createAppId>[0]
       ) => {
         return await client.application.createAppId(options);
+      },
+      onSuccess: () => {
+        // Invalidate applications list to show the new app
+        queryClient.invalidateQueries({ queryKey: ["getApplications"] });
       },
     }),
 
@@ -379,6 +468,11 @@ export function useApplication() {
         >[0]
       ) => {
         return await client.application.whitelistApplicationUrls(options);
+      },
+      onSuccess: () => {
+        // Invalidate applications to reflect updated whitelist
+        queryClient.invalidateQueries({ queryKey: ["getApplications"] });
+        queryClient.invalidateQueries({ queryKey: ["getApplicationById"] });
       },
     }),
   };
