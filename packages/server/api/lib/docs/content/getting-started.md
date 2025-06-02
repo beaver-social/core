@@ -25,7 +25,7 @@ Depending on your needs, you can integrate Beaver Social in multiple ways:
 
 ```bash
 # Install the React SDK and dependencies
-npm install @beaver/react @tanstack/react-query
+npm install @beaver-social/react @tanstack/react-query
 ```
 
 ### Option 2: Client SDK
@@ -50,7 +50,7 @@ Wrap your application with the `BeaverProvider` and React Query's `QueryClientPr
 ```tsx
 // src/App.tsx
 import React from "react";
-import { BeaverProvider } from "@beaver/react";
+import { BeaverProvider } from "@beaver-social/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -86,7 +86,7 @@ Add wallet connection and user authentication:
 ```tsx
 // src/components/Auth.tsx
 import React from "react";
-import { useBeaver, useWallets, useLogin, useRegister } from "@beaver/react";
+import { useBeaver, useWallets, useLogin, useRegister } from "@beaver-social/react";
 
 function Auth() {
   const { user } = useBeaver();
@@ -162,7 +162,7 @@ Display a feed of posts:
 ```tsx
 // src/components/PostFeed.tsx
 import React from "react";
-import { usePost } from "@beaver/react";
+import { usePost } from "@beaver-social/react";
 
 function PostFeed() {
   const { getPosts } = usePost();
@@ -214,7 +214,7 @@ Allow users to create new posts:
 ```tsx
 // src/components/PostComposer.tsx
 import React, { useState } from "react";
-import { usePost, useBeaver } from "@beaver/react";
+import { usePost, useBeaver } from "@beaver-social/react";
 
 function PostComposer() {
   const [content, setContent] = useState("");
@@ -270,7 +270,7 @@ Display a user's profile and their posts:
 ```tsx
 // src/components/UserProfile.tsx
 import React from "react";
-import { useProfile, usePost, useFollow, useBeaver } from "@beaver/react";
+import { useProfile, usePost, useFollow, useBeaver } from "@beaver-social/react";
 
 function UserProfile({ username }) {
   const { user: currentUser } = useBeaver();

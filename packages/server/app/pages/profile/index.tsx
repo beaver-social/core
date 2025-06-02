@@ -9,59 +9,6 @@ import BasicInfo from "./BasicInfo";
 import { useBeaver } from "@beaver/react";
 import Icon from "@/shared/components/Icon";
 
-export type UserDetails = {
-  id: string;
-  username: string;
-  address: string;
-  name: string;
-  verified: boolean;
-  bio: string;
-  location: string;
-  birthday: string;
-  joined: string;
-  followers: number;
-  following: number;
-  profilePicture: string;
-  coverPhoto: string;
-  socials?: {
-    email?: string;
-    twitter?: string;
-    youtube?: string;
-    instagram?: string;
-  };
-  website?: {
-    heading: string;
-    subHeading: string;
-  };
-  pinnedPost?: string;
-};
-
-const userDetails: UserDetails = {
-  id: "1",
-  username: "@ishtails",
-  address: "0x1234567890123456789012345678901234567890",
-  name: "Kartikay Tiwari",
-  verified: true,
-  bio: "Music Producer, DJ, and Software Engineer from Mumbai, India",
-  location: "Mumbai, India",
-  birthday: "March 12, 2001",
-  joined: "May 2025",
-  followers: 12400,
-  following: 320,
-  profilePicture: "/images/user.webp",
-  coverPhoto: "/images/wallpapers/7.jpeg",
-  socials: {
-    twitter: "ishtails",
-    youtube: "ishtails",
-    instagram: "ishtails",
-  },
-  website: {
-    heading: "Beaver Social",
-    subHeading: "A social media platform for the next generation",
-  },
-  pinnedPost: "/videos/workout.mp4",
-};
-
 export default function Profile() {
   const { username } = useParams<{ username: string }>();
   const beaver = useBeaver();
@@ -73,7 +20,6 @@ export default function Profile() {
     type: "username",
     value: username || "ishtails",
   });
-  const isCurrentUser = username === beaver.user?.username;
 
   const { setScreen } = useGlobalUI();
   useEffect(() => {
@@ -90,7 +36,7 @@ export default function Profile() {
             </div>
           ) : isSuccess ? (
             <div>
-              <ProfileHeader data={userDetails} isCurrentUser={isCurrentUser} />
+              <ProfileHeader data={profile} />
               <BasicInfo data={profile} />
               <Tabs />
             </div>

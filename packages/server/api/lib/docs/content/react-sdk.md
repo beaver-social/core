@@ -1,9 +1,9 @@
 ## Installation
 
 ```bash
-npm install @beaver/react
+npm install @beaver-social/react
 # or
-yarn add @beaver/react
+yarn add @beaver-social/react
 ```
 
 ## Getting Started
@@ -13,7 +13,7 @@ The Beaver React SDK provides a React Context provider and custom hooks for inte
 ### Basic Setup
 
 ```tsx
-import { BeaverProvider } from "@beaver/react";
+import { BeaverProvider } from "@beaver-social/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Create a React Query client
@@ -74,7 +74,7 @@ The SDK provides various hooks for interacting with the Beaver Social platform:
 The main hook that provides access to all SDK functionality.
 
 ```tsx
-import { useBeaver } from "@beaver/react";
+import { useBeaver } from "@beaver-social/react";
 
 function ProfileComponent() {
   const { user, wallet, profile, post, follow } = useBeaver();
@@ -94,7 +94,7 @@ function ProfileComponent() {
 Hook for logging in with a connected wallet.
 
 ```tsx
-import { useLogin } from "@beaver/react";
+import { useLogin } from "@beaver-social/react";
 
 function LoginButton() {
   const { mutate: login, isPending } = useLogin();
@@ -112,7 +112,7 @@ function LoginButton() {
 Hook for registering a new account.
 
 ```tsx
-import { useRegister } from "@beaver/react";
+import { useRegister } from "@beaver-social/react";
 
 function RegisterForm() {
   const { mutate: register, isPending } = useRegister();
@@ -142,7 +142,7 @@ function RegisterForm() {
 Hook for managing wallet connections.
 
 ```tsx
-import { useWallets } from "@beaver/react";
+import { useWallets } from "@beaver-social/react";
 
 function WalletConnect() {
   const { wallets, isConnected, connect, disconnect } = useWallets();
@@ -175,7 +175,7 @@ function WalletConnect() {
 Hook for creating and interacting with posts.
 
 ```tsx
-import { usePost } from "@beaver/react";
+import { usePost } from "@beaver-social/react";
 
 function CreatePostForm() {
   const { createPost } = usePost();
@@ -248,7 +248,7 @@ function PostDetails({ postId }) {
 Hook for managing follow relationships.
 
 ```tsx
-import { useFollow } from "@beaver/react";
+import { useFollow } from "@beaver-social/react";
 
 function FollowButton({ userId, initialIsFollowing }) {
   const { followUser, unfollowUser } = useFollow();
@@ -298,7 +298,7 @@ function FollowersList({ userId }) {
 Hook for accessing user profiles.
 
 ```tsx
-import { useProfile } from "@beaver/react";
+import { useProfile } from "@beaver-social/react";
 
 function UserProfile({ username }) {
   const { getProfile } = useProfile();
@@ -343,7 +343,7 @@ function UserSearch({ query }) {
 You can combine multiple hooks to create complex components:
 
 ```tsx
-import { useBeaver, usePost, useProfile } from "@beaver/react";
+import { useBeaver, usePost, useProfile } from "@beaver-social/react";
 
 function UserProfileWithPosts({ username }) {
   const { user } = useBeaver();

@@ -510,7 +510,7 @@ export default function CreatePage() {
             >
               <div className="flex gap-4">
                 <Image
-                  src="/images/user.webp"
+                  src={beaver.user?.imageUrl || "/images/default/profile.webp"}
                   alt="User avatar"
                   className="hidden sm:block w-12 h-12 rounded-full flex-shrink-0"
                 />

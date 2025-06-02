@@ -6,36 +6,10 @@ import { useBeaver } from "@beaver/react";
 import { truncateText } from "@/shared/lib/utils";
 import moment from "moment";
 import FollowDialog from "./FollowDialog";
-import ImageCarousel from "@/shared/components/MediaCarousel";
+import MediaCarousel from "@/shared/components/MediaCarousel";
 
 type Props = {
   data: ReturnType<typeof useBeaver>["user"];
-};
-
-const userrrr = {
-  id: 3,
-  address: "0x7df7afaa27690092e8828d6b638031195e0eda2362a122596cd3f5026e398c79",
-  identity:
-    "0x273a76cd69313280c69788bcf872f0ab1fcd2bc3a13fffc07d2967c4b08b4092",
-  collectionNft:
-    "0x9b359d59cd1d66eb46e5d214bf9704435880e62766a8898f1b84c68fdc1d91f0",
-  username: "ishtails1234",
-  about: null,
-  fullName: "asagag",
-  suinsDomainName: null,
-  location: null,
-  birthday: null,
-  twitter: null,
-  youtube: null,
-  instagram: null,
-  website: null,
-  pinnedPost: null,
-  imageUrl: null,
-  bannerUrl: null,
-  imageBlurhash: null,
-  timezone: null,
-  createdAt: 1747144778436,
-  deletedAt: null,
 };
 
 export default function BasicInfo({ data: user }: Props) {
@@ -212,9 +186,8 @@ export default function BasicInfo({ data: user }: Props) {
                         e.stopPropagation();
                       }}
                     >
-                      <ImageCarousel
-                        images={pinnedPostDetails?.media}
-                        aspectRatio={pinnedPostDetails?.media[0]?.aspectRatio}
+                      <MediaCarousel
+                        media={pinnedPostDetails?.media}
                       />
                     </div>
                   )}

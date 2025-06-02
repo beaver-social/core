@@ -1,24 +1,20 @@
 import { Button } from "@/shared/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router";
-import { UserDetails } from ".";
 import { Image } from "@/shared/components/Image";
 import Icon from "@/shared/components/Icon";
 import { useBeaver } from "@beaver/react";
 import Disconnect from "@/shared/components/Disconnect";
 
-// for now
-import { User } from "@/shared/types/globalUI";
-
 type Props = {
-  data: UserDetails;
-  isCurrentUser?: boolean;
+  data: ReturnType<typeof useBeaver>["user"];
 };
 
-export default function ProfileHeader({ data, isCurrentUser = false }: Props) {
+export default function ProfileHeader({ data }: Props) {
   const navigate = useNavigate();
   const beaver = useBeaver();
-  const user = beaver.user as User;
+  const currentUser = beaver.user;
+  const isCurrentUser = data?.username === currentUser?.username;
 
   return (
     <div>
@@ -43,7 +39,7 @@ export default function ProfileHeader({ data, isCurrentUser = false }: Props) {
         </div>
 
         <Image
-          src={user?.bannerUrl || data.coverPhoto}
+          src={data?.bannerUrl || "/images/default/banner.webp"}
           alt="Cover"
           className="w-full h-48 object-cover sm:rounded-t-xl"
         />
@@ -51,7 +47,7 @@ export default function ProfileHeader({ data, isCurrentUser = false }: Props) {
         <div className="absolute top-24 left-0 w-full h-full flex items-center justify-center">
           <div className="relative">
             <Image
-              src={user?.imageUrl || data.profilePicture}
+              src={data?.imageUrl || "/images/default/profile.webp"}
               alt="Profile"
               className="size-32 rounded-full border-4 border-background bg-grey-900"
             />

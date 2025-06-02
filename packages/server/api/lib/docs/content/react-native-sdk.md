@@ -1,9 +1,9 @@
 ## Installation
 
 ```bash
-npm install @beaver/react-native
+npm install @beaver-social/react-native
 # or
-yarn add @beaver/react-native
+yarn add @beaver-social/react-native
 ```
 
 ## Getting Started
@@ -13,7 +13,7 @@ The Beaver React Native SDK provides a React Native Context provider and custom 
 ### Basic Setup
 
 ```tsx
-import { BeaverProvider } from "@beaver/react-native";
+import { BeaverProvider } from "@beaver-social/react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Create a React Query client
@@ -74,7 +74,7 @@ The SDK provides various hooks for interacting with the Beaver Social platform:
 The main hook that provides access to all SDK functionality.
 
 ```tsx
-import { useBeaver } from "@beaver/react-native";
+import { useBeaver } from "@beaver-social/react-native";
 
 function ProfileComponent() {
   const { user, wallet, profile, post, follow } = useBeaver();
@@ -94,7 +94,7 @@ function ProfileComponent() {
 Hook for logging in with a connected wallet.
 
 ```tsx
-import { useLogin } from "@beaver/react-native";
+import { useLogin } from "@beaver-social/react-native";
 import { Button, ActivityIndicator } from "react-native";
 
 function LoginButton() {
@@ -116,7 +116,7 @@ Hook for registering a new account.
 
 ```tsx
 import { useState } from "react";
-import { useRegister } from "@beaver/react-native";
+import { useRegister } from "@beaver-social/react-native";
 import { View, TextInput, Button } from "react-native";
 
 function RegisterForm() {
@@ -151,7 +151,7 @@ function RegisterForm() {
 Hook for managing wallet connections.
 
 ```tsx
-import { useWallets } from "@beaver/react-native";
+import { useWallets } from "@beaver-social/react-native";
 import { View, Button, FlatList } from "react-native";
 
 function WalletConnect() {
@@ -186,7 +186,7 @@ Hook for creating and interacting with posts.
 
 ```tsx
 import { useState } from "react";
-import { usePost } from "@beaver/react-native";
+import { usePost } from "@beaver-social/react-native";
 import {
   View,
   TextInput,
@@ -255,7 +255,7 @@ Hook for managing follow relationships.
 
 ```tsx
 import { useState } from "react";
-import { useFollow } from "@beaver/react-native";
+import { useFollow } from "@beaver-social/react-native";
 import { View, Button, Text, FlatList } from "react-native";
 
 function FollowButton({ userId, initialIsFollowing }) {
@@ -305,7 +305,7 @@ function FollowersList({ userId }) {
 Hook for accessing user profiles.
 
 ```tsx
-import { useProfile } from "@beaver/react-native";
+import { useProfile } from "@beaver-social/react-native";
 import { View, Text, ActivityIndicator } from "react-native";
 
 function UserProfile({ username }) {
@@ -335,7 +335,7 @@ function UserProfile({ username }) {
 The React Native SDK supports deep linking for wallet connections and authentication flows:
 
 ```tsx
-import { useBeaverDeepLinks } from "@beaver/react-native";
+import { useBeaverDeepLinks } from "@beaver-social/react-native";
 
 function DeepLinkHandler() {
   useBeaverDeepLinks({
@@ -358,7 +358,7 @@ function DeepLinkHandler() {
 Optional biometric authentication for enhanced security:
 
 ```tsx
-import { useBiometricAuth } from "@beaver/react-native";
+import { useBiometricAuth } from "@beaver-social/react-native";
 
 function BiometricLoginButton() {
   const { authenticate, isAvailable } = useBiometricAuth();
@@ -386,7 +386,7 @@ function BiometricLoginButton() {
 Register for push notifications for social interactions:
 
 ```tsx
-import { useNotifications } from "@beaver/react-native";
+import { useNotifications } from "@beaver-social/react-native";
 
 function NotificationSetup() {
   const { registerForPushNotifications, unregisterFromPushNotifications } =
@@ -414,7 +414,7 @@ Integrate with React Navigation:
 ```tsx
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { BeaverNavigationProvider, useBeaver } from "@beaver/react-native";
+import { BeaverNavigationProvider, useBeaver } from "@beaver-social/react-native";
 
 const Stack = createStackNavigator();
 
@@ -449,7 +449,7 @@ function App() {
 The SDK provides offline support through data persistence:
 
 ```tsx
-import { useOfflineSupport } from "@beaver/react-native";
+import { useOfflineSupport } from "@beaver-social/react-native";
 
 function OfflineIndicator() {
   const { isOffline, pendingActions, syncWhenOnline } = useOfflineSupport();
@@ -474,7 +474,7 @@ All hooks that perform mutations or queries use React Query's error handling cap
 
 ```tsx
 import { Alert } from "react-native";
-import { usePost } from "@beaver/react-native";
+import { usePost } from "@beaver-social/react-native";
 
 function ErrorHandlingExample() {
   const { createPost } = usePost();

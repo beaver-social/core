@@ -1,9 +1,9 @@
 ## Installation
 
 ```bash
-npm install @beaver/client
+npm install @beaver-social/client
 # or
-yarn add @beaver/client
+yarn add @beaver-social/client
 ```
 
 ## Getting Started
@@ -11,7 +11,7 @@ yarn add @beaver/client
 The Beaver Client SDK provides a modular, TypeScript-based interface for interacting with the Beaver Social platform.
 
 ```typescript
-import { BeaverClient } from "@beaver/client";
+import { BeaverClient } from "@beaver-social/client";
 
 // Initialize the client
 const client = new BeaverClient({
@@ -214,7 +214,7 @@ The Beaver Client SDK is built with TypeScript and provides full type definition
 ### Complete User Registration & Post Flow
 
 ```typescript
-import { BeaverClient } from "@beaver/client";
+import { BeaverClient } from "@beaver-social/client";
 
 async function registerAndPost() {
   const client = new BeaverClient({
@@ -267,7 +267,7 @@ registerAndPost();
 ### Search & Follow Users
 
 ```typescript
-import { BeaverClient } from "@beaver/client";
+import { BeaverClient } from "@beaver-social/client";
 
 async function searchAndFollow(query: string) {
   const client = new BeaverClient({

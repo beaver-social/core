@@ -170,10 +170,22 @@ export function usePost() {
         return await client.posts.createPost(options);
       },
       onSuccess: () => {
-        // Invalidate all post lists to show the new post
         queryClient.invalidateQueries({ queryKey: ["getPosts"] });
         queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
-        // If it's a reply, invalidate the parent post to update reply count
+        queryClient.invalidateQueries({ queryKey: ["getPostById"] });
+        queryClient.invalidateQueries({ queryKey: ["getPostReplies"] });
+      },
+    }),
+    deletePost: useMutation({
+      mutationKey: ["deletePost"],
+      mutationFn: async (
+        options: Parameters<typeof client.posts.deletePost>[0]
+      ) => {
+        return await client.posts.deletePost(options);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["getPosts"] });
+        queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
         queryClient.invalidateQueries({ queryKey: ["getPostById"] });
         queryClient.invalidateQueries({ queryKey: ["getPostReplies"] });
       },

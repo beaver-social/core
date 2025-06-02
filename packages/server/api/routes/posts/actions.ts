@@ -6,7 +6,7 @@ import { preprocessPostContent } from "./helpers";
 import db from "../../lib/db";
 import { and, eq, sql } from "drizzle-orm";
 
-const { posts, likes, bookmarks, users } = db.schema;
+const { posts, likes, bookmarks, users, media } = db.schema;
 
 export const zUserUpdate = () =>
   createUpdateSchema(users).pick({
@@ -147,6 +147,57 @@ export const createPost = createAction<
         })
         .where(eq(posts.id, post.reposting));
     }
+  }
+);
+
+export const zDeletePostAction = () =>
+  createUpdateSchema(posts).pick({
+    id: true,
+  });
+
+export const deletePost = createAction<
+  z.infer<ReturnType<typeof zDeletePostAction>>
+>()(
+  async function deletePost(tx, { user, id }) {
+    if (!id) {
+      throw new Error("Post ID is required");
+    }
+
+    const [post] = await tx
+      .select()
+      .from(posts)
+      .where(eq(posts.id, id))
+      .limit(1);
+
+    if (!post) {
+      throw new Error("Post not found");
+    }
+
+    if (post.authorId !== user.id) {
+      throw new Error("You are not the author of this post");
+    }
+
+    if (post.deletedAt) {
+      throw new Error("Cannot delete a deleted post");
+    }
+
+    const [deletedPost] = await tx
+      .update(posts)
+      .set({ deletedAt: new Date().getTime() })
+      .where(eq(posts.id, id))
+      .returning({
+        id: posts.id,
+      });
+
+    return { post: { id: deletedPost.id } };
+  },
+  async (tx, result, action) => {
+    const { post } = result;
+
+    await tx
+      .update(media)
+      .set({ deletedAt: new Date().getTime() })
+      .where(eq(media.postId, post.id));
   }
 );
 

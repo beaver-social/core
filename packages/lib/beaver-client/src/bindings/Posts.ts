@@ -62,6 +62,36 @@ export default class Posts {
     return post;
   }
 
+  async deletePost(options: { id: number }) {
+    const { id } = options;
+    const { features, user, actionPointer } = this.defaults.store;
+
+    if (!features || !user || !this.defaults.store.isAuthenticated()) {
+      throw new Error("Login before deleting a post.");
+    }
+
+    const { signature } = await features.signPersonalMessage(
+      stringify({
+        id,
+        userId: user.id,
+        type: "v1.user.delete.post",
+        previous: actionPointer,
+      })
+    );
+
+    const result = await safeParseResponse(
+      this.defaults.apiClient.rpc.posts.$delete({
+        json: {
+          id,
+          signature,
+        },
+      })
+    );
+
+    this.defaults.store.syncUserAndActionPointer();
+    return result;
+  }
+
   async getPosts(
     options: {
       page?: number;

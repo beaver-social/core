@@ -8,11 +8,13 @@ import authenticated from "../../middlewares/authenticated";
 import {
   bookmarkPost,
   createPost,
+  deletePost,
   likePost,
   unbookmarkPost,
   unlikePost,
   zBookmarkPostAction,
   zCreatePostAction,
+  zDeletePostAction,
   zLikePostAction,
   zUnbookmarkPostAction,
   zUnlikePostAction,
@@ -60,8 +62,8 @@ const app = new Hono()
         ctx.req.valid("query");
 
       const baseFilter = repliesOnly
-        ? isNotNull(posts.parentId)
-        : isNull(posts.parentId);
+        ? and(isNotNull(posts.parentId), isNull(posts.deletedAt))
+        : and(isNull(posts.parentId), isNull(posts.deletedAt));
 
       let filter = authorId
         ? and(baseFilter, eq(posts.authorId, authorId))
@@ -143,7 +145,9 @@ const app = new Hono()
             id: posts.id,
           })
           .from(posts)
-          .where(inArray(posts.authorId, followingIds))
+          .where(
+            and(inArray(posts.authorId, followingIds), isNull(posts.deletedAt))
+          )
           .limit(perPage)
           .offset(page * perPage)
       );
@@ -177,7 +181,11 @@ const app = new Hono()
       const { id } = ctx.req.valid("param");
 
       const postResponse = await tryCatch(
-        db.select().from(posts).where(eq(posts.id, id)).limit(1)
+        db
+          .select()
+          .from(posts)
+          .where(and(eq(posts.id, id), isNull(posts.deletedAt)))
+          .limit(1)
       );
 
       const mentions = await tryCatch(
@@ -317,6 +325,35 @@ const app = new Hono()
       }
 
       return respond.ok(ctx, { post }, "Post created successfully", 201);
+    }
+  )
+
+  // Delete post
+  .delete(
+    "/",
+    authenticated,
+    zValidator(
+      "json",
+      zDeletePostAction().merge(
+        z.object({
+          signature: zSuiSignature(),
+        })
+      )
+    ),
+    async (ctx) => {
+      const user = ctx.get("user");
+      const { id, signature } = ctx.req.valid("json");
+
+      const { error: actionError } = await tryCatch(
+        deletePost({ id, userId: user.id }, signature)
+      );
+
+      if (actionError) {
+        ctx.log(actionError);
+        return respond.err(ctx, actionError.message, 400);
+      }
+
+      return respond.ok(ctx, {}, "Post deleted successfully", 201);
     }
   )
 
@@ -494,7 +531,7 @@ const app = new Hono()
             id: posts.id,
           })
           .from(posts)
-          .where(eq(posts.parentId, id))
+          .where(and(eq(posts.parentId, id), isNull(posts.deletedAt)))
           .limit(perPage)
           .offset(page * perPage)
           .orderBy(desc(posts.createdAt))
@@ -536,7 +573,7 @@ const app = new Hono()
       const { id } = ctx.req.valid("param");
       const { quotesOnly, page, perPage } = ctx.req.valid("query");
 
-      const baseFilter = eq(posts.parentId, id);
+      const baseFilter = and(eq(posts.parentId, id), isNull(posts.deletedAt));
       const filter = quotesOnly
         ? and(baseFilter, isNotNull(posts.content))
         : baseFilter;
