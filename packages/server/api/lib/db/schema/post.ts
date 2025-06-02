@@ -42,17 +42,6 @@ export const posts = t.sqliteTable(
   ]
 );
 
-export const post_media = t.sqliteTable(
-  "post_media",
-  {
-    id: t.int().primaryKey({ autoIncrement: true }),
-    postId: t.int().notNull(),
-    url: t.text().notNull(),
-    blurhash: t.text(),
-  },
-  (table) => [t.index("media_post_id_idx").on(table.postId)]
-);
-
 export const topics = t.sqliteTable("topics", {
   id: t.int().primaryKey({ autoIncrement: true }),
   tag: t.text().notNull(),

@@ -118,7 +118,7 @@ function FeedPost({ postId }: { postId: number }) {
               <div className="flex flex-col">
                 <div className="flex items-center gap-1 flex-wrap">
                   <Link
-                    to={`/app/profile/${author?.id}`}
+                    to={`/app/profile/${author?.username}`}
                     className="font-semibold hover:text-primary transition-colors"
                     onClick={(e) => e.stopPropagation()}
                   >

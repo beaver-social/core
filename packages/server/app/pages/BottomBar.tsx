@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router";
 import { sidebarItems } from "./SideNav";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+import { useBeaver } from "@beaver/react";
 
 const bottomBarItems = sidebarItems.slice(0, 4);
 
@@ -11,7 +12,8 @@ function BottomBar() {
   const [hoveredItem, setHoveredItem] = useState<number | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(0);
   const [isProfilePage, setIsProfilePage] = useState(false);
-  const location = useLocation();
+  const beaver = useBeaver();
+  const user = beaver.user;
 
   // Set active index based on current URL
   useEffect(() => {
@@ -74,7 +76,7 @@ function BottomBar() {
 
         <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 1 }}>
           <Link
-            to={"/app/profile/ishtails"}
+            to={`/app/profile/${user?.username}`}
             className="flex flex-col items-center justify-center text-xs"
           >
             <motion.div

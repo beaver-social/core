@@ -3,7 +3,6 @@ import BottomBar from "@/pages/BottomBar";
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
 import GlobalSearch from "@/shared/components/GlobalSearch";
 import Disconnect from "@/shared/components/Disconnect";
-import { useBeaver } from "@beaver/react";
 import TopNav from "./TopNav";
 
 type LayoutProps = {
@@ -12,8 +11,6 @@ type LayoutProps = {
 };
 
 export default function Layout({ main, secondary }: LayoutProps) {
-  const beaver = useBeaver();
-
   return (
     <div className="">
       {/* CTRL+K functionality */}

@@ -3,6 +3,7 @@ import ShortVideo from "./SwipeVideo";
 import { sampleShorts, ShortVideoData } from "./mockData";
 import { useInView } from "../../shared/hooks/useInView";
 import { useGlobalUIStore } from "@/shared/stores/zustand";
+import Icon from "@/shared/components/Icon";
 
 export default function ShortsFeed() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -209,7 +210,7 @@ export default function ShortsFeed() {
       {hasMore && (
         <div ref={loaderRef} className="h-20 flex items-center justify-center">
           {loading && (
-            <Icon name="loader" className="animate-spin size-8 text-primary" />
+            <Icon name="LoaderCircle" className="animate-spin size-8 text-primary" />
           )}
         </div>
       )}

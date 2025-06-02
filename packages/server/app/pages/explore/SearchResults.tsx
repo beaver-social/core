@@ -73,7 +73,7 @@ export default function SearchResults() {
       main={
         <>
           {/* Search Header */}
-          <div className="top-0 z-10 backdrop-blur-sm rounded-t-2xl">
+          <div className="top-0 z-10 mx-4 mt-4 sm:mx-0 sm:mt-0 backdrop-blur-sm rounded-t-2xl">
             <div className="flex items-center gap-4 mb-5">
               <button
                 onClick={() => navigate(-1)}

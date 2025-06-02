@@ -252,11 +252,12 @@ export default function EditProfileDialog({
                   <div className="flex items-center justify-center h-full">
                     <Icon
                       name="User"
-                      className="size-8 text-muted-foreground"
+                      className="size-12 text-muted-foreground"
                     />
                   </div>
                 )}
-                <div className="absolute bottom-0 right-0">
+                {/* centre the button */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                   <Button
                     type="button"
                     size="sm"
@@ -539,9 +540,9 @@ export default function EditProfileDialog({
                 </DialogClose>
                 <Button
                   type="submit"
-                  variant="interactive"
+                  variant="outline"
                   disabled={isSubmitting}
-                  className="rounded-full px-6"
+                  className="rounded-sm px-6"
                 >
                   {isSubmitting ? (
                     <>

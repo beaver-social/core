@@ -33,8 +33,7 @@ import { follows } from "../../lib/db/schema/user";
 import env from "../../../env";
 import { media } from "../../lib/db/schema/media";
 
-const { posts, post_media, post_topics, post_mentions, likes, users } =
-  db.schema;
+const { posts, post_topics, post_mentions, likes, users } = db.schema;
 
 const app = new Hono()
 
@@ -316,64 +315,6 @@ const app = new Hono()
           }
         }
       }
-
-      // if (mediaURL) {
-      //   for (const item of mediaURL) {
-      //     const mimeType = item.file.type.split("/")[0];
-
-      //     if (mimeType === "image") {
-      //       const imageData = Buffer.from(await item.file.arrayBuffer());
-      //       const { imageBuffer, blurhash } =
-      //         await preprocessImageMedia(imageData);
-
-      //       const imageUrl = await tryCatch(s3.upload(imageBuffer));
-
-      //       if (imageUrl.error) {
-      //         ctx.log(imageUrl.error);
-      //         continue;
-      //       }
-
-      //       const { error } = await tryCatch(
-      //         db.insert(post_media).values({
-      //           postId: post.id,
-      //           url: imageUrl.data,
-      //           blurhash,
-      //           aspectRatio: item.aspectRatio || "square",
-      //           type: "image",
-      //         }),
-      //       );
-
-      //       if (error) {
-      //         ctx.log(error);
-      //         continue;
-      //       }
-      //     }
-
-      //     if (mimeType === "video") {
-      //       const videoData = Buffer.from(await item.file.arrayBuffer());
-      //       const videoUrl = await tryCatch(s3.upload(videoData));
-
-      //       if (videoUrl.error) {
-      //         ctx.log(videoUrl.error);
-      //         continue;
-      //       }
-
-      //       const { error } = await tryCatch(
-      //         db.insert(post_media).values({
-      //           postId: post.id,
-      //           url: videoUrl.data,
-      //           aspectRatio: item.aspectRatio || "square",
-      //           type: "video",
-      //         }),
-      //       );
-
-      //       if (error) {
-      //         ctx.log(error);
-      //         continue;
-      //       }
-      //     }
-      //   }
-      // }
 
       return respond.ok(ctx, { post }, "Post created successfully", 201);
     }

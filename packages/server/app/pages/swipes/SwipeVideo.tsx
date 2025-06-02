@@ -192,7 +192,7 @@ const SwipeVideo = memo(function SwipeVideo({
             <div className="absolute top-4 right-4 z-30">
               <button
                 onClick={toggleMute}
-                className="mb-4 p-2 bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors"
+                className="mb-4 p-2 bg-white/20 rounded-full text-white hover:bg-white/20 transition-colors"
               >
                 <Icon
                   name={isMuted ? "VolumeX" : "Volume2"}
