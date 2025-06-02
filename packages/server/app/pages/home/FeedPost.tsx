@@ -12,6 +12,7 @@ import moment from "moment";
 import MediaCarousel from "@/shared/components/MediaCarousel";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { FeedPostMenu } from "./FeedPostMenu";
+import { toast } from "sonner";
 
 function FeedPost({ postId }: { postId: number }) {
   const navigate = useNavigate();
@@ -27,18 +28,15 @@ function FeedPost({ postId }: { postId: number }) {
   const {
     data: post,
     isLoading: postLoading,
-    isError: postError,
-    isSuccess: postSuccess,
   } = beaver.post.getPostById({ id: postId });
   const {
     data: author,
     isLoading: userLoading,
-    isError: userError,
-    isSuccess: userSuccess,
   } = beaver.profile.getProfile({
     value: post?.authorId.toString() || "",
     type: "id",
   });
+  const { mutateAsync: replyToPost, isPending: isReplyPending } = beaver.post.createPost;
 
   const isLoading = postLoading || userLoading;
 
@@ -187,13 +185,6 @@ function FeedPost({ postId }: { postId: number }) {
 
           {/* View / Post Comments */}
           <div className="mt-3">
-            {/* {topReply && (
-              <button onClick={() => {
-                navigate(`/app/post/${postId}/replies/${topReply.id}`, { state: { postId: postId } });
-              }} className="text-sm text-muted-foreground">
-                <span className="font-semibold">{topReply.handle}</span> {truncateText(topReply.content, 50)}
-              </button>
-            )} */}
             <button
               onClick={() => {
                 navigate(`/app/post/${postId}`, { state: { postId: postId } });
@@ -205,8 +196,14 @@ function FeedPost({ postId }: { postId: number }) {
 
             {/* add a comment box */}
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
+                await replyToPost({
+                  content: reply,
+                  parentId: postId,
+                });
+                toast.success("Reply sent!");
+                setReply("");
               }}
               className="mt-2 relative"
             >
@@ -218,9 +215,13 @@ function FeedPost({ postId }: { postId: number }) {
               <Button
                 variant="ghost"
                 className="absolute right-0 top-0 hover:bg-transparent hover:text-primary"
-                disabled={reply.length === 0}
+                disabled={reply.length === 0 || isReplyPending}
               >
-                <Icon name="SendHorizontal" className="size-4" />
+                {isReplyPending ? (
+                  <Icon name="LoaderCircle" className="size-4 animate-spin" />
+                ) : (
+                  <Icon name="SendHorizontal" className="size-4" />
+                )}
               </Button>
             </form>
           </div>
