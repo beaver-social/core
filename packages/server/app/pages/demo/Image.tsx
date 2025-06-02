@@ -9,19 +9,11 @@ export default function Image() {
     const beaver = useBeaver();
     const { mutateAsync: uploadMedia } = beaver.media.uploadMedia;
 
-    console.log({
-        previewUrls
-    });
-
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
         const result = await uploadMedia({
             media: images,
-        });
-
-        console.log({
-            url: result.url
         });
     }
 

@@ -40,7 +40,6 @@ const userrrr = {
 
 export default function BasicInfo({ data: user }: Props) {
   const beaver = useBeaver();
-  console.log({ user });
 
   const { data: pinnedPostDetails, isSuccess: pinnedPostSuccess } =
     beaver.post.getPostById({ id: Number(user?.pinnedPost) });
@@ -135,24 +134,24 @@ export default function BasicInfo({ data: user }: Props) {
 
       {/* Website Section */}
       {user?.website && (
-        <div className="mt-4">
+        <div className="my-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-medium flex items-center gap-2 text-grey-400">
               <Icon name="Globe" className="size-3.5 text-primary" />
               Website
             </h3>
           </div>
-          <Link to={user?.website?.url} target="_blank" className="block">
+          <Link to={user?.website} target="_blank" className="block">
             <div className="bg-grey-900/50 backdrop-blur-sm rounded-xl overflow-hidden border border-grey-800 hover:border-primary/30 transition-all duration-300 shadow-lg hover:shadow-primary/10">
               <div className="p-4">
                 <div className="flex items-center gap-3">
                   <GradientButton iconName="Globe" />
                   <div className="flex-1">
                     <p className="font-medium text-sm">
-                      {user?.website?.heading}
+                      {user?.website}
                     </p>
                     <p className="text-xs text-grey-500">
-                      {user?.website?.subHeading}
+                      {user?.website}
                     </p>
                   </div>
                   <div className="p-1.5 rounded-full bg-grey-950/70 text-primary">

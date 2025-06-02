@@ -56,10 +56,6 @@ export default function SearchResults() {
     hasNextPage,
   });
 
-  console.log({
-    infiniteScrollRef,
-  });
-
   // Handle search from the search bar
   const handleSearch = useCallback(
     (searchQuery: string) => {

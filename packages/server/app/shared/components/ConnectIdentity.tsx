@@ -81,7 +81,6 @@ export default function ConnectIdentity({ open, onOpenChange }: Props) {
                   className="w-full flex py-10"
                   onClick={() => {
                     beaver.wallet.connect(index);
-                    console.log(beaver.wallet);
                   }}
                 >
                   <>

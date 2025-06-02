@@ -130,11 +130,6 @@ export default function EditProfilePage() {
     // Form submission handler
     const onSubmit = async (values: ProfileFormValues) => {
         try {
-            // Here you would typically call your API to update the profile
-            console.log("Form values:", values);
-            console.log("Profile image:", newProfileImage);
-            console.log("Banner image:", newBannerImage);
-
             await updateProfile({
                 image: newProfileImage,
                 banner: newBannerImage,

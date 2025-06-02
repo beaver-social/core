@@ -21,11 +21,6 @@ export default function UpdateProfile({ onComplete, handleBack }: Props) {
   const { mutateAsync: register, isPending } = useRegister();
   const { mutate: login, isPending: isLoginPending, isSuccess: isLoginSuccess } = useLogin();
 
-  console.log({
-    isLoginSuccess,
-    isLoginPending,
-  })
-
   useEffect(() => {
     if (isLoginSuccess) {
       window.location.href = "/app";

@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { ArrowRight } from "lucide-react";
 
@@ -38,10 +37,8 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
-  neon?: boolean; // New prop for neon effect
-  text?: string; // Text to display in interactive button
+  VariantProps<typeof buttonVariants> {
+  neon?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -50,31 +47,86 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       className,
       variant,
       size,
-      asChild = false,
       neon = true,
-      text = "Button",
+      children,
+      onClick,
       ...props
     },
     ref,
   ) => {
-    const Comp = asChild ? Slot : "button";
     const [isClicked, setIsClicked] = React.useState(false);
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       if (variant === "interactive") {
         setIsClicked(true);
-        // Reset after animation completes
         setTimeout(() => setIsClicked(false), 1500);
       }
 
-      // Call the original onClick if it exists
-      if (props.onClick) {
-        props.onClick(e);
+      if (onClick) {
+        onClick(e);
+      }
+    };
+
+    const renderNeonVariant = () => (
+      <>
+        <span
+          className={cn(
+            "absolute h-px opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out inset-x-0 inset-y-0 bg-gradient-to-r w-3/4 mx-auto from-transparent dark:via-blue-500 via-blue-600 to-transparent",
+            neon ? "block" : "hidden",
+          )}
+        />
+        {children}
+        <span
+          className={cn(
+            "absolute group-hover:opacity-30 transition-all duration-500 ease-in-out inset-x-0 h-px -bottom-px bg-gradient-to-r w-3/4 mx-auto from-transparent dark:via-blue-500 via-blue-600 to-transparent",
+            neon ? "block" : "hidden",
+          )}
+        />
+      </>
+    );
+
+    const renderInteractiveVariant = () => (
+      <>
+        <span
+          className={cn(
+            "inline-block translate-x-1 transition-all duration-300",
+            isClicked && "translate-x-12 opacity-0",
+          )}
+        >
+          {children}
+        </span>
+        <div
+          className={cn(
+            "absolute top-0 z-10 flex h-full w-full translate-x-12 items-center justify-center gap-2 text-primary-foreground opacity-0 transition-all duration-300",
+            isClicked && "-translate-x-1 opacity-100",
+          )}
+        >
+          <span>{children}</span>
+          <ArrowRight />
+        </div>
+        <div
+          className={cn(
+            "absolute left-[20%] top-[40%] h-2 w-2 scale-[1] rounded-lg bg-primary transition-all duration-300",
+            isClicked &&
+            "left-[0%] top-[0%] h-full w-full scale-[1.8] bg-primary",
+          )}
+        />
+      </>
+    );
+
+    const renderContent = () => {
+      switch (variant) {
+        case "neon":
+          return renderNeonVariant();
+        case "interactive":
+          return renderInteractiveVariant();
+        default:
+          return children;
       }
     };
 
     return (
-      <Comp
+      <button
         className={cn(
           buttonVariants({ variant, size, className }),
           "transition-all",
@@ -83,56 +135,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         onClick={handleClick}
         {...props}
       >
-        {variant === "neon" && (
-          <>
-            <span
-              className={cn(
-                "absolute h-px opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out inset-x-0 inset-y-0 bg-gradient-to-r w-3/4 mx-auto from-transparent dark:via-blue-500 via-blue-600 to-transparent hidden",
-                neon && "block",
-              )}
-            />
-            {props.children}
-            <span
-              className={cn(
-                "absolute group-hover:opacity-30 transition-all duration-500 ease-in-out inset-x-0 h-px -bottom-px bg-gradient-to-r w-3/4 mx-auto from-transparent dark:via-blue-500 via-blue-600 to-transparent hidden",
-                neon && "block",
-              )}
-            />
-          </>
-        )}{" "}
-        {variant === "interactive" && (
-          <>
-            <span
-              className={cn(
-                "inline-block translate-x-1 transition-all duration-300",
-                isClicked && "translate-x-12 opacity-0",
-              )}
-            >
-              {props.children}
-            </span>
-            <div
-              className={cn(
-                "absolute top-0 z-10 flex h-full w-full translate-x-12 items-center justify-center gap-2 text-primary-foreground opacity-0 transition-all duration-300",
-                isClicked && "-translate-x-1 opacity-100",
-              )}
-            >
-              <span>{props.children}</span>
-              <ArrowRight />
-            </div>
-            <div
-              className={cn(
-                "absolute left-[20%] top-[40%] h-2 w-2 scale-[1] rounded-lg bg-primary transition-all duration-300",
-                isClicked &&
-                  "left-[0%] top-[0%] h-full w-full scale-[1.8] bg-primary",
-              )}
-            ></div>
-          </>
-        )}
-        {variant !== "neon" && variant !== "interactive" && props.children}
-      </Comp>
+        {renderContent()}
+      </button>
     );
   },
 );
+
 Button.displayName = "Button";
 
 export { Button, buttonVariants };
