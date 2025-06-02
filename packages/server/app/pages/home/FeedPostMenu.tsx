@@ -71,7 +71,7 @@ export function FeedPostMenu({
         {post?.authorId !== beaver.user?.id && (
           <DropdownMenuGroup>
             <DropdownMenuItem>Not interested</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => followUser({ id: author?.id })}>Follow @{author?.username}</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => followUser({ userId: author?.id })}>Follow @{author?.username}</DropdownMenuItem>
             <DropdownMenuItem>Mute @{author?.username}</DropdownMenuItem>
             <DropdownMenuItem>Block @{author?.username}</DropdownMenuItem>
           </DropdownMenuGroup>

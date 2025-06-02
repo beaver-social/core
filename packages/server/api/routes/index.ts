@@ -5,6 +5,7 @@ import ping from "./ping";
 import docs from "./docs";
 import dev from "./dev";
 import media from "./media";
+import social from "./social";
 
 const app = new Hono()
   .route("users", users)
@@ -12,6 +13,7 @@ const app = new Hono()
   .route("ping", ping)
   .route("docs", docs)
   .route("dev", dev)
-  .route("media", media);
+  .route("media", media)
+  .route("social", social);
 
 export default app;

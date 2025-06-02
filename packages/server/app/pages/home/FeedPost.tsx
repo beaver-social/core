@@ -129,7 +129,7 @@ function FeedPost({ postId }: { postId: number }) {
                     {moment(post?.createdAt).fromNow()}
                   </time>
                   {post?.authorId !== beaver.user?.id && (
-                    <Button variant="outline" size="sm" className="ml-2" onClick={() => followUser({ id: author?.id })} disabled={isFollowing}>
+                    <Button variant="outline" size="sm" className="ml-2" onClick={() => followUser({ userId: author?.id })} disabled={isFollowing}>
                       {isFollowing ? "Following" : "Follow"}
                       {isFollowing && <Icon name="LoaderCircle" className="size-4 animate-spin" />}
                       {followSuccess && <Icon name="Check" className="size-4 text-green-500" />}

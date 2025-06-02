@@ -68,4 +68,14 @@ type EventEmissions = {
   "beaver:ready": {};
 
   "connection:disconnect": {};
+
+  "social:follow": {
+    followingId: number;
+    userId: number;
+  };
+
+  "social:unfollow": {
+    followingId: number;
+    userId: number;
+  };
 };

@@ -11,6 +11,7 @@ import Posts from "./bindings/Posts";
 import Docs from "./bindings/Docs";
 import Ping from "./bindings/Ping";
 import Application from "./bindings/Application";
+import Social from "./bindings/Social";
 import { BeaverStore } from "./store";
 import ApiClient from "./bindings/ApiClient";
 import EventNotifier from "./bindings/EventHandler";
@@ -28,6 +29,7 @@ export class BeaverClient {
   docs: Docs;
   ping: Ping;
   application: Application;
+  social: Social;
   media: Media;
   constructor(config: BeaverClientConfig) {
     const logger = new Logger("Beaver Social SDK", Boolean(config.debug));
@@ -60,6 +62,7 @@ export class BeaverClient {
     this.docs = new Docs(this.defaults);
     this.ping = new Ping(this.defaults);
     this.application = new Application(this.defaults);
+    this.social = new Social(this.defaults);
     this.media = new Media(this.defaults);
     this.initialize();
   }
