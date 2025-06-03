@@ -1,45 +1,5 @@
-import FeedItem from "./MessageFeedItem";
 import Icon from "@/shared/components/Icon";
-
-// Sample data - replace with actual data from your backend
-const sampleMessages = [
-  {
-    id: "1",
-    username: "Adam Silverman",
-    handle: "AtomSilverman",
-    timestamp: "1d",
-    content: "Hey there! How's it going?",
-    avatarUrl: "/images/user.webp",
-    type: "reply",
-  },
-  {
-    id: "2",
-    username: "John Doe",
-    handle: "johndoe",
-    timestamp: "1d",
-    content: "Hey there! How's it going?",
-    avatarUrl: "/images/user.webp",
-    type: "reply",
-  },
-  {
-    id: "3",
-    username: "John Doe",
-    handle: "johndoe",
-    timestamp: "1d",
-    content: "Hey there! How's it going?",
-    avatarUrl: "/images/user.webp",
-    type: "reply",
-  },
-  {
-    id: "4",
-    username: "John Doe",
-    handle: "johndoe",
-    timestamp: "1d",
-    content: "Hey there! How's it going?",
-    avatarUrl: "/images/user.webp",
-    type: "reply",
-  },
-];
+import { motion } from "framer-motion";
 
 export default function MessagesFeed() {
   return (
@@ -57,11 +17,14 @@ export default function MessagesFeed() {
         />
       </div>
 
-      <div className="divide-y">
-        {sampleMessages.map((post, index) => (
-          <FeedItem key={index} {...post} />
-        ))}
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+        className="flex flex-col gap-2 items-center text-grey-500 justify-center p-10 rounded-sm"
+      >
+        <p className="text-sm">Nothing to show..</p>
+      </motion.div>
     </div>
   );
 }

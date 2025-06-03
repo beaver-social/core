@@ -1,50 +1,14 @@
-import NotificationBody from "../NotificationBody";
-
-const sampleMentionedNotifications = [
-  {
-    id: "1",
-    username: "John Doe",
-    timestamp: "2h",
-    content:
-      "Just launched my new project! 🚀 Check it out and let me know what you think.",
-    avatarUrl: "/images/user.webp",
-    type: "mention",
-  },
-  {
-    id: "2",
-    username: "John Doe",
-    timestamp: "2h",
-    content:
-      "Just launched my new project! 🚀 Check it out and let me know what you think.",
-    avatarUrl: "/images/user.webp",
-    type: "mention",
-  },
-  {
-    id: "3",
-    username: "John Doe",
-    timestamp: "2h",
-    content:
-      "Just launched my new project! 🚀 Check it out and let me know what you think.",
-    avatarUrl: "/images/user.webp",
-    type: "mention",
-  },
-  {
-    id: "4",
-    username: "John Doe",
-    timestamp: "2h",
-    content:
-      "Just launched my new project! 🚀 Check it out and let me know what you think.",
-    avatarUrl: "/images/user.webp",
-    type: "mention",
-  },
-];
+import { motion } from "framer-motion";
 
 export default function Mentioned() {
   return (
-    <div className="divide-y">
-      {sampleMentionedNotifications.map((post, index) => (
-        <NotificationBody key={index} {...post} />
-      ))}
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="flex flex-col gap-2 border items-center text-grey-500 justify-center p-10 rounded-sm"
+    >
+      <p className="text-sm">Nothing to show..</p>
+    </motion.div>
   );
 }

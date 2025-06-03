@@ -1,61 +1,16 @@
-import NotificationBody from "../NotificationBody";
+import { motion } from "framer-motion";
 
 type Props = {};
 
-const sampleAllNotifications = [
-  {
-    id: "1",
-    username: "John Doe",
-    timestamp: "2h",
-    content:
-      "Just launched my new project! 🚀 Check it out and let me know what you think.",
-    avatarUrl: "/images/user.webp",
-    type: "reply",
-  },
-  {
-    id: "2",
-    username: "John Doe",
-    timestamp: "2h",
-    content:
-      "Just launched my new project! 🚀 Check it out and let me know what you think.",
-    avatarUrl: "/images/user.webp",
-    type: "like",
-  },
-  {
-    id: "4",
-    username: "John Doe",
-    timestamp: "2h",
-    content:
-      "Just launched my new project! 🚀 Check it out and let me know what you think.",
-    avatarUrl: "/images/user.webp",
-    type: "repost",
-  },
-  {
-    id: "5",
-    username: "John Doe",
-    timestamp: "2h",
-    content:
-      "Just launched my new project! 🚀 Check it out and let me know what you think.",
-    avatarUrl: "/images/user.webp",
-    type: "message",
-  },
-  {
-    id: "5",
-    username: "John Doe",
-    timestamp: "2h",
-    content:
-      "Just launched my new project! 🚀 Check it out and let me know what you think.",
-    avatarUrl: "/images/user.webp",
-    type: "other",
-  },
-];
-
-export default function AllAlerts({}: Props) {
+export default function AllAlerts({ }: Props) {
   return (
-    <div className="divide-y">
-      {sampleAllNotifications.map((post, index) => (
-        <NotificationBody key={index} {...post} />
-      ))}
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="flex flex-col gap-2 border items-center text-grey-500 justify-center p-10 rounded-sm"
+    >
+      <p className="text-sm">Nothing to show..</p>
+    </motion.div>
   );
 }
