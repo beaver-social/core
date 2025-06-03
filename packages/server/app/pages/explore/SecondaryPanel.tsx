@@ -6,35 +6,10 @@ import SearchBar from "@/pages/explore/SearchBar";
 import Icon from "@/shared/components/Icon";
 import GradientButton from "@/shared/components/GradientButton";
 import { motion } from "framer-motion";
+import { useBeaver } from "@beaver/react";
+import { icons } from "lucide-react";
 
-// Sample data for profiles and trending topics
-const sampleProfiles = [
-  {
-    id: "1",
-    name: "Kartik",
-    handle: "ishtails",
-    profilePicture: "/images/user.webp",
-    bio: "Music Producer, DJ, and Software Engineer",
-    verified: true,
-  },
-  {
-    id: "2",
-    name: "John Doe",
-    handle: "johndoe",
-    profilePicture: "/images/user.webp",
-    bio: "Blockchain developer and crypto enthusiast",
-    verified: false,
-  },
-  {
-    id: "3",
-    name: "Jane Smith",
-    handle: "janesmith",
-    profilePicture: "/images/user.webp",
-    bio: "NFT artist and design expert",
-    verified: true,
-  },
-];
-
+// Sample data for trending topics (keeping this as it seems to be UI/content focused)
 const trendingTopics = [
   {
     id: "1",
@@ -55,16 +30,42 @@ const trendingTopics = [
 
 export default function SecondaryPanel() {
   const navigate = useNavigate();
+  const beaver = useBeaver();
   const [expandedProfile, setExpandedProfile] = useState<string | null>(null);
-  const [followStates, setFollowStates] = useState<Record<string, boolean>>({});
   const [likedTopic, setLikedTopic] = useState<Record<string, boolean>>({});
 
+  // Get suggested profiles using the search suggestions hook
+  const { data: suggestedProfiles } = beaver.profile.searchSuggestions({
+    search: "", // Empty search to get general suggestions
+    limit: 5,
+  });
+
+  // Use suggested profiles or fallback to empty array
+  const profiles = Array.isArray(suggestedProfiles) ? suggestedProfiles : [];
+
+  // Get bulk follow status for suggested profiles
+  const profileIds = profiles.map((profile) => profile.id);
+  const { data: followStatus } = beaver.social.bulkCheckFollowStatus({
+    userIds: profileIds,
+  });
+
+  // Follow/unfollow mutations
+  const followUserMutation = beaver.social.followUser;
+  const unfollowUserMutation = beaver.social.unfollowUser;
+
   // Toggle following status for a profile
-  const toggleFollow = (profileId: string) => {
-    setFollowStates((prev) => ({
-      ...prev,
-      [profileId]: !prev[profileId],
-    }));
+  const toggleFollow = async (profileId: number) => {
+    const isCurrentlyFollowing = followStatus?.[profileId] || false;
+
+    try {
+      if (isCurrentlyFollowing) {
+        await unfollowUserMutation.mutateAsync({ userId: profileId });
+      } else {
+        await followUserMutation.mutateAsync({ userId: profileId });
+      }
+    } catch (error) {
+      console.error("Error toggling follow status:", error);
+    }
   };
 
   // Toggle like status for a topic
@@ -80,7 +81,7 @@ export default function SecondaryPanel() {
     <div className="p-4 text-sm space-y-6">
       {/* Search Bar */}
       <SearchBar
-        profiles={sampleProfiles}
+        profiles={profiles}
         topics={trendingTopics}
         placeholder="Search"
       />
@@ -111,7 +112,7 @@ export default function SecondaryPanel() {
             >
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground flex items-center gap-1.5">
-                  <Icon name={topic.iconName as any} className="size-3.5" />
+                  <Icon name={topic.iconName as keyof typeof icons} className="size-3.5" />
                   Trending in {topic.category}
                 </p>
                 <motion.button
@@ -164,118 +165,162 @@ export default function SecondaryPanel() {
           <Icon name="Users" className="size-4 text-primary" />
           Suggested for you
         </h2>
-        <div className="space-y-5">
-          {sampleProfiles.map((profile) => (
-            <motion.div
-              key={profile.id}
-              className={`rounded-lg border border-transparent transition-all duration-300 ${expandedProfile === profile.id ? "bg-background/30 border-primary/20 p-3" : "p-2"}`}
-            >
-              <div className="flex items-center justify-between">
-                <div
-                  className="flex items-center gap-3 cursor-pointer"
-                  onClick={() =>
-                    setExpandedProfile(
-                      expandedProfile === profile.id ? null : profile.id,
-                    )
-                  }
-                >
-                  <Link to={`/app/profile/${profile.handle}`}>
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      className="relative"
-                    >
-                      <Image
-                        src={profile.profilePicture}
-                        alt={profile.name}
-                        className="w-10 h-10 rounded-full bg-background border border-primary/30"
-                      />
-                      {profile.verified && (
-                        <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-0.5">
-                          <Icon
-                            name="BadgeCheck"
-                            className="text-primary size-3"
-                          />
-                        </div>
-                      )}
-                    </motion.div>
-                  </Link>
-                  <div>
-                    <div className="flex items-center gap-1">
-                      <p className="font-semibold">{profile.name}</p>
-                      {profile.verified && (
-                        <Icon
-                          name="SquareCheckBig"
-                          className="text-primary size-3.5"
-                        />
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      @{profile.handle}
-                    </p>
-                  </div>
-                </div>
-                <motion.div whileTap={{ scale: 0.95 }}>
-                  <Button
-                    variant={followStates[profile.id] ? "default" : "outline"}
-                    size="sm"
-                    className={`rounded-full transition-all ${followStates[profile.id] ? "bg-primary text-white" : ""}`}
-                    onClick={() => toggleFollow(profile.id)}
+
+        {profiles.length > 0 ? (
+          <>
+            <div className="space-y-5">
+              {profiles.map((profile) => {
+                const isFollowing = followStatus?.[profile.id] || false;
+                const isFollowLoading = followUserMutation.isPending || unfollowUserMutation.isPending;
+
+                return (
+                  <motion.div
+                    key={profile.id}
+                    className={`rounded-lg border border-transparent transition-all duration-300 ${expandedProfile === profile.id.toString() ? "bg-background/30 border-primary/20 p-3" : "p-2"}`}
                   >
-                    {followStates[profile.id] ? "Following" : "Follow"}
-                  </Button>
-                </motion.div>
-              </div>
-
-              {/* Expanded view with bio and social buttons */}
-              {expandedProfile === profile.id && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="mt-3"
-                >
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {profile.bio}
-                  </p>
-
-                  {/* Social Icons */}
-                  <div className="flex gap-2 mt-2 justify-start">
-                    <Link to={`/message/${profile.handle}`}>
-                      <motion.div
-                        whileHover={{ y: -2 }}
-                        whileTap={{ scale: 0.9 }}
+                    <div className="flex items-center justify-between">
+                      <div
+                        className="flex items-center gap-3 cursor-pointer"
+                        onClick={() =>
+                          setExpandedProfile(
+                            expandedProfile === profile.id.toString() ? null : profile.id.toString(),
+                          )
+                        }
                       >
-                        <GradientButton iconName="Mail" />
+                        <Link to={`/app/profile/${profile.username}`}>
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            className="relative"
+                          >
+                            <Image
+                              src={profile.imageUrl || "/images/user.webp"}
+                              alt={profile.fullName}
+                              className="w-10 h-10 rounded-full bg-background border border-primary/30"
+                            />
+                            {profile.verified && (
+                              <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-0.5">
+                                <Icon
+                                  name="BadgeCheck"
+                                  className="text-primary size-3"
+                                />
+                              </div>
+                            )}
+                          </motion.div>
+                        </Link>
+                        <div>
+                          <div className="flex items-center gap-1">
+                            <p className="font-semibold">{profile.fullName}</p>
+                            {profile.verified && (
+                              <Icon
+                                name="SquareCheckBig"
+                                className="text-primary size-3.5"
+                              />
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            @{profile.username}
+                          </p>
+                        </div>
+                      </div>
+                      <motion.div whileTap={{ scale: 0.95 }}>
+                        <Button
+                          variant={isFollowing ? "default" : "outline"}
+                          size="sm"
+                          className={`rounded-full transition-all ${isFollowing ? "bg-primary text-white" : ""}`}
+                          onClick={() => toggleFollow(profile.id)}
+                          disabled={isFollowLoading}
+                        >
+                          {isFollowLoading ? "..." : isFollowing ? "Following" : "Follow"}
+                        </Button>
                       </motion.div>
-                    </Link>
-                    <motion.div
-                      whileHover={{ y: -2 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <GradientButton iconName="Twitter" />
-                    </motion.div>
-                    <motion.div
-                      whileHover={{ y: -2 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <GradientButton iconName="Youtube" />
-                    </motion.div>
-                  </div>
-                </motion.div>
-              )}
-            </motion.div>
-          ))}
-        </div>
-        <div className="mt-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full text-primary hover:text-primary hover:bg-primary/10 transition-colors"
+                    </div>
+
+                    {/* Expanded view with bio and social buttons */}
+                    {expandedProfile === profile.id.toString() && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="mt-3"
+                      >
+                        <p className="text-sm text-muted-foreground mb-3">
+                          {profile.about || "No bio available"}
+                        </p>
+
+                        {/* Social Icons */}
+                        <div className="flex gap-2 mt-2 justify-start">
+                          <Link to={`/message/${profile.username}`}>
+                            <motion.div
+                              whileHover={{ y: -2 }}
+                              whileTap={{ scale: 0.9 }}
+                            >
+                              <GradientButton iconName="Mail" />
+                            </motion.div>
+                          </Link>
+                          {profile.twitter && (
+                            <Link to={`https://twitter.com/${profile.twitter}`} target="_blank">
+                              <motion.div
+                                whileHover={{ y: -2 }}
+                                whileTap={{ scale: 0.9 }}
+                              >
+                                <GradientButton iconName="Twitter" />
+                              </motion.div>
+                            </Link>
+                          )}
+                          {profile.youtube && (
+                            <Link to={`https://youtube.com/@${profile.youtube}`} target="_blank">
+                              <motion.div
+                                whileHover={{ y: -2 }}
+                                whileTap={{ scale: 0.9 }}
+                              >
+                                <GradientButton iconName="Youtube" />
+                              </motion.div>
+                            </Link>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </motion.div>
+                );
+              })}
+            </div>
+            <div className="mt-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full text-primary hover:text-primary hover:bg-primary/10 transition-colors"
+              >
+                View all suggestions
+              </Button>
+            </div>
+          </>
+        ) : (
+          /* No Recommendations UI */
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+            className="flex flex-col items-center justify-center text-center"
           >
-            View all suggestions
-          </Button>
-        </div>
+            <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center">
+              <Icon name="Users" className="size-8 text-muted-foreground" />
+            </div>
+            <h3 className="font-medium text-foreground mb-2">No suggestions available</h3>
+            <p className="text-sm text-muted-foreground mb-4 max-w-xs">
+              We're still learning about your interests. Check back later for personalized recommendations!
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-primary border-primary/50 hover:bg-primary/10"
+              onClick={() => navigate('/app/explore/search')}
+            >
+              <Icon name="Search" className="size-4 mr-2" />
+              Explore profiles
+            </Button>
+          </motion.div>
+        )}
       </motion.div>
     </div>
   );
