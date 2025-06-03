@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import ShortVideo from "./SwipeVideo";
-import { sampleShorts, ShortVideoData } from "./mockData";
+import { sampleSwipeVideos, SwipeVideoData } from "./mockData";
 import { useInView } from "../../shared/hooks/useInView";
 import { useGlobalUIStore } from "@/shared/stores/zustand";
 import Icon from "@/shared/components/Icon";
 
 export default function ShortsFeed() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [shorts, setShorts] = useState<ShortVideoData[]>([]);
+  const [shorts, setShorts] = useState<SwipeVideoData[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -24,7 +24,7 @@ export default function ShortsFeed() {
   useEffect(() => {
     try {
       // Start with 4 videos instead of 2 to have more preloaded content
-      const initialShorts = sampleShorts.slice(0, 4);
+      const initialShorts = sampleSwipeVideos.slice(0, 4);
       setShorts(initialShorts);
 
       // Preload the first video immediately
@@ -88,7 +88,7 @@ export default function ShortsFeed() {
       const currentLength = shorts.length;
 
       // Load more videos at once to ensure we have enough preloaded content
-      const moreShorts = sampleShorts.slice(currentLength, currentLength + 3);
+      const moreShorts = sampleSwipeVideos.slice(currentLength, currentLength + 3);
 
       if (moreShorts.length > 0) {
         setShorts((prev) => [...prev, ...moreShorts]);

@@ -1,4 +1,4 @@
-export interface ShortVideoData {
+export interface SwipeVideoData {
   id: string;
   videoUrl: string;
   username: string;
@@ -12,7 +12,7 @@ export interface ShortVideoData {
 }
 
 // Using videos from a more reliable source for testing
-export const sampleShorts: ShortVideoData[] = [
+export const sampleSwipeVideos: SwipeVideoData[] = [
   {
     id: "1",
     videoUrl:
