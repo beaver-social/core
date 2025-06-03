@@ -5,7 +5,7 @@ import authenticated, { getUserFromCtx } from "../../middlewares/authenticated";
 import { respond } from "../../lib/utils/respond";
 import { tryCatch, tryCatchSync } from "../../lib/tryCatch";
 import db from "../../lib/db";
-import { count, eq, like, or } from "drizzle-orm";
+import { count, eq, inArray, like, or } from "drizzle-orm";
 import { contracts } from "../../lib/sui/contracts";
 import { Transaction } from "@mysten/sui/transactions";
 import { defaultAdminCapId } from "contracts/definitions";
@@ -97,6 +97,31 @@ export default new Hono()
       return respond.ok(ctx, user, "User details", 200);
     }
   )
+
+  .get("/bulk", authenticated, async (ctx) => {
+    const ids = ctx.req.query("ids")?.split(",").map(Number);
+
+    console.log({ ids });
+    if (!ids) {
+      return respond.err(ctx, "No ids provided", 400);
+    }
+
+    const userResponse = await tryCatch(
+      db.select().from(users).where(inArray(users.id, ids))
+    );
+
+    if (userResponse.error) {
+      ctx.log(userResponse.error);
+      return respond.err(ctx, "Failed to fetch users", 500);
+    }
+
+    return respond.ok(
+      ctx,
+      { users: userResponse.data },
+      "User details fetched successfully",
+      200
+    );
+  })
 
   .get(
     "/search-suggestions",

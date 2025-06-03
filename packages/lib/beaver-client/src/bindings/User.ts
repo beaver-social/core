@@ -181,6 +181,15 @@ export default class User {
     );
   }
 
+  async getProfilesByIds(options: { ids: number[] }) {
+    const { ids } = options;
+    return safeParseResponse(
+      this.defaults.apiClient.rpc.users.bulk.$get({
+        query: { ids: ids.join(",") },
+      })
+    );
+  }
+
   async searchSuggestions(options: { search: string; limit: number }) {
     const { search, limit } = options;
 

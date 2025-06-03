@@ -18,12 +18,6 @@ export default function BasicInfo({ data: user }: Props) {
   const { data: pinnedPostDetails, isSuccess: pinnedPostSuccess } =
     beaver.post.getPostById({ id: Number(user?.pinnedPost) });
 
-  const followerData = beaver.social.getFollowers({
-    userId: Number(user?.id),
-  });
-  const followingData = beaver.social.getFollowing({
-    userId: Number(user?.id),
-  });
   const count = beaver.social.getFollowCounts({
     userId: Number(user?.id),
   });
@@ -91,12 +85,12 @@ export default function BasicInfo({ data: user }: Props) {
       {/* Followers/Following Stats */}
       <div className="flex gap-5 my-3 justify-center">
         <FollowDialog
-          data={followingData.data?.following}
+          userId={Number(user?.id)}
           count={count.data?.following || 0}
           title="Following"
         />
         <FollowDialog
-          data={followerData.data?.followers}
+          userId={Number(user?.id)}
           count={count.data?.followers || 0}
           title="Followers"
         />

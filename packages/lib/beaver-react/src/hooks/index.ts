@@ -114,6 +114,7 @@ export function useSocial() {
         queryClient.invalidateQueries({ queryKey: ["getFollowers"] });
         queryClient.invalidateQueries({ queryKey: ["getFollowing"] });
         queryClient.invalidateQueries({ queryKey: ["bulkCheckFollowStatus"] });
+        queryClient.invalidateQueries({ queryKey: ["getProfilesByIds"] });
       },
     }),
 
@@ -130,6 +131,7 @@ export function useSocial() {
         queryClient.invalidateQueries({ queryKey: ["getFollowers"] });
         queryClient.invalidateQueries({ queryKey: ["getFollowing"] });
         queryClient.invalidateQueries({ queryKey: ["bulkCheckFollowStatus"] });
+        queryClient.invalidateQueries({ queryKey: ["getProfilesByIds"] });
       },
     }),
 
@@ -405,6 +407,15 @@ export function useProfile() {
         queryKey: ["getProfile", options],
         queryFn: async () => {
           return await client.user.getProfile(options);
+        },
+      }),
+    getProfilesByIds: (
+      options: Parameters<typeof client.user.getProfilesByIds>[0]
+    ) =>
+      useQuery({
+        queryKey: ["getProfilesByIds", options],
+        queryFn: async () => {
+          return await client.user.getProfilesByIds(options);
         },
       }),
     searchSuggestions: (
