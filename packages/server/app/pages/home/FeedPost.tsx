@@ -148,17 +148,11 @@ function FeedPost({ postId }: { postId: number }) {
           </div>
 
           {/* Images if present */}
-          {post?.media && post?.media.length > 0 && (
-            <div
-              className="w-full rounded-sm overflow-hidden mt-4"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-            >
-              <MediaCarousel media={post?.media} />
-            </div>
-          )}
+          <div
+            className="w-full rounded-sm overflow-hidden mt-4"
+          >
+            <MediaCarousel media={post?.media} />
+          </div>
 
           {/* Post Actions */}
           <div className="mt-2">

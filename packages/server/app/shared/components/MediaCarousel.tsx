@@ -5,6 +5,10 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, EffectFade, Pagination } from "swiper/modules";
 import { Button } from "./ui/button";
 
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+
 interface MediaCarouselProps {
   media: {
     id: number;
@@ -46,109 +50,122 @@ export default function MediaCarousel({
     }
   };
 
+  // Handle video events to keep state in sync
+  const handleVideoPlay = (index: number) => {
+    setIsPlaying((prev) => ({ ...prev, [index]: true }));
+  };
+
+  const handleVideoPause = (index: number) => {
+    setIsPlaying((prev) => ({ ...prev, [index]: false }));
+  };
+
   if (!media.length) return null;
 
   return (
-    <div className={`relative max-w-2xl mx-auto ${className}`}>
-      <div className={`relative bg-secondary overflow-hidden aspect-auto`}>
-        <Swiper
-          modules={[Navigation, EffectFade, Pagination]}
-          spaceBetween={0}
-          slidesPerView={1}
-          effect="slide"
-          speed={300}
-          threshold={5}
-          resistanceRatio={0.85}
-          onSlideChange={(swiper) => {
-            setCurrentIndex(swiper.activeIndex);
-            // Pause all videos when changing slides
-            document.querySelectorAll("video").forEach((video) => {
-              video.pause();
-            });
-            // Reset playing state
-            setIsPlaying({});
-          }}
-          pagination={{
-            clickable: true,
-            bulletClass: "swiper-pagination-bullet carousel-dot",
-            bulletActiveClass: "carousel-dot-active",
-          }}
-          navigation={{
-            nextEl: ".carousel-button-next",
-            prevEl: ".carousel-button-prev",
-          }}
-          className="w-full h-full"
-        >
-          {media.map((item, index) => (
-            <SwiperSlide key={index} className="w-full h-full">
-              {item.type.includes("image") ? (
-                errorImages.has(index) ? (
-                  <button
-                    onClick={() => retryImage(index)}
-                    className="absolute inset-0 flex items-center justify-center flex-col"
-                  >
-                    <div className="p-2 rounded-full bg-black/30 text-white hover:bg-black/50 transition-all">
-                      <Icon name="RefreshCw" className="w-6 h-6" />
-                    </div>
-                  </button>
+    <>
+      <div className={`relative max-w-2xl mx-auto ${className}`}>
+        <div className={`relative bg-secondary overflow-hidden aspect-square rounded-lg`}>
+          <Swiper
+            modules={[Navigation, Pagination]}
+            spaceBetween={0}
+            slidesPerView={1}
+            speed={300}
+            threshold={5}
+            resistanceRatio={0.85}
+            onSlideChange={(swiper) => {
+              setCurrentIndex(swiper.activeIndex);
+              // Pause all videos when changing slides
+              document.querySelectorAll("video").forEach((video, idx) => {
+                if (!video.paused) {
+                  video.pause();
+                }
+              });
+            }}
+            pagination={{
+              clickable: true,
+              bulletClass: "swiper-pagination-bullet",
+              bulletActiveClass: "swiper-pagination-bullet-active",
+            }}
+            navigation={{
+              nextEl: ".carousel-button-next",
+              prevEl: ".carousel-button-prev",
+            }}
+            className="w-full h-full"
+            style={{ height: "100%" }}
+          >
+            {media.map((item, index) => (
+              <SwiperSlide key={index} className="w-full h-full flex items-center justify-center">
+                {item.type.includes("image") ? (
+                  errorImages.has(index) ? (
+                    <button
+                      onClick={() => retryImage(index)}
+                      className="absolute inset-0 flex items-center justify-center flex-col"
+                    >
+                      <div className="p-2 rounded-full bg-black/30 text-white hover:bg-black/50 transition-all">
+                        <Icon name="RefreshCw" className="w-6 h-6" />
+                      </div>
+                    </button>
+                  ) : (
+                    <Image
+                      src={item.url}
+                      alt={`Image ${index + 1} of ${media.length}`}
+                      className="w-full h-full object-cover"
+                      onError={() => handleImageError(index)}
+                    />
+                  )
                 ) : (
-                  <Image
-                    src={item.url}
-                    alt={`Image ${index + 1} of ${media.length}`}
-                    className="w-full h-full object-cover"
-                    onError={() => handleImageError(index)}
-                  />
-                )
-              ) : (
-                <div className="relative w-full h-full bg-black">
-                  <video
-                    src={item.url}
-                    className="w-full h-full object-cover"
-                    onClick={(e) => toggleVideoPlay(index, e.currentTarget)}
-                    loop
-                    controls
-                  />
+                  <div
+                    className="relative w-full h-full bg-black cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const video = e.currentTarget.querySelector("video");
+                      if (video) toggleVideoPlay(index, video);
+                    }}
+                  >
+                    <video
+                      src={item.url}
+                      className="w-full h-full object-cover"
+                      onPlay={() => handleVideoPlay(index)}
+                      onPause={() => handleVideoPause(index)}
+                      onLoadedData={() => handleVideoPause(index)} // Initialize as paused
+                      loop
+                      controls={false}
+                    />
 
-                  {!isPlaying[index] && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="bg-black/50 hover:bg-black/70 text-white rounded-full"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const video = e.currentTarget
-                            .closest(".relative")
-                            ?.querySelector("video");
-                          if (video) toggleVideoPlay(index, video);
-                        }}
-                      >
-                        <Icon name="Play" className="size-6" />
-                      </Button>
+                    {!isPlaying[index] && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
+                        <div className="bg-black/50 text-white rounded-full p-3">
+                          <Icon name="Play" className="size-8" />
+                        </div>
+                      </div>
+                    )}
+
+                    {isPlaying[index] && (
+                      <div className="absolute inset-0 bg-transparent" />
+                    )}
+
+                    <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
+                      Video
                     </div>
-                  )}
-
-                  <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
-                    Video
                   </div>
-                </div>
-              )}
-            </SwiperSlide>
-          ))}
+                )}
+              </SwiperSlide>
+            ))}
 
-          {/* Navigation Arrows */}
-          {media.length > 1 && (
-            <>
-              <button className="carousel-button-prev absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors z-10">
-                <Icon name="ChevronLeft" className="w-5 h-5" />
-              </button>
-              <button className="carousel-button-next absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors z-10">
-                <Icon name="ChevronRight" className="w-5 h-5" />
-              </button>
-            </>
-          )}
-        </Swiper>
+            {/* Navigation Arrows */}
+            {media.length > 1 && (
+              <>
+                <button className="carousel-button-prev absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors z-10">
+                  <Icon name="ChevronLeft" className="w-5 h-5" />
+                </button>
+                <button className="carousel-button-next absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors z-10">
+                  <Icon name="ChevronRight" className="w-5 h-5" />
+                </button>
+              </>
+            )}
+          </Swiper>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

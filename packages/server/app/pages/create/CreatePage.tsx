@@ -415,8 +415,8 @@ export default function CreatePage() {
     async (e: React.FormEvent) => {
       e.preventDefault();
 
-      if (content.trim() === "" && mediaFiles.length === 0) {
-        setError("Please add content or media to your post");
+      if (content.trim() === "") {
+        setError("Please add content to your post");
         return;
       }
 
