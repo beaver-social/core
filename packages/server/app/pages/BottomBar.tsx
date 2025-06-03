@@ -1,6 +1,6 @@
 import { Image } from "@/shared/components/Image";
 import Icon from "../shared/components/Icon";
-import { Link, useLocation } from "react-router";
+import { NavLink } from "react-router";
 import { sidebarItems } from "./SideNav";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
@@ -51,7 +51,7 @@ function BottomBar() {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 1 }}
           >
-            <Link
+            <NavLink
               to={item.to || "/app"}
               className="flex flex-col items-center justify-center text-xs relative"
             >
@@ -70,12 +70,12 @@ function BottomBar() {
                 name={item.iconName}
                 className={`w-6 h-6 ${activeIndex === index ? "text-primary" : "text-grey-300"}`}
               />
-            </Link>
+            </NavLink>
           </motion.div>
         ))}
 
         <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 1 }}>
-          <Link
+          <NavLink
             to={`/app/profile/${user?.username}`}
             className="flex flex-col items-center justify-center text-xs"
           >
@@ -125,13 +125,13 @@ function BottomBar() {
                 className={`bg-grey-900 rounded-full ${isProfilePage ? "border-2 border-primary" : ""}`}
               >
                 <Image
-                  src="/images/user.webp"
+                  src={user?.imageUrl || "/images/user.webp"}
                   alt="user"
                   className="size-7 rounded-full"
                 />
               </div>
             </motion.div>
-          </Link>
+          </NavLink>
         </motion.div>
       </nav>
     </div>

@@ -45,7 +45,6 @@ type ProfileFormValues = z.infer<typeof formSchema>;
 export default function EditProfile() {
     const navigate = useNavigate();
     const beaver = useBeaver();
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [showImageCrop, setShowImageCrop] = useState(false);
     const [showBannerCrop, setShowBannerCrop] = useState(false);
     const [tempImage, setTempImage] = useState<File | null>(null);
@@ -128,6 +127,8 @@ export default function EditProfile() {
     // Form submission handler
     const onSubmit = async (values: ProfileFormValues) => {
         try {
+            console.log(newProfileImage)
+
             await updateProfile({
                 image: newProfileImage,
                 banner: newBannerImage,

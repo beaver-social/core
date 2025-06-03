@@ -10,7 +10,7 @@ type Props = {
 export function Image({ src, alt, className, ...props }: Props) {
   return (
     <img
-      src={src ?? "/images/user.webp"}
+      src={src ?? "/images/default/user.webp"}
       alt={alt || "default image"}
       className={cn(className)}
       {...props}

@@ -10,10 +10,10 @@ import social from "./social";
 const app = new Hono()
   .route("users", users)
   .route("posts", posts)
-  // .route("ping", ping)
-  // .route("docs", docs)
+  .route("ping", ping)
+  .route("docs", docs)
   .route("dev", dev)
-  // .route("media", media)
+  .route("media", media)
   .route("social", social);
 
 export default app;

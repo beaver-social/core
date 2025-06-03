@@ -10,6 +10,7 @@ import {
 import { Button } from "./ui/button";
 import Icon from "./Icon";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
+import { Input } from "./ui/input";
 
 type AspectRatio =
   | "square"
@@ -215,10 +216,10 @@ export default function ImageCropDialog({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl">
-        <DialogHeader className="pt-6">
-          <DialogTitle>Crop Image</DialogTitle>
+        <DialogHeader className="sr-only">
+          <DialogTitle className="sr-only">Crop Image</DialogTitle>
         </DialogHeader>
-        <div className="relative h-[500px] w-full bg-black">
+        <div className="relative min-h-[50vh] w-full bg-black">
           <Cropper
             image={imageUrl}
             crop={crop}
@@ -233,7 +234,7 @@ export default function ImageCropDialog({
         </div>
 
         {filteredAspectRatios.length > 1 && (
-          <div className="flex flex-col gap-2 py-4">
+          <div className="flex flex-col gap-2">
             <label className="text-sm font-medium">Aspect Ratio</label>
             <ToggleGroup
               type="single"
@@ -241,7 +242,7 @@ export default function ImageCropDialog({
               onValueChange={(value) => {
                 if (value) setAspectRatio(value as AspectRatio);
               }}
-              className="justify-start flex-wrap"
+              className="flex-wrap justify-start"
             >
               {filteredAspectRatios.map((ratio) => (
                 <ToggleGroupItem
@@ -251,9 +252,9 @@ export default function ImageCropDialog({
                 >
                   <Icon
                     name={aspectRatioOptions[ratio].icon as any}
-                    className="mr-2 size-4"
+                    className="size-4"
                   />
-                  <span className="hidden sm:inline">
+                  <span className="hidden ml-2 md:inline">
                     {aspectRatioOptions[ratio].label}
                   </span>
                 </ToggleGroupItem>
@@ -262,25 +263,22 @@ export default function ImageCropDialog({
           </div>
         )}
 
-        <div className="flex flex-col gap-2 py-2">
-          <label className="text-sm font-medium">Zoom</label>
-          <div className="flex items-center gap-2">
-            <Icon name="Minimize" className="size-4" />
-            <input
-              type="range"
-              value={zoom}
-              min={1}
-              max={3}
-              step={0.1}
-              aria-labelledby="Zoom"
-              onChange={(e) => setZoom(Number(e.target.value))}
-              className="w-full"
-            />
-            <Icon name="Maximize" className="size-4" />
-          </div>
+        <div className="flex items-center gap-2">
+          <Icon name="Minimize" className="size-4" />
+          <input
+            type="range"
+            value={zoom}
+            min={1}
+            max={3}
+            step={0.1}
+            aria-labelledby="Zoom"
+            onChange={(e) => setZoom(Number(e.target.value))}
+            className="w-full"
+          />
+          <Icon name="Maximize" className="size-4" />
         </div>
 
-        <DialogFooter className="px-6 pb-2">
+        <DialogFooter className="gap-4 px-6">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>

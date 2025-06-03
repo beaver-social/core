@@ -159,7 +159,7 @@ export default function AppId() {
         />
       </div>
 
-      <div className="flex flex-col items-center w-full max-w-xl p-8 mx-10 space-y-8 overflow-hidden text-center border shadow-lg bg-background/80 glass rounded-xl">
+      <div className="flex flex-col items-center w-full max-w-xl p-8 mx-10 space-y-4 overflow-hidden text-center border shadow-lg bg-background/80 glass rounded-xl my-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -476,7 +476,7 @@ export default function AppId() {
         </Dialog>
 
         <motion.div
-          className="max-w-md mt-2 text-xs text-muted-foreground"
+          className="max-w-md text-xs text-muted-foreground"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.5 }}
@@ -487,7 +487,7 @@ export default function AppId() {
         </motion.div>
 
         <motion.div
-          className="max-w-md mt-2 text-xs text-muted-foreground"
+          className="max-w-md text-xs text-muted-foreground"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.5 }}
