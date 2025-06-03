@@ -94,126 +94,6 @@ export function useWallets() {
   };
 }
 
-export function useSocial() {
-  const { client } = useBeaverContext();
-  const queryClient = useQueryClient();
-
-  return {
-    // Mutations for follow/unfollow actions
-    followUser: useMutation({
-      mutationKey: ["followUser"],
-      mutationFn: async (
-        data: Parameters<typeof client.social.followUser>[0]
-      ) => {
-        return await client.social.followUser(data);
-      },
-      onSuccess: (_, variables) => {
-        // Invalidate follow-related queries
-        queryClient.invalidateQueries({ queryKey: ["getFollowCounts"] });
-        queryClient.invalidateQueries({ queryKey: ["isFollowing"] });
-        queryClient.invalidateQueries({ queryKey: ["getFollowers"] });
-        queryClient.invalidateQueries({ queryKey: ["getFollowing"] });
-        queryClient.invalidateQueries({ queryKey: ["bulkCheckFollowStatus"] });
-        queryClient.invalidateQueries({ queryKey: ["getProfilesByIds"] });
-      },
-    }),
-
-    unfollowUser: useMutation({
-      mutationKey: ["unfollowUser"],
-      mutationFn: async (
-        data: Parameters<typeof client.social.unfollowUser>[0]
-      ) => {
-        return await client.social.unfollowUser(data);
-      },
-      onSuccess: (_, variables) => {
-        queryClient.invalidateQueries({ queryKey: ["getFollowCounts"] });
-        queryClient.invalidateQueries({ queryKey: ["isFollowing"] });
-        queryClient.invalidateQueries({ queryKey: ["getFollowers"] });
-        queryClient.invalidateQueries({ queryKey: ["getFollowing"] });
-        queryClient.invalidateQueries({ queryKey: ["bulkCheckFollowStatus"] });
-        queryClient.invalidateQueries({ queryKey: ["getProfilesByIds"] });
-      },
-    }),
-
-    // Queries for follow data
-    isFollowing: (options: Parameters<typeof client.social.isFollowing>[0]) =>
-      useQuery({
-        queryKey: ["isFollowing", options],
-        queryFn: async () => {
-          return await client.social.isFollowing(options);
-        },
-        enabled: !!options.userId,
-      }),
-
-    getFollowCounts: (
-      options: Parameters<typeof client.social.getFollowCounts>[0]
-    ) =>
-      useQuery({
-        queryKey: ["getFollowCounts", options],
-        queryFn: async () => {
-          return await client.social.getFollowCounts(options);
-        },
-        enabled: !!options.userId,
-      }),
-
-    bulkCheckFollowStatus: (
-      options: Parameters<typeof client.social.bulkCheckFollowStatus>[0]
-    ) =>
-      useQuery({
-        queryKey: ["bulkCheckFollowStatus", options],
-        queryFn: async () => {
-          return await client.social.bulkCheckFollowStatus(options);
-        },
-        enabled: !!options.userIds && options.userIds.length > 0,
-      }),
-
-    getFollowers: (options: { userId: number; perPage?: number }) =>
-      useInfiniteQuery({
-        queryKey: ["getFollowersInfinite", options],
-        queryFn: async ({ pageParam = 1 }) => {
-          return await client.social.getFollowers({
-            userId: options.userId,
-            page: pageParam,
-            perPage: options.perPage || 10,
-          });
-        },
-        initialPageParam: 1,
-        getNextPageParam: (lastPage: any, pages) => {
-          return lastPage.hasMore ? pages.length + 1 : undefined;
-        },
-        enabled: !!options.userId,
-      }),
-
-    getFollowing: (options: { userId: number; perPage?: number }) =>
-      useInfiniteQuery({
-        queryKey: ["getFollowingInfinite", options],
-        queryFn: async ({ pageParam = 1 }) => {
-          return await client.social.getFollowing({
-            userId: options.userId,
-            page: pageParam,
-            perPage: options.perPage || 10,
-          });
-        },
-        initialPageParam: 1,
-        getNextPageParam: (lastPage: any, pages) => {
-          return lastPage.hasMore ? pages.length + 1 : undefined;
-        },
-        enabled: !!options.userId,
-      }),
-
-    getMutualFollowers: (
-      options: Parameters<typeof client.social.getMutualFollowers>[0]
-    ) =>
-      useQuery({
-        queryKey: ["getMutualFollowers", options],
-        queryFn: async () => {
-          return await client.social.getMutualFollowers(options);
-        },
-        enabled: !!options.userId,
-      }),
-  };
-}
-
 export function usePost() {
   const { client } = useBeaverContext();
   const queryClient = useQueryClient();
@@ -568,5 +448,135 @@ export function useMedia() {
         return await client.media.uploadMedia(options);
       },
     }),
+  };
+}
+
+export function useSocial() {
+  const { client } = useBeaverContext();
+  const queryClient = useQueryClient();
+
+  return {
+    // Mutations for follow/unfollow actions
+    followUser: useMutation({
+      mutationKey: ["followUser"],
+      mutationFn: async (
+        data: Parameters<typeof client.social.followUser>[0]
+      ) => {
+        return await client.social.followUser(data);
+      },
+      onSuccess: (_, variables) => {
+        // Invalidate follow-related queries
+        queryClient.invalidateQueries({ queryKey: ["getFollowCounts"] });
+        queryClient.invalidateQueries({ queryKey: ["isFollowing"] });
+        queryClient.invalidateQueries({ queryKey: ["getFollowers"] });
+        queryClient.invalidateQueries({ queryKey: ["getFollowing"] });
+        queryClient.invalidateQueries({ queryKey: ["bulkCheckFollowStatus"] });
+        queryClient.invalidateQueries({ queryKey: ["getProfilesByIds"] });
+      },
+    }),
+
+    unfollowUser: useMutation({
+      mutationKey: ["unfollowUser"],
+      mutationFn: async (
+        data: Parameters<typeof client.social.unfollowUser>[0]
+      ) => {
+        return await client.social.unfollowUser(data);
+      },
+      onSuccess: (_, variables) => {
+        queryClient.invalidateQueries({ queryKey: ["getFollowCounts"] });
+        queryClient.invalidateQueries({ queryKey: ["isFollowing"] });
+        queryClient.invalidateQueries({ queryKey: ["getFollowers"] });
+        queryClient.invalidateQueries({ queryKey: ["getFollowing"] });
+        queryClient.invalidateQueries({ queryKey: ["bulkCheckFollowStatus"] });
+        queryClient.invalidateQueries({ queryKey: ["getProfilesByIds"] });
+      },
+    }),
+
+    // Queries for follow data
+    isFollowing: (options: Parameters<typeof client.social.isFollowing>[0]) =>
+      useQuery({
+        queryKey: ["isFollowing", options],
+        queryFn: async () => {
+          return await client.social.isFollowing(options);
+        },
+        enabled: !!options.userId,
+      }),
+
+    getFollowCounts: (
+      options: Parameters<typeof client.social.getFollowCounts>[0]
+    ) =>
+      useQuery({
+        queryKey: ["getFollowCounts", options],
+        queryFn: async () => {
+          return await client.social.getFollowCounts(options);
+        },
+        enabled: !!options.userId,
+      }),
+
+    bulkCheckFollowStatus: (
+      options: Parameters<typeof client.social.bulkCheckFollowStatus>[0]
+    ) =>
+      useQuery({
+        queryKey: ["bulkCheckFollowStatus", options],
+        queryFn: async () => {
+          return await client.social.bulkCheckFollowStatus(options);
+        },
+        enabled: !!options.userIds && options.userIds.length > 0,
+      }),
+
+    getFollowers: (options: { userId: number; perPage?: number }) =>
+      useInfiniteQuery({
+        queryKey: ["getFollowersInfinite", options],
+        queryFn: async ({ pageParam = 1 }) => {
+          return await client.social.getFollowers({
+            userId: options.userId,
+            page: pageParam,
+            perPage: options.perPage || 10,
+          });
+        },
+        initialPageParam: 1,
+        getNextPageParam: (lastPage: any, pages) => {
+          return lastPage.hasMore ? pages.length + 1 : undefined;
+        },
+        enabled: !!options.userId,
+      }),
+
+    getFollowing: (options: { userId: number; perPage?: number }) =>
+      useInfiniteQuery({
+        queryKey: ["getFollowingInfinite", options],
+        queryFn: async ({ pageParam = 1 }) => {
+          return await client.social.getFollowing({
+            userId: options.userId,
+            page: pageParam,
+            perPage: options.perPage || 10,
+          });
+        },
+        initialPageParam: 1,
+        getNextPageParam: (lastPage: any, pages) => {
+          return lastPage.hasMore ? pages.length + 1 : undefined;
+        },
+        enabled: !!options.userId,
+      }),
+
+    getMutualFollowers: (
+      options: Parameters<typeof client.social.getMutualFollowers>[0]
+    ) =>
+      useQuery({
+        queryKey: ["getMutualFollowers", options],
+        queryFn: async () => {
+          return await client.social.getMutualFollowers(options);
+        },
+        enabled: !!options.userId,
+      }),
+
+    getRecommendedUsers: (
+      options: Parameters<typeof client.social.getRecommendedUsers>[0]
+    ) =>
+      useQuery({
+        queryKey: ["getRecommendedUsers", options],
+        queryFn: async () => {
+          return await client.social.getRecommendedUsers(options);
+        },
+      }),
   };
 }

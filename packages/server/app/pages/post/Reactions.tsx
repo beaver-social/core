@@ -79,10 +79,6 @@ export default function Reactions(props: Props) {
         className="flex items-center gap-1 text-muted-foreground group"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 1 }}
-        onClick={(e) => {
-          e.stopPropagation();
-          setCommentDialogOpen(true);
-        }}
       >
         <motion.div
           whileHover={{ y: -2 }}

@@ -34,14 +34,13 @@ export default function SecondaryPanel() {
   const [expandedProfile, setExpandedProfile] = useState<string | null>(null);
   const [likedTopic, setLikedTopic] = useState<Record<string, boolean>>({});
 
-  // Get suggested profiles using the search suggestions hook
-  const { data: suggestedProfiles } = beaver.profile.searchSuggestions({
-    search: "", // Empty search to get general suggestions
+  // Get suggested profiles using the recommended users hook
+  const { data: suggestedProfiles } = beaver.social.getRecommendedUsers({
     limit: 5,
   });
 
   // Use suggested profiles or fallback to empty array
-  const profiles = Array.isArray(suggestedProfiles) ? suggestedProfiles : [];
+  const profiles = Array.isArray(suggestedProfiles?.recommendations) ? suggestedProfiles?.recommendations : [];
 
   // Get bulk follow status for suggested profiles
   const profileIds = profiles.map((profile) => profile.id);
@@ -55,7 +54,7 @@ export default function SecondaryPanel() {
 
   // Toggle following status for a profile
   const toggleFollow = async (profileId: number) => {
-    const isCurrentlyFollowing = followStatus?.[profileId] || false;
+    const isCurrentlyFollowing = (followStatus as Record<number, boolean>)?.[profileId] || false;
 
     try {
       if (isCurrentlyFollowing) {
@@ -170,7 +169,7 @@ export default function SecondaryPanel() {
           <>
             <div className="space-y-5">
               {profiles.map((profile) => {
-                const isFollowing = followStatus?.[profile.id] || false;
+                const isFollowing = (followStatus as Record<number, boolean>)?.[profile.id] || false;
                 const isFollowLoading = followUserMutation.isPending || unfollowUserMutation.isPending;
 
                 return (

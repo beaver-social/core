@@ -50,22 +50,22 @@ function FeedPost({ postId }: { postId: number }) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
-        className="py-6 sm:px-4"
+        className="py-6"
       >
-        <div className="flex flex-col rounded-sm overflow-hidden bg-secondary shadow-sm transition-all duration-300 border mx-6 sm:mx-0">
+        <div className="flex flex-col mx-6 overflow-hidden transition-all duration-300 border rounded-sm shadow-sm bg-secondary sm:mx-0">
           {/* Header skeleton */}
           <div className="flex items-center gap-3 p-4 pb-2">
-            <Skeleton className="size-8 rounded-full" />
-            <div className="flex flex-col gap-2 w-full">
+            <Skeleton className="rounded-full size-8" />
+            <div className="flex flex-col w-full gap-2">
               <Skeleton className="h-4 w-28" />
-              <Skeleton className="h-3 w-16" />
+              <Skeleton className="w-16 h-3" />
             </div>
           </div>
 
           {/* Content skeleton */}
           <div className="px-4 pt-1 pb-3">
-            <Skeleton className="h-4 w-full mb-2" />
-            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="w-full h-4 mb-2" />
+            <Skeleton className="w-3/4 h-4" />
           </div>
 
           {/* Media skeleton */}
@@ -74,9 +74,9 @@ function FeedPost({ postId }: { postId: number }) {
           {/* Actions skeleton */}
           <div className="px-4 py-3 border-t border-border">
             <div className="flex items-center gap-4">
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-16" />
+              <Skeleton className="w-16 h-4" />
+              <Skeleton className="w-16 h-4" />
+              <Skeleton className="w-16 h-4" />
             </div>
           </div>
         </div>
@@ -89,14 +89,14 @@ function FeedPost({ postId }: { postId: number }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="py-6 sm:px-4 hover:bg-secondary/50 sm:hover:rounded-sm transition-all cursor-pointer"
+      className="transition-all cursor-pointer sm:hover:rounded-sm"
       onClick={() => {
         navigate(`/app/post/${postId}`, { state: { postId } });
       }}
     >
       {post?.media && post?.media.length > 0 ? (
         <motion.article
-          className="flex flex-col rounded-sm transition-all duration-300 mx-6 sm:mx-0"
+          className="flex flex-col p-6 transition-all duration-300 rounded-sm hover:bg-secondary/50 sm:px-4 sm:mx-0"
           whileTap={{ scale: 0.99 }}
         >
           {/* Header with Avatar */}
@@ -113,29 +113,29 @@ function FeedPost({ postId }: { postId: number }) {
                   <Image
                     src={author?.imageUrl}
                     alt={author?.username}
-                    className="size-8 rounded-full border-2 border-primary/20"
+                    className="border-2 rounded-full size-8 border-primary/20"
                   />
                 </Link>
               </motion.div>
 
               <div className="flex flex-col">
-                <div className="flex items-center gap-1 flex-wrap">
+                <div className="flex flex-wrap items-center gap-1">
                   <Link
                     to={`/app/profile/${author?.username}`}
-                    className="font-semibold hover:text-primary transition-colors"
+                    className="font-semibold transition-colors hover:text-primary"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {author?.username}
                   </Link>
-                  <span className="text-muted-foreground mx-1">·</span>
-                  <time className="text-muted-foreground text-sm hover:underline">
+                  <span className="mx-1 text-muted-foreground">·</span>
+                  <time className="text-sm text-muted-foreground hover:underline">
                     {moment(post?.createdAt).fromNow()}
                   </time>
                   {post?.authorId !== beaver.user?.id && (
                     <Button variant="outline" size="sm" className="ml-2" onClick={() => followUser({ userId: author?.id })} disabled={isFollowing}>
                       {isFollowing ? "Following" : "Follow"}
                       {isFollowing && <Icon name="LoaderCircle" className="size-4 animate-spin" />}
-                      {followSuccess && <Icon name="Check" className="size-4 text-green-500" />}
+                      {followSuccess && <Icon name="Check" className="text-green-500 size-4" />}
                     </Button>
                   )}
                 </div>
@@ -152,7 +152,7 @@ function FeedPost({ postId }: { postId: number }) {
 
           {/* Images if present */}
           <div
-            className="w-full rounded-sm overflow-hidden mt-4 cursor-default"
+            className="w-full mt-4 overflow-hidden rounded-sm cursor-default"
             onClick={(e) => {
               e.stopPropagation();
             }}
@@ -180,7 +180,7 @@ function FeedPost({ postId }: { postId: number }) {
               {post?.content.length > 50 && (
                 <span>
                   <button
-                    className="text-muted-foreground text-sm hover:text-primary transition-colors"
+                    className="text-sm transition-colors text-muted-foreground hover:text-primary"
                     onClick={() => setShowMore(!showMore)}
                   >
                     {showMore ? "See less" : "more"}
@@ -196,7 +196,7 @@ function FeedPost({ postId }: { postId: number }) {
               onClick={() => {
                 navigate(`/app/post/${postId}`, { state: { postId: postId } });
               }}
-              className="text-sm hover:text-primary transition-colors text-muted-foreground"
+              className="text-sm transition-colors hover:text-primary text-muted-foreground"
             >
               View all {post?.analytics.comments} replies
             </button>
@@ -212,7 +212,7 @@ function FeedPost({ postId }: { postId: number }) {
                 toast.success("Reply sent!");
                 setReply("");
               }}
-              className="mt-2 relative"
+              className="relative mt-2"
             >
               <Input
                 placeholder="Reply to post"
@@ -221,7 +221,7 @@ function FeedPost({ postId }: { postId: number }) {
               />
               <Button
                 variant="ghost"
-                className="absolute right-0 top-0 hover:bg-transparent hover:text-primary"
+                className="absolute top-0 right-0 hover:bg-transparent hover:text-primary"
                 disabled={reply.length === 0 || isReplyPending}
               >
                 {isReplyPending ? (
@@ -235,19 +235,14 @@ function FeedPost({ postId }: { postId: number }) {
         </motion.article>
       ) : (
         <motion.article
-          className="flex flex-col rounded-sm overflow-hidden bg-secondary shadow-sm hover:shadow-md transition-all duration-300 border mx-6 sm:mx-0 relative"
+          className="relative flex flex-col m-6 overflow-hidden transition-all border rounded-sm shadow-sm bg-secondary hover:shadow-md hover:bg-grey-900 sm:mx-0"
           onClick={(e) => {
-            e.preventDefault();
             navigate(`/app/post/${postId}`, { state: { postId } });
           }}
         >
           {/* Header with Avatar */}
           <div
             className="flex items-center justify-between p-4 pb-2"
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-            }}
           >
             <div className="flex items-center gap-3">
               <motion.div
@@ -261,22 +256,22 @@ function FeedPost({ postId }: { postId: number }) {
                   <Image
                     src={author?.imageUrl}
                     alt={author?.username}
-                    className="size-8 rounded-full border-2 border-primary/20"
+                    className="border-2 rounded-full size-8 border-primary/20"
                   />
                 </Link>
               </motion.div>
 
               <div className="flex flex-col">
-                <div className="flex items-center gap-1 flex-wrap">
+                <div className="flex flex-wrap items-center gap-1">
                   <Link
                     to={`/app/profile/${author?.username}`}
-                    className="font-semibold hover:text-primary transition-colors"
+                    className="font-semibold transition-colors hover:text-primary"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {author?.username}
                   </Link>
-                  <span className="text-muted-foreground mx-1">·</span>
-                  <time className="text-muted-foreground text-sm hover:underline">
+                  <span className="mx-1 text-muted-foreground">·</span>
+                  <time className="text-sm text-muted-foreground hover:underline">
                     {moment(post?.createdAt).fromNow()}
                   </time>
                 </div>

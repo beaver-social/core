@@ -5,7 +5,7 @@ import authenticated from "../../middlewares/authenticated";
 import { respond } from "../../lib/utils/respond";
 import { tryCatch } from "../../lib/tryCatch";
 import db from "../../lib/db";
-import { count, eq, and, inArray, desc } from "drizzle-orm";
+import { count, eq, and, inArray, desc, ne, not } from "drizzle-orm";
 import { zNumberString, zSuiSignature } from "../../lib/zod/helpers";
 import { followUser, unfollowUser } from "./actions";
 
@@ -426,7 +426,33 @@ export default new Hono()
         .filter((rec) => !excludeIds.includes(rec.userId))
         .slice(0, limit);
 
-      const userIds = filteredRecommendations.map((rec) => rec.userId);
+      let userIds = filteredRecommendations.map((rec) => rec.userId);
+
+      // Fallback: if no popular users available, get random users
+      if (userIds.length < limit) {
+        const remainingLimit = limit - userIds.length;
+
+        const randomUsersResponse = await tryCatch(
+          db
+            .select({ id: users.id })
+            .from(users)
+            .where(
+              excludeIds.length > 0
+                ? not(inArray(users.id, excludeIds))
+                : undefined
+            )
+            .limit(remainingLimit * 2) // Get more to have options
+        );
+
+        if (!randomUsersResponse.error) {
+          const randomUserIds = randomUsersResponse.data
+            .map((u) => u.id)
+            .filter((id) => !userIds.includes(id)) // Avoid duplicates
+            .slice(0, remainingLimit);
+
+          userIds = [...userIds, ...randomUserIds];
+        }
+      }
 
       if (userIds.length === 0) {
         return respond.ok(

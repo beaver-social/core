@@ -21,13 +21,7 @@ import {
 } from "../../shared/components/ui/dialog";
 import Icon from "@/shared/components/Icon";
 import { DialogTitle } from "@radix-ui/react-dialog";
-
-type Profile = {
-  id: string;
-  name: string;
-  handle: string;
-  profilePicture: string;
-};
+import { useBeaver } from "@beaver/react";
 
 type Topic = {
   id: string;
@@ -36,7 +30,7 @@ type Topic = {
 };
 
 type SearchBarProps = {
-  profiles: Profile[];
+  profiles: Array<ReturnType<typeof useBeaver>["user"]>;
   topics: Topic[];
   className?: string;
   placeholder?: string;
@@ -77,16 +71,16 @@ export default function SearchBar({
   // Filter suggestions based on debounced search value
   const filteredProfiles = debouncedValue
     ? profiles.filter(
-        (profile) =>
-          profile.name.toLowerCase().includes(debouncedValue.toLowerCase()) ||
-          profile.handle.toLowerCase().includes(debouncedValue.toLowerCase()),
-      )
+      (profile) =>
+        profile.fullName.toLowerCase().includes(debouncedValue.toLowerCase()) ||
+        profile.username.toLowerCase().includes(debouncedValue.toLowerCase()),
+    )
     : profiles.slice(0, 3); // Show only a few results when not searching
 
   const filteredTopics = debouncedValue
     ? topics.filter((topic) =>
-        topic.name.toLowerCase().includes(debouncedValue.toLowerCase()),
-      )
+      topic.name.toLowerCase().includes(debouncedValue.toLowerCase()),
+    )
     : topics.slice(0, 3); // Show only a few results when not searching
 
   // Combined results for keyboard navigation
@@ -111,8 +105,8 @@ export default function SearchBar({
 
   // Select a profile
   const handleSelectProfile = useCallback(
-    (handle: string) => {
-      navigate(`/app/profile/${handle}`);
+    (username: string) => {
+      navigate(`/app/profile/${username}`);
       setOpen(false);
       setIsFocused(false);
       if (isModal && onModalClose) {
@@ -180,18 +174,18 @@ export default function SearchBar({
                 return (
                   <CommandItem
                     key={profile.id}
-                    onSelect={() => handleSelectProfile(profile.handle)}
+                    onSelect={() => handleSelectProfile(profile.username)}
                     className={`flex items-center gap-2 py-2 cursor-pointer ${isActive ? "bg-accent" : ""}`}
                   >
                     <Image
-                      src={profile.profilePicture}
-                      alt={profile.name}
+                      src={profile.imageUrl}
+                      alt={profile.fullName}
                       className="w-8 h-8 rounded-full"
                     />
                     <div>
-                      <p className="font-medium">{profile.name}</p>
+                      <p className="font-medium">{profile.fullName}</p>
                       <p className="text-sm text-muted-foreground">
-                        @{profile.handle}
+                        @{profile.username}
                       </p>
                     </div>
                   </CommandItem>
