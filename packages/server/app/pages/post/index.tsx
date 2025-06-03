@@ -135,31 +135,3 @@ export default function Post() {
     />
   );
 }
-
-// Sample replies data - you can remove this when you have a real API
-const sampleReplies = [
-  {
-    username: "Jane Smith",
-    handle: "janesmith",
-    timestamp: "1h",
-    content:
-      "This looks amazing! Can't wait to try it out! The visual design is really impressive, and the UX seems very intuitive. Great job on the implementation.",
-    likes: 8,
-    comments: 2,
-    reposts: 1,
-    shares: 0,
-    avatarUrl: "/images/user.webp",
-  },
-  {
-    username: "Mike Johnson",
-    handle: "mikej",
-    timestamp: "30m",
-    content:
-      "Great work! The UI looks clean and modern. Did you use a specific design system for this? Would love to know more about the tech stack.",
-    likes: 5,
-    comments: 1,
-    reposts: 0,
-    shares: 0,
-    avatarUrl: "/images/user.webp",
-  },
-];

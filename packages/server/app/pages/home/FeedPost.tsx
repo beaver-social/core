@@ -50,7 +50,7 @@ function FeedPost({ postId }: { postId: number }) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
-        className="mb-6 pb-6"
+        className="py-6 sm:px-4"
       >
         <div className="flex flex-col rounded-sm overflow-hidden bg-secondary shadow-sm transition-all duration-300 border mx-6 sm:mx-0">
           {/* Header skeleton */}
@@ -89,7 +89,10 @@ function FeedPost({ postId }: { postId: number }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="mb-6 pb-6"
+      className="py-6 sm:px-4 hover:bg-secondary/50 sm:hover:rounded-sm transition-all cursor-pointer"
+      onClick={() => {
+        navigate(`/app/post/${postId}`, { state: { postId } });
+      }}
     >
       {post?.media && post?.media.length > 0 ? (
         <motion.article
@@ -149,7 +152,10 @@ function FeedPost({ postId }: { postId: number }) {
 
           {/* Images if present */}
           <div
-            className="w-full rounded-sm overflow-hidden mt-4"
+            className="w-full rounded-sm overflow-hidden mt-4 cursor-default"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
           >
             <MediaCarousel media={post?.media} />
           </div>

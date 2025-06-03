@@ -42,7 +42,7 @@ export default function PostContent({
       if (word.startsWith("@")) {
         const username = word.substring(1); // Remove the @ symbol
         const mentionedUser = mentionedUsers.find(
-          (user) => user.username === username,
+          (user: any) => user.username === username,
         );
 
         if (mentionedUser) {
@@ -80,7 +80,7 @@ export default function PostContent({
             />
           </motion.div>
         </Link>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1 flex-wrap">
             <Link
               to={`/app/profile/${author?.username}`}
@@ -105,16 +105,18 @@ export default function PostContent({
 
           <div className="mt-2">
             <p className="text-sm">
-              {post?.content ? formatContentWithMentions(post.content) : null}
+              {post?.content ? formatContentWithMentions(post?.content) : null}
             </p>
           </div>
 
           {/* Post Images */}
-          {post?.media && post.media.length > 0 && (
-            <div className="w-full mt-3 rounded-lg overflow-hidden">
-              <ImageCarousel
-                media={post.media || []}
-              />
+          {post?.media && post?.media.length > 0 && (
+            <div className="w-full max-w-full mt-3 rounded-lg overflow-hidden">
+              <div className="relative w-full">
+                <ImageCarousel
+                  media={post?.media || []}
+                />
+              </div>
             </div>
           )}
 

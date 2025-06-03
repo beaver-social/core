@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useBeaver } from "@beaver/react";
 import moment from "moment";
 import { useNavigate } from "react-router";
+import MediaCarousel from "@/shared/components/MediaCarousel";
 
 export default function Reply({ id }: { id: number }) {
   const [showMore, setShowMore] = useState(false);
@@ -15,7 +16,7 @@ export default function Reply({ id }: { id: number }) {
     id: id.toString(),
   });
   const { data: author } = beaver.profile.getProfile({
-    value: reply?.authorId.toString() || "",
+    value: reply?.authorId?.toString() || "",
     type: "id",
   });
 
@@ -40,7 +41,7 @@ export default function Reply({ id }: { id: number }) {
             className="size-8 rounded-full border-2 border-primary/20"
           />
         </Link>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1 flex-wrap">
             <Link
               to={`/app/profile/${author?.username}`}
@@ -64,12 +65,24 @@ export default function Reply({ id }: { id: number }) {
             {reply?.content && reply?.content.length > 150 && (
               <button
                 className="text-primary text-sm ml-1 hover:underline"
-                onClick={() => setShowMore(!showMore)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowMore(!showMore);
+                }}
               >
                 {showMore ? "See less" : "See more"}
               </button>
             )}
           </p>
+
+          {/* Media Display - Compact for replies */}
+          {reply?.media && reply?.media.length > 0 && (
+            <div className="w-full max-w-full mt-2 rounded-lg overflow-hidden">
+              <div className="relative w-full max-w-sm">
+                <MediaCarousel media={reply.media} />
+              </div>
+            </div>
+          )}
 
           <div className="mt-3">
             <Reactions
