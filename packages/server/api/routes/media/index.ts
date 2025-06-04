@@ -6,74 +6,164 @@ import { uploadMedia } from "./helpers";
 import { tryCatch } from "../../lib/tryCatch";
 import db from "../../lib/db";
 import authenticated from "../../middlewares/authenticated";
+import { eq, desc, and, isNull } from "drizzle-orm";
+import { zNumberString } from "../../lib/zod/helpers";
 
-export default new Hono().post(
-  "/upload",
-  authenticated,
-  zValidator(
-    "form",
-    z.object({
-      media: z.array(z.instanceof(File)).min(1).max(10).or(z.instanceof(File)),
-      tags: z.array(z.string()).optional(),
-    })
-  ),
-  async (ctx) => {
-    const { media, tags } = ctx.req.valid("form");
-    const user = ctx.get("user");
+const { media } = db.schema;
 
-    if (Array.isArray(media)) {
-      const results = await Promise.all(
-        media.map(async (file) => {
-          const result = await tryCatch(uploadMedia(file, tags));
-          if (result.error) {
-            console.error(result.error);
-            return;
-          }
-
-          await tryCatch(
-            db.insert(db.schema.media).values({
-              authorId: user.id,
-              url: result.data.url,
-              type: file.type,
-            })
-          );
-
-          return result.data;
-        })
+export default new Hono()
+  // get media by id
+  .get(
+    "/:id",
+    zValidator("param", z.object({ id: zNumberString() })),
+    authenticated,
+    async (ctx) => {
+      const { id } = ctx.req.valid("param");
+      const mediaResult = await tryCatch(
+        db
+          .select()
+          .from(media)
+          .where(eq(media.id, Number(id)))
+          .limit(1)
       );
 
-      return respond.ok(
-        ctx,
-        {
-          url: results
-            .filter((result) => result !== undefined)
-            .map((result) => result.url),
-        },
-        "Files uploaded successfully",
-        200
-      );
-    } else {
-      const result = await tryCatch(uploadMedia(media, tags));
-      if (result.error) {
-        return respond.err(ctx, result.error.message, 500);
+      if (mediaResult.error) {
+        return respond.err(ctx, mediaResult.error.message, 500);
       }
 
-      await tryCatch(
-        db.insert(db.schema.media).values({
-          authorId: user.id,
-          url: result.data.url,
-          type: media.type,
-        })
-      );
-
       return respond.ok(
         ctx,
         {
-          url: [result.data.url],
+          media: mediaResult.data[0],
         },
-        "File uploaded successfully",
+        "Media fetched successfully",
         200
       );
     }
-  }
-);
+  )
+
+  // get all media for a user (paginated)
+  .get(
+    "/user/:id",
+    zValidator("param", z.object({ id: zNumberString() })),
+    zValidator(
+      "query",
+      z.object({
+        page: zNumberString()
+          .default("1")
+          .transform((v) => v - 1),
+        perPage: zNumberString()
+          .transform((v) => Math.min(v, 32))
+          .default("10"),
+      })
+    ),
+    authenticated,
+    async (ctx) => {
+      const { id: userId } = ctx.req.valid("param");
+      const { page, perPage } = ctx.req.valid("query");
+
+      console.log({ userId });
+
+      // only return if deletedAt is null
+      const mediaResult = await tryCatch(
+        db
+          .select()
+          .from(media)
+          .where(
+            and(eq(media.authorId, Number(userId)), isNull(media.deletedAt))
+          )
+          .limit(perPage)
+          .offset(page * perPage)
+          .orderBy(desc(media.createdAt))
+      );
+
+      if (mediaResult.error) {
+        return respond.err(ctx, mediaResult.error.message, 500);
+      }
+
+      return respond.ok(
+        ctx,
+        {
+          media: mediaResult.data,
+        },
+        "Media fetched successfully",
+        200
+      );
+    }
+  )
+
+  // upload media
+  .post(
+    "/upload",
+    authenticated,
+    zValidator(
+      "form",
+      z.object({
+        media: z
+          .array(z.instanceof(File))
+          .min(1)
+          .max(10)
+          .or(z.instanceof(File)),
+        tags: z.array(z.string()).optional(),
+      })
+    ),
+    async (ctx) => {
+      const { media, tags } = ctx.req.valid("form");
+      const user = ctx.get("user");
+
+      if (Array.isArray(media)) {
+        const results = await Promise.all(
+          media.map(async (file) => {
+            const result = await tryCatch(uploadMedia(file, tags));
+            if (result.error) {
+              console.error(result.error);
+              return;
+            }
+
+            await tryCatch(
+              db.insert(db.schema.media).values({
+                authorId: user.id,
+                url: result.data.url,
+                type: file.type,
+              })
+            );
+
+            return result.data;
+          })
+        );
+
+        return respond.ok(
+          ctx,
+          {
+            url: results
+              .filter((result) => result !== undefined)
+              .map((result) => result.url),
+          },
+          "Files uploaded successfully",
+          200
+        );
+      } else {
+        const result = await tryCatch(uploadMedia(media, tags));
+        if (result.error) {
+          return respond.err(ctx, result.error.message, 500);
+        }
+
+        await tryCatch(
+          db.insert(db.schema.media).values({
+            authorId: user.id,
+            url: result.data.url,
+            type: media.type,
+          })
+        );
+
+        return respond.ok(
+          ctx,
+          {
+            url: [result.data.url],
+          },
+          "File uploaded successfully",
+          200
+        );
+      }
+    }
+  );

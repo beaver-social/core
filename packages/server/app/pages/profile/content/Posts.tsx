@@ -3,6 +3,7 @@ import FeedPost from "@/pages/home/FeedPost";
 import useInfiniteScroll from "@/shared/hooks/useInfiniteScroll";
 import { motion } from "framer-motion";
 import { useParams } from "react-router";
+import Spinner from "@/shared/components/Spinner";
 
 export default function PostData() {
   const beaver = useBeaver();
@@ -14,6 +15,8 @@ export default function PostData() {
   });
   const {
     data: postArray,
+    isLoading: isPostsLoading,
+    isRefetching: isPostsRefetching,
     fetchNextPage,
     hasNextPage,
   } = beaver.post.getPosts({ perPage: 10, authorId: user?.id });
@@ -22,6 +25,14 @@ export default function PostData() {
     fetchNextPage,
     hasNextPage,
   });
+
+  if (isPostsLoading || isPostsRefetching) {
+    return (
+      <div className="flex items-center justify-center m-6">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <>

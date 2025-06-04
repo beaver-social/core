@@ -17,7 +17,7 @@ export function deriveActionNameFromFn(fn: Function) {
   if (!fnName.endsWith("2")) {
     throw new Error(
       "Function name must be same as action name. Invalid function name: " +
-        fn.name,
+        fn.name
     );
   }
 
@@ -53,13 +53,13 @@ export async function executeActionFunction<T, R>(
   tx: Transaction,
   fn: (tx: Transaction, args: ActionOptions<T>) => Promise<R>,
   options: ActionOptions<T> & { user: DB["user"] },
-  actionType: string,
+  actionType: string
 ): Promise<R> {
   const result = await tryCatch(fn(tx, options));
 
   if (result.error) {
     throw new Error(
-      `Error performing action "${actionType}" ` + result.error.message,
+      `Error performing action "${actionType}" ` + result.error.message
     );
   }
 
@@ -69,7 +69,7 @@ export async function executeActionFunction<T, R>(
 export async function storeFunctionDefinition(
   tx: Transaction,
   fnHash: string,
-  keys: any,
+  keys: any
 ) {
   const [fnExists] = await tx
     .select()
@@ -96,7 +96,7 @@ export async function storeActionRequest(
   tx: Transaction,
   hash: string,
   functionId: number,
-  compressedPayload: string,
+  compressedPayload: string
 ) {
   await tx.insert(actionRequests).values({
     hash,
@@ -111,7 +111,7 @@ export async function storeActionRecord(
   hash: string,
   previous: string,
   type: string,
-  signature: string,
+  signature: string
 ) {
   const [action] = await tx
     .insert(actions)
@@ -131,7 +131,7 @@ export function compressActionRequest(
   req: Parameters<ReturnType<ReturnType<typeof createAction>>>["0"] & {
     type: string;
     previous: string;
-  },
+  }
 ) {
   const { type, previous, userId, ...rest } = req;
   const toStore = rest as Record<string, unknown>;
@@ -165,16 +165,13 @@ export async function retrieveActionRequest(actionId: number) {
 
   const keys = JSON.parse(params) as string[];
   const vals = msgpackDecode(
-    Buffer.from(request.payload, "base64"),
+    Buffer.from(request.payload, "base64")
   ) as unknown[];
 
-  const req = keys.reduce(
-    (acc, key, index) => {
-      acc[key] = vals[index];
-      return acc;
-    },
-    {} as Record<string, unknown>,
-  );
+  const req = keys.reduce((acc, key, index) => {
+    acc[key] = vals[index];
+    return acc;
+  }, {} as Record<string, unknown>);
 
-  return { userId: action.userId, previous: action.previous, ...req };
+  return { userId: action.userId, previous: action.previous, req: req };
 }

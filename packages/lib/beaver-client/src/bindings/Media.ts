@@ -24,4 +24,30 @@ export default class Media {
     );
     return uploadMedia;
   }
+
+  async getMediaDetails(options: { id: number }) {
+    const getMediaById = safeParseResponse(
+      this.defaults.apiClient.rpc.media.$get({
+        param: { id: options.id },
+      })
+    );
+    return getMediaById;
+  }
+
+  async getUserMedia(options: {
+    userId: number;
+    page: number;
+    perPage: number;
+  }) {
+    const getMediaByUserId = safeParseResponse(
+      this.defaults.apiClient.rpc.media.user[":id"].$get({
+        param: { id: options.userId },
+        query: {
+          page: options.page,
+          perPage: options.perPage,
+        },
+      })
+    );
+    return getMediaByUserId;
+  }
 }

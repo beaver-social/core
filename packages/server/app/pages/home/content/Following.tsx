@@ -2,15 +2,24 @@ import ConnectIdentity from "@/shared/components/ConnectIdentity";
 import FeedPost from "../FeedPost";
 import { useBeaver } from "@beaver/react";
 import { motion } from "framer-motion";
+import Spinner from "@/shared/components/Spinner";
 
 type Props = {};
 
-export default function Following({}: Props) {
+export default function Following({ }: Props) {
   const beaver = useBeaver();
-  const { data: followingPosts, isLoading } = beaver.post.getFollowingPosts({
+  const { data: followingPosts, isLoading: isPostsLoading, isRefetching: isPostsRefetching } = beaver.post.getFollowingPosts({
     page: 1,
     perPage: 10,
   });
+
+  if (isPostsLoading || isPostsRefetching) {
+    return (
+      <div className="flex items-center justify-center m-10">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className="divide-y">

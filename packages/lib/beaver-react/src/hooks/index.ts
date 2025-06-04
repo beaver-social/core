@@ -113,6 +113,7 @@ export function usePost() {
         queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
         queryClient.invalidateQueries({ queryKey: ["getPostById"] });
         queryClient.invalidateQueries({ queryKey: ["getPostReplies"] });
+        queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
       },
     }),
     deletePost: useMutation({
@@ -127,6 +128,7 @@ export function usePost() {
         queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
         queryClient.invalidateQueries({ queryKey: ["getPostById"] });
         queryClient.invalidateQueries({ queryKey: ["getPostReplies"] });
+        queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
       },
     }),
     getPosts: ({
@@ -186,6 +188,7 @@ export function usePost() {
         queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
         queryClient.invalidateQueries({ queryKey: ["getPostInteracted"] });
         queryClient.invalidateQueries({ queryKey: ["getPostLikes"] });
+        queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
       },
     }),
     unlikePost: useMutation({
@@ -202,6 +205,7 @@ export function usePost() {
         queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
         queryClient.invalidateQueries({ queryKey: ["getPostInteracted"] });
         queryClient.invalidateQueries({ queryKey: ["getPostLikes"] });
+        queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
       },
     }),
     bookmarkPost: useMutation({
@@ -214,6 +218,7 @@ export function usePost() {
       onSuccess: () => {
         // Invalidate interaction data to update bookmark status
         queryClient.invalidateQueries({ queryKey: ["getPostInteracted"] });
+        queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
       },
     }),
     unbookmarkPost: useMutation({
@@ -226,6 +231,7 @@ export function usePost() {
       onSuccess: () => {
         // Invalidate interaction data to update bookmark status
         queryClient.invalidateQueries({ queryKey: ["getPostInteracted"] });
+        queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
       },
     }),
     getPostLikes: (options: Parameters<typeof client.posts.getPostLikes>[0]) =>
@@ -274,6 +280,7 @@ export function usePost() {
         queryClient.invalidateQueries({ queryKey: ["getPostById"] });
         queryClient.invalidateQueries({ queryKey: ["getPosts"] });
         queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
+        queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
       },
     }),
   };
@@ -323,6 +330,7 @@ export function useProfile() {
         queryClient.invalidateQueries({ queryKey: ["getPosts"] });
         queryClient.invalidateQueries({ queryKey: ["getPostById"] });
         queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
+        queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
       },
     }),
   };
@@ -365,6 +373,7 @@ export function usePing() {
         // Invalidate chat lists to show the new message
         queryClient.invalidateQueries({ queryKey: ["getAllChats"] });
         queryClient.invalidateQueries({ queryKey: ["getChatById"] });
+        queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
       },
     }),
 
@@ -450,6 +459,32 @@ export function useMedia() {
         return await client.media.uploadMedia(options);
       },
     }),
+
+    getMediaDetails: (
+      options: Parameters<typeof client.media.getMediaDetails>[0]
+    ) =>
+      useQuery({
+        queryKey: ["getMediaDetails", options],
+        queryFn: async () => {
+          return await client.media.getMediaDetails(options);
+        },
+      }),
+
+    getUserMedia: (options: { userId: number; perPage?: number }) =>
+      useInfiniteQuery({
+        queryKey: ["getUserMedia", options],
+        queryFn: async ({ pageParam = 1 }) => {
+          return await client.media.getUserMedia({
+            userId: options.userId,
+            page: pageParam,
+            perPage: options.perPage || 10,
+          });
+        },
+        initialPageParam: 1,
+        getNextPageParam: (lastPage, pages) => {
+          return lastPage.hasMore ? pages.length + 1 : undefined;
+        },
+      }),
   };
 }
 
@@ -474,6 +509,7 @@ export function useSocial() {
         queryClient.invalidateQueries({ queryKey: ["getFollowing"] });
         queryClient.invalidateQueries({ queryKey: ["bulkCheckFollowStatus"] });
         queryClient.invalidateQueries({ queryKey: ["getProfilesByIds"] });
+        queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
       },
     }),
 
@@ -491,6 +527,7 @@ export function useSocial() {
         queryClient.invalidateQueries({ queryKey: ["getFollowing"] });
         queryClient.invalidateQueries({ queryKey: ["bulkCheckFollowStatus"] });
         queryClient.invalidateQueries({ queryKey: ["getProfilesByIds"] });
+        queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
       },
     }),
 
