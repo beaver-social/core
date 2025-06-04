@@ -1,5 +1,6 @@
 import Icon from "@/shared/components/Icon";
 import { Button } from "@/shared/components/ui/button";
+import Spinner from "@/shared/components/Spinner";
 import { useBeaver } from "@beaver/react";
 import { icons } from "lucide-react";
 import moment from "moment";
@@ -21,8 +22,8 @@ export default function Actions() {
 
   if (isActionsLoading) {
     return (
-      <div className="flex items-center justify-center p-6">
-        <Icon name="LoaderCircle" className="size-10 animate-spin" />
+      <div className="flex items-center justify-center m-10">
+        <Spinner />
       </div>
     );
   }

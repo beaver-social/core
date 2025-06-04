@@ -46,13 +46,8 @@ function FeedPost({ postId }: { postId: number }) {
   // Skeleton loader
   if (isLoading) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2 }}
-        className="py-6"
-      >
-        <div className="flex flex-col mx-6 overflow-hidden transition-all duration-300 border rounded-sm shadow-sm bg-secondary sm:mx-0">
+      <div>
+        <div className="flex flex-col m-6 overflow-hidden transition-all duration-300 border rounded-sm shadow-sm bg-secondary sm:mx-0">
           {/* Header skeleton */}
           <div className="flex items-center gap-3 p-4 pb-2">
             <Skeleton className="rounded-full size-8" />
@@ -80,29 +75,26 @@ function FeedPost({ postId }: { postId: number }) {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
+    <div
       className="transition-all cursor-pointer sm:hover:rounded-sm"
       onClick={() => {
         navigate(`/app/post/${postId}`, { state: { postId } });
       }}
     >
       {post?.media && post?.media.length > 0 ? (
-        <motion.article
+        <article
           className="flex flex-col p-6 transition-all duration-300 rounded-sm hover:bg-secondary/50 sm:px-4 sm:mx-0"
           whileTap={{ scale: 0.99 }}
         >
           {/* Header with Avatar */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <motion.div
+              <div
                 whileHover={{ scale: 1.05 }}
                 className="flex-shrink-0"
               >
@@ -116,7 +108,7 @@ function FeedPost({ postId }: { postId: number }) {
                     className="border-2 rounded-full size-8 border-primary/20"
                   />
                 </Link>
-              </motion.div>
+              </div>
 
               <div className="flex flex-col">
                 <div className="flex flex-wrap items-center gap-1">
@@ -162,12 +154,12 @@ function FeedPost({ postId }: { postId: number }) {
 
           {/* Post Actions */}
           <div className="mt-2">
-            <motion.div initial={{ opacity: 0.8 }} whileHover={{ opacity: 1 }}>
+            <div initial={{ opacity: 0.8 }} whileHover={{ opacity: 1 }}>
               <Reactions
                 postId={postId}
                 analytics={post?.analytics}
               />
-            </motion.div>
+            </div>
           </div>
 
           {/* Post Content */}
@@ -232,9 +224,9 @@ function FeedPost({ postId }: { postId: number }) {
               </Button>
             </form>
           </div>
-        </motion.article>
+        </article>
       ) : (
-        <motion.article
+        <article
           className="relative flex flex-col m-6 overflow-hidden transition-all border rounded-sm shadow-sm bg-secondary hover:shadow-md hover:bg-grey-900 sm:mx-0"
           onClick={(e) => {
             navigate(`/app/post/${postId}`, { state: { postId } });
@@ -245,7 +237,7 @@ function FeedPost({ postId }: { postId: number }) {
             className="flex items-center justify-between p-4 pb-2"
           >
             <div className="flex items-center gap-3">
-              <motion.div
+              <div
                 whileHover={{ scale: 1.05 }}
                 className="flex-shrink-0"
               >
@@ -259,7 +251,7 @@ function FeedPost({ postId }: { postId: number }) {
                     className="border-2 rounded-full size-8 border-primary/20"
                   />
                 </Link>
-              </motion.div>
+              </div>
 
               <div className="flex flex-col">
                 <div className="flex flex-wrap items-center gap-1">
@@ -288,16 +280,16 @@ function FeedPost({ postId }: { postId: number }) {
 
           {/* Post Actions */}
           <div className="px-4 py-3 border-t border-border">
-            <motion.div initial={{ opacity: 0.8 }} whileHover={{ opacity: 1 }}>
+            <div initial={{ opacity: 0.8 }} whileHover={{ opacity: 1 }}>
               <Reactions
                 postId={postId}
                 analytics={post?.analytics}
               />
-            </motion.div>
+            </div>
           </div>
-        </motion.article>
+        </article>
       )}
-    </motion.div>
+    </div>
   );
 }
 

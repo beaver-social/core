@@ -1,16 +1,15 @@
 import { useSearchParams } from "react-router";
-import { useEffect, useState, useCallback } from "react";
+import { useCallback } from "react";
 import Layout from "@/pages/layout";
 import SecondaryPanel from "./SecondaryPanel";
 import FeedPost from "@/pages/home/FeedPost";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router";
 import SearchBar from "@/pages/explore/SearchBar";
-import { samplePosts } from "@/shared/data/posts";
 import { useBeaver } from "@beaver/react";
-import useInfiniteScroll from "@/shared/hooks/useInfiniteScroll";
 import { motion } from "framer-motion";
 import { Button } from "@/shared/components/ui/button";
+import Spinner from "@/shared/components/Spinner";
 
 // Sample data for profiles and topics in search
 const sampleProfiles = [
@@ -48,14 +47,11 @@ export default function SearchResults() {
   const beaver = useBeaver();
   const {
     data: postArray,
+    isLoading: isPostsLoading,
+    isRefetching: isPostsRefetching,
     fetchNextPage,
     hasNextPage,
   } = beaver.post.getPosts({ perPage: 10 });
-
-  const { infiniteScrollRef } = useInfiniteScroll({
-    fetchNextPage,
-    hasNextPage,
-  });
 
   // Handle search from the search bar
   const handleSearch = useCallback(
@@ -68,7 +64,7 @@ export default function SearchResults() {
   return (
     <Layout
       main={
-        <>
+        <div>
           {/* Search Header */}
           <div className="top-0 z-10 mx-4 mt-4 sm:mx-0 sm:mt-0 backdrop-blur-sm rounded-t-2xl">
             <div className="flex items-center gap-4 mb-5">
@@ -99,36 +95,43 @@ export default function SearchResults() {
           </div>
 
           {/* Search Results */}
-          <div className="divide-y my-6">
-            {postArray?.pages && postArray?.pages[0].posts.length > 0 ? (
-              postArray?.pages.map((page) =>
-                page.posts.map((postId, index) => (
-                  <FeedPost key={index} postId={postId.id} />
-                )),
-              )
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className="flex flex-col gap-2 border items-center text-grey-500 justify-center p-10 rounded-sm"
-              >
-                <p className="text-sm">No posts found..</p>
-              </motion.div>
-            )}
+          {isPostsLoading || isPostsRefetching ? (
+            <div className="flex items-center justify-center m-10">
+              <Spinner />
+            </div>
+          ) : (
+            <div className="divide-y">
+              {postArray?.pages && postArray?.pages[0].posts.length > 0 ? (
+                postArray?.pages.map((page) =>
+                  page.posts.map((postId, index) => (
+                    <FeedPost key={index} postId={postId.id} />
+                  )),
+                )
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex flex-col gap-2 border items-center text-grey-500 justify-center p-10 rounded-sm"
+                >
+                  <p className="text-sm">No posts found..</p>
+                </motion.div>
+              )}
 
-            {/* Load more button */}
-            {hasNextPage && (
-              <div className="flex justify-center mt-4">
-                <Button variant="outline" onClick={() => fetchNextPage()}>
-                  Load More
-                </Button>
-              </div>
-            )}
+              {/* Load more button */}
+              {hasNextPage && (
+                <div className="flex justify-center mt-4">
+                  <Button variant="outline" onClick={() => fetchNextPage()}>
+                    Load More
+                  </Button>
+                </div>
+              )}
 
-            {/* {hasNextPage && <div ref={infiniteScrollRef} className="h-1" />} */}
-          </div>
-        </>
+              {/* {hasNextPage && <div ref={infiniteScrollRef} className="h-1" />} */}
+            </div>
+          )
+          }
+        </div>
       }
       secondary={<SecondaryPanel />}
     />

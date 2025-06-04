@@ -36,14 +36,11 @@ export default function ForYou() {
             )),
           )
         ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
+          <div
             className="flex flex-col gap-2 border items-center text-grey-500 justify-center p-10 rounded-sm"
           >
             <p className="text-sm">No posts found..</p>
-          </motion.div>
+          </div>
         )}
 
         {hasNextPage && <div ref={infiniteScrollRef} className="h-1" />}
