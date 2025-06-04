@@ -28,7 +28,6 @@ import NotLoggedInDialog from "./shared/components/NotLoggedInDialog";
 import Landing from "./pages/landing";
 import Docs from "./pages/docs";
 import AppId from "./pages/dev/AppId";
-import Image from "./pages/demo/Image";
 
 // Wrap each page component with PageErrorBoundary
 const withPageErrorBoundary =
@@ -111,11 +110,6 @@ export default function () {
 
         <Route path="/demo" element={withPageErrorBoundary(Demo)({})} />
 
-        {/* <Route
-          path="/image"
-          element={withPageErrorBoundary(Image)({})}
-        /> */}
-
         <Route
           path="/*"
           element={
@@ -156,7 +150,7 @@ export default function () {
                           element={withPageErrorBoundary(Message)({})}
                         />
                         <Route
-                          path="/profile/edit"
+                          path="/update-profile"
                           element={withPageErrorBoundary(EditProfile)({})}
                         />
                         <Route

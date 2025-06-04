@@ -54,7 +54,7 @@ export default function EditProfile() {
     const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
     const [newBannerImage, setNewBannerImage] = useState<File | null>(null);
 
-    const { mutateAsync: updateProfile, isPending, isSuccess } = beaver.profile.updateProfile;
+    const { mutateAsync: updateProfile, isPending } = beaver.profile.updateProfile;
 
     // Initialize form with default values
     const form = useForm<ProfileFormValues>({

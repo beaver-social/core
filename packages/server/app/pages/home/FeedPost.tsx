@@ -174,12 +174,12 @@ function FeedPost({ postId }: { postId: number }) {
 
           {/* Post Actions */}
           <div className="mt-2">
-            <div initial={{ opacity: 0.8 }} whileHover={{ opacity: 1 }}>
+            <motion.div initial={{ opacity: 0.8 }} whileHover={{ opacity: 1 }}>
               <Reactions
                 postId={postId}
                 analytics={post?.analytics}
               />
-            </div>
+            </motion.div>
           </div>
 
           {/* Post Content */}
@@ -258,7 +258,7 @@ function FeedPost({ postId }: { postId: number }) {
             className="flex items-center justify-between p-4 pb-2"
           >
             <div className="flex items-center gap-3">
-              <div
+              <motion.div
                 whileHover={{ scale: 1.05 }}
                 className="flex-shrink-0"
               >
@@ -272,7 +272,7 @@ function FeedPost({ postId }: { postId: number }) {
                     className="border-2 rounded-full size-8 border-primary/20"
                   />
                 </Link>
-              </div>
+              </motion.div>
 
               <div className="flex flex-col">
                 <div className="flex flex-wrap items-center gap-1">
@@ -319,12 +319,12 @@ function FeedPost({ postId }: { postId: number }) {
 
           {/* Post Actions */}
           <div className="px-4 py-3 border-t border-border">
-            <div initial={{ opacity: 0.8 }} whileHover={{ opacity: 1 }}>
+            <motion.div initial={{ opacity: 0.8 }} whileHover={{ opacity: 1 }}>
               <Reactions
                 postId={postId}
                 analytics={post?.analytics}
               />
-            </div>
+            </motion.div>
           </div>
         </motion.article>
       )}

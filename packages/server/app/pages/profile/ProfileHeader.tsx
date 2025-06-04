@@ -63,7 +63,7 @@ export default function ProfileHeader({ data }: Props) {
           {isCurrentUser ? (
             <Button
               variant="outline"
-              onClick={() => navigate(`/app/profile/edit`)}
+              onClick={() => navigate(`/app/update-profile`)}
             >
               Edit profile
             </Button>
