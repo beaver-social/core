@@ -2,8 +2,7 @@ import { useState } from "react";
 import Icon from "./Icon";
 import { Image } from "./Image";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, EffectFade, Pagination } from "swiper/modules";
-import { Button } from "./ui/button";
+import { Navigation, Pagination } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -64,7 +63,7 @@ export default function MediaCarousel({
   return (
     <>
       <div className={`relative max-w-2xl mx-auto ${className}`}>
-        <div className={`relative bg-secondary overflow-hidden aspect-square rounded-lg`}>
+        <div className={`relative bg-secondary overflow-hidden rounded-lg`}>
           <Swiper
             modules={[Navigation, Pagination]}
             spaceBetween={0}

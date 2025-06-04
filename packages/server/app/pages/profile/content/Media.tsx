@@ -16,7 +16,7 @@ export default function Media() {
   const { data: mediaArray, isLoading: isMediaLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = beaver.media.getUserMedia({
     userId: (profile)?.id,
     postOnly: true,
-    perPage: 4,
+    perPage: 12,
   });
 
   const { infiniteScrollRef } = useInfiniteScroll({

@@ -114,7 +114,7 @@ export default function FollowDialog({ userId, count, title }: FollowDialogProps
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5 mb-1">
-                          <h4 className="font-semibold text-white truncate">
+                          <h4 className="font-semibold text-foreground truncate">
                             {user.fullName}
                           </h4>
                           {user.isVerified && (
