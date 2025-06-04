@@ -6,8 +6,8 @@ import { uploadMedia } from "./helpers";
 import { tryCatch } from "../../lib/tryCatch";
 import db from "../../lib/db";
 import authenticated from "../../middlewares/authenticated";
-import { eq, desc, and, isNull } from "drizzle-orm";
-import { zNumberString } from "../../lib/zod/helpers";
+import { eq, desc, and, isNull, isNotNull } from "drizzle-orm";
+import { zBooleanString, zNumberString } from "../../lib/zod/helpers";
 
 const { media } = db.schema;
 
@@ -55,23 +55,24 @@ export default new Hono()
         perPage: zNumberString()
           .transform((v) => Math.min(v, 32))
           .default("10"),
+        postOnly: zBooleanString().optional(),
       })
     ),
     authenticated,
     async (ctx) => {
       const { id: userId } = ctx.req.valid("param");
-      const { page, perPage } = ctx.req.valid("query");
+      const { page, perPage, postOnly } = ctx.req.valid("query");
 
-      console.log({ userId });
+      let filter = and(eq(media.authorId, userId), isNull(media.deletedAt));
+      if (postOnly) {
+        filter = and(filter, isNotNull(media.postId));
+      }
 
-      // only return if deletedAt is null
       const mediaResult = await tryCatch(
         db
           .select()
           .from(media)
-          .where(
-            and(eq(media.authorId, Number(userId)), isNull(media.deletedAt))
-          )
+          .where(filter)
           .limit(perPage)
           .offset(page * perPage)
           .orderBy(desc(media.createdAt))
@@ -85,6 +86,7 @@ export default new Hono()
         ctx,
         {
           media: mediaResult.data,
+          hasMore: !(mediaResult.data.length < perPage),
         },
         "Media fetched successfully",
         200

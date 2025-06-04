@@ -42,7 +42,7 @@ export default function BasicInfo({ data: user }: Props) {
 
       {/* Social Icons */}
       <div className="flex space-x-4 my-4 justify-center">
-        {user.id !== beaver.user.id && (
+        {user?.id !== beaver.user?.id && (
           <Link to={`/message/${user?.username}`}>
             <GradientButton iconName="Mail" />
           </Link>

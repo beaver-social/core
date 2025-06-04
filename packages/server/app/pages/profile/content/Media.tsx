@@ -2,21 +2,29 @@ import { Image } from "@/shared/components/Image";
 import { useBeaver } from "@beaver/react";
 import { useNavigate, useParams } from "react-router";
 import Spinner from "@/shared/components/Spinner";
+import useInfiniteScroll from "@/shared/hooks/useInfiniteScroll";
+import { Button } from "@/shared/components/ui/button";
 
 export default function Media() {
   const beaver = useBeaver();
   const navigate = useNavigate();
-  const { username } = useParams();
+  const { username } = useParams<{ username: string }>();
   const { data: profile, isLoading: isProfileLoading } = beaver.profile.getProfile({
     type: "username",
     value: username || "",
-  })
-  const { data: mediaArray, isLoading: isMediaLoading, isSuccess: isMediaSuccess, isRefetching: isMediaRefetching } = beaver.media.getUserMedia({
-    userId: profile?.id,
-    perPage: 20,
+  });
+  const { data: mediaArray, isLoading: isMediaLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = beaver.media.getUserMedia({
+    userId: (profile)?.id,
+    postOnly: true,
+    perPage: 4,
   });
 
-  if (isProfileLoading || isMediaLoading || isMediaRefetching) {
+  const { infiniteScrollRef } = useInfiniteScroll({
+    fetchNextPage,
+    hasNextPage,
+  });
+
+  if (isProfileLoading || isMediaLoading) {
     return (
       <div className="flex items-center justify-center m-10">
         <Spinner />
@@ -24,13 +32,13 @@ export default function Media() {
     );
   }
 
-  const media = mediaArray?.pages.flatMap((page) => {
-    return page.media.filter((item) => item.postId !== null);
-  });
+  const media = mediaArray?.pages.flatMap((page) => page.media);
+
+  console.log({ media, mediaArray });
 
   return (
     <div className="p-4">
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2">
         {media?.map((item) => (
           <div
             key={item.id}
@@ -49,6 +57,14 @@ export default function Media() {
           </div>
         ))}
       </div>
+
+      {hasNextPage && (
+        <div className="flex justify-center p-4">
+          <Button variant="outline" onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+            Load More
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

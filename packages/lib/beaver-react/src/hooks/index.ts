@@ -97,7 +97,7 @@ export function useWallets() {
 }
 
 export function usePost() {
-  const { client } = useBeaverContext();
+  const { client, isAuthenticated } = useBeaverContext();
   const queryClient = useQueryClient();
 
   return {
@@ -166,6 +166,7 @@ export function usePost() {
         queryFn: async () => {
           return await client.posts.getFollowingPosts(options);
         },
+        enabled: isAuthenticated,
       }),
     getPostById: (options: Parameters<typeof client.posts.getPostById>[0]) =>
       useQuery({
@@ -173,6 +174,7 @@ export function usePost() {
         queryFn: async () => {
           return await client.posts.getPostById(options);
         },
+        enabled: !!options.id,
       }),
     likePost: useMutation({
       mutationKey: ["likePost"],
@@ -291,6 +293,7 @@ export function useProfile() {
         queryFn: async () => {
           return await client.user.getProfile(options);
         },
+        enabled: !!options.value,
       }),
     getProfilesByIds: (
       options: Parameters<typeof client.user.getProfilesByIds>[0]
@@ -350,7 +353,7 @@ export function useDocs() {
 }
 
 export function usePing() {
-  const { client } = useBeaverContext();
+  const { client, isAuthenticated } = useBeaverContext();
   const queryClient = useQueryClient();
 
   return {
@@ -372,6 +375,7 @@ export function usePing() {
       queryFn: async () => {
         return await client.ping.getAllChats();
       },
+      enabled: isAuthenticated,
     }),
 
     getChatById: (options: Parameters<typeof client.ping.getChatById>[0]) =>
@@ -385,7 +389,7 @@ export function usePing() {
 }
 
 export function useApplication() {
-  const { client } = useBeaverContext();
+  const { client, isAuthenticated } = useBeaverContext();
   const queryClient = useQueryClient();
 
   return {
@@ -407,6 +411,7 @@ export function useApplication() {
       queryFn: async () => {
         return await client.application.getApplications();
       },
+      enabled: isAuthenticated,
     }),
 
     getApplicationById: (
@@ -458,9 +463,14 @@ export function useMedia() {
         queryFn: async () => {
           return await client.media.getMediaDetails(options);
         },
+        enabled: !!options.id,
       }),
 
-    getUserMedia: (options: { userId: number; perPage?: number }) =>
+    getUserMedia: (options: {
+      userId: number;
+      perPage?: number;
+      postOnly?: boolean;
+    }) =>
       useInfiniteQuery({
         queryKey: ["getUserMedia", options],
         queryFn: async ({ pageParam = 1 }) => {
@@ -468,12 +478,14 @@ export function useMedia() {
             userId: options.userId,
             page: pageParam,
             perPage: options.perPage || 10,
+            postOnly: options.postOnly,
           });
         },
         initialPageParam: 1,
         getNextPageParam: (lastPage, pages) => {
           return lastPage.hasMore ? pages.length + 1 : undefined;
         },
+        enabled: !!options.userId,
       }),
   };
 }
@@ -626,6 +638,7 @@ export function useActions() {
         getNextPageParam: (lastPage, pages) => {
           return lastPage.hasMore ? pages.length + 1 : undefined;
         },
+        enabled: !!options.userId,
       }),
     getActionById: (
       options: Parameters<typeof client.actions.fetchActionById>[0]

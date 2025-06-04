@@ -38,6 +38,7 @@ export default class Media {
     userId: number;
     page: number;
     perPage: number;
+    postOnly?: boolean;
   }) {
     const getMediaByUserId = safeParseResponse(
       this.defaults.apiClient.rpc.media.user[":id"].$get({
@@ -45,6 +46,7 @@ export default class Media {
         query: {
           page: options.page,
           perPage: options.perPage,
+          postOnly: options.postOnly ? "true" : "false",
         },
       })
     );

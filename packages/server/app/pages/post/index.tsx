@@ -24,7 +24,7 @@ export default function Post() {
     value: post?.authorId.toString() || "",
     type: "id",
   });
-  const { data: repliesResponse, refetch: refetchReplies } =
+  const { data: repliesResponse } =
     beaver.post.getPostReplies({
       id: postId || "",
     });

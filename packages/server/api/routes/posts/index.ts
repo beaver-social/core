@@ -518,7 +518,6 @@ const app = new Hono()
   // Get replies
   .get(
     "/:id/replies",
-    authenticated,
     zValidator("param", z.object({ id: zNumberString() })),
     zValidator("query", zPaginatedRequest()),
     async (ctx) => {

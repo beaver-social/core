@@ -146,6 +146,7 @@ export default new Hono()
         ctx,
         {
           actions: actionWithPayload,
+          hasMore: !(actionsResult.data.length < perPage),
         },
         "User actions fetched successfully",
         200

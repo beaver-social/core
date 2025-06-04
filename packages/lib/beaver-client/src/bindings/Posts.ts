@@ -280,10 +280,6 @@ export default class Posts {
   }) {
     const { id, page = 1, perPage = 8 } = options;
 
-    if (!this.defaults.store.isAuthenticated()) {
-      throw new Error("Login to view post replies.");
-    }
-
     return safeParseResponse(
       this.defaults.apiClient.rpc.posts[`:id`].replies.$get({
         param: { id: id.toString() },

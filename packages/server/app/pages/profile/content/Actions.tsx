@@ -5,14 +5,15 @@ import { useBeaver } from "@beaver/react";
 import { icons } from "lucide-react";
 import moment from "moment";
 import { useNavigate, useParams } from "react-router";
+import useInfiniteScroll from "@/shared/hooks/useInfiniteScroll";
 
 export default function Actions() {
   const navigate = useNavigate();
-  const { username } = useParams();
+  const { username } = useParams<{ username: string }>();
   const beaver = useBeaver();
   const { data: profile } = beaver.profile.getProfile({
     type: "username",
-    value: username,
+    value: username || "",
   });
 
   const {
@@ -22,8 +23,13 @@ export default function Actions() {
     fetchNextPage,
     hasNextPage,
   } = beaver.actions.getUserActions({
-    userId: profile?.id,
+    userId: (profile as any)?.id || 0,
     perPage: 10,
+  });
+
+  const { infiniteScrollRef } = useInfiniteScroll({
+    fetchNextPage,
+    hasNextPage,
   });
 
   if (isActionsLoading) {
@@ -34,7 +40,7 @@ export default function Actions() {
     );
   }
 
-  const allActions = actionData?.pages.flatMap(page => page.actions) || [];
+  const allActions = actionData?.pages.flatMap((page: any) => page.actions) || [];
 
   if (allActions.length === 0) {
     return (
@@ -85,14 +91,7 @@ export default function Actions() {
         );
       })}
 
-      {hasNextPage && (
-        <div className="flex justify-center p-4">
-          <Button variant="outline" onClick={() => fetchNextPage()} disabled={isActionsLoading}>
-            Load More
-            {isActionsLoading && <Icon name="LoaderCircle" className="ml-2 size-4 animate-spin" />}
-          </Button>
-        </div>
-      )}
+      {hasNextPage && <div ref={infiniteScrollRef} className="h-1" />}
     </div>
   );
 }
