@@ -1,6 +1,5 @@
 import FeedPost from "../FeedPost";
 import { useBeaver } from "@beaver/react";
-import { motion } from "framer-motion";
 import useInfiniteScroll from "@/shared/hooks/useInfiniteScroll";
 import Spinner from "@/shared/components/Spinner";
 
@@ -9,16 +8,16 @@ export default function ForYou() {
   const {
     data: postArray,
     isLoading: isPostsLoading,
-    isRefetching: isPostsRefetching,
     fetchNextPage,
     hasNextPage,
+
   } = beaver.post.getPosts({ perPage: 10 });
   const { infiniteScrollRef } = useInfiniteScroll({
     fetchNextPage,
     hasNextPage,
   });
 
-  if (isPostsLoading || isPostsRefetching) {
+  if (isPostsLoading) {
     return (
       <div className="flex items-center justify-center m-10">
         <Spinner />
@@ -37,7 +36,7 @@ export default function ForYou() {
           )
         ) : (
           <div
-            className="flex flex-col gap-2 border items-center text-grey-500 justify-center p-10 rounded-sm"
+            className="flex flex-col gap-2 border items-center text-grey-500 justify-center p-10 rounded-sm mt-6"
           >
             <p className="text-sm">No posts found..</p>
           </div>

@@ -25,36 +25,20 @@ export function FeedPostMenu({
   const beaver = useBeaver();
   const { mutate: deletePost, error: deleteError, isSuccess: deleteSuccess } = beaver.post.deletePost;
   const { mutate: upgradePost, error: upgradeError, isSuccess: upgradeSuccess } = beaver.post.upgradePost;
-  const { mutate: followUser, error: followError, isSuccess: followSuccess } = beaver.social.followUser;
+
+  const { data: followStatus } = beaver.social.bulkCheckFollowStatus({
+    userIds: author?.id ? [author.id] : []
+  });
+  const isFollowing = followStatus?.followStatus?.[author?.id || 0];
 
   useEffect(() => {
-    if (deleteError) {
-      toast.error(deleteError.message);
-    }
-
-    if (deleteSuccess) {
-      toast.success("Post deleted successfully");
-    }
+    if (deleteError) toast.error(deleteError.message);
+    if (deleteSuccess) toast.success("Post deleted successfully");
   }, [deleteError, deleteSuccess]);
 
   useEffect(() => {
-    if (followError) {
-      toast.error(followError.message);
-    }
-
-    if (followSuccess) {
-      toast.success("Followed user successfully");
-    }
-  }, [followError, followSuccess]);
-
-  useEffect(() => {
-    if (upgradeError) {
-      toast.error(upgradeError.message);
-    }
-
-    if (upgradeSuccess) {
-      toast.success("Post upgraded successfully");
-    }
+    if (upgradeError) toast.error(upgradeError.message);
+    if (upgradeSuccess) toast.success("Post upgraded successfully");
   }, [upgradeError, upgradeSuccess]);
 
   return (
@@ -71,7 +55,20 @@ export function FeedPostMenu({
         {post?.authorId !== beaver.user?.id && (
           <DropdownMenuGroup>
             <DropdownMenuItem>Not interested</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => followUser({ userId: author?.id })}>Follow @{author?.username}</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={async (e) => {
+                e.stopPropagation();
+                if (!author?.id) return;
+                try {
+                  await (isFollowing
+                    ? beaver.social.unfollowUser.mutateAsync({ userId: author.id })
+                    : beaver.social.followUser.mutateAsync({ userId: author.id }));
+                  toast.success(isFollowing ? "Unfollowed" : "Followed");
+                } catch { toast.error("Failed"); }
+              }}
+            >
+              {isFollowing ? `Unfollow @${author?.username}` : `Follow @${author?.username}`}
+            </DropdownMenuItem>
             <DropdownMenuItem>Mute @{author?.username}</DropdownMenuItem>
             <DropdownMenuItem>Block @{author?.username}</DropdownMenuItem>
           </DropdownMenuGroup>

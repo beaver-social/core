@@ -95,7 +95,7 @@ export default function SearchResults() {
           </div>
 
           {/* Search Results */}
-          {isPostsLoading || isPostsRefetching ? (
+          {isPostsLoading ? (
             <div className="flex items-center justify-center m-10">
               <Spinner />
             </div>

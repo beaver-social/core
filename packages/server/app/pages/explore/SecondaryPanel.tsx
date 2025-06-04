@@ -9,7 +9,6 @@ import { motion } from "framer-motion";
 import { useBeaver } from "@beaver/react";
 import { icons } from "lucide-react";
 
-// Sample data for trending topics (keeping this as it seems to be UI/content focused)
 const trendingTopics = [
   {
     id: "1",
@@ -34,6 +33,11 @@ export default function SecondaryPanel() {
   const [expandedProfile, setExpandedProfile] = useState<string | null>(null);
   const [likedTopic, setLikedTopic] = useState<Record<string, boolean>>({});
 
+
+
+  const { mutate: followUser, isPending: isFollowPending, error: followError, isSuccess: followSuccess } = beaver.social.followUser;
+  const { mutate: unfollowUser, isPending: isUnfollowPending, error: unfollowError, isSuccess: unfollowSuccess } = beaver.social.unfollowUser;
+
   // Get suggested profiles using the recommended users hook
   const { data: suggestedProfiles } = beaver.social.getRecommendedUsers({
     limit: 5,
@@ -47,25 +51,6 @@ export default function SecondaryPanel() {
   const { data: followStatus } = beaver.social.bulkCheckFollowStatus({
     userIds: profileIds,
   });
-
-  // Follow/unfollow mutations
-  const followUserMutation = beaver.social.followUser;
-  const unfollowUserMutation = beaver.social.unfollowUser;
-
-  // Toggle following status for a profile
-  const toggleFollow = async (profileId: number) => {
-    const isCurrentlyFollowing = (followStatus as Record<number, boolean>)?.[profileId] || false;
-
-    try {
-      if (isCurrentlyFollowing) {
-        await unfollowUserMutation.mutateAsync({ userId: profileId });
-      } else {
-        await followUserMutation.mutateAsync({ userId: profileId });
-      }
-    } catch (error) {
-      console.error("Error toggling follow status:", error);
-    }
-  };
 
   // Toggle like status for a topic
   const toggleLikeTopic = (topicId: string, event: React.MouseEvent) => {
@@ -170,7 +155,7 @@ export default function SecondaryPanel() {
             <div className="space-y-5">
               {profiles.map((profile) => {
                 const isFollowing = (followStatus as Record<number, boolean>)?.[profile.id] || false;
-                const isFollowLoading = followUserMutation.isPending || unfollowUserMutation.isPending;
+                const isFollowLoading = isFollowPending || isUnfollowPending;
 
                 return (
                   <motion.div
@@ -223,13 +208,15 @@ export default function SecondaryPanel() {
                       </div>
                       <motion.div whileTap={{ scale: 0.95 }}>
                         <Button
-                          variant={isFollowing ? "default" : "outline"}
+                          variant="outline"
                           size="sm"
-                          className={`rounded-full transition-all ${isFollowing ? "bg-primary text-white" : ""}`}
-                          onClick={() => toggleFollow(profile.id)}
-                          disabled={isFollowLoading}
+                          disabled={isFollowPending || isUnfollowPending}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            isFollowing ? unfollowUser({ userId: profile.id }) : followUser({ userId: profile.id })
+                          }}
                         >
-                          {isFollowLoading ? "..." : isFollowing ? "Following" : "Follow"}
+                          {isFollowing ? "Following" : "Follow"}
                         </Button>
                       </motion.div>
                     </div>

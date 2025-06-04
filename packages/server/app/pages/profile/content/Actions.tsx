@@ -4,11 +4,17 @@ import Spinner from "@/shared/components/Spinner";
 import { useBeaver } from "@beaver/react";
 import { icons } from "lucide-react";
 import moment from "moment";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 export default function Actions() {
   const navigate = useNavigate();
+  const { username } = useParams();
   const beaver = useBeaver();
+  const { data: profile } = beaver.profile.getProfile({
+    type: "username",
+    value: username,
+  });
+
   const {
     data: actionData,
     isPending: isActionsLoading,
@@ -16,7 +22,7 @@ export default function Actions() {
     fetchNextPage,
     hasNextPage,
   } = beaver.actions.getUserActions({
-    userId: 1,
+    userId: profile?.id,
     perPage: 10,
   });
 

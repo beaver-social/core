@@ -184,8 +184,6 @@ export function usePost() {
       onSuccess: () => {
         // Invalidate post data to update like counts and interactions
         queryClient.invalidateQueries({ queryKey: ["getPostById"] });
-        queryClient.invalidateQueries({ queryKey: ["getPosts"] });
-        queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
         queryClient.invalidateQueries({ queryKey: ["getPostInteracted"] });
         queryClient.invalidateQueries({ queryKey: ["getPostLikes"] });
         queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
@@ -201,8 +199,6 @@ export function usePost() {
       onSuccess: () => {
         // Invalidate post data to update like counts and interactions
         queryClient.invalidateQueries({ queryKey: ["getPostById"] });
-        queryClient.invalidateQueries({ queryKey: ["getPosts"] });
-        queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
         queryClient.invalidateQueries({ queryKey: ["getPostInteracted"] });
         queryClient.invalidateQueries({ queryKey: ["getPostLikes"] });
         queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
@@ -278,8 +274,6 @@ export function usePost() {
       onSuccess: () => {
         // Invalidate post data to reflect upgrade status
         queryClient.invalidateQueries({ queryKey: ["getPostById"] });
-        queryClient.invalidateQueries({ queryKey: ["getPosts"] });
-        queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
         queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
       },
     }),
@@ -326,11 +320,7 @@ export function useProfile() {
       onSuccess: () => {
         // Invalidate all profile-related queries to ensure fresh data
         queryClient.invalidateQueries({ queryKey: ["getProfile"] });
-        // Also invalidate any posts queries to refresh author info
-        queryClient.invalidateQueries({ queryKey: ["getPosts"] });
         queryClient.invalidateQueries({ queryKey: ["getPostById"] });
-        queryClient.invalidateQueries({ queryKey: ["getFollowingPosts"] });
-        queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
       },
     }),
   };
@@ -508,8 +498,7 @@ export function useSocial() {
         queryClient.invalidateQueries({ queryKey: ["getFollowers"] });
         queryClient.invalidateQueries({ queryKey: ["getFollowing"] });
         queryClient.invalidateQueries({ queryKey: ["bulkCheckFollowStatus"] });
-        queryClient.invalidateQueries({ queryKey: ["getProfilesByIds"] });
-        queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
+        queryClient.invalidateQueries({ queryKey: ["getRecommendedUsers"] });
       },
     }),
 
@@ -526,8 +515,7 @@ export function useSocial() {
         queryClient.invalidateQueries({ queryKey: ["getFollowers"] });
         queryClient.invalidateQueries({ queryKey: ["getFollowing"] });
         queryClient.invalidateQueries({ queryKey: ["bulkCheckFollowStatus"] });
-        queryClient.invalidateQueries({ queryKey: ["getProfilesByIds"] });
-        queryClient.invalidateQueries({ queryKey: ["getUserActions"] });
+        queryClient.invalidateQueries({ queryKey: ["getRecommendedUsers"] });
       },
     }),
 
@@ -565,7 +553,7 @@ export function useSocial() {
 
     getFollowers: (options: { userId: number; perPage?: number }) =>
       useInfiniteQuery({
-        queryKey: ["getFollowersInfinite", options],
+        queryKey: ["getFollowers", options],
         queryFn: async ({ pageParam = 1 }) => {
           return await client.social.getFollowers({
             userId: options.userId,
@@ -582,7 +570,7 @@ export function useSocial() {
 
     getFollowing: (options: { userId: number; perPage?: number }) =>
       useInfiniteQuery({
-        queryKey: ["getFollowingInfinite", options],
+        queryKey: ["getFollowing", options],
         queryFn: async ({ pageParam = 1 }) => {
           return await client.social.getFollowing({
             userId: options.userId,

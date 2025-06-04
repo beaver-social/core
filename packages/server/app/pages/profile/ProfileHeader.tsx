@@ -16,6 +16,10 @@ export default function ProfileHeader({ data }: Props) {
   const currentUser = beaver.user;
   const isCurrentUser = data?.username === currentUser?.username;
 
+  const { mutate: followUser, isPending: isFollowPending, error: followError, isSuccess: followSuccess } = beaver.social.followUser;
+  const { mutate: unfollowUser, isPending: isUnfollowPending, error: unfollowError, isSuccess: unfollowSuccess } = beaver.social.unfollowUser;
+  const { data: isFollowingData } = beaver.social.isFollowing({ userId: data?.id });
+
   return (
     <div>
       {/* Cover Photo */}
@@ -59,14 +63,21 @@ export default function ProfileHeader({ data }: Props) {
           {isCurrentUser ? (
             <Button
               variant="outline"
-              className="rounded-full font-semibold"
               onClick={() => navigate(`/app/profile/edit`)}
             >
               Edit profile
             </Button>
           ) : (
-            <Button variant="outline" className="rounded-full font-semibold">
-              Follow
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isFollowPending || isUnfollowPending}
+              onClick={(e) => {
+                e.stopPropagation();
+                isFollowingData?.following ? unfollowUser({ userId: data?.id }) : followUser({ userId: data?.id })
+              }}
+            >
+              {isFollowingData?.following ? "Unfollow" : "Follow"}
             </Button>
           )}
         </div>

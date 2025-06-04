@@ -31,22 +31,18 @@ export default function FollowDialog({ userId, count, title }: FollowDialogProps
   const beaver = useBeaver();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Use the appropriate infinite query based on the title
   const query = title === "Following"
     ? beaver.social.getFollowing({ userId })
     : beaver.social.getFollowers({ userId });
 
-  // Get all user IDs from the paginated results
   const allUserIds = useMemo(() => {
     return query.data?.pages?.flatMap(page =>
       title === "Following" ? page.following : page.followers
     ) || [];
   }, [query.data, title]);
 
-  // Fetch user details for all the IDs
   const usersQuery = beaver.profile.getProfilesByIds({ ids: allUserIds });
 
-  // Get current user's following status for each user in the list
   const followStatusQuery = beaver.social.bulkCheckFollowStatus({
     userIds: allUserIds
   });
@@ -57,34 +53,13 @@ export default function FollowDialog({ userId, count, title }: FollowDialogProps
     }
   };
 
-  const handleFollow = async (targetUserId: number) => {
-    try {
-      await beaver.social.followUser.mutateAsync({ userId: targetUserId });
-    } catch (error) {
-      console.error('Error following user:', error);
-    }
-  };
-
-  const handleUnfollow = async (targetUserId: number) => {
-    try {
-      await beaver.social.unfollowUser.mutateAsync({ userId: targetUserId });
-    } catch (error) {
-      console.error('Error unfollowing user:', error);
-    }
-  };
-
-  const isFollowing = (targetUserId: number) => {
-    return followStatusQuery.data?.followStatus?.[targetUserId] === true;
-  };
-
-  const isCurrentUser = (targetUserId: number) => {
-    return beaver.user?.id === targetUserId;
-  };
+  const isFollowing = (userId: number) => followStatusQuery.data?.followStatus?.[userId] === true;
+  const isCurrentUser = (userId: number) => beaver.user?.id === userId;
 
   const users = usersQuery.data?.users || [];
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen} onClose={() => { }}>
       <DialogTrigger asChild>
         <button className="hover:underline underline-offset-2 text-sm transition-colors">
           <span className="font-semibold text-grey-300">
@@ -163,31 +138,21 @@ export default function FollowDialog({ userId, count, title }: FollowDialogProps
                     {/* Follow/Unfollow Button */}
                     {!isCurrentUser(user.id) && (
                       <div className="flex-shrink-0 ml-3">
-                        {isFollowing(user.id) ? (
-                          <Button
-                            variant="outline"
-                            onClick={() => handleUnfollow(user.id)}
-                            disabled={beaver.social.unfollowUser.isPending}
-                          >
-                            {beaver.social.unfollowUser.isPending ? (
-                              <Icon name="LoaderCircle" className="size-4 animate-spin" />
-                            ) : (
-                              "Following"
-                            )}
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="outline"
-                            onClick={() => handleFollow(user.id)}
-                            disabled={beaver.social.followUser.isPending}
-                          >
-                            {beaver.social.followUser.isPending ? (
-                              <Icon name="LoaderCircle" className="size-4 animate-spin" />
-                            ) : (
-                              "Follow"
-                            )}
-                          </Button>
-                        )}
+                        <Button
+                          variant="outline"
+                          onClick={async () => {
+                            try {
+                              await (isFollowing(user.id)
+                                ? beaver.social.unfollowUser.mutateAsync({ userId: user.id })
+                                : beaver.social.followUser.mutateAsync({ userId: user.id }));
+                            } catch (error) {
+                              console.error('Error:', error);
+                            }
+                          }}
+                          disabled={beaver.social.followUser.isPending || beaver.social.unfollowUser.isPending}
+                        >
+                          {isFollowing(user.id) ? "Following" : "Follow"}
+                        </Button>
                       </div>
                     )}
                   </div>

@@ -32,7 +32,9 @@ function FeedPost({ postId }: { postId: number }) {
     type: "id",
   });
   const { mutateAsync: replyToPost, isPending: isReplyPending } = beaver.post.createPost;
-  const { mutate: followUser, isPending: isFollowing, error: followError, isSuccess: followSuccess } = beaver.social.followUser;
+  const { mutate: followUser, isPending: isFollowPending, error: followError, isSuccess: followSuccess } = beaver.social.followUser;
+  const { mutate: unfollowUser, isPending: isUnfollowPending, error: unfollowError, isSuccess: unfollowSuccess } = beaver.social.unfollowUser;
+  const { data: isFollowingData } = beaver.social.isFollowing({ userId: post?.authorId });
 
   useEffect(() => {
     if (followError) {
@@ -46,7 +48,11 @@ function FeedPost({ postId }: { postId: number }) {
   // Skeleton loader
   if (isLoading) {
     return (
-      <div>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+      >
         <div className="flex flex-col m-6 overflow-hidden transition-all duration-300 border rounded-sm shadow-sm bg-secondary sm:mx-0">
           {/* Header skeleton */}
           <div className="flex items-center gap-3 p-4 pb-2">
@@ -75,26 +81,29 @@ function FeedPost({ postId }: { postId: number }) {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
       className="transition-all cursor-pointer sm:hover:rounded-sm"
       onClick={() => {
         navigate(`/app/post/${postId}`, { state: { postId } });
       }}
     >
       {post?.media && post?.media.length > 0 ? (
-        <article
+        <motion.article
           className="flex flex-col p-6 transition-all duration-300 rounded-sm hover:bg-secondary/50 sm:px-4 sm:mx-0"
           whileTap={{ scale: 0.99 }}
         >
           {/* Header with Avatar */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div
+              <motion.div
                 whileHover={{ scale: 1.05 }}
                 className="flex-shrink-0"
               >
@@ -108,7 +117,7 @@ function FeedPost({ postId }: { postId: number }) {
                     className="border-2 rounded-full size-8 border-primary/20"
                   />
                 </Link>
-              </div>
+              </motion.div>
 
               <div className="flex flex-col">
                 <div className="flex flex-wrap items-center gap-1">
@@ -123,11 +132,20 @@ function FeedPost({ postId }: { postId: number }) {
                   <time className="text-sm text-muted-foreground hover:underline">
                     {moment(post?.createdAt).fromNow()}
                   </time>
+                  <span className="mx-1 text-muted-foreground">·</span>
+                  {/* Follow button */}
                   {post?.authorId !== beaver.user?.id && (
-                    <Button variant="outline" size="sm" className="ml-2" onClick={() => followUser({ userId: author?.id })} disabled={isFollowing}>
-                      {isFollowing ? "Following" : "Follow"}
-                      {isFollowing && <Icon name="LoaderCircle" className="size-4 animate-spin" />}
-                      {followSuccess && <Icon name="Check" className="text-green-500 size-4" />}
+                    <Button
+                      variant="link"
+                      size="sm"
+                      disabled={isFollowPending || isUnfollowPending}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        isFollowingData?.following ? unfollowUser({ userId: author?.id }) : followUser({ userId: author?.id })
+                      }}
+                      className="p-0"
+                    >
+                      {isFollowingData?.following ? "Following" : "Follow"}
                     </Button>
                   )}
                 </div>
@@ -139,7 +157,9 @@ function FeedPost({ postId }: { postId: number }) {
               </div>
             </div>
 
-            <FeedPostMenu post={post} author={author} />
+            <div onClick={(e) => e.stopPropagation()}>
+              <FeedPostMenu post={post} author={author} />
+            </div>
           </div>
 
           {/* Images if present */}
@@ -224,13 +244,14 @@ function FeedPost({ postId }: { postId: number }) {
               </Button>
             </form>
           </div>
-        </article>
+        </motion.article>
       ) : (
-        <article
+        <motion.article
           className="relative flex flex-col m-6 overflow-hidden transition-all border rounded-sm shadow-sm bg-secondary hover:shadow-md hover:bg-grey-900 sm:mx-0"
           onClick={(e) => {
             navigate(`/app/post/${postId}`, { state: { postId } });
           }}
+          whileTap={{ scale: 0.99 }}
         >
           {/* Header with Avatar */}
           <div
@@ -266,11 +287,29 @@ function FeedPost({ postId }: { postId: number }) {
                   <time className="text-sm text-muted-foreground hover:underline">
                     {moment(post?.createdAt).fromNow()}
                   </time>
+                  <span className="mx-1 text-muted-foreground">·</span>
+                  {/* Follow button */}
+                  {post?.authorId !== beaver.user?.id && (
+                    <Button
+                      variant="link"
+                      size="sm"
+                      disabled={isFollowPending || isUnfollowPending}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        isFollowingData?.following ? unfollowUser({ userId: author?.id }) : followUser({ userId: author?.id })
+                      }}
+                      className="p-0"
+                    >
+                      {isFollowingData?.following ? "Following" : "Follow"}
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
 
-            <FeedPostMenu post={post} author={author} />
+            <div onClick={(e) => e.stopPropagation()}>
+              <FeedPostMenu post={post} author={author} />
+            </div>
           </div>
 
           {/* Post Content */}
@@ -287,9 +326,9 @@ function FeedPost({ postId }: { postId: number }) {
               />
             </div>
           </div>
-        </article>
+        </motion.article>
       )}
-    </div>
+    </motion.div>
   );
 }
 

@@ -30,7 +30,7 @@ export default function PostData() {
     hasNextPage,
   });
 
-  if (isPostsLoading || isPostsRefetching) {
+  if (isPostsLoading) {
     return (
       <div className="flex items-center justify-center m-6">
         <Spinner />
