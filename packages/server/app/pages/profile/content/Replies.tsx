@@ -40,7 +40,7 @@ export default function PostData() {
 
   return (
     <>
-      <div className="divide-y mx-4">
+      <div className="divide-y sm:mx-4">
         {postArray?.pages && postArray?.pages[0].posts.length > 0 ? (
           postArray?.pages.map((page) =>
             page.posts.map((postId, index) => (
