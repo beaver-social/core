@@ -1,29 +1,43 @@
 import { Image } from "@/shared/components/Image";
+import { useBeaver } from "@beaver/react";
+import moment from "moment";
+import { Navigate, useNavigate, useParams } from "react-router";
 
-type Props = {};
+export default function UserDetails() {
+  const beaver = useBeaver();
+  const { username } = useParams();
+  const navigate = useNavigate();
+  const { data: user, isLoading } = beaver.profile.getProfile({
+    type: "username",
+    value: username as string,
+  });
 
-export default function UserDetails({}: Props) {
+  if (isLoading) return <div>Loading...</div>;
+  if (!user) return <div>User not found</div>;
+
   return (
     <div>
       <div className="flex w-full flex-col items-center justify-center p-6">
         <div className="flex flex-col items-center justify-center w-full">
           <Image
-            src="/images/user.webp"
-            alt="User Avatar"
+            src={user?.imageUrl}
+            alt={user?.username}
             className="size-20 rounded-full"
           />
-          <h2 className="text-xl font-bold">Adam Silverman</h2>
-          <p className="text-sm text-muted-foreground">@AtomSilverman</p>
+          <h2 className="text-xl font-bold">{user?.fullName}</h2>
+          <p className="text-sm text-muted-foreground">@{user?.username}</p>
         </div>
 
-        <p className="text-sm text-muted-foreground mt-4 text-center">
-          Agent Consulting: http://Agen.cy Agent Observability:
-          http://AgentOps.ai + @AgentOpsAI
-        </p>
+        {user?.about && (
+          <p className="text-sm text-grey-600 text-center mt-1">
+            {user?.about}
+          </p>
+        )}
 
-        <p className="text-sm text-grey-600 mt-4 text-center">
-          <span className="font-semibold">Joined May 2019</span> •{" "}
-          <span className="font-semibold">1.2K Followers</span>
+        <p className="text-sm text-grey-600 text-center mt-2">
+          <span className="">
+            Joined {moment(user?.createdAt).format("MMMM YYYY")}
+          </span>
         </p>
       </div>
     </div>

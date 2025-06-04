@@ -42,9 +42,11 @@ export default function BasicInfo({ data: user }: Props) {
 
       {/* Social Icons */}
       <div className="flex space-x-4 my-4 justify-center">
-        <Link to={`/message/${user?.username}`}>
-          <GradientButton iconName="Mail" />
-        </Link>
+        {user.id !== beaver.user.id && (
+          <Link to={`/message/${user?.username}`}>
+            <GradientButton iconName="Mail" />
+          </Link>
+        )}
         <Link to={`https://twitter.com/${user?.twitter}`} target="_blank">
           <GradientButton iconName="Twitter" />
         </Link>

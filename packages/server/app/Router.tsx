@@ -147,7 +147,7 @@ export default function () {
                           element={withPageErrorBoundary(Messages)({})}
                         />
                         <Route
-                          path="/message/:id"
+                          path="/message/:username"
                           element={withPageErrorBoundary(Message)({})}
                         />
                         <Route
