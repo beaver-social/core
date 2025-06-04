@@ -10,6 +10,7 @@ import { samplePosts } from "@/shared/data/posts";
 import { useBeaver } from "@beaver/react";
 import useInfiniteScroll from "@/shared/hooks/useInfiniteScroll";
 import { motion } from "framer-motion";
+import { Button } from "@/shared/components/ui/button";
 
 // Sample data for profiles and topics in search
 const sampleProfiles = [
@@ -116,7 +117,16 @@ export default function SearchResults() {
               </motion.div>
             )}
 
-            {hasNextPage && <div ref={infiniteScrollRef} className="h-1" />}
+            {/* Load more button */}
+            {hasNextPage && (
+              <div className="flex justify-center mt-4">
+                <Button variant="outline" onClick={() => fetchNextPage()}>
+                  Load More
+                </Button>
+              </div>
+            )}
+
+            {/* {hasNextPage && <div ref={infiniteScrollRef} className="h-1" />} */}
           </div>
         </>
       }

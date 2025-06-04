@@ -6,6 +6,7 @@ import docs from "./docs";
 import dev from "./dev";
 import media from "./media";
 import social from "./social";
+import actions from "./actions";
 
 const app = new Hono()
   .route("users", users)
@@ -14,6 +15,7 @@ const app = new Hono()
   .route("docs", docs)
   .route("dev", dev)
   .route("media", media)
-  .route("social", social);
+  .route("social", social)
+  .route("actions", actions);
 
 export default app;

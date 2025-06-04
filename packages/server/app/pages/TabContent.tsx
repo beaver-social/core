@@ -2,12 +2,12 @@ import { Screen, Tab } from "../shared/types/globalUI";
 import Posts from "./profile/content/Posts";
 import Replies from "./profile/content/Replies";
 import Media from "./profile/content/Media";
-import Activity from "./profile/content/Activity";
 import ForYou from "./home/content/ForYou";
 import Following from "./home/content/Following";
 import Mentioned from "./alerts/content/Mentioned";
 import AllAlerts from "./alerts/content/AllAlerts";
 import ShortsFeed from "./swipes/SwipeFeed";
+import Actions from "./profile/content/Actions";
 
 export const tabs: Record<Screen, Tab[]> = {
   home: [
@@ -39,9 +39,9 @@ export const tabs: Record<Screen, Tab[]> = {
       content: <Media />,
     },
     {
-      id: "activity",
-      label: "Activity",
-      content: <Activity />,
+      id: "actions",
+      label: "Actions",
+      content: <Actions />,
     },
   ],
   alerts: [

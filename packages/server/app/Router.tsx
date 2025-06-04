@@ -70,7 +70,6 @@ function OnboardingProtection({ children }: { children: React.ReactNode }) {
     beaver.wallet.hasIdentity,
     beaver.user,
     beaver.wallet.isAuthenticated,
-    location.pathname,
   ]);
 
   if (isPending) {

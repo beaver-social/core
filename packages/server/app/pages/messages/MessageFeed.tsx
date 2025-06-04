@@ -8,7 +8,7 @@ export default function MessagesFeed() {
       <div className="relative p-4 border-b">
         <Icon
           name="Search"
-          className="absolute left-7 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+          className="absolute size-5 left-7 top-1/2 transform -translate-y-1/2 text-muted-foreground"
         />
         <input
           type="text"
@@ -21,7 +21,7 @@ export default function MessagesFeed() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
-        className="flex flex-col gap-2 items-center text-grey-500 justify-center p-10 rounded-sm"
+        className="flex flex-col gap-2 items-center text-grey-500 justify-center p-10"
       >
         <p className="text-sm">Nothing to show..</p>
       </motion.div>

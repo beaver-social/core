@@ -17,6 +17,7 @@ export function useBeaver() {
   const ping = usePing();
   const application = useApplication();
   const media = useMedia();
+  const actions = useActions();
 
   return {
     register: client.user.register.bind(client.user),
@@ -33,6 +34,7 @@ export function useBeaver() {
     ping,
     application,
     media,
+    actions,
   };
 }
 
@@ -576,6 +578,37 @@ export function useSocial() {
         queryKey: ["getRecommendedUsers", options],
         queryFn: async () => {
           return await client.social.getRecommendedUsers(options);
+        },
+      }),
+  };
+}
+
+export function useActions() {
+  const { client } = useBeaverContext();
+
+  return {
+    getUserActions: (options: { userId: number; perPage?: number }) =>
+      useInfiniteQuery({
+        queryKey: ["getUserActions", options],
+        queryFn: async ({ pageParam = 1 }) => {
+          return await client.actions.fetchActions({
+            perPage: options.perPage || 10,
+            page: pageParam,
+            userId: options.userId,
+          });
+        },
+        initialPageParam: 1,
+        getNextPageParam: (lastPage, pages) => {
+          return lastPage.hasMore ? pages.length + 1 : undefined;
+        },
+      }),
+    getActionById: (
+      options: Parameters<typeof client.actions.fetchActionById>[0]
+    ) =>
+      useQuery({
+        queryKey: ["getActionById", options],
+        queryFn: async () => {
+          return await client.actions.fetchActionById(options);
         },
       }),
   };
