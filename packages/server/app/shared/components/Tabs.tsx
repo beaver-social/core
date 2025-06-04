@@ -1,50 +1,124 @@
 import { cn } from "@/shared/lib/utils";
-import { useGlobalUI } from "../hooks/useGlobalUI";
-import { Tab } from "../types/globalUI";
-import { useEffect } from "react";
+import { useScreen } from "../hooks/useScreen";
+import { useMemo } from "react";
 
 interface TabsProps {
   className?: string;
   tabClassName?: string;
 }
 
-function Tabs({ className, tabClassName }: TabsProps) {
-  const { getTabs, activeTab, setActiveTab } = useGlobalUI();
-  const tabs = getTabs();
+interface TabManager {
+  tabs: Array<{ id: string; label: string; content: React.ReactNode }>;
+  activeTab: string;
+  setActiveTab: (tabId: string) => void;
+  activeTabContent: React.ReactNode;
+  hasValidTabs: boolean;
+}
 
+function useTabManager(): TabManager {
+  const { getTabsForScreen, activeTab, setActiveTab } = useScreen();
+
+  const tabs = useMemo(() => getTabsForScreen(), [getTabsForScreen]);
+
+  const hasValidTabs = tabs && tabs.length > 0;
+
+  const currentActiveTab = useMemo(() => {
+    if (!hasValidTabs) return null;
+
+    // Find the active tab, fallback to first tab if active tab doesn't exist
+    const foundTab = tabs.find(tab => tab.id === activeTab);
+    return foundTab || tabs[0];
+  }, [tabs, activeTab, hasValidTabs]);
+
+  const activeTabContent = currentActiveTab?.content || null;
+
+  const handleSetActiveTab = (tabId: string) => {
+    if (hasValidTabs && tabs.some(tab => tab.id === tabId)) {
+      setActiveTab(tabId);
+    }
+  };
+
+  return {
+    tabs,
+    activeTab: currentActiveTab?.id || "default",
+    setActiveTab: handleSetActiveTab,
+    activeTabContent,
+    hasValidTabs
+  };
+}
+
+function TabHeader({
+  tabs,
+  activeTabId,
+  onTabChange,
+  tabClassName
+}: {
+  tabs: TabManager['tabs'];
+  activeTabId: string;
+  onTabChange: (tabId: string) => void;
+  tabClassName?: string;
+}) {
   return (
-    <div className={cn("w-full", className)}>
-      {/* Tabs Header */}
-      <div className="sticky glass top-0 z-10 bg-background/50">
-        <div className="flex">
-          {tabs &&
-            tabs.length > 0 &&
-            tabs.map((tab) => (
-              <button
-                key={tab.id}
-                className={cn(
-                  "flex-1 py-4 text-center font-semibold",
-                  activeTab === tab.id
-                    ? "text-foreground border-b border-foreground"
-                    : "text-foreground/50 hover:text-foreground",
-                  tabClassName,
-                )}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                {tab.label}
-              </button>
-            ))}
+    <div className="sticky glass top-0 z-10 bg-background/50">
+      <div className="flex">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            className={cn(
+              "flex-1 py-4 text-center font-semibold transition-colors",
+              activeTabId === tab.id
+                ? "text-foreground border-b border-foreground"
+                : "text-foreground/50 hover:text-foreground",
+              tabClassName,
+            )}
+            onClick={() => onTabChange(tab.id)}
+            aria-selected={activeTabId === tab.id}
+            role="tab"
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TabContent({ content }: { content: React.ReactNode }) {
+  return (
+    <div role="tabpanel">
+      {content}
+    </div>
+  );
+}
+
+function Tabs({ className, tabClassName }: TabsProps) {
+  const {
+    tabs,
+    activeTab,
+    setActiveTab,
+    activeTabContent,
+    hasValidTabs
+  } = useTabManager();
+
+  if (!hasValidTabs) {
+    return (
+      <div className={cn("w-full", className)}>
+        <div className="text-center py-8 text-foreground/50">
+          No tabs available
         </div>
       </div>
+    );
+  }
 
-      {/* Tab Content */}
-      <div>
-        {tabs &&
-          tabs.length > 0 &&
-          tabs.find((tab) => tab.id === activeTab)?.content
-          ? tabs.find((tab) => tab.id === activeTab)?.content
-          : tabs.find((tab) => tab.id === tabs[0].id)?.content}
-      </div>
+  return (
+    <div className={cn("w-full", className)} role="tablist">
+      <TabHeader
+        tabs={tabs}
+        activeTabId={activeTab}
+        onTabChange={setActiveTab}
+        tabClassName={tabClassName}
+      />
+      <TabContent content={activeTabContent} />
     </div>
   );
 }

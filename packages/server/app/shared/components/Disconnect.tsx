@@ -3,13 +3,13 @@ import { AlertDialogComponent } from "./AlertDialog";
 import { useBeaver } from "@beaver/react";
 import Icon from "./Icon";
 import { Button } from "./ui/button";
-import { useGlobalUIStore } from "../stores/zustand";
+import { useScreenStore } from "../stores/zustand";
 
 type Props = {};
 
-export default function Disconnect({}: Props) {
+export default function Disconnect({ }: Props) {
   const beaver = useBeaver();
-  const { setOnboardingData, setOnboardingProgress } = useGlobalUIStore();
+  const { setOnboardingData, setOnboardingProgress } = useScreenStore();
 
   return (
     <AlertDialogComponent

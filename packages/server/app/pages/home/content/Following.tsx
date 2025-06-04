@@ -13,7 +13,7 @@ export default function Following({ }: Props) {
     perPage: 10,
   });
 
-  if (isPostsLoading || isPostsRefetching) {
+  if (beaver.user && (isPostsLoading || isPostsRefetching)) {
     return (
       <div className="flex items-center justify-center m-10">
         <Spinner />
@@ -39,7 +39,7 @@ export default function Following({ }: Props) {
           </motion.div>
         )
       ) : (
-        <div className="flex flex-col gap-2 border items-center text-grey-500 justify-center p-10 rounded-sm">
+        <div className="flex flex-col mt-6 gap-2 border items-center text-grey-500 justify-center p-10 rounded-sm">
           <p className="text-sm">Connect identity to continue..</p>
           <ConnectIdentity />
         </div>

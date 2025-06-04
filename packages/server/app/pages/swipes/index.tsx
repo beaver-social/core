@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import Layout from "../layout";
 import SecondaryPanel from "../explore/SecondaryPanel";
-import { useGlobalUI } from "@/shared/hooks/useGlobalUI";
+import { useScreen } from "@/shared/hooks/useScreen";
 import SwipeFeed from "./SwipeFeed";
 import ShortsErrorBoundary from "./SwipeErrorBoundary";
 
 export default function Swipes() {
-  const { setScreen } = useGlobalUI();
+  const { setScreen } = useScreen();
   useEffect(() => {
     setScreen("swipes");
   }, []);

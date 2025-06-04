@@ -2,11 +2,11 @@ import Layout from "@/pages/layout";
 import SecondaryPanel from "../explore/SecondaryPanel";
 import PageTitle from "@/shared/components/PageTitle";
 import Tabs from "@/shared/components/Tabs";
-import { useGlobalUI } from "@/shared/hooks/useGlobalUI";
+import { useScreen } from "@/shared/hooks/useScreen";
 import { useEffect } from "react";
 
 export default function Notifications() {
-  const { setScreen } = useGlobalUI();
+  const { setScreen } = useScreen();
   useEffect(() => {
     setScreen("alerts");
   }, []);

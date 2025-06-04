@@ -4,7 +4,7 @@ import Layout from "../layout";
 import SecondaryPanel from "../explore/SecondaryPanel";
 import ProfileHeader from "./ProfileHeader";
 import Tabs from "@/shared/components/Tabs";
-import { useGlobalUI } from "@/shared/hooks/useGlobalUI";
+import { useScreen } from "@/shared/hooks/useScreen";
 import BasicInfo from "./BasicInfo";
 import { useBeaver } from "@beaver/react";
 import Icon from "@/shared/components/Icon";
@@ -21,7 +21,7 @@ export default function Profile() {
     value: username || "ishtails",
   });
 
-  const { setScreen } = useGlobalUI();
+  const { setScreen } = useScreen();
   useEffect(() => {
     setScreen("profile");
   }, []);

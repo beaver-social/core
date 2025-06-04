@@ -1,11 +1,11 @@
 import Layout from "@/pages/layout";
 import SecondaryPanel from "../explore/SecondaryPanel";
 import Tabs from "@/shared/components/Tabs";
-import { useGlobalUI } from "@/shared/hooks/useGlobalUI";
+import { useScreen } from "@/shared/hooks/useScreen";
 import { useEffect } from "react";
 
 export default function Home() {
-  const { setScreen } = useGlobalUI();
+  const { setScreen } = useScreen();
   useEffect(() => {
     setScreen("home");
   }, []);
@@ -13,10 +13,8 @@ export default function Home() {
   return (
     <Layout
       main={
-        <div>
-          <div className="flex-1 mx-auto w-full">
-            <Tabs />
-          </div>
+        <div className="flex-1 mx-auto w-full">
+          <Tabs />
         </div>
       }
       secondary={<SecondaryPanel />}

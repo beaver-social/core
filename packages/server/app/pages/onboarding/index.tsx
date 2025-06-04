@@ -6,8 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/shared/components/ui/card";
 import ChooseUsername from "./ChooseUsername";
 import UpdateProfile from "./UpdateProfile";
-import { useGlobalUIStore } from "@/shared/stores/zustand";
-import { useGlobalUI } from "@/shared/hooks/useGlobalUI";
+import { useScreenStore } from "@/shared/stores/zustand";
+import { useScreen } from "@/shared/hooks/useScreen";
 import ThemeSwitch from "@/shared/components/ThemeSwitch";
 import { useNavigate } from "react-router";
 import CompleteOnboarding from "./CompleteOnboarding";
@@ -18,8 +18,8 @@ import { Image } from "@/shared/components/Image";
 const TOTAL_STEPS = 5;
 
 export default function Onboarding() {
-  const { onboardingProgress, setOnboardingProgress } = useGlobalUIStore();
-  const { setScreen } = useGlobalUI();
+  const { onboardingProgress, setOnboardingProgress } = useScreenStore();
+  const { setScreen } = useScreen();
   const beaver = useBeaver();
   const [step, setStep] = useState(
     beaver.wallet.hasIdentity

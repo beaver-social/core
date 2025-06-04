@@ -1,16 +1,16 @@
 import { useEffect } from "react";
 import Layout from "../layout";
-import { useGlobalUI } from "@/shared/hooks/useGlobalUI";
+import { useScreen } from "@/shared/hooks/useScreen";
 import SettingsTree from "./SettingsTree";
 import SettingsSearch from "./SettingsSearch";
 import SettingsContent from "./SettingsIndex";
 import { Drawer } from "vaul";
 import Icon from "@/shared/components/Icon";
-import { useGlobalUIStore } from "@/shared/stores/zustand";
+import { useScreenStore } from "@/shared/stores/zustand";
 
 export default function Settings() {
-  const { setScreen } = useGlobalUI();
-  const { selectedSetting, setSelectedSetting } = useGlobalUIStore();
+  const { setScreen } = useScreen();
+  const { selectedSetting, setSelectedSetting } = useScreenStore();
 
   useEffect(() => {
     setScreen("settings");

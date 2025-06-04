@@ -4,10 +4,10 @@ import AuthDemo from "./components/AuthDemo";
 import DemoLayout from "./components/DemoLayout";
 import WalletDemo from "./components/WalletDemo";
 import { Image } from "@/shared/components/Image";
-import { useGlobalUIStore } from "@/shared/stores/zustand";
+import { useScreenStore } from "@/shared/stores/zustand";
 
 export default function Demo() {
-  const { demoTab, setDemoTab } = useGlobalUIStore();
+  const { demoTab, setDemoTab } = useScreenStore();
 
   return (
     <div className="overflow-x-clip min-h-screen">

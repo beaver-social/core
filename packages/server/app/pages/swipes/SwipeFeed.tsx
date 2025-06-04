@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import ShortVideo from "./SwipeVideo";
 import { sampleSwipeVideos, SwipeVideoData } from "./mockData";
 import { useInView } from "../../shared/hooks/useInView";
-import { useGlobalUIStore } from "@/shared/stores/zustand";
+import { useScreenStore } from "@/shared/stores/zustand";
 import Icon from "@/shared/components/Icon";
 
 export default function ShortsFeed() {
@@ -15,7 +15,7 @@ export default function ShortsFeed() {
   // Track which videos have been preloaded
   const preloadedVideos = useRef<Set<string>>(new Set());
   // Get global mute state from Zustand
-  const { isMuted, toggleMute } = useGlobalUIStore();
+  const { isMuted, toggleMute } = useScreenStore();
 
   // Bottom loader element to detect when to load more
   const [loaderRef, inView] = useInView<HTMLDivElement>({ threshold: 0.5 });

@@ -4,7 +4,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { Card, CardContent } from "@/shared/components/ui/card";
-import { useGlobalUIStore } from "@/shared/stores/zustand";
+import { useScreenStore } from "@/shared/stores/zustand";
 import { useRegister, useLogin } from "@beaver/react";
 import { toast } from "sonner";
 
@@ -17,7 +17,7 @@ type Props = {
 export default function UpdateProfile({ onComplete, handleBack }: Props) {
   const [name, setName] = useState("");
   const [about, setAbout] = useState("");
-  const { onboardingData, setOnboardingData } = useGlobalUIStore();
+  const { onboardingData, setOnboardingData } = useScreenStore();
   const { mutateAsync: register, isPending } = useRegister();
   const { mutate: login, isPending: isLoginPending, isSuccess: isLoginSuccess } = useLogin();
 

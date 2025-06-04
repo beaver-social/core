@@ -7,7 +7,7 @@ interface ZkAuthStore {
   setZkEphemeralKeyPair: (zkEphemeralKeyPair: string | null) => void;
   partialZkLoginSignature: partialZkLoginSignature | null;
   setPartialZkLoginSignature: (
-    partialZkLoginSignature: partialZkLoginSignature | null,
+    partialZkLoginSignature: partialZkLoginSignature | null
   ) => void;
   zkLoginData: StoredZkLoginData | null;
   setZkLoginData: (zkLoginData: StoredZkLoginData | null) => void;
@@ -25,8 +25,8 @@ export const useZkAuthStore = create<ZkAuthStore>()(
       zkLoginData: null,
       setZkLoginData: (zkLoginData) => set({ zkLoginData }),
     }),
-    { name: "zk-auth-store" },
-  ),
+    { name: "zk-auth-store" }
+  )
 );
 
 interface OnboardingProgress {
@@ -46,8 +46,8 @@ interface OnboardingData {
 interface GlobalUIStore {
   screen: Screen;
   setScreen: (screen: Screen) => void;
-  activeTab: string | null;
-  setActiveTab: (tab: string | null) => void;
+  activeTabsByScreen: Record<Screen, string>;
+  setActiveTab: (tab: string) => void;
   isMuted: boolean;
   toggleMute: () => void;
   selectedSetting: string;
@@ -60,13 +60,28 @@ interface GlobalUIStore {
   setDemoTab: (tab: string) => void;
 }
 
-export const useGlobalUIStore = create<GlobalUIStore>()(
+export const useScreenStore = create<GlobalUIStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       screen: "home",
       setScreen: (screen) => set({ screen }),
-      activeTab: "for-you",
-      setActiveTab: (tab) => set({ activeTab: tab }),
+      activeTabsByScreen: {
+        home: "default",
+        profile: "default",
+        alerts: "default",
+        messages: "default",
+        settings: "default",
+        swipes: "default",
+        onboarding: "default",
+        create: "default",
+      },
+      setActiveTab: (tab) =>
+        set((state) => ({
+          activeTabsByScreen: {
+            ...state.activeTabsByScreen,
+            [state.screen]: tab,
+          },
+        })),
       isMuted: true,
       toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
       selectedSetting: "account.username",
@@ -79,6 +94,6 @@ export const useGlobalUIStore = create<GlobalUIStore>()(
       demoTab: "wallet",
       setDemoTab: (tab) => set({ demoTab: tab }),
     }),
-    { name: "global-ui-store" },
-  ),
+    { name: "global-ui-store" }
+  )
 );

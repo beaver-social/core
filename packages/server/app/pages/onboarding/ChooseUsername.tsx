@@ -4,7 +4,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Card, CardContent } from "@/shared/components/ui/card";
 // import { useAuth } from "@beaver/react";
-import { useGlobalUIStore } from "@/shared/stores/zustand";
+import { useScreenStore } from "@/shared/stores/zustand";
 type Props = {
   onComplete: () => void;
   handleBack: () => void;
@@ -14,7 +14,7 @@ export default function ChooseUsername({ onComplete, handleBack }: Props) {
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   const [isValidFormat, setIsValidFormat] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const { onboardingData, setOnboardingData } = useGlobalUIStore();
+  const { onboardingData, setOnboardingData } = useScreenStore();
 
   // Validate username format
   async function handleSaveUsername(e: React.FormEvent<HTMLFormElement>) {

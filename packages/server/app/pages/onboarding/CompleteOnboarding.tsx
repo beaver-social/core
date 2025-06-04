@@ -2,7 +2,7 @@ import { Button } from "@/shared/components/ui/button";
 import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import { useBeaver, useLogin } from "@beaver/react";
-import { useGlobalUIStore } from "@/shared/stores/zustand";
+import { useScreenStore } from "@/shared/stores/zustand";
 
 interface CompleteOnboardingProps {
   onComplete: () => void;
@@ -11,7 +11,7 @@ interface CompleteOnboardingProps {
 export default function CompleteOnboarding({
   onComplete,
 }: CompleteOnboardingProps) {
-  const { setOnboardingProgress, setOnboardingData } = useGlobalUIStore();
+  const { setOnboardingProgress, setOnboardingData } = useScreenStore();
   const { mutate: login, isPending, isSuccess, isError, error } = useLogin();
   const navigate = useNavigate();
   const beaver = useBeaver();

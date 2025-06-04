@@ -1,11 +1,11 @@
 import Layout from "@/pages/layout";
 import SecondaryPanel from "../explore/SecondaryPanel";
-import { useGlobalUI } from "@/shared/hooks/useGlobalUI";
+import { useScreen } from "@/shared/hooks/useScreen";
 import { useEffect } from "react";
 import CreatePage from "./CreatePage";
 
 export default function Home() {
-  const { setScreen } = useGlobalUI();
+  const { setScreen } = useScreen();
   useEffect(() => {
     setScreen("create");
   }, []);

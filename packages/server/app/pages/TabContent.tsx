@@ -9,7 +9,7 @@ import AllAlerts from "./alerts/content/AllAlerts";
 import ShortsFeed from "./swipes/SwipeFeed";
 import Actions from "./profile/content/Actions";
 
-export const tabs: Record<Screen, Tab[]> = {
+export const tabContent: Record<Screen, Tab[]> = {
   home: [
     {
       id: "default",
