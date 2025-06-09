@@ -103,7 +103,7 @@ export default function FollowDialog({ userId, count, title }: FollowDialogProps
                     className="flex items-center justify-between py-3 border-b border-grey-800/50 last:border-b-0"
                   >
                     <Link
-                      to={`/profile/${user.username}`}
+                      to={`/app/profile/${user.username}`}
                       className="flex items-center gap-3 flex-1 min-w-0 hover:opacity-80 transition-opacity"
                       onClick={() => setIsOpen(false)}
                     >
